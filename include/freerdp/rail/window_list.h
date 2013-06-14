@@ -17,13 +17,14 @@
  * limitations under the License.
  */
 
-#ifndef __RAIL_WINDOW_LIST_H
-#define __RAIL_WINDOW_LIST_H
+#ifndef FREERDP_RAIL_WINDOW_LIST_H
+#define FREERDP_RAIL_WINDOW_LIST_H
 
 #include <freerdp/api.h>
 #include <freerdp/types.h>
 #include <freerdp/update.h>
-#include <freerdp/utils/stream.h>
+
+#include <winpr/stream.h>
 
 typedef struct rdp_window_list rdpWindowList;
 
@@ -53,4 +54,4 @@ FREERDP_API void window_list_clear(rdpWindowList* list);
 FREERDP_API rdpWindowList* window_list_new(rdpRail* rail);
 FREERDP_API void window_list_free(rdpWindowList* list);
 
-#endif /* __RAIL_WINDOW_LIST_H */
+#endif /* FREERDP_RAIL_WINDOW_LIST_H */

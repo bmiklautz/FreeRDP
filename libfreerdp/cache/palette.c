@@ -23,15 +23,19 @@
 
 #include <stdio.h>
 
-#include <freerdp/utils/stream.h>
-#include <freerdp/utils/memory.h>
+#include <winpr/crt.h>
 
 #include <freerdp/cache/palette.h>
 
 void update_gdi_cache_color_table(rdpContext* context, CACHE_COLOR_TABLE_ORDER* cache_color_table)
 {
+	UINT32* colorTable;
 	rdpCache* cache = context->cache;
-	palette_cache_put(cache->palette, cache_color_table->cacheIndex, (void*) cache_color_table->colorTable);
+
+	colorTable = (UINT32*) malloc(sizeof(UINT32) * 256);
+	CopyMemory(colorTable, cache_color_table->colorTable, sizeof(UINT32) * 256);
+
+	palette_cache_put(cache->palette, cache_color_table->cacheIndex, (void*) colorTable);
 }
 
 void* palette_cache_get(rdpPaletteCache* palette_cache, UINT32 index)
@@ -40,7 +44,7 @@ void* palette_cache_get(rdpPaletteCache* palette_cache, UINT32 index)
 
 	if (index >= palette_cache->maxEntries)
 	{
-		printf("invalid color table index: 0x%04X\n", index);
+		fprintf(stderr, "invalid color table index: 0x%04X\n", index);
 		return NULL;
 	}
 
@@ -48,7 +52,7 @@ void* palette_cache_get(rdpPaletteCache* palette_cache, UINT32 index)
 
 	if (entry == NULL)
 	{
-		printf("invalid color table at index: 0x%04X\n", index);
+		fprintf(stderr, "invalid color table at index: 0x%04X\n", index);
 		return NULL;
 	}
 
@@ -59,7 +63,7 @@ void palette_cache_put(rdpPaletteCache* palette_cache, UINT32 index, void* entry
 {
 	if (index >= palette_cache->maxEntries)
 	{
-		printf("invalid color table index: 0x%04X\n", index);
+		fprintf(stderr, "invalid color table index: 0x%04X\n", index);
 		return;
 	}
 
@@ -75,13 +79,15 @@ rdpPaletteCache* palette_cache_new(rdpSettings* settings)
 {
 	rdpPaletteCache* palette_cache;
 
-	palette_cache = (rdpPaletteCache*) xzalloc(sizeof(rdpPaletteCache));
+	palette_cache = (rdpPaletteCache*) malloc(sizeof(rdpPaletteCache));
+	ZeroMemory(palette_cache, sizeof(rdpPaletteCache));
 
 	if (palette_cache != NULL)
 	{
 		palette_cache->settings = settings;
 		palette_cache->maxEntries = 6;
-		palette_cache->entries = (PALETTE_TABLE_ENTRY*) xzalloc(sizeof(PALETTE_TABLE_ENTRY) * palette_cache->maxEntries);
+		palette_cache->entries = (PALETTE_TABLE_ENTRY*) malloc(sizeof(PALETTE_TABLE_ENTRY) * palette_cache->maxEntries);
+		ZeroMemory(palette_cache->entries, sizeof(PALETTE_TABLE_ENTRY) * palette_cache->maxEntries);
 	}
 
 	return palette_cache;
@@ -95,4 +101,3 @@ void palette_cache_free(rdpPaletteCache* palette_cache)
 		free(palette_cache);
 	}
 }
-

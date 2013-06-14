@@ -21,7 +21,8 @@
 #define __FASTPATH_H
 
 #include "rdp.h"
-#include <freerdp/utils/stream.h>
+
+#include <winpr/stream.h>
 
 typedef struct rdp_fastpath rdpFastPath;
 
@@ -99,20 +100,24 @@ struct rdp_fastpath
 	rdpRdp* rdp;
 	BYTE encryptionFlags;
 	BYTE numberEvents;
-	STREAM* updateData;
+	wStream* updateData;
+	int fragmentation;
 };
 
-UINT16 fastpath_header_length(STREAM* s);
-UINT16 fastpath_read_header(rdpFastPath* fastpath, STREAM* s);
-UINT16 fastpath_read_header_rdp(rdpFastPath* fastpath, STREAM* s);
-BOOL fastpath_recv_updates(rdpFastPath* fastpath, STREAM* s);
-BOOL fastpath_recv_inputs(rdpFastPath* fastpath, STREAM* s);
+UINT16 fastpath_header_length(wStream* s);
+UINT16 fastpath_read_header(rdpFastPath* fastpath, wStream* s);
+BOOL fastpath_read_header_rdp(rdpFastPath* fastpath, wStream* s, UINT16 *length);
+int fastpath_recv_updates(rdpFastPath* fastpath, wStream* s);
+int fastpath_recv_inputs(rdpFastPath* fastpath, wStream* s);
 
-STREAM* fastpath_input_pdu_init(rdpFastPath* fastpath, BYTE eventFlags, BYTE eventCode);
-BOOL fastpath_send_input_pdu(rdpFastPath* fastpath, STREAM* s);
+wStream* fastpath_input_pdu_init_header(rdpFastPath* fastpath);
+wStream* fastpath_input_pdu_init(rdpFastPath* fastpath, BYTE eventFlags, BYTE eventCode);
+BOOL fastpath_send_multiple_input_pdu(rdpFastPath* fastpath, wStream* s, int iEventCount);
+BOOL fastpath_send_input_pdu(rdpFastPath* fastpath, wStream* s);
 
-STREAM* fastpath_update_pdu_init(rdpFastPath* fastpath);
-BOOL fastpath_send_update_pdu(rdpFastPath* fastpath, BYTE updateCode, STREAM* s);
+wStream* fastpath_update_pdu_init(rdpFastPath* fastpath);
+wStream* fastpath_update_pdu_init_new(rdpFastPath* fastpath);
+BOOL fastpath_send_update_pdu(rdpFastPath* fastpath, BYTE updateCode, wStream* s);
 
 BOOL fastpath_send_surfcmd_frame_marker(rdpFastPath* fastpath, UINT16 frameAction, UINT32 frameId);
 

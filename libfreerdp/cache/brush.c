@@ -23,10 +23,11 @@
 
 #include <stdio.h>
 
+#include <winpr/crt.h>
+
 #include <freerdp/update.h>
 #include <freerdp/freerdp.h>
-#include <freerdp/utils/stream.h>
-#include <freerdp/utils/memory.h>
+#include <winpr/stream.h>
 
 #include <freerdp/cache/brush.h>
 
@@ -74,8 +75,16 @@ void update_gdi_polygon_cb(rdpContext* context, POLYGON_CB_ORDER* polygon_cb)
 
 void update_gdi_cache_brush(rdpContext* context, CACHE_BRUSH_ORDER* cache_brush)
 {
+	int length;
+	void* data = NULL;
 	rdpCache* cache = context->cache;
-	brush_cache_put(cache->brush, cache_brush->index, cache_brush->data, cache_brush->bpp);
+
+	length = cache_brush->bpp * 64 / 8;
+
+	data = malloc(length);
+	CopyMemory(data, cache_brush->data, length);
+
+	brush_cache_put(cache->brush, cache_brush->index, data, cache_brush->bpp);
 }
 
 void* brush_cache_get(rdpBrushCache* brush, UINT32 index, UINT32* bpp)
@@ -86,7 +95,7 @@ void* brush_cache_get(rdpBrushCache* brush, UINT32 index, UINT32* bpp)
 	{
 		if (index >= brush->maxMonoEntries)
 		{
-			printf("invalid brush (%d bpp) index: 0x%04X\n", *bpp, index);
+			fprintf(stderr, "invalid brush (%d bpp) index: 0x%04X\n", *bpp, index);
 			return NULL;
 		}
 
@@ -97,7 +106,7 @@ void* brush_cache_get(rdpBrushCache* brush, UINT32 index, UINT32* bpp)
 	{
 		if (index >= brush->maxEntries)
 		{
-			printf("invalid brush (%d bpp) index: 0x%04X\n", *bpp, index);
+			fprintf(stderr, "invalid brush (%d bpp) index: 0x%04X\n", *bpp, index);
 			return NULL;
 		}
 
@@ -107,7 +116,7 @@ void* brush_cache_get(rdpBrushCache* brush, UINT32 index, UINT32* bpp)
 
 	if (entry == NULL)
 	{
-		printf("invalid brush (%d bpp) at index: 0x%04X\n", *bpp, index);
+		fprintf(stderr, "invalid brush (%d bpp) at index: 0x%04X\n", *bpp, index);
 		return NULL;
 	}
 
@@ -122,7 +131,7 @@ void brush_cache_put(rdpBrushCache* brush, UINT32 index, void* entry, UINT32 bpp
 	{
 		if (index >= brush->maxMonoEntries)
 		{
-			printf("invalid brush (%d bpp) index: 0x%04X\n", bpp, index);
+			fprintf(stderr, "invalid brush (%d bpp) index: 0x%04X\n", bpp, index);
 			return;
 		}
 
@@ -138,7 +147,7 @@ void brush_cache_put(rdpBrushCache* brush, UINT32 index, void* entry, UINT32 bpp
 	{
 		if (index >= brush->maxEntries)
 		{
-			printf("invalid brush (%d bpp) index: 0x%04X\n", bpp, index);
+			fprintf(stderr, "invalid brush (%d bpp) index: 0x%04X\n", bpp, index);
 			return;
 		}
 
@@ -170,7 +179,8 @@ rdpBrushCache* brush_cache_new(rdpSettings* settings)
 {
 	rdpBrushCache* brush;
 
-	brush = (rdpBrushCache*) xzalloc(sizeof(rdpBrushCache));
+	brush = (rdpBrushCache*) malloc(sizeof(rdpBrushCache));
+	ZeroMemory(brush, sizeof(rdpBrushCache));
 
 	if (brush != NULL)
 	{
@@ -179,8 +189,11 @@ rdpBrushCache* brush_cache_new(rdpSettings* settings)
 		brush->maxEntries = 64;
 		brush->maxMonoEntries = 64;
 
-		brush->entries = (BRUSH_ENTRY*) xzalloc(sizeof(BRUSH_ENTRY) * brush->maxEntries);
-		brush->monoEntries = (BRUSH_ENTRY*) xzalloc(sizeof(BRUSH_ENTRY) * brush->maxMonoEntries);
+		brush->entries = (BRUSH_ENTRY*) malloc(sizeof(BRUSH_ENTRY) * brush->maxEntries);
+		ZeroMemory(brush->entries, sizeof(BRUSH_ENTRY) * brush->maxEntries);
+
+		brush->monoEntries = (BRUSH_ENTRY*) malloc(sizeof(BRUSH_ENTRY) * brush->maxMonoEntries);
+		ZeroMemory(brush->monoEntries, sizeof(BRUSH_ENTRY) * brush->maxMonoEntries);
 	}
 
 	return brush;

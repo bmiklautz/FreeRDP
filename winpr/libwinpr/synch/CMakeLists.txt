@@ -18,8 +18,7 @@
 set(MODULE_NAME "winpr-synch")
 set(MODULE_PREFIX "WINPR_SYNCH")
 
-set(CMAKE_THREAD_PREFER_PTHREAD)
-find_required_package(Threads)
+include_directories(../thread)
 
 set(${MODULE_PREFIX}_SRCS
 	address.c
@@ -36,10 +35,6 @@ set(${MODULE_PREFIX}_SRCS
 	synch.h
 	timer.c
 	wait.c)
-
-if(MSVC AND (NOT MONOLITHIC_BUILD))
-	set(${MODULE_PREFIX}_SRCS ${${MODULE_PREFIX}_SRCS} module.def)
-endif()
 
 add_complex_library(MODULE ${MODULE_NAME} TYPE "OBJECT"
 	MONOLITHIC ${MONOLITHIC_BUILD}
@@ -68,3 +63,4 @@ else()
 endif()
 
 set_property(TARGET ${MODULE_NAME} PROPERTY FOLDER "WinPR")
+

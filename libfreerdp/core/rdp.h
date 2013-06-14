@@ -44,43 +44,44 @@
 #include <freerdp/freerdp.h>
 #include <freerdp/settings.h>
 #include <freerdp/utils/debug.h>
-#include <freerdp/utils/stream.h>
 #include <freerdp/codec/mppc_dec.h>
 #include <freerdp/codec/mppc_enc.h>
 
+#include <winpr/stream.h>
+
 /* Security Header Flags */
-#define SEC_EXCHANGE_PKT		0x0001
-#define SEC_ENCRYPT			0x0008
-#define SEC_RESET_SEQNO			0x0010
-#define	SEC_IGNORE_SEQNO		0x0020
-#define	SEC_INFO_PKT			0x0040
-#define	SEC_LICENSE_PKT			0x0080
-#define SEC_LICENSE_ENCRYPT_CS		0x0200
-#define SEC_LICENSE_ENCRYPT_SC		0x0200
-#define SEC_REDIRECTION_PKT		0x0400
-#define SEC_SECURE_CHECKSUM		0x0800
-#define SEC_FLAGSHI_VALID		0x8000
+#define SEC_EXCHANGE_PKT					0x0001
+#define SEC_ENCRYPT						0x0008
+#define SEC_RESET_SEQNO						0x0010
+#define SEC_IGNORE_SEQNO					0x0020
+#define	SEC_INFO_PKT						0x0040
+#define	SEC_LICENSE_PKT						0x0080
+#define SEC_LICENSE_ENCRYPT_CS					0x0200
+#define SEC_LICENSE_ENCRYPT_SC					0x0200
+#define SEC_REDIRECTION_PKT					0x0400
+#define SEC_SECURE_CHECKSUM					0x0800
+#define SEC_FLAGSHI_VALID					0x8000
 
-#define SEC_PKT_CS_MASK			(SEC_EXCHANGE_PKT | SEC_INFO_PKT)
-#define SEC_PKT_SC_MASK			(SEC_LICENSE_PKT | SEC_REDIRECTION_PKT)
-#define SEC_PKT_MASK			(SEC_PKT_CS_MASK | SEC_PKT_SC_MASK)
+#define SEC_PKT_CS_MASK						(SEC_EXCHANGE_PKT | SEC_INFO_PKT)
+#define SEC_PKT_SC_MASK						(SEC_LICENSE_PKT | SEC_REDIRECTION_PKT)
+#define SEC_PKT_MASK						(SEC_PKT_CS_MASK | SEC_PKT_SC_MASK)
 
-#define RDP_SECURITY_HEADER_LENGTH	4
-#define RDP_SHARE_CONTROL_HEADER_LENGTH	6
-#define RDP_SHARE_DATA_HEADER_LENGTH	12
-#define RDP_PACKET_HEADER_MAX_LENGTH	(TPDU_DATA_LENGTH + MCS_SEND_DATA_HEADER_MAX_LENGTH)
+#define RDP_SECURITY_HEADER_LENGTH				4
+#define RDP_SHARE_CONTROL_HEADER_LENGTH				6
+#define RDP_SHARE_DATA_HEADER_LENGTH				12
+#define RDP_PACKET_HEADER_MAX_LENGTH				(TPDU_DATA_LENGTH + MCS_SEND_DATA_HEADER_MAX_LENGTH)
 
-#define PDU_TYPE_DEMAND_ACTIVE		0x1
-#define PDU_TYPE_CONFIRM_ACTIVE		0x3
-#define PDU_TYPE_DEACTIVATE_ALL		0x6
-#define PDU_TYPE_DATA			0x7
-#define PDU_TYPE_SERVER_REDIRECTION	0xA
+#define PDU_TYPE_DEMAND_ACTIVE					0x1
+#define PDU_TYPE_CONFIRM_ACTIVE					0x3
+#define PDU_TYPE_DEACTIVATE_ALL					0x6
+#define PDU_TYPE_DATA						0x7
+#define PDU_TYPE_SERVER_REDIRECTION				0xA
 
-#define FINALIZE_SC_SYNCHRONIZE_PDU		0x01
-#define FINALIZE_SC_CONTROL_COOPERATE_PDU	0x02
-#define FINALIZE_SC_CONTROL_GRANTED_PDU		0x04
-#define FINALIZE_SC_FONT_MAP_PDU		0x08
-#define FINALIZE_SC_COMPLETE			0x0F
+#define FINALIZE_SC_SYNCHRONIZE_PDU				0x01
+#define FINALIZE_SC_CONTROL_COOPERATE_PDU			0x02
+#define FINALIZE_SC_CONTROL_GRANTED_PDU				0x04
+#define FINALIZE_SC_FONT_MAP_PDU				0x08
+#define FINALIZE_SC_COMPLETE					0x0F
 
 /* Data PDU Types */
 #define DATA_PDU_TYPE_UPDATE					0x02
@@ -110,10 +111,10 @@
 #define DATA_PDU_TYPE_FRAME_ACKNOWLEDGE				0x38
 
 /* Stream Identifiers */
-#define STREAM_UNDEFINED		0x00
-#define STREAM_LOW			0x01
-#define STREAM_MED			0x02
-#define STREAM_HI			0x04
+#define STREAM_UNDEFINED					0x00
+#define STREAM_LOW						0x01
+#define STREAM_MED						0x02
+#define STREAM_HI						0x04
 
 struct rdp_rdp
 {
@@ -155,37 +156,38 @@ struct rdp_rdp
 	UINT32 errorInfo;
 	UINT32 finalize_sc_pdus;
 	BOOL disconnect;
+	BOOL resendFocus;
 };
 
-void rdp_read_security_header(STREAM* s, UINT16* flags);
-void rdp_write_security_header(STREAM* s, UINT16 flags);
+BOOL rdp_read_security_header(wStream* s, UINT16* flags);
+void rdp_write_security_header(wStream* s, UINT16 flags);
 
-BOOL rdp_read_share_control_header(STREAM* s, UINT16* length, UINT16* type, UINT16* channel_id);
-void rdp_write_share_control_header(STREAM* s, UINT16 length, UINT16 type, UINT16 channel_id);
+BOOL rdp_read_share_control_header(wStream* s, UINT16* length, UINT16* type, UINT16* channel_id);
+void rdp_write_share_control_header(wStream* s, UINT16 length, UINT16 type, UINT16 channel_id);
 
-BOOL rdp_read_share_data_header(STREAM* s, UINT16* length, BYTE* type, UINT32* share_id, 
+BOOL rdp_read_share_data_header(wStream* s, UINT16* length, BYTE* type, UINT32* share_id, 
 			BYTE *compressed_type, UINT16 *compressed_len);
 
-void rdp_write_share_data_header(STREAM* s, UINT16 length, BYTE type, UINT32 share_id);
+void rdp_write_share_data_header(wStream* s, UINT16 length, BYTE type, UINT32 share_id);
 
-STREAM* rdp_send_stream_init(rdpRdp* rdp);
+int rdp_init_stream(rdpRdp* rdp, wStream* s);
+wStream* rdp_send_stream_init(rdpRdp* rdp);
 
-BOOL rdp_read_header(rdpRdp* rdp, STREAM* s, UINT16* length, UINT16* channel_id);
-void rdp_write_header(rdpRdp* rdp, STREAM* s, UINT16 length, UINT16 channel_id);
+BOOL rdp_read_header(rdpRdp* rdp, wStream* s, UINT16* length, UINT16* channel_id);
+void rdp_write_header(rdpRdp* rdp, wStream* s, UINT16 length, UINT16 channel_id);
 
-STREAM* rdp_pdu_init(rdpRdp* rdp);
-BOOL rdp_send_pdu(rdpRdp* rdp, STREAM* s, UINT16 type, UINT16 channel_id);
+int rdp_init_stream_pdu(rdpRdp* rdp, wStream* s);
+BOOL rdp_send_pdu(rdpRdp* rdp, wStream* s, UINT16 type, UINT16 channel_id);
 
-STREAM* rdp_data_pdu_init(rdpRdp* rdp);
-BOOL rdp_send_data_pdu(rdpRdp* rdp, STREAM* s, BYTE type, UINT16 channel_id);
-BOOL rdp_recv_data_pdu(rdpRdp* rdp, STREAM* s);
+wStream* rdp_data_pdu_init(rdpRdp* rdp);
+BOOL rdp_send_data_pdu(rdpRdp* rdp, wStream* s, BYTE type, UINT16 channel_id);
+int rdp_recv_data_pdu(rdpRdp* rdp, wStream* s);
 
-BOOL rdp_send(rdpRdp* rdp, STREAM* s, UINT16 channel_id);
-void rdp_recv(rdpRdp* rdp);
+BOOL rdp_send(rdpRdp* rdp, wStream* s, UINT16 channel_id);
 
 int rdp_send_channel_data(rdpRdp* rdp, int channel_id, BYTE* data, int size);
 
-BOOL rdp_recv_out_of_sequence_pdu(rdpRdp* rdp, STREAM* s);
+BOOL rdp_recv_out_of_sequence_pdu(rdpRdp* rdp, wStream* s);
 
 void rdp_set_blocking_mode(rdpRdp* rdp, BOOL blocking);
 int rdp_check_fds(rdpRdp* rdp);
@@ -199,6 +201,6 @@ void rdp_free(rdpRdp* rdp);
 #define DEBUG_RDP(fmt, ...) DEBUG_NULL(fmt, ## __VA_ARGS__)
 #endif
 
-BOOL rdp_decrypt(rdpRdp* rdp, STREAM* s, int length, UINT16 securityFlags);
+BOOL rdp_decrypt(rdpRdp* rdp, wStream* s, int length, UINT16 securityFlags);
 
 #endif /* __RDP_H */

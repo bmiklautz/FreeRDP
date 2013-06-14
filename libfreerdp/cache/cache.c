@@ -21,8 +21,9 @@
 #include "config.h"
 #endif
 
-#include <freerdp/utils/stream.h>
-#include <freerdp/utils/memory.h>
+#include <winpr/crt.h>
+
+#include <winpr/stream.h>
 
 #include <freerdp/cache/cache.h>
 
@@ -30,7 +31,8 @@ rdpCache* cache_new(rdpSettings* settings)
 {
 	rdpCache* cache;
 
-	cache = (rdpCache*) xzalloc(sizeof(rdpCache));
+	cache = (rdpCache*) malloc(sizeof(rdpCache));
+	ZeroMemory(cache, sizeof(rdpCache));
 
 	if (cache != NULL)
 	{

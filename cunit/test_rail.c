@@ -28,8 +28,7 @@
 #include <freerdp/constants.h>
 #include <freerdp/channels/channels.h>
 #include <freerdp/utils/event.h>
-#include <freerdp/utils/hexdump.h>
-#include <freerdp/utils/memory.h>
+#include <winpr/print.h>
 #include <freerdp/utils/rail.h>
 #include <freerdp/rail.h>
 
@@ -380,13 +379,13 @@ static BYTE server_app_get_resp_app_id[] =
 
 
 #define EMULATE_SERVER_SEND_CHANNEL_DATA(inst, byte_array) \
-	emulate_server_send_channel_data(inst, byte_array, ARRAY_SIZE(byte_array))
+	emulate_server_send_channel_data(inst, byte_array, ARRAYSIZE(byte_array))
 
 #define STREAM_EQUAL_TO_DUMP(stream, dump) \
-	(stream_equal_dump((stream)->data, (stream)->size, dump, ARRAY_SIZE(dump)))
+	(stream_equal_dump((stream)->data, (stream)->size, dump, ARRAYSIZE(dump)))
 
 #define UNICODE_STRING_EQUAL_TO_DUMP(ustring, dump) \
-	(stream_equal_dump((ustring)->string, (ustring)->length, dump, ARRAY_SIZE(dump)))
+	(stream_equal_dump((ustring)->string, (ustring)->length, dump, ARRAYSIZE(dump)))
 
 typedef struct
 {
@@ -427,7 +426,7 @@ typedef struct
 	RAIL_EVENT  in_events[20];
 	size_t      in_events_number;
 
-	STREAM      in_streams[20];
+	wStream      in_streams[20];
 	size_t      in_streams_number;
 
 	RDP_PLUGIN_DATA plugin_data;
@@ -447,10 +446,10 @@ int stream_equal_dump(void * dataS, size_t sizeS, void * data, size_t size)
 		printf("Stream and dump have different length (%d != %d)\n",
 			(int) sizeS, (int) size);
 		printf("Stream hexdump:\n");
-		freerdp_hexdump(dataS, sizeS);
+		winpr_HexDump(dataS, sizeS);
 
 		printf("Dump hexdump:\n");
-		freerdp_hexdump(data, size);
+		winpr_HexDump(data, size);
 
 		printf("----------------- stream_equal_dump -----------------\n");
 		return 0;
@@ -464,10 +463,10 @@ int stream_equal_dump(void * dataS, size_t sizeS, void * data, size_t size)
 			printf("----------------- stream_equal_dump -----------------\n");
 			printf("Stream and dump have different content from %d offset.\n", (int) i);
 			printf("Stream hexdump:\n");
-			freerdp_hexdump(dataS, sizeS);
+			winpr_HexDump(dataS, sizeS);
 
 			printf("Dump hexdump:\n");
-			freerdp_hexdump(data, size);
+			winpr_HexDump(data, size);
 			printf("----------------- stream_equal_dump -----------------\n");
 			return 0;
 		}
@@ -476,7 +475,7 @@ int stream_equal_dump(void * dataS, size_t sizeS, void * data, size_t size)
 	return 1;
 }
 //-----------------------------------------------------------------------------
-static void test_on_free_rail_client_event(RDP_EVENT* event)
+static void test_on_free_rail_client_event(wMessage* event)
 {
 	if (event->event_class == RDP_EVENT_CLASS_RAIL)
 	{
@@ -490,7 +489,7 @@ static void send_ui_event2plugin(
 	void * data
 	)
 {
-	RDP_EVENT* out_event = NULL;
+	wMessage* out_event = NULL;
 	void * payload = NULL;
 
 	payload = rail_clone_order(event_type, data);
@@ -512,7 +511,7 @@ static void emulate_server_send_channel_data(
 	counter++;
 
 	printf("Emulate server packet (%d packet):\n", counter);
-	freerdp_hexdump(data, size);
+	winpr_HexDump(data, size);
 
 	freerdp_channels_data(instance, 0, (char*)data, size,
 			CHANNEL_FLAG_FIRST | CHANNEL_FLAG_LAST, size);
@@ -521,13 +520,13 @@ static void emulate_server_send_channel_data(
 static void save_dump(void* data, size_t size)
 {
 	thread_param * p = global_thread_params;
-	if (p->in_streams_number < ARRAY_SIZE(p->in_streams))
+	if (p->in_streams_number < ARRAYSIZE(p->in_streams))
 	{
-		STREAM* s = &p->in_streams[p->in_streams_number];
-		s->data = malloc(size);
-		s->size = size;
+		wStream* s = &p->in_streams[p->in_streams_number];
+		s->buffer = malloc(size);
+		s->capacity = size;
 
-		memcpy(s->data, data, size);
+		memcpy(s->buffer, data, size);
 		p->in_streams_number++;
 	}
 }
@@ -540,7 +539,7 @@ static int emulate_client_send_channel_data(
 	counter++;
 
 	printf("Client send to server (%d packet):\n", counter);
-	freerdp_hexdump(data, size);
+	winpr_HexDump(data, size);
 
 	// add to global dumps list
 	save_dump(data, size);
@@ -548,7 +547,7 @@ static int emulate_client_send_channel_data(
 	return 0;
 }
 //-----------------------------------------------------------------------------
-void save_event(RDP_EVENT* event, RAIL_EVENT* rail_event)
+void save_event(wMessage* event, RAIL_EVENT* rail_event)
 {
 	rail_event->event_type = event->event_type;
 
@@ -611,7 +610,7 @@ void save_event(RDP_EVENT* event, RAIL_EVENT* rail_event)
 //-----------------------------------------------------------------------------
 static void process_events_and_channel_data_from_plugin(thread_param* param)
 {
-	RDP_EVENT* event;
+	wMessage* event;
 
 	param->th_count++;
 	while (param->th_to_finish == 0)
@@ -631,7 +630,7 @@ static void process_events_and_channel_data_from_plugin(thread_param* param)
 					counter);
 
 			// add to global event list
-			if (param->in_events_number < ARRAY_SIZE(param->in_events))
+			if (param->in_events_number < ARRAYSIZE(param->in_events))
 			{
 				save_event(event, &param->in_events[param->in_events_number]);
 				param->in_events_number++;
@@ -664,12 +663,12 @@ void test_rail_plugin(void)
 	freerdp* inst = &s_inst;
 	size_t sn = 0;
 	size_t en = 0;
-	STREAM* ss = NULL;
+	wStream* ss = NULL;
 	RAIL_EVENT* ee = NULL;
 
 	printf("\n");
 
-	settings.hostname = "testhost";
+	settings.Hostname = "testhost";
 	inst->settings = &settings;
 	inst->SendChannelData = emulate_client_send_channel_data;
 

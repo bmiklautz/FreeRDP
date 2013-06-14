@@ -48,10 +48,11 @@
  *    Create IWTSVirtualChannelCallback instance if the new channel is accepted
  */
 
-#ifndef __FREERDP_DVC_H
-#define __FREERDP_DVC_H
+#ifndef FREERDP_DVC_H
+#define FREERDP_DVC_H
 
 #include <freerdp/types.h>
+#include <freerdp/addin.h>
 
 typedef struct _IWTSVirtualChannelManager IWTSVirtualChannelManager;
 typedef struct _IWTSListener IWTSListener;
@@ -66,6 +67,8 @@ struct _IWTSListener
 	/* Retrieves the listener-specific configuration. */
 	int (*GetConfiguration) (IWTSListener* pListener,
 		void** ppPropertyBag);
+
+	void* pInterface;
 };
 
 struct _IWTSVirtualChannel
@@ -91,7 +94,7 @@ struct _IWTSVirtualChannelManager
 	/* Push a virtual channel event.
 	   This is a FreeRDP extension to standard MS API. */
 	int (*PushEvent) (IWTSVirtualChannelManager* pChannelMgr,
-		RDP_EVENT* pEvent);
+		wMessage* pEvent);
 	/* Find the channel or ID to send data to a specific endpoint. */
 	UINT32 (*GetChannelId) (IWTSVirtualChannel * channel);
 	IWTSVirtualChannel* (*FindChannelById) (IWTSVirtualChannelManager* pChannelMgr, 
@@ -114,6 +117,10 @@ struct _IWTSPlugin
 	/* Notifies the plug-in that the Remote Desktop Connection (RDC) client
 	   has terminated. */
 	int (*Terminated) (IWTSPlugin* pPlugin);
+
+	/* Extended */
+
+	void* pInterface;
 };
 
 struct _IWTSListenerCallback
@@ -145,9 +152,9 @@ struct _IDRDYNVC_ENTRY_POINTS
 		const char* name, IWTSPlugin* pPlugin);
 	IWTSPlugin* (*GetPlugin) (IDRDYNVC_ENTRY_POINTS* pEntryPoints,
 		const char* name);
-	RDP_PLUGIN_DATA* (*GetPluginData) (IDRDYNVC_ENTRY_POINTS* pEntryPoints);
+	ADDIN_ARGV* (*GetPluginData) (IDRDYNVC_ENTRY_POINTS* pEntryPoints);
 };
 
 typedef int (*PDVC_PLUGIN_ENTRY) (IDRDYNVC_ENTRY_POINTS*);
 
-#endif
+#endif /* FREERDP_DVC_H */

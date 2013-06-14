@@ -33,7 +33,8 @@
 #include <X11/Xatom.h>
 #include <X11/extensions/XShm.h>
 
-#include <freerdp/utils/memory.h>
+#include <winpr/crt.h>
+
 #include <freerdp/utils/event.h>
 #include <freerdp/client/tsmf.h>
 
@@ -77,7 +78,9 @@ void xf_tsmf_init(xfInfo* xfi, long xv_port)
 	XvAttribute* attr;
 	XvImageFormatValues* fo;
 
-	xv = xnew(xfXvContext);
+	xv = (xfXvContext*) malloc(sizeof(xfXvContext));
+	ZeroMemory(xv, sizeof(xfXvContext));
+
 	xfi->xv_context = xv;
 
 	xv->xv_colorkey_atom = None;
@@ -137,17 +140,19 @@ void xf_tsmf_init(xfInfo* xfi, long xv_port)
 	XFree(attr);
 
 #ifdef WITH_DEBUG_XV
-	printf("xf_tsmf_init: pixel format ");
+	fprintf(stderr, "xf_tsmf_init: pixel format ");
 #endif
 	fo = XvListImageFormats(xfi->display, xv->xv_port, &ret);
 	if (ret > 0)
 	{
-		xv->xv_pixfmts = (UINT32*) xzalloc((ret + 1) * sizeof(UINT32));
+		xv->xv_pixfmts = (UINT32*) malloc((ret + 1) * sizeof(UINT32));
+		ZeroMemory(xv->xv_pixfmts, (ret + 1) * sizeof(UINT32));
+
 		for (i = 0; i < ret; i++)
 		{
 			xv->xv_pixfmts[i] = fo[i].id;
 #ifdef WITH_DEBUG_XV
-			printf("%c%c%c%c ", ((char*)(xv->xv_pixfmts + i))[0], ((char*)(xv->xv_pixfmts + i))[1],
+			fprintf(stderr, "%c%c%c%c ", ((char*)(xv->xv_pixfmts + i))[0], ((char*)(xv->xv_pixfmts + i))[1],
 				((char*)(xv->xv_pixfmts + i))[2], ((char*)(xv->xv_pixfmts + i))[3]);
 #endif
 		}
@@ -155,7 +160,7 @@ void xf_tsmf_init(xfInfo* xfi, long xv_port)
 	}
 	XFree(fo);
 #ifdef WITH_DEBUG_XV
-	printf("\n");
+	fprintf(stderr, "\n");
 #endif
 }
 
@@ -370,15 +375,15 @@ static void xf_process_tsmf_redraw_event(xfInfo* xfi, RDP_REDRAW_EVENT* revent)
 		revent->x, revent->y, revent->width, revent->height, revent->x, revent->y);
 }
 
-void xf_process_tsmf_event(xfInfo* xfi, RDP_EVENT* event)
+void xf_process_tsmf_event(xfInfo* xfi, wMessage* event)
 {
-	switch (event->event_type)
+	switch (GetMessageType(event->id))
 	{
-		case RDP_EVENT_TYPE_TSMF_VIDEO_FRAME:
+		case TsmfChannel_VideoFrame:
 			xf_process_tsmf_video_frame_event(xfi, (RDP_VIDEO_FRAME_EVENT*) event);
 			break;
 
-		case RDP_EVENT_TYPE_TSMF_REDRAW:
+		case TsmfChannel_Redraw:
 			xf_process_tsmf_redraw_event(xfi, (RDP_REDRAW_EVENT*) event);
 			break;
 
@@ -395,7 +400,7 @@ void xf_tsmf_uninit(xfInfo* xfi)
 {
 }
 
-void xf_process_tsmf_event(xfInfo* xfi, RDP_EVENT* event)
+void xf_process_tsmf_event(xfInfo* xfi, wMessage* event)
 {
 }
 

@@ -23,9 +23,10 @@
 
 #include <stdio.h>
 
+#include <winpr/crt.h>
+
 #include <freerdp/freerdp.h>
-#include <freerdp/utils/stream.h>
-#include <freerdp/utils/memory.h>
+#include <winpr/stream.h>
 
 #include <freerdp/cache/glyph.h>
 
@@ -172,6 +173,7 @@ void update_gdi_glyph_index(rdpContext* context, GLYPH_INDEX_ORDER* glyph_index)
 	rdpGlyphCache* glyph_cache;
 
 	glyph_cache = context->cache->glyph;
+
 	update_process_glyph_fragments(context, glyph_index->data, glyph_index->cbData,
 			glyph_index->cacheId, glyph_index->ulCharInc, glyph_index->flAccel,
 			glyph_index->backColor, glyph_index->foreColor, glyph_index->x, glyph_index->y,
@@ -183,8 +185,9 @@ void update_gdi_glyph_index(rdpContext* context, GLYPH_INDEX_ORDER* glyph_index)
 
 void update_gdi_fast_index(rdpContext* context, FAST_INDEX_ORDER* fast_index)
 {
-	INT32 opLeft, opTop, opRight, opBottom;
 	INT32 x, y;
+	INT32 opLeft, opTop;
+	INT32 opRight, opBottom;
 	rdpGlyphCache* glyph_cache;
 
 	glyph_cache = context->cache->glyph;
@@ -233,12 +236,13 @@ void update_gdi_fast_index(rdpContext* context, FAST_INDEX_ORDER* fast_index)
 
 void update_gdi_fast_glyph(rdpContext* context, FAST_GLYPH_ORDER* fast_glyph)
 {
-	INT32 opLeft, opTop, opRight, opBottom;
 	INT32 x, y;
-	GLYPH_DATA_V2* glyph_data;
 	rdpGlyph* glyph;
-	rdpCache* cache = context->cache;
 	BYTE text_data[2];
+	INT32 opLeft, opTop;
+	INT32 opRight, opBottom;
+	GLYPH_DATA_V2* glyph_data;
+	rdpCache* cache = context->cache;
 
 	opLeft = fast_glyph->opLeft;
 	opTop = fast_glyph->opTop;
@@ -273,21 +277,21 @@ void update_gdi_fast_glyph(rdpContext* context, FAST_GLYPH_ORDER* fast_glyph)
 	if (y == -32768)
 		y = fast_glyph->bkTop;
 
-	if (fast_glyph->glyph_data != NULL)
+	if (fast_glyph->cbData > 1)
 	{
 		/* got option font that needs to go into cache */
-		glyph_data = (GLYPH_DATA_V2*) (fast_glyph->glyph_data);
+		glyph_data = &fast_glyph->glyphData;
+
 		glyph = Glyph_Alloc(context);
 		glyph->x = glyph_data->x;
 		glyph->y = glyph_data->y;
 		glyph->cx = glyph_data->cx;
 		glyph->cy = glyph_data->cy;
-		glyph->aj = glyph_data->aj;
 		glyph->cb = glyph_data->cb;
+		glyph->aj = glyph_data->aj;
 		Glyph_New(context, glyph);
+
 		glyph_cache_put(cache->glyph, fast_glyph->cacheId, fast_glyph->data[0], glyph);
-		free(fast_glyph->glyph_data);
-		fast_glyph->glyph_data = NULL;
 	}
 
 	text_data[0] = fast_glyph->data[0];
@@ -311,7 +315,7 @@ void update_gdi_cache_glyph(rdpContext* context, CACHE_GLYPH_ORDER* cache_glyph)
 
 	for (i = 0; i < (int) cache_glyph->cGlyphs; i++)
 	{
-		glyph_data = cache_glyph->glyphData[i];
+		glyph_data = &cache_glyph->glyphData[i];
 
 		glyph = Glyph_Alloc(context);
 
@@ -319,14 +323,11 @@ void update_gdi_cache_glyph(rdpContext* context, CACHE_GLYPH_ORDER* cache_glyph)
 		glyph->y = glyph_data->y;
 		glyph->cx = glyph_data->cx;
 		glyph->cy = glyph_data->cy;
-		glyph->aj = glyph_data->aj;
 		glyph->cb = glyph_data->cb;
+		glyph->aj = glyph_data->aj;
 		Glyph_New(context, glyph);
 
 		glyph_cache_put(cache->glyph, cache_glyph->cacheId, glyph_data->cacheIndex, glyph);
-
-		cache_glyph->glyphData[i] = NULL;
-		free(glyph_data);
 	}
 }
 
@@ -339,7 +340,7 @@ void update_gdi_cache_glyph_v2(rdpContext* context, CACHE_GLYPH_V2_ORDER* cache_
 
 	for (i = 0; i < (int) cache_glyph_v2->cGlyphs; i++)
 	{
-		glyph_data = cache_glyph_v2->glyphData[i];
+		glyph_data = &cache_glyph_v2->glyphData[i];
 
 		glyph = Glyph_Alloc(context);
 
@@ -347,14 +348,11 @@ void update_gdi_cache_glyph_v2(rdpContext* context, CACHE_GLYPH_V2_ORDER* cache_
 		glyph->y = glyph_data->y;
 		glyph->cx = glyph_data->cx;
 		glyph->cy = glyph_data->cy;
-		glyph->aj = glyph_data->aj;
 		glyph->cb = glyph_data->cb;
+		glyph->aj = glyph_data->aj;
 		Glyph_New(context, glyph);
 
 		glyph_cache_put(cache->glyph, cache_glyph_v2->cacheId, glyph_data->cacheIndex, glyph);
-
-		cache_glyph_v2->glyphData[i] = NULL;
-		free(glyph_data);
 	}
 }
 
@@ -364,13 +362,13 @@ rdpGlyph* glyph_cache_get(rdpGlyphCache* glyph_cache, UINT32 id, UINT32 index)
 
 	if (id > 9)
 	{
-		printf("invalid glyph cache id: %d\n", id);
+		fprintf(stderr, "invalid glyph cache id: %d\n", id);
 		return NULL;
 	}
 
 	if (index > glyph_cache->glyphCache[id].number)
 	{
-		printf("invalid glyph cache index: %d in cache id: %d\n", index, id);
+		fprintf(stderr, "invalid glyph cache index: %d in cache id: %d\n", index, id);
 		return NULL;
 	}
 
@@ -378,7 +376,7 @@ rdpGlyph* glyph_cache_get(rdpGlyphCache* glyph_cache, UINT32 id, UINT32 index)
 
 	if (glyph == NULL)
 	{
-		printf("invalid glyph at cache index: %d in cache id: %d\n", index, id);
+		fprintf(stderr, "invalid glyph at cache index: %d in cache id: %d\n", index, id);
 	}
 
 	return glyph;
@@ -390,13 +388,13 @@ void glyph_cache_put(rdpGlyphCache* glyph_cache, UINT32 id, UINT32 index, rdpGly
 
 	if (id > 9)
 	{
-		printf("invalid glyph cache id: %d\n", id);
+		fprintf(stderr, "invalid glyph cache id: %d\n", id);
 		return;
 	}
 
 	if (index > glyph_cache->glyphCache[id].number)
 	{
-		printf("invalid glyph cache index: %d in cache id: %d\n", index, id);
+		fprintf(stderr, "invalid glyph cache index: %d in cache id: %d\n", index, id);
 		return;
 	}
 
@@ -421,7 +419,7 @@ void* glyph_cache_fragment_get(rdpGlyphCache* glyph_cache, UINT32 index, UINT32*
 
 	if (fragment == NULL)
 	{
-		printf("invalid glyph fragment at index:%d\n", index);
+		fprintf(stderr, "invalid glyph fragment at index:%d\n", index);
 	}
 
 	return fragment;
@@ -455,7 +453,8 @@ rdpGlyphCache* glyph_cache_new(rdpSettings* settings)
 {
 	rdpGlyphCache* glyph;
 
-	glyph = (rdpGlyphCache*) xzalloc(sizeof(rdpGlyphCache));
+	glyph = (rdpGlyphCache*) malloc(sizeof(rdpGlyphCache));
+	ZeroMemory(glyph, sizeof(rdpGlyphCache));
 
 	if (glyph != NULL)
 	{
@@ -466,12 +465,14 @@ rdpGlyphCache* glyph_cache_new(rdpSettings* settings)
 
 		for (i = 0; i < 10; i++)
 		{
-			glyph->glyphCache[i].number = settings->glyphCache[i].cacheEntries;
-			glyph->glyphCache[i].maxCellSize = settings->glyphCache[i].cacheMaximumCellSize;
-			glyph->glyphCache[i].entries = (rdpGlyph**) xzalloc(sizeof(rdpGlyph*) * glyph->glyphCache[i].number);
+			glyph->glyphCache[i].number = settings->GlyphCache[i].cacheEntries;
+			glyph->glyphCache[i].maxCellSize = settings->GlyphCache[i].cacheMaximumCellSize;
+			glyph->glyphCache[i].entries = (rdpGlyph**) malloc(sizeof(rdpGlyph*) * glyph->glyphCache[i].number);
+			ZeroMemory(glyph->glyphCache[i].entries, sizeof(rdpGlyph*) * glyph->glyphCache[i].number);
 		}
 
-		glyph->fragCache.entries = xzalloc(sizeof(FRAGMENT_CACHE_ENTRY) * 256);
+		glyph->fragCache.entries = malloc(sizeof(FRAGMENT_CACHE_ENTRY) * 256);
+		ZeroMemory(glyph->fragCache.entries, sizeof(FRAGMENT_CACHE_ENTRY) * 256);
 	}
 
 	return glyph;

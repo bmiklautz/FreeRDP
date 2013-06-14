@@ -21,8 +21,7 @@
 #include "config.h"
 #endif
 
-#include <freerdp/utils/stream.h>
-#include <freerdp/utils/memory.h>
+#include <winpr/stream.h>
 #include <freerdp/codec/color.h>
 
 #include <freerdp/codec/bitmap.h>

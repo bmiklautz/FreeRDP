@@ -28,8 +28,7 @@
 #include <freerdp/types.h>
 #include <freerdp/constants.h>
 #include <freerdp/utils/print.h>
-#include <freerdp/utils/memory.h>
-#include <freerdp/utils/hexdump.h>
+#include <winpr/print.h>
 #include <freerdp/codec/nsc.h>
 
 #include "test_nsc.h"
@@ -336,9 +335,8 @@ void test_nsc_decode(void)
 	NSC_CONTEXT* context;
 
 	context = nsc_context_new();
-	nsc_context_set_cpu_opt(context, CPU_SSE2);
 	nsc_process_message(context, 32, 15, 10, (BYTE*) nsc_data, sizeof(nsc_data));
-	/*freerdp_hexdump(context->bmpdata, 15 * 10 * 4);*/
+	/*winpr_HexDump(context->bmpdata, 15 * 10 * 4);*/
 	for (i = 0; i < 30000; i++)
 	{
 		nsc_process_message(context, 32, 54, 44, (BYTE*) nsc_stress_data, sizeof(nsc_stress_data));
@@ -350,7 +348,7 @@ void test_nsc_encode(void)
 {
 	int i;
 	BYTE* rgb_data;
-	STREAM* enc_stream;
+	wStream* enc_stream;
 	NSC_CONTEXT* context;
 
 	rgb_data = (BYTE *) malloc(64 * 64 * 3);
@@ -358,7 +356,6 @@ void test_nsc_encode(void)
 		memcpy(rgb_data + i * 64 * 3, rgb_scanline_data, 64 * 3);
 
 	context = nsc_context_new();
-	nsc_context_set_cpu_opt(context, CPU_SSE2);
 	nsc_context_set_pixel_format(context, RDP_PIXEL_FORMAT_R8G8B8);
 
 	enc_stream = stream_new(65536);
@@ -366,12 +363,12 @@ void test_nsc_encode(void)
 
 	for (i = 0; i < 30000; i++)
 	{
-		stream_set_pos(enc_stream, 0);
+		Stream_SetPosition(enc_stream, 0);
 		nsc_compose_message(context, enc_stream, rgb_data, 64, 64, 64 * 3);
 	}
-	/*freerdp_hexdump(stream_get_head(enc_stream), stream_get_length(enc_stream));*/
-	nsc_process_message(context, 32, 64, 64, stream_get_head(enc_stream), stream_get_length(enc_stream));
-	/*freerdp_hexdump(context->bmpdata, 64 * 64 * 4);*/
+	/*winpr_HexDump(Stream_Buffer(enc_stream), Stream_GetPosition(enc_stream));*/
+	nsc_process_message(context, 32, 64, 64, Stream_Buffer(enc_stream), Stream_GetPosition(enc_stream));
+	/*winpr_HexDump(context->bmpdata, 64 * 64 * 4);*/
 	stream_free(enc_stream);
 
 	nsc_context_free(context);

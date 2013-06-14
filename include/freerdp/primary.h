@@ -17,10 +17,34 @@
  * limitations under the License.
  */
 
-#ifndef __UPDATE_PRIMARY_H
-#define __UPDATE_PRIMARY_H
+#ifndef FREERDP_UPDATE_PRIMARY_H
+#define FREERDP_UPDATE_PRIMARY_H
 
 #include <freerdp/types.h>
+
+struct _GLYPH_DATA
+{
+	UINT32 cacheIndex;
+	INT32 x;
+	INT32 y;
+	UINT32 cx;
+	UINT32 cy;
+	UINT32 cb;
+	BYTE* aj;
+};
+typedef struct _GLYPH_DATA GLYPH_DATA;
+
+struct _GLYPH_DATA_V2
+{
+	UINT32 cacheIndex;
+	INT32 x;
+	INT32 y;
+	UINT32 cx;
+	UINT32 cy;
+	UINT32 cb;
+	BYTE* aj;
+};
+typedef struct _GLYPH_DATA_V2 GLYPH_DATA_V2;
 
 #define BACKMODE_TRANSPARENT	0x0001
 #define BACKMODE_OPAQUE		0x0002
@@ -49,13 +73,11 @@ typedef struct rdp_brush rdpBrush;
 
 struct _ORDER_INFO
 {
+	UINT32 controlFlags;
 	UINT32 orderType;
 	UINT32 fieldFlags;
+	UINT32 boundsFlags;
 	rdpBounds bounds;
-	INT32 deltaBoundLeft;
-	INT32 deltaBoundTop;
-	INT32 deltaBoundRight;
-	INT32 deltaBoundBottom;
 	BOOL deltaCoordinates;
 };
 typedef struct _ORDER_INFO ORDER_INFO;
@@ -357,7 +379,7 @@ struct _FAST_GLYPH_ORDER
 	INT32 y;
 	UINT32 cbData;
 	BYTE data[256];
-	void* glyph_data;
+	GLYPH_DATA_V2 glyphData;
 };
 typedef struct _FAST_GLYPH_ORDER FAST_GLYPH_ORDER;
 
@@ -496,4 +518,4 @@ struct rdp_primary_update
 };
 typedef struct rdp_primary_update rdpPrimaryUpdate;
 
-#endif /* __UPDATE_PRIMARY_H */
+#endif /* FREERDP_UPDATE_PRIMARY_H */

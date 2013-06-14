@@ -26,10 +26,14 @@
 #ifndef _WIN32
 
 #include "../synch/synch.h"
+#include "../thread/thread.h"
+#include "../pipe/pipe.h"
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+
+#include "../handle/handle.h"
 
 BOOL CloseHandle(HANDLE hObject)
 {
@@ -41,12 +45,22 @@ BOOL CloseHandle(HANDLE hObject)
 
 	if (Type == HANDLE_TYPE_THREAD)
 	{
+		WINPR_THREAD* thread;
+
+		thread = (WINPR_THREAD*) Object;
+
+		free(Object);
+
 		return TRUE;
 	}
 	else if (Type == HANDLE_TYPE_MUTEX)
 	{
-		pthread_mutex_destroy((pthread_mutex_t*) Object);
-		winpr_Handle_Remove(Object);
+		WINPR_MUTEX* mutex;
+
+		mutex = (WINPR_MUTEX*) Object;
+
+		pthread_mutex_destroy(&mutex->mutex);
+
 		free(Object);
 
 		return TRUE;
@@ -57,46 +71,69 @@ BOOL CloseHandle(HANDLE hObject)
 
 		event = (WINPR_EVENT*) Object;
 
-		if (event->pipe_fd[0] != -1)
+		if (!event->bAttached)
 		{
-			close(event->pipe_fd[0]);
-			event->pipe_fd[0] = -1;
-		}
-		if (event->pipe_fd[1] != -1)
-		{
-			close(event->pipe_fd[1]);
-			event->pipe_fd[1] = -1;
+			if (event->pipe_fd[0] != -1)
+			{
+				close(event->pipe_fd[0]);
+				event->pipe_fd[0] = -1;
+			}
+			if (event->pipe_fd[1] != -1)
+			{
+				close(event->pipe_fd[1]);
+				event->pipe_fd[1] = -1;
+			}
 		}
 
-		winpr_Handle_Remove(Object);
-		free(event);
+		free(Object);
 
 		return TRUE;
 	}
 	else if (Type == HANDLE_TYPE_SEMAPHORE)
 	{
-#if defined __APPLE__
-		semaphore_destroy(mach_task_self(), *((winpr_sem_t*) Object));
+		WINPR_SEMAPHORE* semaphore;
+
+		semaphore = (WINPR_SEMAPHORE*) Object;
+
+#ifdef WINPR_PIPE_SEMAPHORE
+
+		if (semaphore->pipe_fd[0] != -1)
+		{
+			close(semaphore->pipe_fd[0]);
+			semaphore->pipe_fd[0] = -1;
+
+			if (semaphore->pipe_fd[1] != -1)
+			{
+				close(semaphore->pipe_fd[1]);
+				semaphore->pipe_fd[1] = -1;
+			}
+		}
+
 #else
-		sem_destroy((winpr_sem_t*) Object);
+
+#if defined __APPLE__
+		semaphore_destroy(mach_task_self(), *((winpr_sem_t*) semaphore->sem));
+#else
+		sem_destroy((winpr_sem_t*) semaphore->sem);
 #endif
-		winpr_Handle_Remove(Object);
+
+#endif
 		free(Object);
 
 		return TRUE;
 	}
 	else if (Type == HANDLE_TYPE_ANONYMOUS_PIPE)
 	{
-		int pipe_fd;
+		WINPR_PIPE* pipe;
 
-		pipe_fd = (int) ((ULONG_PTR) Object);
+		pipe = (WINPR_PIPE*) Object;
 
-		if (pipe_fd != -1)
+		if (pipe->fd != -1)
 		{
-			close(pipe_fd);
+			close(pipe->fd);
 		}
 
-		winpr_Handle_Remove(Object);
+		free(Object);
 
 		return TRUE;
 	}

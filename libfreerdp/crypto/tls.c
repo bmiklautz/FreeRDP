@@ -21,8 +21,11 @@
 #include "config.h"
 #endif
 
-#include <freerdp/utils/stream.h>
-#include <freerdp/utils/memory.h>
+#include <winpr/crt.h>
+#include <winpr/sspi.h>
+
+#include <winpr/stream.h>
+#include <freerdp/utils/tcp.h>
 
 #include <freerdp/crypto/tls.h>
 
@@ -38,7 +41,7 @@ static CryptoCert tls_get_certificate(rdpTls* tls, BOOL peer)
 
 	if (!server_cert)
 	{
-		printf("tls_get_certificate: failed to get the server TLS certificate\n");
+		fprintf(stderr, "tls_get_certificate: failed to get the server TLS certificate\n");
 		cert = NULL;
 	}
 	else
@@ -56,6 +59,42 @@ static void tls_free_certificate(CryptoCert cert)
 	free(cert);
 }
 
+#define TLS_SERVER_END_POINT	"tls-server-end-point:"
+
+SecPkgContext_Bindings* tls_get_channel_bindings(X509* cert)
+{
+	int PrefixLength;
+	BYTE CertificateHash[32];
+	UINT32 CertificateHashLength;
+	BYTE* ChannelBindingToken;
+	UINT32 ChannelBindingTokenLength;
+	SEC_CHANNEL_BINDINGS* ChannelBindings;
+	SecPkgContext_Bindings* ContextBindings;
+
+	ZeroMemory(CertificateHash, sizeof(CertificateHash));
+	X509_digest(cert, EVP_sha256(), CertificateHash, &CertificateHashLength);
+
+	PrefixLength = strlen(TLS_SERVER_END_POINT);
+	ChannelBindingTokenLength = PrefixLength + CertificateHashLength;
+
+	ContextBindings = (SecPkgContext_Bindings*) malloc(sizeof(SecPkgContext_Bindings));
+	ZeroMemory(ContextBindings, sizeof(SecPkgContext_Bindings));
+
+	ContextBindings->BindingsLength = sizeof(SEC_CHANNEL_BINDINGS) + ChannelBindingTokenLength;
+	ChannelBindings = (SEC_CHANNEL_BINDINGS*) malloc(ContextBindings->BindingsLength);
+	ZeroMemory(ChannelBindings, ContextBindings->BindingsLength);
+	ContextBindings->Bindings = ChannelBindings;
+
+	ChannelBindings->cbApplicationDataLength = ChannelBindingTokenLength;
+	ChannelBindings->dwApplicationDataOffset = sizeof(SEC_CHANNEL_BINDINGS);
+	ChannelBindingToken = &((BYTE*) ChannelBindings)[ChannelBindings->dwApplicationDataOffset];
+
+	strcpy((char*) ChannelBindingToken, TLS_SERVER_END_POINT);
+	CopyMemory(&ChannelBindingToken[PrefixLength], CertificateHash, CertificateHashLength);
+
+	return ContextBindings;
+}
+
 BOOL tls_connect(rdpTls* tls)
 {
 	CryptoCert cert;
@@ -66,9 +105,11 @@ BOOL tls_connect(rdpTls* tls)
 
 	if (tls->ctx == NULL)
 	{
-		printf("SSL_CTX_new failed\n");
+		fprintf(stderr, "SSL_CTX_new failed\n");
 		return FALSE;
 	}
+
+	//SSL_CTX_set_mode(tls->ctx, SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER | SSL_MODE_ENABLE_PARTIAL_WRITE);
 
 	/**
 	 * SSL_OP_NO_COMPRESSION:
@@ -105,13 +146,13 @@ BOOL tls_connect(rdpTls* tls)
 
 	if (tls->ssl == NULL)
 	{
-		printf("SSL_new failed\n");
+		fprintf(stderr, "SSL_new failed\n");
 		return FALSE;
 	}
 
 	if (SSL_set_fd(tls->ssl, tls->sockfd) < 1)
 	{
-		printf("SSL_set_fd failed\n");
+		fprintf(stderr, "SSL_set_fd failed\n");
 		return FALSE;
 	}
 
@@ -129,20 +170,22 @@ BOOL tls_connect(rdpTls* tls)
 
 	if (cert == NULL)
 	{
-		printf("tls_connect: tls_get_certificate failed to return the server certificate.\n");
+		fprintf(stderr, "tls_connect: tls_get_certificate failed to return the server certificate.\n");
 		return FALSE;
 	}
 
+	tls->Bindings = tls_get_channel_bindings(cert->px509);
+
 	if (!crypto_cert_get_public_key(cert, &tls->PublicKey, &tls->PublicKeyLength))
 	{
-		printf("tls_connect: crypto_cert_get_public_key failed to return the server public key.\n");
+		fprintf(stderr, "tls_connect: crypto_cert_get_public_key failed to return the server public key.\n");
 		tls_free_certificate(cert);
 		return FALSE;
 	}
 
-	if (!tls_verify_certificate(tls, cert, tls->settings->hostname))
+	if (!tls_verify_certificate(tls, cert, tls->settings->ServerHostname))
 	{
-		printf("tls_connect: certificate not trusted, aborting.\n");
+		fprintf(stderr, "tls_connect: certificate not trusted, aborting.\n");
 		tls_disconnect(tls);
 		tls_free_certificate(cert);
 		return FALSE;
@@ -163,7 +206,7 @@ BOOL tls_accept(rdpTls* tls, const char* cert_file, const char* privatekey_file)
 
 	if (tls->ctx == NULL)
 	{
-		printf("SSL_CTX_new failed\n");
+		fprintf(stderr, "SSL_CTX_new failed\n");
 		return FALSE;
 	}
 
@@ -208,44 +251,28 @@ BOOL tls_accept(rdpTls* tls, const char* cert_file, const char* privatekey_file)
 
 	if (SSL_CTX_use_RSAPrivateKey_file(tls->ctx, privatekey_file, SSL_FILETYPE_PEM) <= 0)
 	{
-		printf("SSL_CTX_use_RSAPrivateKey_file failed\n");
+		fprintf(stderr, "SSL_CTX_use_RSAPrivateKey_file failed\n");
+		fprintf(stderr, "PrivateKeyFile: %s\n", privatekey_file);
 		return FALSE;
 	}
 
 	tls->ssl = SSL_new(tls->ctx);
 
-	if (tls->ssl == NULL)
+	if (!tls->ssl)
 	{
-		printf("SSL_new failed\n");
+		fprintf(stderr, "SSL_new failed\n");
 		return FALSE;
 	}
 
 	if (SSL_use_certificate_file(tls->ssl, cert_file, SSL_FILETYPE_PEM) <= 0)
 	{
-		printf("SSL_use_certificate_file failed\n");
+		fprintf(stderr, "SSL_use_certificate_file failed\n");
 		return FALSE;
 	}
-
-	cert = tls_get_certificate(tls, FALSE);
-
-	if (cert == NULL)
-	{
-		printf("tls_connect: tls_get_certificate failed to return the server certificate.\n");
-		return FALSE;
-	}
-
-	if (!crypto_cert_get_public_key(cert, &tls->PublicKey, &tls->PublicKeyLength))
-	{
-		printf("tls_connect: crypto_cert_get_public_key failed to return the server public key.\n");
-		tls_free_certificate(cert);
-		return FALSE;
-	}
-
-	free(cert);
 
 	if (SSL_set_fd(tls->ssl, tls->sockfd) < 1)
 	{
-		printf("SSL_set_fd failed\n");
+		fprintf(stderr, "SSL_set_fd failed\n");
 		return FALSE;
 	}
 
@@ -274,7 +301,24 @@ BOOL tls_accept(rdpTls* tls, const char* cert_file, const char* privatekey_file)
 		}
 	}
 
-	printf("TLS connection accepted\n");
+	cert = tls_get_certificate(tls, FALSE);
+
+	if (!cert)
+	{
+		fprintf(stderr, "tls_connect: tls_get_certificate failed to return the server certificate.\n");
+		return FALSE;
+	}
+
+	if (!crypto_cert_get_public_key(cert, &tls->PublicKey, &tls->PublicKeyLength))
+	{
+		fprintf(stderr, "tls_connect: crypto_cert_get_public_key failed to return the server public key.\n");
+		tls_free_certificate(cert);
+		return FALSE;
+	}
+
+	free(cert);
+
+	fprintf(stderr, "TLS connection accepted\n");
 
 	return TRUE;
 }
@@ -283,29 +327,51 @@ BOOL tls_disconnect(rdpTls* tls)
 {
 	if (tls->ssl)
 		SSL_shutdown(tls->ssl);
+
 	return TRUE;
 }
 
 int tls_read(rdpTls* tls, BYTE* data, int length)
 {
+	int error;
 	int status;
 
 	status = SSL_read(tls->ssl, data, length);
 
-	switch (SSL_get_error(tls->ssl, status))
+	if (status <= 0)
 	{
-		case SSL_ERROR_NONE:
-			break;
+		error = SSL_get_error(tls->ssl, status);
 
-		case SSL_ERROR_WANT_READ:
-		case SSL_ERROR_WANT_WRITE:
-			status = 0;
-			break;
+		//fprintf(stderr, "tls_read: length: %d status: %d error: 0x%08X\n",
+		//		length, status, error);
 
-		default:
-			tls_print_error("SSL_read", tls->ssl, status);
-			status = -1;
-			break;
+		switch (error)
+		{
+			case SSL_ERROR_NONE:
+				break;
+
+			case SSL_ERROR_WANT_READ:
+			case SSL_ERROR_WANT_WRITE:
+				status = 0;
+				break;
+
+			case SSL_ERROR_SYSCALL:
+				if (errno == EAGAIN)
+				{
+					status = 0;
+				}
+				else
+				{
+					tls_print_error("SSL_read", tls->ssl, status);
+					status = -1;
+				}
+				break;
+
+			default:
+				tls_print_error("SSL_read", tls->ssl, status);
+				status = -1;
+				break;
+		}
 	}
 
 	return status;
@@ -318,6 +384,8 @@ int tls_read_all(rdpTls* tls, BYTE* data, int length)
 	do
 	{
 		status = tls_read(tls, data, length);
+		if (status == 0)
+			tls_wait_read(tls);
 	}
 	while (status == 0);
 
@@ -326,29 +394,48 @@ int tls_read_all(rdpTls* tls, BYTE* data, int length)
 
 int tls_write(rdpTls* tls, BYTE* data, int length)
 {
+	int error;
 	int status;
 
 	status = SSL_write(tls->ssl, data, length);
 
-	switch (SSL_get_error(tls->ssl, status))
+	if (status <= 0)
 	{
-		case SSL_ERROR_NONE:
-			break;
+		error = SSL_get_error(tls->ssl, status);
 
-		case SSL_ERROR_WANT_READ:
-		case SSL_ERROR_WANT_WRITE:
-			status = 0;
-			break;
+		//fprintf(stderr, "tls_write: length: %d status: %d error: 0x%08X\n", length, status, error);
 
-		default:
-			tls_print_error("SSL_write", tls->ssl, status);
-			status = -1;
-			break;
+		switch (error)
+		{
+			case SSL_ERROR_NONE:
+				break;
+
+			case SSL_ERROR_WANT_READ:
+			case SSL_ERROR_WANT_WRITE:
+				status = 0;
+				break;
+
+			case SSL_ERROR_SYSCALL:
+				if (errno == EAGAIN)
+				{
+					status = 0;
+				}
+				else
+				{
+					tls_print_error("SSL_write", tls->ssl, status);
+					status = -1;
+				}
+				break;
+
+			default:
+				tls_print_error("SSL_write", tls->ssl, status);
+				status = -1;
+				break;
+		}
 	}
 
 	return status;
 }
-
 
 int tls_write_all(rdpTls* tls, BYTE* data, int length)
 {
@@ -361,6 +448,8 @@ int tls_write_all(rdpTls* tls, BYTE* data, int length)
 
 		if (status > 0)
 			sent += status;
+		else if (status == 0)
+			tls_wait_write(tls);
 
 		if (sent >= length)
 			break;
@@ -373,12 +462,22 @@ int tls_write_all(rdpTls* tls, BYTE* data, int length)
 		return status;
 }
 
+int tls_wait_read(rdpTls* tls)
+{
+	return freerdp_tcp_wait_read(tls->sockfd);
+}
+
+int tls_wait_write(rdpTls* tls)
+{
+	return freerdp_tcp_wait_write(tls->sockfd);
+}
+
 static void tls_errors(const char *prefix)
 {
 	unsigned long error;
 
 	while ((error = ERR_get_error()) != 0)
-		printf("%s: %s\n", prefix, ERR_error_string(error, NULL));
+		fprintf(stderr, "%s: %s\n", prefix, ERR_error_string(error, NULL));
 }
 
 BOOL tls_print_error(char* func, SSL* connection, int value)
@@ -386,29 +485,29 @@ BOOL tls_print_error(char* func, SSL* connection, int value)
 	switch (SSL_get_error(connection, value))
 	{
 		case SSL_ERROR_ZERO_RETURN:
-			printf("%s: Server closed TLS connection\n", func);
+			fprintf(stderr, "%s: Server closed TLS connection\n", func);
 			return TRUE;
 
 		case SSL_ERROR_WANT_READ:
-			printf("%s: SSL_ERROR_WANT_READ\n", func);
+			fprintf(stderr, "%s: SSL_ERROR_WANT_READ\n", func);
 			return FALSE;
 
 		case SSL_ERROR_WANT_WRITE:
-			printf("%s: SSL_ERROR_WANT_WRITE\n", func);
+			fprintf(stderr, "%s: SSL_ERROR_WANT_WRITE\n", func);
 			return FALSE;
 
 		case SSL_ERROR_SYSCALL:
-			printf("%s: I/O error\n", func);
+			fprintf(stderr, "%s: I/O error: %s (%d)\n", func, strerror(errno), errno);
 			tls_errors(func);
 			return TRUE;
 
 		case SSL_ERROR_SSL:
-			printf("%s: Failure in SSL library (protocol error?)\n", func);
+			fprintf(stderr, "%s: Failure in SSL library (protocol error?)\n", func);
 			tls_errors(func);
 			return TRUE;
 
 		default:
-			printf("%s: Unknown error\n", func);
+			fprintf(stderr, "%s: Unknown error\n", func);
 			tls_errors(func);
 			return TRUE;
 	}
@@ -429,12 +528,12 @@ BOOL tls_verify_certificate(rdpTls* tls, CryptoCert cert, char* hostname)
 	rdpCertificateData* certificate_data;
 
 	/* ignore certificate verification if user explicitly required it (discouraged) */
-	if (tls->settings->ignore_certificate)
+	if (tls->settings->IgnoreCertificate)
 		return TRUE;  /* success! */
 
 	/* if user explicitly specified a certificate name, use it instead of the hostname */
-	if (tls->settings->certificate_name)
-		hostname = tls->settings->certificate_name;
+	if (tls->settings->CertificateName)
+		hostname = tls->settings->CertificateName;
 
 	/* attempt verification using OpenSSL and the ~/.freerdp/certs certificate store */
 	certificate_status = x509_verify_certificate(cert, tls->certificate_store->path);
@@ -528,7 +627,7 @@ BOOL tls_verify_certificate(rdpTls* tls, CryptoCert cert, char* hostname)
 		else if (match == -1)
 		{
 			/* entry was found in known_hosts file, but fingerprint does not match. ask user to use it */
-			tls_print_certificate_error(hostname, fingerprint);
+			tls_print_certificate_error(hostname, fingerprint, tls->certificate_store->file);
 			
 			if (instance->VerifyChangedCertificate)
 				accept_certificate = instance->VerifyChangedCertificate(instance, subject, issuer, fingerprint, "");
@@ -562,63 +661,69 @@ BOOL tls_verify_certificate(rdpTls* tls, CryptoCert cert, char* hostname)
 		free(certificate_data);
 	}
 
+#ifndef _WIN32
+	free(common_name);
+#endif
+
 	return verification_status;
 }
 
-void tls_print_certificate_error(char* hostname, char* fingerprint)
+void tls_print_certificate_error(char* hostname, char* fingerprint, char *hosts_file)
 {
-	printf("The host key for %s has changed\n", hostname);
-	printf("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
-	printf("@    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @\n");
-	printf("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
-	printf("IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!\n");
-	printf("Someone could be eavesdropping on you right now (man-in-the-middle attack)!\n");
-	printf("It is also possible that a host key has just been changed.\n");
-	printf("The fingerprint for the host key sent by the remote host is\n%s\n", fingerprint);
-	printf("Please contact your system administrator.\n");
-	printf("Add correct host key in ~/.freerdp/known_hosts to get rid of this message.\n");
-	printf("Host key for %s has changed and you have requested strict checking.\n", hostname);
-	printf("Host key verification failed.\n");
+	fprintf(stderr, "The host key for %s has changed\n", hostname);
+	fprintf(stderr, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+	fprintf(stderr, "@    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @\n");
+	fprintf(stderr, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+	fprintf(stderr, "IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!\n");
+	fprintf(stderr, "Someone could be eavesdropping on you right now (man-in-the-middle attack)!\n");
+	fprintf(stderr, "It is also possible that a host key has just been changed.\n");
+	fprintf(stderr, "The fingerprint for the host key sent by the remote host is\n%s\n", fingerprint);
+	fprintf(stderr, "Please contact your system administrator.\n");
+	fprintf(stderr, "Add correct host key in %s to get rid of this message.\n", hosts_file);
+	fprintf(stderr, "Host key for %s has changed and you have requested strict checking.\n", hostname);
+	fprintf(stderr, "Host key verification failed.\n");
 }
 
 void tls_print_certificate_name_mismatch_error(char* hostname, char* common_name, char** alt_names, int alt_names_count)
 {
 	int index;
 
-	printf("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
-	printf("@           WARNING: CERTIFICATE NAME MISMATCH!           @\n");
-	printf("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
-	printf("The hostname used for this connection (%s) \n", hostname);
+	fprintf(stderr, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+	fprintf(stderr, "@           WARNING: CERTIFICATE NAME MISMATCH!           @\n");
+	fprintf(stderr, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+	fprintf(stderr, "The hostname used for this connection (%s) \n", hostname);
 
 	if (alt_names_count < 1)
 	{
-		printf("does not match the name given in the certificate:\n");
-		printf("%s\n", common_name);
+		fprintf(stderr, "does not match the name given in the certificate:\n");
+		fprintf(stderr, "%s\n", common_name);
 	}
 	else
 	{
-		printf("does not match the names given in the certificate:\n");
-		printf("%s", common_name);
+		fprintf(stderr, "does not match the names given in the certificate:\n");
+		fprintf(stderr, "%s", common_name);
 
 		for (index = 0; index < alt_names_count; index++)
 		{
-			printf(", %s", alt_names[index]);
+			fprintf(stderr, ", %s", alt_names[index]);
 		}
 
-		printf("\n");
+		fprintf(stderr, "\n");
 	}
 
-	printf("A valid certificate for the wrong name should NOT be trusted!\n");
+	fprintf(stderr, "A valid certificate for the wrong name should NOT be trusted!\n");
 }
 
 rdpTls* tls_new(rdpSettings* settings)
 {
 	rdpTls* tls;
 
-	tls = (rdpTls*) xzalloc(sizeof(rdpTls));
+	tls = (rdpTls*) malloc(sizeof(rdpTls));
 
 	if (tls != NULL)
 	{
+		ZeroMemory(tls, sizeof(rdpTls));
+
 		SSL_load_error_strings();
 		SSL_library_init();
 
@@ -641,6 +746,12 @@ void tls_free(rdpTls* tls)
 
 		if (tls->PublicKey)
 			free(tls->PublicKey);
+
+		if (tls->Bindings)
+		{
+			free(tls->Bindings->Bindings);
+			free(tls->Bindings);
+		}
 
 		certificate_store_free(tls->certificate_store);
 

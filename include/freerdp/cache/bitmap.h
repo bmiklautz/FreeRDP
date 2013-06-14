@@ -17,14 +17,15 @@
  * limitations under the License.
  */
 
-#ifndef __BITMAP_V2_CACHE_H
-#define __BITMAP_V2_CACHE_H
+#ifndef FREERDP_BITMAP_V2_CACHE_H
+#define FREERDP_BITMAP_V2_CACHE_H
 
 #include <freerdp/api.h>
 #include <freerdp/types.h>
 #include <freerdp/update.h>
 #include <freerdp/freerdp.h>
-#include <freerdp/utils/stream.h>
+
+#include <winpr/stream.h>
 
 typedef struct _BITMAP_V2_CELL BITMAP_V2_CELL;
 typedef struct rdp_bitmap_cache rdpBitmapCache;
@@ -59,6 +60,10 @@ struct rdp_bitmap_cache
 	rdpSettings* settings;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 FREERDP_API rdpBitmap* bitmap_cache_get(rdpBitmapCache* bitmap_cache, UINT32 id, UINT32 index);
 FREERDP_API void bitmap_cache_put(rdpBitmapCache* bitmap_cache, UINT32 id, UINT32 index, rdpBitmap* bitmap);
 
@@ -67,4 +72,8 @@ FREERDP_API void bitmap_cache_register_callbacks(rdpUpdate* update);
 FREERDP_API rdpBitmapCache* bitmap_cache_new(rdpSettings* settings);
 FREERDP_API void bitmap_cache_free(rdpBitmapCache* bitmap_cache);
 
-#endif /* __BITMAP_V2_CACHE_H */
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* FREERDP_BITMAP_V2_CACHE_H */

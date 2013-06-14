@@ -24,6 +24,10 @@
 
 #ifndef _WIN32
 
+#include "../handle/handle.h"
+
+#define WINPR_PIPE_SEMAPHORE	1
+
 #if defined __APPLE__
 #include <pthread.h>
 #include <semaphore.h>
@@ -37,9 +41,29 @@
 #define winpr_sem_t sem_t
 #endif
 
+struct winpr_mutex
+{
+	WINPR_HANDLE_DEF();
+
+	pthread_mutex_t mutex;
+};
+typedef struct winpr_mutex WINPR_MUTEX;
+
+struct winpr_semaphore
+{
+	WINPR_HANDLE_DEF();
+
+	int pipe_fd[2];
+	winpr_sem_t* sem;
+};
+typedef struct winpr_semaphore WINPR_SEMAPHORE;
+
 struct winpr_event
 {
+	WINPR_HANDLE_DEF();
+
 	int pipe_fd[2];
+	BOOL bAttached;
 	BOOL bManualReset;
 };
 typedef struct winpr_event WINPR_EVENT;

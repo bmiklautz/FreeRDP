@@ -21,8 +21,11 @@
 #include "config.h"
 #endif
 
+#include <winpr/windows.h>
+
+#include <winpr/crt.h>
+
 #include <freerdp/utils/tcp.h>
-#include <freerdp/utils/print.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,6 +41,7 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
+#include <sys/select.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <net/if.h>
@@ -51,6 +55,9 @@
 #else /* ifdef _WIN32 */
 
 #include <winpr/windows.h>
+
+#include <winpr/crt.h>
+
 #define SHUT_RDWR SD_BOTH
 #define close(_fd) closesocket(_fd)
 #endif
@@ -73,12 +80,12 @@ int freerdp_tcp_connect(const char* hostname, int port)
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 
-	snprintf(servname, sizeof(servname), "%d", port);
+	sprintf_s(servname, sizeof(servname), "%d", port);
 	status = getaddrinfo(hostname, servname, &hints, &res);
 
 	if (status != 0)
 	{
-		printf("tcp_connect: getaddrinfo (%s)\n", gai_strerror(status));
+		fprintf(stderr, "tcp_connect: getaddrinfo (%s)\n", gai_strerror(status));
 		return -1;
 	}
 
@@ -93,7 +100,7 @@ int freerdp_tcp_connect(const char* hostname, int port)
 
 		if (connect(sockfd, ai->ai_addr, ai->ai_addrlen) == 0)
 		{
-			printf("connected to %s:%s\n", hostname, servname);
+			fprintf(stderr, "connected to %s:%s\n", hostname, servname);
 			break;
 		}
 
@@ -105,7 +112,7 @@ int freerdp_tcp_connect(const char* hostname, int port)
 
 	if (sockfd == -1)
 	{
-		printf("unable to connect to %s:%s\n", hostname, servname);
+		fprintf(stderr, "unable to connect to %s:%s\n", hostname, servname);
 		return -1;
 	}
 
@@ -131,7 +138,7 @@ int freerdp_tcp_read(int sockfd, BYTE* data, int length)
 		if (wsa_error == WSAEWOULDBLOCK)
 			return 0;
 
-		printf("recv() error: %d\n", wsa_error);
+		fprintf(stderr, "recv() error: %d\n", wsa_error);
 #else
 		/* No data available */
 		if (errno == EAGAIN || errno == EWOULDBLOCK)
@@ -170,6 +177,37 @@ int freerdp_tcp_write(int sockfd, BYTE* data, int length)
 	}
 
 	return status;
+}
+
+int freerdp_tcp_wait_read(int sockfd)
+{
+	fd_set fds;
+	if(sockfd<1)
+	{
+	    fprintf(stderr, "Invalid socket to watch: %d\n", sockfd);
+	    return 0 ;	    
+	}
+	FD_ZERO(&fds);
+	FD_SET(sockfd, &fds);
+	select(sockfd+1, &fds, NULL, NULL, NULL);
+
+	return 0;
+}
+
+int freerdp_tcp_wait_write(int sockfd)
+{
+	fd_set fds;
+	if(sockfd<1)
+	{
+	    fprintf(stderr, "Invalid socket to watch: %d\n", sockfd);
+	    return 0;
+	}
+
+	FD_ZERO(&fds);
+	FD_SET(sockfd, &fds);
+	select(sockfd+1, NULL, &fds, NULL, NULL);
+
+	return 0;
 }
 
 int freerdp_tcp_disconnect(int sockfd)

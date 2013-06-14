@@ -16,10 +16,16 @@
 # limitations under the License.
 #=============================================================================
 
-# Enable compatibility for cmake < 2.8.3
-if(${CMAKE_VERSION} VERSION_LESS 2.8.3)
-        set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake/compat_2.8.3/)
-endif()
+macro(enable_cmake_compat CMVERSION)
+	if(${CMAKE_VERSION} VERSION_LESS ${CMVERSION})
+		LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/compat_${CMVERSION}/")
+	endif()
+endmacro()
+
+# Compatibility includes - oder does matter!
+enable_cmake_compat(2.8.6)
+enable_cmake_compat(2.8.3)
+enable_cmake_compat(2.8.2)
 
 # If MONOLITHIC_BUILD is used with cmake < 2.8.8 build fails
 if (MONOLITHIC_BUILD)
@@ -32,4 +38,10 @@ endif(MONOLITHIC_BUILD)
 # build won't fail but GIT_REVISION is set to n/a
 if(${CMAKE_VERSION} VERSION_LESS 2.8.2)
 	message(WARNING "GetGitRevisionDescription reqires (FindGit) cmake >= 2.8.2 to work properly - GIT_REVISION will be set to n/a")
+endif()
+
+# Since cmake 2.8.9 modules/library names without lib/.so can be used
+# for dependencies
+if(IOS AND ${CMAKE_VERSION} VERSION_LESS 2.8.9)
+	message(FATAL_ERROR "CMAKE version >= 2.8.9 required to build the IOS client")
 endif()

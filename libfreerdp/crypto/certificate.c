@@ -27,42 +27,58 @@
 #include <string.h>
 
 #include <winpr/crt.h>
+#include <winpr/file.h>
+#include <winpr/path.h>
 
 #include <openssl/pem.h>
 #include <openssl/rsa.h>
 
-#include <freerdp/utils/file.h>
-
 static const char certificate_store_dir[] = "certs";
+static const char certificate_server_dir[] = "server";
 static const char certificate_known_hosts_file[] = "known_hosts";
 
 #include <freerdp/crypto/certificate.h>
 
 void certificate_store_init(rdpCertificateStore* certificate_store)
 {
-	char* config_path;
+	char* server_path;
 	rdpSettings* settings;
 
 	settings = certificate_store->settings;
 
-	config_path = freerdp_get_config_path(settings);
-	certificate_store->path = freerdp_construct_path(config_path, (char*) certificate_store_dir);
-
-	if (freerdp_check_file_exists(certificate_store->path) == FALSE)
+	if (!PathFileExistsA(settings->ConfigPath))
 	{
-		freerdp_mkdir(certificate_store->path);
-		printf("creating directory %s\n", certificate_store->path);
+		CreateDirectoryA(settings->ConfigPath, 0);
+		fprintf(stderr, "creating directory %s\n", settings->ConfigPath);
 	}
 
-	certificate_store->file = freerdp_construct_path(config_path, (char*) certificate_known_hosts_file);
+	certificate_store->path = GetCombinedPath(settings->ConfigPath, (char*) certificate_store_dir);
 
-	if (freerdp_check_file_exists(certificate_store->file) == FALSE)
+	if (!PathFileExistsA(certificate_store->path))
+	{
+		CreateDirectoryA(certificate_store->path, 0);
+		fprintf(stderr, "creating directory %s\n", certificate_store->path);
+	}
+
+	server_path = GetCombinedPath(settings->ConfigPath, (char*) certificate_server_dir);
+
+	if (!PathFileExistsA(server_path))
+	{
+		CreateDirectoryA(server_path, 0);
+		fprintf(stderr, "creating directory %s\n", server_path);
+	}
+
+	free(server_path);
+
+	certificate_store->file = GetCombinedPath(settings->ConfigPath, (char*) certificate_known_hosts_file);
+
+	if (PathFileExistsA(certificate_store->file) == FALSE)
 	{
 		certificate_store->fp = fopen((char*) certificate_store->file, "w+");
 
 		if (certificate_store->fp == NULL)
 		{
-			printf("certificate_store_open: error opening [%s] for writing\n", certificate_store->file);
+			fprintf(stderr, "certificate_store_open: error opening [%s] for writing\n", certificate_store->file);
 			return;
 		}
 
@@ -148,7 +164,7 @@ void certificate_data_replace(rdpCertificateStore* certificate_store, rdpCertifi
 	if (!fp)
 		return;
 	
-	// Read the current contents of the file.
+	/* Read the current contents of the file. */
 	fseek(fp, 0, SEEK_END);
 	size = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
@@ -164,7 +180,7 @@ void certificate_data_replace(rdpCertificateStore* certificate_store, rdpCertifi
 		return;
 	}
 	
-	// Write the file back out, with appropriate fingerprint substitutions
+	/* Write the file back out, with appropriate fingerprint substitutions */
 	fp = fopen(certificate_store->file, "w+");
 	data[size] = '\n';
 	data[size + 1] = '\0';
@@ -215,10 +231,12 @@ rdpCertificateData* certificate_data_new(char* hostname, char* fingerprint)
 {
 	rdpCertificateData* certdata;
 
-	certdata = (rdpCertificateData*) xzalloc(sizeof(rdpCertificateData));
+	certdata = (rdpCertificateData*) malloc(sizeof(rdpCertificateData));
 
 	if (certdata != NULL)
 	{
+		ZeroMemory(certdata, sizeof(rdpCertificateData));
+
 		certdata->hostname = _strdup(hostname);
 		certdata->fingerprint = _strdup(fingerprint);
 	}
@@ -240,10 +258,12 @@ rdpCertificateStore* certificate_store_new(rdpSettings* settings)
 {
 	rdpCertificateStore* certificate_store;
 
-	certificate_store = (rdpCertificateStore*) xzalloc(sizeof(rdpCertificateStore));
+	certificate_store = (rdpCertificateStore*) malloc(sizeof(rdpCertificateStore));
 
 	if (certificate_store != NULL)
 	{
+		ZeroMemory(certificate_store, sizeof(rdpCertificateStore));
+
 		certificate_store->settings = settings;
 		certificate_store_init(certificate_store);
 	}

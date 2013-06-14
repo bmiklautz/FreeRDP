@@ -24,6 +24,7 @@
 #include <winpr/wtypes.h>
 
 #include <winpr/io.h>
+#include <winpr/error.h>
 
 #ifndef _WIN32
 
@@ -193,6 +194,10 @@ typedef VOID (*LPOVERLAPPED_COMPLETION_ROUTINE)(DWORD dwErrorCode, DWORD dwNumbe
 #define LPWIN32_FIND_DATA	LPWIN32_FIND_DATAA
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 WINPR_API HANDLE CreateFileA(LPCSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes,
 		DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile);
 
@@ -256,20 +261,49 @@ WINPR_API BOOL FindNextFileW(HANDLE hFindFile, LPWIN32_FIND_DATAW lpFindFileData
 
 WINPR_API BOOL FindClose(HANDLE hFindFile);
 
+WINPR_API BOOL CreateDirectoryA(LPCSTR lpPathName, LPSECURITY_ATTRIBUTES lpSecurityAttributes);
+WINPR_API BOOL CreateDirectoryW(LPCWSTR lpPathName, LPSECURITY_ATTRIBUTES lpSecurityAttributes);
+
+#ifdef __cplusplus
+}
+#endif
+
 #ifdef UNICODE
 #define CreateFile		CreateFileW
 #define DeleteFile		DeleteFileW
 #define FindFirstFile		FindFirstFileW
 #define FindFirstFileEx		FindFirstFileExW
 #define FindNextFile		FindNextFileW
+#define CreateDirectory		CreateDirectoryW
 #else
 #define CreateFile		CreateFileA
 #define DeleteFile		DeleteFileA
 #define FindFirstFile		FindFirstFileA
 #define FindFirstFileEx		FindFirstFileExA
 #define FindNextFile		FindNextFileA
+#define CreateDirectory		CreateDirectoryA
 #endif
 
+#endif
+
+/* Extra Functions */
+
+#define WILDCARD_STAR		0x00000001
+#define WILDCARD_QM		0x00000002
+#define WILDCARD_DOS		0x00000100
+#define WILDCARD_DOS_STAR	0x00000110
+#define WILDCARD_DOS_QM		0x00000120
+#define WILDCARD_DOS_DOT	0x00000140
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+WINPR_API BOOL FilePatternMatchA(LPCSTR lpFileName, LPCSTR lpPattern);
+WINPR_API LPSTR FilePatternFindNextWildcardA(LPCSTR lpPattern, DWORD* pFlags);
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* WINPR_FILE_H */

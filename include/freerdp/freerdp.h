@@ -17,8 +17,8 @@
  * limitations under the License.
  */
 
-#ifndef __FREERDP_H
-#define __FREERDP_H
+#ifndef FREERDP_H
+#define FREERDP_H
 
 typedef struct rdp_rdp rdpRdp;
 typedef struct rdp_gdi rdpGdi;
@@ -33,13 +33,17 @@ typedef struct rdp_freerdp_peer freerdp_peer;
 
 #include <freerdp/api.h>
 #include <freerdp/types.h>
+#include <freerdp/error.h>
 #include <freerdp/settings.h>
 #include <freerdp/extension.h>
-#include <freerdp/utils/stream.h>
+
+#include <winpr/stream.h>
+
+#include <freerdp/client.h>
 
 #include <freerdp/input.h>
 #include <freerdp/update.h>
-#include <freerdp/errorcodes.h>
+#include <freerdp/message.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -54,8 +58,13 @@ typedef BOOL (*pAuthenticate)(freerdp* instance, char** username, char** passwor
 typedef BOOL (*pVerifyCertificate)(freerdp* instance, char* subject, char* issuer, char* fingerprint);
 typedef BOOL (*pVerifyChangedCertificate)(freerdp* instance, char* subject, char* issuer, char* new_fingerprint, char* old_fingerprint);
 
+typedef int (*pLogonErrorInfo)(freerdp* instance, UINT32 data, UINT32 type);
+
 typedef int (*pSendChannelData)(freerdp* instance, int channelId, BYTE* data, int size);
 typedef int (*pReceiveChannelData)(freerdp* instance, int channelId, BYTE* data, int size, int flags, int total_size);
+
+typedef int (*pOnChannelConnected)(freerdp* instance, const char* name, void* pInterface);
+typedef int (*pOnChannelDisconnected)(freerdp* instance, const char* name, void* pInterface);
 
 /**
  * Defines the context for a given instance of RDP connection.
@@ -82,6 +91,7 @@ struct rdp_context
 					List of arguments given to the program at launch time.
 					Used to keep this data available and used later on, typically just before connection initialization.
 					@see freerdp_parse_args() */
+
 	UINT32 paddingB[32 - 18]; /* 18 */
 
 	rdpRdp* rdp; /**< (offset 32)
@@ -96,7 +106,11 @@ struct rdp_context
 	rdpCache* cache; /* 35 */
 	rdpChannels* channels; /* 36 */
 	rdpGraphics* graphics; /* 37 */
-	UINT32 paddingC[64 - 38]; /* 38 */
+	rdpInput* input; /* 38 */
+	rdpUpdate* update; /* 39 */
+	rdpSettings* settings; /* 40 */
+	rdpClient* client; /* 41 */
+	UINT32 paddingC[64 - 42]; /* 42 */
 };
 
 /** Defines the options for a given instance of RDP connection.
@@ -114,7 +128,8 @@ struct rdp_freerdp
 							  When using this capability, client application should ALWAYS declare their structure with the
 							  rdpContext field first, and any additional content following it.
 							  Can be allocated by a call to freerdp_context_new().
-							  Must be dealocated by a call to freerdp_context_free() before deallocating the current instance. */
+							  Must be deallocated by a call to freerdp_context_free() before deallocating the current instance. */
+
 	UINT32 paddingA[16 - 1]; /* 1 */
 
 	rdpInput* input; /* (offset 16)
@@ -168,7 +183,10 @@ struct rdp_freerdp
 															 Callback for changed certificate validation. 
 															 Used when a certificate differs from stored fingerprint.
 															 If returns TRUE, the new fingerprint will be trusted and old thrown out. */
-	UINT32 paddingD[64 - 51]; /* 51 */
+
+	pLogonErrorInfo LogonErrorInfo; /**< (offset 53)  Callback for logon error info, important for logon system messages with RemoteApp */
+
+	UINT32 paddingD[64 - 54]; /* 54 */
 
 	pSendChannelData SendChannelData; /* (offset 64)
 										 Callback for sending data to a channel.
@@ -178,6 +196,10 @@ struct rdp_freerdp
 											   Callback for receiving data from a channel.
 											   This is called by freerdp_channel_process() (if not NULL).
 											   Clients will typically use a function that calls freerdp_channels_data() to perform the needed tasks. */
+
+	pOnChannelConnected OnChannelConnected;
+	pOnChannelDisconnected OnChannelDisconnected;
+
 	UINT32 paddingE[80 - 66]; /* 66 */
 };
 
@@ -191,15 +213,21 @@ FREERDP_API BOOL freerdp_disconnect(freerdp* instance);
 FREERDP_API BOOL freerdp_get_fds(freerdp* instance, void** rfds, int* rcount, void** wfds, int* wcount);
 FREERDP_API BOOL freerdp_check_fds(freerdp* instance);
 
+FREERDP_API wMessageQueue* freerdp_get_message_queue(freerdp* instance, DWORD id);
+FREERDP_API HANDLE freerdp_get_message_queue_event_handle(freerdp* instance, DWORD id);
+FREERDP_API int freerdp_message_queue_process_message(freerdp* instance, DWORD id, wMessage* message);
+FREERDP_API int freerdp_message_queue_process_pending_messages(freerdp* instance, DWORD id);
+
 FREERDP_API UINT32 freerdp_error_info(freerdp* instance);
 
 FREERDP_API void freerdp_get_version(int* major, int* minor, int* revision);
 
-FREERDP_API freerdp* freerdp_new();
+FREERDP_API freerdp* freerdp_new(void);
 FREERDP_API void freerdp_free(freerdp* instance);
 
+FREERDP_API BOOL freerdp_focus_required(freerdp* instance);
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif /* FREERDP_H */

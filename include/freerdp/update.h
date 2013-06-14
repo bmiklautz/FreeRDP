@@ -17,17 +17,22 @@
  * limitations under the License.
  */
 
-#ifndef __UPDATE_API_H
-#define __UPDATE_API_H
+#ifndef FREERDP_UPDATE_H
+#define FREERDP_UPDATE_H
 
 typedef struct rdp_update rdpUpdate;
+
+#include <winpr/crt.h>
+#include <winpr/synch.h>
+#include <winpr/thread.h>
+#include <winpr/stream.h>
+#include <winpr/collections.h>
 
 #include <freerdp/rail.h>
 #include <freerdp/types.h>
 #include <freerdp/freerdp.h>
 #include <freerdp/graphics.h>
 #include <freerdp/utils/pcap.h>
-#include <freerdp/utils/stream.h>
 
 #include <freerdp/primary.h>
 #include <freerdp/secondary.h>
@@ -85,7 +90,7 @@ typedef struct _PALETTE_UPDATE PALETTE_UPDATE;
 struct rdp_palette
 {
 	UINT32 count;
-	PALETTE_ENTRY* entries;
+	PALETTE_ENTRY entries[256];
 };
 typedef struct rdp_palette rdpPalette;
 
@@ -129,6 +134,9 @@ enum SURFCMD_FRAMEACTION
 	SURFACECMD_FRAMEACTION_END = 0x0001
 };
 
+/* defined inside libfreerdp-core */
+typedef struct rdp_update_proxy rdpUpdateProxy;
+
 /* Update Interface */
 
 typedef void (*pBeginPaint)(rdpContext* context);
@@ -144,9 +152,10 @@ typedef void (*pPlaySound)(rdpContext* context, PLAY_SOUND_UPDATE* play_sound);
 typedef void (*pRefreshRect)(rdpContext* context, BYTE count, RECTANGLE_16* areas);
 typedef void (*pSuppressOutput)(rdpContext* context, BYTE allow, RECTANGLE_16* area);
 
-typedef void (*pSurfaceCommand)(rdpContext* context, STREAM* s);
+typedef void (*pSurfaceCommand)(rdpContext* context, wStream* s);
 typedef void (*pSurfaceBits)(rdpContext* context, SURFACE_BITS_COMMAND* surface_bits_command);
 typedef void (*pSurfaceFrameMarker)(rdpContext* context, SURFACE_FRAME_MARKER* surface_frame_marker);
+typedef void (*pSurfaceFrameAcknowledge)(rdpContext* context, UINT32 frameId);
 
 struct rdp_update
 {
@@ -177,13 +186,15 @@ struct rdp_update
 	pSurfaceCommand SurfaceCommand; /* 64 */
 	pSurfaceBits SurfaceBits; /* 65 */
 	pSurfaceFrameMarker SurfaceFrameMarker; /* 66 */
-	UINT32 paddingE[80 - 67]; /* 67 */
+	pSurfaceFrameAcknowledge SurfaceFrameAcknowledge; /* 67 */
+	UINT32 paddingE[80 - 68]; /* 68 */
 
 	/* internal */
 
 	BOOL dump_rfx;
 	BOOL play_rfx;
 	rdpPcap* pcap_rfx;
+	BOOL initialState;
 
 	BITMAP_UPDATE bitmap_update;
 	PALETTE_UPDATE palette_update;
@@ -191,7 +202,16 @@ struct rdp_update
 
 	SURFACE_BITS_COMMAND surface_bits_command;
 	SURFACE_FRAME_MARKER surface_frame_marker;
+
+	BOOL asynchronous;
+	rdpUpdateProxy* proxy;
+	wMessageQueue* queue;
+
+	wStream* us;
+	UINT16 numberOrders;
+	BOOL combineUpdates;
+	rdpBounds currentBounds;
+	rdpBounds previousBounds;
 };
 
-#endif /* __UPDATE_API_H */
-
+#endif /* FREERDP_UPDATE_H */

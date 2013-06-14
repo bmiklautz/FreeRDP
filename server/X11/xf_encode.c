@@ -22,7 +22,12 @@
 #endif
 
 #include <X11/Xlib.h>
-#include <freerdp/utils/sleep.h>
+#include <X11/Xutil.h>
+
+#include <sys/select.h>
+#include <sys/signal.h>
+
+#include <winpr/crt.h>
 
 #include "xf_encode.h"
 
@@ -33,25 +38,12 @@ XImage* xf_snapshot(xfPeerContext* xfp, int x, int y, int width, int height)
 
 	if (xfi->use_xshm)
 	{
-		pthread_mutex_lock(&(xfp->mutex));
-
-		XCopyArea(xfi->display, xfi->root_window, xfi->fb_pixmap,
-				xfi->xdamage_gc, x, y, width, height, x, y);
-
-		XSync(xfi->display, False);
-
+		XCopyArea(xfi->display, xfi->root_window, xfi->fb_pixmap, xfi->xdamage_gc, x, y, width, height, x, y);
 		image = xfi->fb_image;
-
-		pthread_mutex_unlock(&(xfp->mutex));
 	}
 	else
 	{
-		pthread_mutex_lock(&(xfp->mutex));
-
-		image = XGetImage(xfi->display, xfi->root_window,
-				x, y, width, height, AllPlanes, ZPixmap);
-
-		pthread_mutex_unlock(&(xfp->mutex));
+		image = XGetImage(xfi->display, xfi->root_window, x, y, width, height, AllPlanes, ZPixmap);
 	}
 
 	return image;
@@ -68,112 +60,90 @@ void xf_xdamage_subtract_region(xfPeerContext* xfp, int x, int y, int width, int
 	region.height = height;
 
 #ifdef WITH_XFIXES
-	pthread_mutex_lock(&(xfp->mutex));
 	XFixesSetRegion(xfi->display, xfi->xdamage_region, &region, 1);
 	XDamageSubtract(xfi->display, xfi->xdamage, xfi->xdamage_region, None);
-	pthread_mutex_unlock(&(xfp->mutex));
 #endif
 }
 
-void* xf_frame_rate_thread(void* param)
+int xf_update_encode(freerdp_peer* client, int x, int y, int width, int height)
 {
+	wStream* s;
+	BYTE* data;
 	xfInfo* xfi;
-	xfEvent* event;
+	RFX_RECT rect;
+	XImage* image;
+	rdpUpdate* update;
 	xfPeerContext* xfp;
-	freerdp_peer* client;
-	UINT32 wait_interval;
+	SURFACE_BITS_COMMAND* cmd;
 
-	client = (freerdp_peer*) param;
+	update = client->update;
 	xfp = (xfPeerContext*) client->context;
+	cmd = &update->surface_bits_command;
 	xfi = xfp->info;
 
-	wait_interval = 1000000 / xfp->fps;
-
-	while (1)
+	if (width * height <= 0)
 	{
-		// check if we should terminate
-		pthread_testcancel();
-		
-		event = xf_event_new(XF_EVENT_TYPE_FRAME_TICK);
-		xf_event_push(xfp->event_queue, (xfEvent*) event);
-		freerdp_usleep(wait_interval);
-	}
-}
-
-void* xf_monitor_updates(void* param)
-{
-	int fds;
-	xfInfo* xfi;
-	XEvent xevent;
-	fd_set rfds_set;
-	int select_status;
-	int pending_events;
-	xfPeerContext* xfp;
-	freerdp_peer* client;
-	UINT32 wait_interval;
-	struct timeval timeout;
-	int x, y, width, height;
-	XDamageNotifyEvent* notify;
-	xfEventRegion* event_region;
-
-	client = (freerdp_peer*) param;
-	xfp = (xfPeerContext*) client->context;
-	xfi = xfp->info;
-
-	fds = xfi->xfds;
-	wait_interval = (1000000 / 2500);
-	memset(&timeout, 0, sizeof(struct timeval));
-
-	pthread_create(&(xfp->frame_rate_thread), 0, xf_frame_rate_thread, (void*) client);
-
-	while (1)
-	{
-		// check if we should terminate
-		pthread_testcancel();
-
-		FD_ZERO(&rfds_set);
-		FD_SET(fds, &rfds_set);
-
-		timeout.tv_sec = 0;
-		timeout.tv_usec = wait_interval;
-		select_status = select(fds + 1, &rfds_set, NULL, NULL, &timeout);
-
-		if (select_status == -1)
-		{
-			printf("select failed\n");
-		}
-		else if (select_status == 0)
-		{
-			//printf("select timeout\n");
-		}
-
-		pthread_mutex_lock(&(xfp->mutex));
-		pending_events = XPending(xfi->display);
-		pthread_mutex_unlock(&(xfp->mutex));
-
-		if (pending_events > 0)
-		{
-			pthread_mutex_lock(&(xfp->mutex));
-			memset(&xevent, 0, sizeof(xevent));
-			XNextEvent(xfi->display, &xevent);
-			pthread_mutex_unlock(&(xfp->mutex));
-
-			if (xevent.type == xfi->xdamage_notify_event)
-			{
-				notify = (XDamageNotifyEvent*) &xevent;
-
-				x = notify->area.x;
-				y = notify->area.y;
-				width = notify->area.width;
-				height = notify->area.height;
-
-				xf_xdamage_subtract_region(xfp, x, y, width, height);
-
-				event_region = xf_event_region_new(x, y, width, height);
-				xf_event_push(xfp->event_queue, (xfEvent*) event_region);
-			}
-		}
+		cmd->bitmapDataLength = 0;
+		return -1;
 	}
 
-	return NULL;
+	s = xfp->s;
+	Stream_Clear(s);
+	Stream_SetPosition(s, 0);
+
+	if (xfi->use_xshm)
+	{
+		/**
+		 * Passing an offset source rectangle to rfx_compose_message()
+		 * leads to protocol errors, so offset the data pointer instead.
+		 */
+
+		rect.x = 0;
+		rect.y = 0;
+		rect.width = width;
+		rect.height = height;
+
+		image = xf_snapshot(xfp, x, y, width, height);
+
+		data = (BYTE*) image->data;
+		data = &data[(y * image->bytes_per_line) + (x * image->bits_per_pixel / 8)];
+
+		rfx_compose_message(xfp->rfx_context, s, &rect, 1, data,
+				width, height, image->bytes_per_line);
+
+		cmd->destLeft = x;
+		cmd->destTop = y;
+		cmd->destRight = x + width;
+		cmd->destBottom = y + height;
+	}
+	else
+	{
+		rect.x = 0;
+		rect.y = 0;
+		rect.width = width;
+		rect.height = height;
+
+		image = xf_snapshot(xfp, x, y, width, height);
+
+		data = (BYTE*) image->data;
+
+		rfx_compose_message(xfp->rfx_context, s, &rect, 1, data,
+				width, height, image->bytes_per_line);
+
+		cmd->destLeft = x;
+		cmd->destTop = y;
+		cmd->destRight = x + width;
+		cmd->destBottom = y + height;
+
+		XDestroyImage(image);
+	}
+
+	cmd->bpp = 32;
+	cmd->codecID = client->settings->RemoteFxCodecId;
+	cmd->width = width;
+	cmd->height = height;
+	cmd->bitmapDataLength = Stream_GetPosition(s);
+	cmd->bitmapData = Stream_Buffer(s);
+
+	return 0;
 }

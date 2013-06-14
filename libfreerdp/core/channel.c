@@ -28,59 +28,60 @@
 #include <freerdp/freerdp.h>
 #include <freerdp/peer.h>
 #include <freerdp/constants.h>
-#include <freerdp/utils/memory.h>
-#include <freerdp/utils/stream.h>
+#include <winpr/stream.h>
 
 #include "rdp.h"
 #include "channel.h"
 
 BOOL freerdp_channel_send(rdpRdp* rdp, UINT16 channel_id, BYTE* data, int size)
 {
-	STREAM* s;
+	wStream* s;
 	UINT32 flags;
 	int i, left;
 	int chunk_size;
 	rdpChannel* channel = NULL;
 
-	for (i = 0; i < rdp->settings->num_channels; i++)
+	for (i = 0; i < rdp->settings->ChannelCount; i++)
 	{
-		if (rdp->settings->channels[i].channel_id == channel_id)
+		if (rdp->settings->ChannelDefArray[i].ChannelId == channel_id)
 		{
-			channel = &rdp->settings->channels[i];
+			channel = &rdp->settings->ChannelDefArray[i];
 			break;
 		}
 	}
 
-	if (channel == NULL)
+	if (!channel)
 	{
-		printf("freerdp_channel_send: unknown channel_id %d\n", channel_id);
+		fprintf(stderr, "freerdp_channel_send: unknown channel_id %d\n", channel_id);
 		return FALSE;
 	}
 
 	flags = CHANNEL_FLAG_FIRST;
 	left = size;
+
 	while (left > 0)
 	{
 		s = rdp_send_stream_init(rdp);
 
-		if (left > (int) rdp->settings->vc_chunk_size)
+		if (left > (int) rdp->settings->VirtualChannelChunkSize)
 		{
-			chunk_size = rdp->settings->vc_chunk_size;
+			chunk_size = rdp->settings->VirtualChannelChunkSize;
 		}
 		else
 		{
 			chunk_size = left;
 			flags |= CHANNEL_FLAG_LAST;
 		}
+
 		if ((channel->options & CHANNEL_OPTION_SHOW_PROTOCOL))
 		{
 			flags |= CHANNEL_FLAG_SHOW_PROTOCOL;
 		}
 
-		stream_write_UINT32(s, size);
-		stream_write_UINT32(s, flags);
-		stream_check_size(s, chunk_size);
-		stream_write(s, data, chunk_size);
+		Stream_Write_UINT32(s, size);
+		Stream_Write_UINT32(s, flags);
+		Stream_EnsureCapacity(s, chunk_size);
+		Stream_Write(s, data, chunk_size);
 
 		rdp_send(rdp, s, channel_id);
 
@@ -92,30 +93,40 @@ BOOL freerdp_channel_send(rdpRdp* rdp, UINT16 channel_id, BYTE* data, int size)
 	return TRUE;
 }
 
-void freerdp_channel_process(freerdp* instance, STREAM* s, UINT16 channel_id)
+BOOL freerdp_channel_process(freerdp* instance, wStream* s, UINT16 channel_id)
 {
 	UINT32 length;
 	UINT32 flags;
 	int chunk_length;
 
-	stream_read_UINT32(s, length);
-	stream_read_UINT32(s, flags);
-	chunk_length = stream_get_left(s);
+	if (Stream_GetRemainingLength(s) < 8)
+		return FALSE;
+
+	Stream_Read_UINT32(s, length);
+	Stream_Read_UINT32(s, flags);
+	chunk_length = Stream_GetRemainingLength(s);
 
 	IFCALL(instance->ReceiveChannelData, instance,
-		channel_id, stream_get_tail(s), chunk_length, flags, length);
+		channel_id, Stream_Pointer(s), chunk_length, flags, length);
+
+	return TRUE;
 }
 
-void freerdp_channel_peer_process(freerdp_peer* client, STREAM* s, UINT16 channel_id)
+BOOL freerdp_channel_peer_process(freerdp_peer* client, wStream* s, UINT16 channel_id)
 {
 	UINT32 length;
 	UINT32 flags;
 	int chunk_length;
 
-	stream_read_UINT32(s, length);
-	stream_read_UINT32(s, flags);
-	chunk_length = stream_get_left(s);
+	if (Stream_GetRemainingLength(s) < 8)
+		return FALSE;
+
+	Stream_Read_UINT32(s, length);
+	Stream_Read_UINT32(s, flags);
+	chunk_length = Stream_GetRemainingLength(s);
 
 	IFCALL(client->ReceiveChannelData, client,
-		channel_id, stream_get_tail(s), chunk_length, flags, length);
+		channel_id, Stream_Pointer(s), chunk_length, flags, length);
+
+	return TRUE;
 }

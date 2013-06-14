@@ -17,14 +17,15 @@
  * limitations under the License.
  */
 
-#ifndef __RAIL_ICON_CACHE_H
-#define __RAIL_ICON_CACHE_H
+#ifndef FREERDP_RAIL_ICON_CACHE_H
+#define FREERDP_RAIL_ICON_CACHE_H
 
 #include <freerdp/api.h>
 #include <freerdp/rail.h>
 #include <freerdp/types.h>
 #include <freerdp/update.h>
-#include <freerdp/utils/stream.h>
+
+#include <winpr/stream.h>
 
 typedef struct rdp_icon rdpIcon;
 typedef struct rdp_icon_cache rdpIconCache;
@@ -58,4 +59,4 @@ void icon_cache_put(rdpIconCache* cache, BYTE id, UINT16 index, ICON_INFO* entry
 rdpIconCache* icon_cache_new(rdpRail* rail);
 void icon_cache_free(rdpIconCache* cache);
 
-#endif /* __RAIL_ICON_H */
+#endif /* FREERDP_RAIL_ICON_CACHE_H */

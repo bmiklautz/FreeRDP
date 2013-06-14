@@ -3,6 +3,9 @@ if((CMAKE_SYSTEM_PROCESSOR MATCHES "i386|i686|x86") AND (CMAKE_SIZEOF_VOID_P EQU
 	set(TARGET_ARCH "x86")
 elseif((CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64") AND (CMAKE_SIZEOF_VOID_P EQUAL 8))
 	set(TARGET_ARCH "x64")
+elseif((CMAKE_SYSTEM_PROCESSOR MATCHES "i386") AND (CMAKE_SIZEOF_VOID_P EQUAL 8) AND (APPLE))
+	# Mac is weird like that.
+	set(TARGET_ARCH "x64")
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "arm*")
 	set(TARGET_ARCH "ARM")
 endif()
@@ -16,20 +19,33 @@ else()
 	option(WITH_SSE2 "Enable SSE2 optimization." OFF)
 endif()
 
-if((TARGET_ARCH MATCHES "ARM") AND (NOT DEFINED WITH_NEON))
-	option(WITH_NEON "Enable NEON optimization." ON)
+if(TARGET_ARCH MATCHES "ARM")
+	if (NOT DEFINED WITH_NEON)
+		option(WITH_NEON "Enable NEON optimization." ON)
+	else()
+		option(WITH_NEON "Enable NEON optimization." OFF)
+	endif()
+	if (NOT DEFINED ARM_FP_ABI)
+		set(ARM_FP_ABI "softfp" CACHE STRING "Floating point ABI to use on arm")
+	else()
+		set(ARM_FP_ABI ${ARM_FP_API} CACHE STRING "Floating point ABI to use on arm")
+	endif()
+	mark_as_advanced(ARM_FP_ABI)
 else()
-	option(WITH_NEON "Enable NEON optimization." OFF)
+	if(NOT APPLE)
+		option(WITH_IPP "Use Intel Performance Primitives." OFF)
+	endif()
 endif()
 
 option(WITH_JPEG "Use JPEG decoding." OFF)
 
-if(APPLE)
-	option(WITH_CLANG "Build using clang" OFF)
+if(CMAKE_C_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+	set(CMAKE_COMPILER_IS_CLANG 1)
 endif()
 
 if(MSVC)
 	option(WITH_NATIVE_SSPI "Use native SSPI modules" ON)
+	option(WITH_WINMM "Use Windows Multimedia" ON)
 	option(WITH_WIN8 "Use Windows 8 libraries" OFF)
 endif()
 
@@ -61,7 +77,8 @@ endif()
 
 option(WITH_THIRD_PARTY "Build third-party components" OFF)
 
-option(WITH_SERVER_INTERFACE "Build server as a library with an interface" OFF)
+option(WITH_CLIENT_INTERFACE "Build clients as a library with an interface" ON)
+option(WITH_SERVER_INTERFACE "Build servers as a library with an interface" ON)
 
 option(WITH_DEBUG_ALL "Print all debug messages." OFF)
 
@@ -72,6 +89,7 @@ else()
 endif()
 
 option(WITH_DEBUG_CERTIFICATE "Print certificate related debug messages." ${DEFAULT_DEBUG_OPTION})
+option(WITH_DEBUG_CAPABILITIES "Print capability negotiation debug messages." ${DEFAULT_DEBUG_OPTION})
 option(WITH_DEBUG_CHANNELS "Print channel manager debug messages." ${DEFAULT_DEBUG_OPTION})
 option(WITH_DEBUG_CLIPRDR "Print clipboard redirection debug messages" ${DEFAULT_DEBUG_OPTION})
 option(WITH_DEBUG_DVC "Print dynamic virtual channel debug messages." ${DEFAULT_DEBUG_OPTION})
@@ -97,3 +115,10 @@ option(WITH_DEBUG_X11_LOCAL_MOVESIZE "Print X11 Client local movesize debug mess
 option(WITH_DEBUG_X11 "Print X11 Client debug messages" ${DEFAULT_DEBUG_OPTION})
 option(WITH_DEBUG_XV "Print XVideo debug messages" ${DEFAULT_DEBUG_OPTION})
 
+if(ANDROID)
+include(ConfigOptionsAndroid)
+endif(ANDROID)
+
+if(IOS)
+include(ConfigOptionsiOS)
+endif(IOS)

@@ -43,11 +43,14 @@
 #include "serial_tty.h"
 #include "serial_constants.h"
 
+#include <winpr/crt.h>
+#include <winpr/synch.h>
+#include <winpr/thread.h>
+#include <winpr/collections.h>
+
 #include <freerdp/freerdp.h>
-#include <freerdp/utils/stream.h>
-#include <freerdp/utils/thread.h>
-#include <freerdp/utils/unicode.h>
-#include <freerdp/utils/wait_obj.h>
+#include <freerdp/utils/list.h>
+#include <winpr/stream.h>
 #include <freerdp/channels/rdpdr.h>
 
 typedef struct _SERIAL_DEVICE SERIAL_DEVICE;
@@ -59,10 +62,12 @@ struct _SERIAL_DEVICE
 	char* path;
 	SERIAL_TTY* tty;
 
-	LIST* irp_list;
+	HANDLE thread;
+	HANDLE stopEvent;
+
+	wQueue* queue;
 	LIST* pending_irps;
-	freerdp_thread* thread;
-	struct wait_obj* in_event;
+	HANDLE in_event;
 
 	fd_set read_fds;
 	fd_set write_fds;
@@ -79,16 +84,21 @@ static BOOL serial_check_fds(SERIAL_DEVICE* serial);
 
 static void serial_process_irp_create(SERIAL_DEVICE* serial, IRP* irp)
 {
-	char* path;
+	char* path = NULL;
+	int status;
 	SERIAL_TTY* tty;
 	UINT32 PathLength;
 	UINT32 FileId;
 
-	stream_seek(irp->input, 28); /* DesiredAccess(4) AllocationSize(8), FileAttributes(4) */
+	Stream_Seek(irp->input, 28); /* DesiredAccess(4) AllocationSize(8), FileAttributes(4) */
 					/* SharedAccess(4) CreateDisposition(4), CreateOptions(4) */
-	stream_read_UINT32(irp->input, PathLength);
+	Stream_Read_UINT32(irp->input, PathLength);
 
-	freerdp_UnicodeToAsciiAlloc((WCHAR*) stream_get_tail(irp->input), &path, PathLength / 2);
+	status = ConvertFromUnicode(CP_UTF8, 0, (WCHAR*) Stream_Pointer(irp->input),
+			PathLength / 2, &path, 0, NULL, NULL);
+
+	if (status < 1)
+		path = (char*) calloc(1, 1);
 
 	FileId = irp->devman->id_sequence++;
 
@@ -107,8 +117,8 @@ static void serial_process_irp_create(SERIAL_DEVICE* serial, IRP* irp)
 		DEBUG_SVC("%s(%d) created.", serial->path, FileId);
 	}
 
-	stream_write_UINT32(irp->output, FileId);
-	stream_write_BYTE(irp->output, 0);
+	Stream_Write_UINT32(irp->output, FileId);
+	Stream_Write_UINT8(irp->output, 0);
 
 	free(path);
 
@@ -134,7 +144,7 @@ static void serial_process_irp_close(SERIAL_DEVICE* serial, IRP* irp)
 		serial->tty = NULL;
 	}
 
-	stream_write_zero(irp->output, 5); /* Padding(5) */
+	Stream_Zero(irp->output, 5); /* Padding(5) */
 
 	irp->Complete(irp);
 }
@@ -146,8 +156,8 @@ static void serial_process_irp_read(SERIAL_DEVICE* serial, IRP* irp)
 	UINT64 Offset;
 	BYTE* buffer = NULL;
 
-	stream_read_UINT32(irp->input, Length);
-	stream_read_UINT64(irp->input, Offset);
+	Stream_Read_UINT32(irp->input, Length);
+	Stream_Read_UINT64(irp->input, Offset);
 
 	DEBUG_SVC("length %u offset %llu", Length, Offset);
 
@@ -179,12 +189,12 @@ static void serial_process_irp_read(SERIAL_DEVICE* serial, IRP* irp)
 		}
 	}
 
-	stream_write_UINT32(irp->output, Length);
+	Stream_Write_UINT32(irp->output, Length);
 
 	if (Length > 0)
 	{
-		stream_check_size(irp->output, Length);
-		stream_write(irp->output, buffer, Length);
+		Stream_EnsureRemainingCapacity(irp->output, Length);
+		Stream_Write(irp->output, buffer, Length);
 	}
 
 	free(buffer);
@@ -198,9 +208,9 @@ static void serial_process_irp_write(SERIAL_DEVICE* serial, IRP* irp)
 	UINT32 Length;
 	UINT64 Offset;
 
-	stream_read_UINT32(irp->input, Length);
-	stream_read_UINT64(irp->input, Offset);
-	stream_seek(irp->input, 20); /* Padding */
+	Stream_Read_UINT32(irp->input, Length);
+	Stream_Read_UINT64(irp->input, Offset);
+	Stream_Seek(irp->input, 20); /* Padding */
 
 	DEBUG_SVC("length %u offset %llu", Length, Offset);
 
@@ -213,7 +223,7 @@ static void serial_process_irp_write(SERIAL_DEVICE* serial, IRP* irp)
 
 		DEBUG_WARN("tty not valid.");
 	}
-	else if (!serial_tty_write(tty, stream_get_tail(irp->input), Length))
+	else if (!serial_tty_write(tty, Stream_Pointer(irp->input), Length))
 	{
 		irp->IoStatus = STATUS_UNSUCCESSFUL;
 		Length = 0;
@@ -225,8 +235,8 @@ static void serial_process_irp_write(SERIAL_DEVICE* serial, IRP* irp)
 		DEBUG_SVC("write %llu-%llu to %s(%d).", Offset, Offset + Length, serial->path, tty->id);
 	}
 
-	stream_write_UINT32(irp->output, Length);
-	stream_write_BYTE(irp->output, 0); /* Padding */
+	Stream_Write_UINT32(irp->output, Length);
+	Stream_Write_UINT8(irp->output, 0); /* Padding */
 
 	irp->Complete(irp);
 }
@@ -241,14 +251,14 @@ static void serial_process_irp_device_control(SERIAL_DEVICE* serial, IRP* irp)
 
 	DEBUG_SVC("[in] pending size %d", list_size(serial->pending_irps));
 
-	stream_read_UINT32(irp->input, InputBufferLength);
-	stream_read_UINT32(irp->input, OutputBufferLength);
-	stream_read_UINT32(irp->input, IoControlCode);
-	stream_seek(irp->input, 20); /* Padding */
+	Stream_Read_UINT32(irp->input, InputBufferLength);
+	Stream_Read_UINT32(irp->input, OutputBufferLength);
+	Stream_Read_UINT32(irp->input, IoControlCode);
+	Stream_Seek(irp->input, 20); /* Padding */
 
 	tty = serial->tty;
 
-	if (tty == NULL)
+	if (!tty)
 	{
 		irp->IoStatus = STATUS_UNSUCCESSFUL;
 		OutputBufferLength = 0;
@@ -309,141 +319,69 @@ static void serial_process_irp(SERIAL_DEVICE* serial, IRP* irp)
 	serial_check_for_events(serial);
 }
 
-static void serial_process_irp_list(SERIAL_DEVICE* serial)
-{
-	IRP* irp;
-
-	while (1)
-	{
-		if (freerdp_thread_is_stopped(serial->thread))
-			break;
-
-		freerdp_thread_lock(serial->thread);
-		irp = (IRP*) list_dequeue(serial->irp_list);
-		freerdp_thread_unlock(serial->thread);
-
-		if (irp == NULL)
-			break;
-
-		serial_process_irp(serial, irp);
-	}
-}
-
 static void* serial_thread_func(void* arg)
 {
+	IRP* irp;
+	DWORD status;
 	SERIAL_DEVICE* serial = (SERIAL_DEVICE*)arg;
 
 	while (1)
 	{
-		freerdp_thread_wait(serial->thread);
+		if (WaitForSingleObject(serial->stopEvent, 0) == WAIT_OBJECT_0)
+			break;
+
+		if (WaitForSingleObject(Queue_Event(serial->queue), 10) == WAIT_OBJECT_0)
+			break;
 
 		serial->nfds = 1;
 		FD_ZERO(&serial->read_fds);
 		FD_ZERO(&serial->write_fds);
 
-		serial->tv.tv_sec = 20;
+		serial->tv.tv_sec = 1;
 		serial->tv.tv_usec = 0;
 		serial->select_timeout = 0;
 
-		if (freerdp_thread_is_stopped(serial->thread))
-			break;
+		irp = (IRP*) Queue_Dequeue(serial->queue);
 
-		freerdp_thread_reset(serial->thread);
-		serial_process_irp_list(serial);
+		if (irp)
+			serial_process_irp(serial, irp);
 
-		if (wait_obj_is_set(serial->in_event))
+		status = WaitForSingleObject(serial->in_event, 0);
+
+		if ((status == WAIT_OBJECT_0) || (status == WAIT_TIMEOUT))
 		{
 			if (serial_check_fds(serial))
-				wait_obj_clear(serial->in_event);
+				ResetEvent(serial->in_event);
 		}
 	}
-
-	freerdp_thread_quit(serial->thread);
 
 	return NULL;
 }
 
 static void serial_irp_request(DEVICE* device, IRP* irp)
 {
-	SERIAL_DEVICE* serial = (SERIAL_DEVICE*)device;
+	SERIAL_DEVICE* serial = (SERIAL_DEVICE*) device;
 
-	freerdp_thread_lock(serial->thread);
-	list_enqueue(serial->irp_list, irp);
-	freerdp_thread_unlock(serial->thread);
-
-	freerdp_thread_signal(serial->thread);
+	Queue_Enqueue(serial->queue, irp);
 }
 
 static void serial_free(DEVICE* device)
 {
-	IRP* irp;
 	SERIAL_DEVICE* serial = (SERIAL_DEVICE*) device;
 
 	DEBUG_SVC("freeing device");
 
-	freerdp_thread_stop(serial->thread);
-	freerdp_thread_free(serial->thread);
+	SetEvent(serial->stopEvent);
 
-	while ((irp = (IRP*) list_dequeue(serial->irp_list)) != NULL)
-		irp->Discard(irp);
-
-	list_free(serial->irp_list);
-
-	while ((irp = (IRP*) list_dequeue(serial->pending_irps)) != NULL)
-		irp->Discard(irp);
-
-	list_free(serial->pending_irps);
+	/* TODO: free lists */
 
 	free(serial);
 }
 
-#ifdef STATIC_CHANNELS
-#define DeviceServiceEntry	serial_DeviceServiceEntry
-#endif
-
-int DeviceServiceEntry(PDEVICE_SERVICE_ENTRY_POINTS pEntryPoints)
-{
-	int i, len;
-	char* name;
-	char* path;
-	SERIAL_DEVICE* serial;
-
-	name = (char*) pEntryPoints->plugin_data->data[1];
-	path = (char*) pEntryPoints->plugin_data->data[2];
-
-	if (name[0] && path[0])
-	{
-		serial = xnew(SERIAL_DEVICE);
-
-		serial->device.type = RDPDR_DTYP_SERIAL;
-		serial->device.name = name;
-		serial->device.IRPRequest = serial_irp_request;
-		serial->device.Free = serial_free;
-
-		len = strlen(name);
-		serial->device.data = stream_new(len + 1);
-
-		for (i = 0; i <= len; i++)
-			stream_write_BYTE(serial->device.data, name[i] < 0 ? '_' : name[i]);
-
-		serial->path = path;
-		serial->irp_list = list_new();
-		serial->pending_irps = list_new();
-		serial->thread = freerdp_thread_new();
-		serial->in_event = wait_obj_new();
-
-		pEntryPoints->RegisterDevice(pEntryPoints->devman, (DEVICE*)serial);
-
-		freerdp_thread_start(serial->thread, serial_thread_func, serial);
-	}
-
-	return 0;
-}
-
 static void serial_abort_single_io(SERIAL_DEVICE* serial, UINT32 file_id, UINT32 abort_io, UINT32 io_status)
 {
-	IRP* irp = NULL;
 	UINT32 major;
+	IRP* irp = NULL;
 	SERIAL_TTY* tty;
 
 	DEBUG_SVC("[in] pending size %d", list_size(serial->pending_irps));
@@ -482,10 +420,10 @@ static void serial_abort_single_io(SERIAL_DEVICE* serial, UINT32 file_id, UINT32
 		/* Process a SINGLE FileId and MajorFunction */
 		list_remove(serial->pending_irps, irp);
 		irp->IoStatus = io_status;
-		stream_write_UINT32(irp->output, 0);
+		Stream_Write_UINT32(irp->output, 0);
 		irp->Complete(irp);
 
-		wait_obj_set(serial->in_event);
+		SetEvent(serial->in_event);
 		break;
 	}
 
@@ -516,14 +454,14 @@ static void serial_check_for_events(SERIAL_DEVICE* serial)
 				DEBUG_SVC("got event result %u", result);
 
 				irp->IoStatus = STATUS_SUCCESS;
-				stream_write_UINT32(irp->output, result);
+				Stream_Write_UINT32(irp->output, result);
 				irp->Complete(irp);
 
 				prev = irp;
 				irp = (IRP*) list_next(serial->pending_irps, irp);
 				list_remove(serial->pending_irps, prev);
 
-				wait_obj_set(serial->in_event);
+				SetEvent(serial->in_event);
 			}
 		}
 
@@ -540,9 +478,9 @@ void serial_get_timeouts(SERIAL_DEVICE* serial, IRP* irp, UINT32* timeout, UINT3
 	UINT32 Length;
 	UINT32 pos;
 
-	pos = stream_get_pos(irp->input);
-	stream_read_UINT32(irp->input, Length);
-	stream_set_pos(irp->input, pos);
+	pos = Stream_GetPosition(irp->input);
+	Stream_Read_UINT32(irp->input, Length);
+	Stream_SetPosition(irp->input, pos);
 
 	DEBUG_SVC("length read %u", Length);
 
@@ -574,14 +512,14 @@ static void serial_handle_async_irp(SERIAL_DEVICE* serial, IRP* irp)
 			serial_get_timeouts(serial, irp, &timeout, &itv_timeout);
 
 			/* Check if io request timeout is smaller than current (but not 0). */
-			if (timeout && (serial->select_timeout == 0 || timeout < serial->select_timeout))
+			if (timeout && ((serial->select_timeout == 0) || (timeout < serial->select_timeout)))
 			{
 				serial->select_timeout = timeout;
 				serial->tv.tv_sec = serial->select_timeout / 1000;
 				serial->tv.tv_usec = (serial->select_timeout % 1000) * 1000;
 				serial->timeout_id = tty->id;
 			}
-			if (itv_timeout && (serial->select_timeout == 0 || itv_timeout < serial->select_timeout))
+			if (itv_timeout && ((serial->select_timeout == 0) || (itv_timeout < serial->select_timeout)))
 			{
 				serial->select_timeout = itv_timeout;
 				serial->tv.tv_sec = serial->select_timeout / 1000;
@@ -599,7 +537,7 @@ static void serial_handle_async_irp(SERIAL_DEVICE* serial, IRP* irp)
 
 	irp->IoStatus = STATUS_PENDING;
 	list_enqueue(serial->pending_irps, irp);
-	wait_obj_set(serial->in_event);
+	SetEvent(serial->in_event);
 }
 
 static void __serial_check_fds(SERIAL_DEVICE* serial)
@@ -608,8 +546,9 @@ static void __serial_check_fds(SERIAL_DEVICE* serial)
 	IRP* prev;
 	SERIAL_TTY* tty;
 	UINT32 result = 0;
+	BOOL irp_completed = FALSE;
 
-	memset(&serial->tv, 0, sizeof(struct timeval));
+	ZeroMemory(&serial->tv, sizeof(struct timeval));
 	tty = serial->tty;
 
 	/* scan every pending */
@@ -626,6 +565,7 @@ static void __serial_check_fds(SERIAL_DEVICE* serial)
 				{
 					irp->IoStatus = STATUS_SUCCESS;
 					serial_process_irp_read(serial, irp);
+					irp_completed = TRUE;
 				}
 				break;
 
@@ -634,6 +574,7 @@ static void __serial_check_fds(SERIAL_DEVICE* serial)
 				{
 					irp->IoStatus = STATUS_SUCCESS;
 					serial_process_irp_write(serial, irp);
+					irp_completed = TRUE;
 				}
 				break;
 
@@ -643,8 +584,9 @@ static void __serial_check_fds(SERIAL_DEVICE* serial)
 					DEBUG_SVC("got event result %u", result);
 
 					irp->IoStatus = STATUS_SUCCESS;
-					stream_write_UINT32(irp->output, result);
+					Stream_Write_UINT32(irp->output, result);
 					irp->Complete(irp);
+					irp_completed = TRUE;
 				}
 				break;
 
@@ -656,10 +598,10 @@ static void __serial_check_fds(SERIAL_DEVICE* serial)
 		prev = irp;
 		irp = (IRP*) list_next(serial->pending_irps, irp);
 
-		if (prev->IoStatus == STATUS_SUCCESS)
+		if (irp_completed || (prev->IoStatus == STATUS_SUCCESS))
 		{
 			list_remove(serial->pending_irps, prev);
-			wait_obj_set(serial->in_event);
+			SetEvent(serial->in_event);
 		}
 	}
 }
@@ -717,6 +659,7 @@ static BOOL serial_check_fds(SERIAL_DEVICE* serial)
 		case 0:
 			if (serial->select_timeout)
 			{
+				__serial_check_fds(serial);
 				serial_abort_single_io(serial, serial->timeout_id, SERIAL_ABORT_IO_NONE, STATUS_TIMEOUT);
 				serial_abort_single_io(serial, serial->timeout_id, SERIAL_ABORT_IO_READ, STATUS_TIMEOUT);
 				serial_abort_single_io(serial, serial->timeout_id, SERIAL_ABORT_IO_WRITE, STATUS_TIMEOUT);
@@ -731,4 +674,51 @@ static BOOL serial_check_fds(SERIAL_DEVICE* serial)
 	__serial_check_fds(serial);
 
 	return 1;
+}
+
+#ifdef STATIC_CHANNELS
+#define DeviceServiceEntry	serial_DeviceServiceEntry
+#endif
+
+int DeviceServiceEntry(PDEVICE_SERVICE_ENTRY_POINTS pEntryPoints)
+{
+	int i, len;
+	char* name;
+	char* path;
+	RDPDR_SERIAL* device;
+	SERIAL_DEVICE* serial;
+
+	device = (RDPDR_SERIAL*) pEntryPoints->device;
+	name = device->Name;
+	path = device->Path;
+
+	if (name[0] && path[0])
+	{
+		serial = (SERIAL_DEVICE*) malloc(sizeof(SERIAL_DEVICE));
+		ZeroMemory(serial, sizeof(SERIAL_DEVICE));
+
+		serial->device.type = RDPDR_DTYP_SERIAL;
+		serial->device.name = name;
+		serial->device.IRPRequest = serial_irp_request;
+		serial->device.Free = serial_free;
+
+		len = strlen(name);
+		serial->device.data = Stream_New(NULL, len + 1);
+
+		for (i = 0; i <= len; i++)
+			Stream_Write_UINT8(serial->device.data, name[i] < 0 ? '_' : name[i]);
+
+		serial->path = path;
+		serial->queue = Queue_New(TRUE, -1, -1);
+		serial->pending_irps = list_new();
+		serial->in_event = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+		serial->stopEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+		pEntryPoints->RegisterDevice(pEntryPoints->devman, (DEVICE*) serial);
+
+		serial->thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) serial_thread_func, (void*) serial, 0, NULL);
+	}
+
+	return 0;
 }

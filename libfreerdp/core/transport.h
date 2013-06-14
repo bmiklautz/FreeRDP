@@ -31,45 +31,52 @@ typedef enum
 typedef struct rdp_transport rdpTransport;
 
 #include "tcp.h"
-#include "tsg.h"
+#include "nla.h"
+
+#include "gateway/tsg.h"
 
 #include <winpr/sspi.h>
+#include <winpr/synch.h>
+#include <winpr/thread.h>
+#include <winpr/stream.h>
+#include <winpr/collections.h>
+
 #include <freerdp/crypto/tls.h>
-#include <freerdp/crypto/nla.h>
 
 #include <time.h>
 #include <freerdp/types.h>
 #include <freerdp/settings.h>
-#include <freerdp/utils/stream.h>
-#include <freerdp/utils/wait_obj.h>
 
-typedef BOOL (*TransportRecv) (rdpTransport* transport, STREAM* stream, void* extra);
+typedef int (*TransportRecv) (rdpTransport* transport, wStream* stream, void* extra);
 
 struct rdp_transport
 {
-	STREAM* recv_stream;
-	STREAM* send_stream;
 	TRANSPORT_LAYER layer;
-	struct rdp_tcp* tcp;
-	struct rdp_tls* tls;
-	struct rdp_tsg* tsg;
-	struct rdp_tcp* tcp_in;
-	struct rdp_tcp* tcp_out;
-	struct rdp_tls* tls_in;
-	struct rdp_tls* tls_out;
-	struct rdp_credssp* credssp;
-	struct rdp_settings* settings;
-	UINT32 usleep_interval;
-	void* recv_extra;
-	STREAM* recv_buffer;
-	TransportRecv recv_callback;
-	struct wait_obj* recv_event;
+	rdpTsg* tsg;
+	rdpTcp* TcpIn;
+	rdpTcp* TcpOut;
+	rdpTls* TlsIn;
+	rdpTls* TlsOut;
+	rdpCredssp* credssp;
+	rdpSettings* settings;
+	UINT32 SleepInterval;
+	void* ReceiveExtra;
+	wStream* ReceiveBuffer;
+	TransportRecv ReceiveCallback;
+	HANDLE ReceiveEvent;
+	HANDLE GatewayEvent;
 	BOOL blocking;
-	BOOL process_single_pdu; /* process single pdu in transport_check_fds */
+	BOOL SplitInputOutput;
+	wStreamPool* ReceivePool;
+	HANDLE connectedEvent;
+	HANDLE stopEvent;
+	HANDLE thread;
+	BOOL async;
+	HANDLE ReadMutex;
+	HANDLE WriteMutex;
 };
 
-STREAM* transport_recv_stream_init(rdpTransport* transport, int size);
-STREAM* transport_send_stream_init(rdpTransport* transport, int size);
+wStream* transport_send_stream_init(rdpTransport* transport, int size);
 BOOL transport_connect(rdpTransport* transport, const char* hostname, UINT16 port);
 void transport_attach(rdpTransport* transport, int sockfd);
 BOOL transport_disconnect(rdpTransport* transport);
@@ -80,11 +87,16 @@ BOOL transport_connect_tsg(rdpTransport* transport);
 BOOL transport_accept_rdp(rdpTransport* transport);
 BOOL transport_accept_tls(rdpTransport* transport);
 BOOL transport_accept_nla(rdpTransport* transport);
-int transport_read(rdpTransport* transport, STREAM* s);
-int transport_write(rdpTransport* transport, STREAM* s);
+int transport_read(rdpTransport* transport, wStream* s);
+int transport_write(rdpTransport* transport, wStream* s);
 void transport_get_fds(rdpTransport* transport, void** rfds, int* rcount);
 int transport_check_fds(rdpTransport** ptransport);
 BOOL transport_set_blocking_mode(rdpTransport* transport, BOOL blocking);
+void transport_get_read_handles(rdpTransport* transport, HANDLE* events, DWORD* count);
+
+wStream* transport_receive_pool_take(rdpTransport* transport);
+int transport_receive_pool_return(rdpTransport* transport, wStream* pdu);
+
 rdpTransport* transport_new(rdpSettings* settings);
 void transport_free(rdpTransport* transport);
 

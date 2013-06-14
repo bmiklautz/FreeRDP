@@ -25,10 +25,11 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <winpr/crt.h>
+
 #include <freerdp/api.h>
 #include <freerdp/freerdp.h>
 #include <freerdp/constants.h>
-#include <freerdp/utils/memory.h>
 #include <freerdp/utils/bitmap.h>
 #include <freerdp/codec/color.h>
 #include <freerdp/codec/bitmap.h>
@@ -311,6 +312,16 @@ static const UINT32 rop3_code_table[] =
 	0x00FF0062  /* 1 */
 };
 
+/* Hatch Patterns as monochrome data */
+static BYTE GDI_BS_HACHTED_PATTERNS[] = {
+	0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, /* HS_HORIZONTAL */
+	0xF7, 0xF7, 0xF7, 0xF7, 0xF7, 0xF7, 0xF7, 0xF7, /* HS_VERTICAL */
+	0xFE, 0xFD, 0xFB, 0xF7, 0xEF, 0xDF, 0xBF, 0x7F, /* HS_FDIAGONAL */
+	0x7F, 0xBF, 0xDF, 0xEF, 0xF7, 0xFB, 0xFD, 0xFE, /* HS_BDIAGONAL */
+	0xF7, 0xF7, 0xF7, 0x00, 0xF7, 0xF7, 0xF7, 0xF7, /* HS_CROSS */
+	0x7E, 0xBD, 0xDB, 0xE7, 0xE7, 0xDB, 0xBD, 0x7E /* HS_DIACROSS */
+};
+
 /* GDI Helper Functions */
 
 INLINE UINT32 gdi_rop3_code(BYTE code)
@@ -330,7 +341,7 @@ INLINE BYTE* gdi_get_bitmap_pointer(HGDI_DC hdcBmp, int x, int y)
 	}
 	else
 	{
-		printf("gdi_get_bitmap_pointer: requesting invalid pointer: (%d,%d) in %dx%d\n", x, y, hBmp->width, hBmp->height);
+		fprintf(stderr, "gdi_get_bitmap_pointer: requesting invalid pointer: (%d,%d) in %dx%d\n", x, y, hBmp->width, hBmp->height);
 		return 0;
 	}
 }
@@ -341,7 +352,7 @@ INLINE BYTE* gdi_get_brush_pointer(HGDI_DC hdcBrush, int x, int y)
 
 	if (hdcBrush->brush != NULL)
 	{
-		if (hdcBrush->brush->style == GDI_BS_PATTERN)
+		if ((hdcBrush->brush->style == GDI_BS_PATTERN) || (hdcBrush->brush->style == GDI_BS_HATCHED))
 		{
 			HGDI_BITMAP hBmpBrush = hdcBrush->brush->pattern;
 	
@@ -438,8 +449,7 @@ void gdi_bitmap_free_ex(gdiBitmap* bitmap)
 void gdi_palette_update(rdpContext* context, PALETTE_UPDATE* palette)
 {
 	rdpGdi* gdi = context->gdi;
-	gdi->clrconv->palette->count = palette->number;
-	gdi->clrconv->palette->entries = palette->entries;
+	CopyMemory(gdi->clrconv->palette, palette, sizeof(rdpPalette));
 }
 
 void gdi_set_bounds(rdpContext* context, rdpBounds* bounds)
@@ -488,6 +498,24 @@ void gdi_patblt(rdpContext* context, PATBLT_ORDER* patblt)
 		gdi_DeleteObject((HGDIOBJECT) gdi->drawing->hdc->brush);
 		gdi->drawing->hdc->brush = originalBrush;
 	}
+	else if (brush->style == GDI_BS_HATCHED)
+	{
+		HGDI_BITMAP hBmp;
+
+		data = freerdp_mono_image_convert(GDI_BS_HACHTED_PATTERNS + 8 * brush->hatch, 8, 8, 1,
+		gdi->dstBpp, patblt->backColor, patblt->foreColor, gdi->clrconv);
+
+		hBmp = gdi_CreateBitmap(8, 8, gdi->drawing->hdc->bitsPerPixel, data);
+
+		originalBrush = gdi->drawing->hdc->brush;
+		gdi->drawing->hdc->brush = gdi_CreateHatchBrush(hBmp);
+
+		gdi_PatBlt(gdi->drawing->hdc, patblt->nLeftRect, patblt->nTopRect,
+		patblt->nWidth, patblt->nHeight, gdi_rop3_code(patblt->bRop));
+
+		gdi_DeleteObject((HGDIOBJECT) gdi->drawing->hdc->brush);
+		gdi->drawing->hdc->brush = originalBrush;
+	}
 	else if (brush->style == GDI_BS_PATTERN)
 	{
 		HGDI_BITMAP hBmp;
@@ -515,7 +543,7 @@ void gdi_patblt(rdpContext* context, PATBLT_ORDER* patblt)
 	}
 	else
 	{
-		printf("unimplemented brush style:%d\n", brush->style);
+		fprintf(stderr, "unimplemented brush style:%d\n", brush->style);
 	}
 }
 
@@ -633,6 +661,7 @@ void gdi_memblt(rdpContext* context, MEMBLT_ORDER* memblt)
 
 void gdi_mem3blt(rdpContext* context, MEM3BLT_ORDER* mem3blt)
 {
+	BYTE* data;
 	rdpBrush* brush;
 	UINT32 foreColor;
 	UINT32 backColor;
@@ -658,30 +687,56 @@ void gdi_mem3blt(rdpContext* context, MEM3BLT_ORDER* mem3blt)
 		gdi_DeleteObject((HGDIOBJECT) gdi->drawing->hdc->brush);
 		gdi->drawing->hdc->brush = originalBrush;
 	}
+	else if (brush->style == GDI_BS_PATTERN)
+	{
+		HGDI_BITMAP hBmp;
+
+		if (brush->bpp > 1)
+		{
+			data = freerdp_image_convert(brush->data, NULL, 8, 8, gdi->srcBpp, gdi->dstBpp, gdi->clrconv);
+		}
+		else
+		{
+			data = freerdp_mono_image_convert(brush->data, 8, 8, gdi->srcBpp, gdi->dstBpp,
+					mem3blt->backColor, mem3blt->foreColor, gdi->clrconv);
+		}
+
+		hBmp = gdi_CreateBitmap(8, 8, gdi->drawing->hdc->bitsPerPixel, data);
+
+		originalBrush = gdi->drawing->hdc->brush;
+		gdi->drawing->hdc->brush = gdi_CreatePatternBrush(hBmp);
+
+		gdi_BitBlt(gdi->drawing->hdc, mem3blt->nLeftRect, mem3blt->nTopRect,
+				mem3blt->nWidth, mem3blt->nHeight, bitmap->hdc,
+				mem3blt->nXSrc, mem3blt->nYSrc, gdi_rop3_code(mem3blt->bRop));
+
+		gdi_DeleteObject((HGDIOBJECT) gdi->drawing->hdc->brush);
+		gdi->drawing->hdc->brush = originalBrush;
+	}
 	else
 	{
-		printf("Mem3Blt unimplemented brush style:%d\n", brush->style);
+		fprintf(stderr, "Mem3Blt unimplemented brush style:%d\n", brush->style);
 	}
 }
 
 void gdi_polygon_sc(rdpContext* context, POLYGON_SC_ORDER* polygon_sc)
 {
-	printf("PolygonSC\n");
+	fprintf(stderr, "PolygonSC\n");
 }
 
 void gdi_polygon_cb(rdpContext* context, POLYGON_CB_ORDER* polygon_cb)
 {
-	printf("PolygonCB\n");
+	fprintf(stderr, "PolygonCB\n");
 }
 
 void gdi_ellipse_sc(rdpContext* context, ELLIPSE_SC_ORDER* ellipse_sc)
 {
-	printf("EllipseSC\n");
+	fprintf(stderr, "EllipseSC\n");
 }
 
 void gdi_ellipse_cb(rdpContext* context, ELLIPSE_CB_ORDER* ellipse_cb)
 {
-	printf("EllipseCB\n");
+	fprintf(stderr, "EllipseCB\n");
 }
 
 int tilenum = 0;
@@ -704,9 +759,10 @@ void gdi_surface_bits(rdpContext* context, SURFACE_BITS_COMMAND* surface_bits_co
 		surface_bits_command->width, surface_bits_command->height,
 		surface_bits_command->bitmapDataLength);
 
-	tile_bitmap = (char*) xzalloc(32);
+	tile_bitmap = (char*) malloc(32);
+	ZeroMemory(tile_bitmap, 32);
 
-	if (surface_bits_command->codecID == CODEC_ID_REMOTEFX)
+	if (surface_bits_command->codecID == RDP_CODEC_ID_REMOTEFX)
 	{
 		message = rfx_process_message(rfx_context,
 				surface_bits_command->bitmapData, surface_bits_command->bitmapDataLength);
@@ -726,6 +782,7 @@ void gdi_surface_bits(rdpContext* context, SURFACE_BITS_COMMAND* surface_bits_co
 			freerdp_bitmap_write(tile_bitmap, gdi->tile->bitmap->data, 64, 64, 32);
 #endif
 
+
 			for (j = 0; j < message->num_rects; j++)
 			{
 				gdi_SetClipRgn(gdi->primary->hdc,
@@ -740,7 +797,7 @@ void gdi_surface_bits(rdpContext* context, SURFACE_BITS_COMMAND* surface_bits_co
 		gdi_SetNullClipRgn(gdi->primary->hdc);
 		rfx_message_free(rfx_context, message);
 	}
-	else if (surface_bits_command->codecID == CODEC_ID_NSCODEC)
+	else if (surface_bits_command->codecID == RDP_CODEC_ID_NSCODEC)
 	{
 		nsc_process_message(nsc_context, surface_bits_command->bpp, surface_bits_command->width, surface_bits_command->height,
 			surface_bits_command->bitmapData, surface_bits_command->bitmapDataLength);
@@ -752,7 +809,7 @@ void gdi_surface_bits(rdpContext* context, SURFACE_BITS_COMMAND* surface_bits_co
 		freerdp_image_flip(nsc_context->bmpdata, gdi->image->bitmap->data, gdi->image->bitmap->width, gdi->image->bitmap->height, 32);
 		gdi_BitBlt(gdi->primary->hdc, surface_bits_command->destLeft, surface_bits_command->destTop, surface_bits_command->width, surface_bits_command->height, gdi->image->hdc, 0, 0, GDI_SRCCOPY);
 	} 
-	else if (surface_bits_command->codecID == CODEC_ID_NONE)
+	else if (surface_bits_command->codecID == RDP_CODEC_ID_NONE)
 	{
 		gdi->image->bitmap->width = surface_bits_command->width;
 		gdi->image->bitmap->height = surface_bits_command->height;
@@ -789,7 +846,7 @@ void gdi_surface_bits(rdpContext* context, SURFACE_BITS_COMMAND* surface_bits_co
 	}
 	else
 	{
-		printf("Unsupported codecID %d\n", surface_bits_command->codecID);
+		fprintf(stderr, "Unsupported codecID %d\n", surface_bits_command->codecID);
 	}
 
 	if (tile_bitmap != NULL)
@@ -880,14 +937,15 @@ int gdi_init(freerdp* instance, UINT32 flags, BYTE* buffer)
 	rdpGdi* gdi;
 	rdpCache* cache;
 
-	gdi = (rdpGdi*) xzalloc(sizeof(rdpGdi));
+	gdi = (rdpGdi*) malloc(sizeof(rdpGdi));
+	ZeroMemory(gdi, sizeof(rdpGdi));
 
 	instance->context->gdi = gdi;
 	cache = instance->context->cache;
 
-	gdi->width = instance->settings->width;
-	gdi->height = instance->settings->height;
-	gdi->srcBpp = instance->settings->color_depth;
+	gdi->width = instance->settings->DesktopWidth;
+	gdi->height = instance->settings->DesktopHeight;
+	gdi->srcBpp = instance->settings->ColorDepth;
 	gdi->primary_buffer = buffer;
 
 	/* default internal buffer format */
@@ -925,7 +983,7 @@ int gdi_init(freerdp* instance, UINT32 flags, BYTE* buffer)
 			gdi->bytesPerPixel = 4;
 		}
 	}
-	
+
 	gdi->hdc = gdi_GetDC();
 	gdi->hdc->bitsPerPixel = gdi->dstBpp;
 	gdi->hdc->bytesPerPixel = gdi->bytesPerPixel;
@@ -977,7 +1035,9 @@ void gdi_free(freerdp* instance)
 		gdi_bitmap_free_ex(gdi->tile);
 		gdi_bitmap_free_ex(gdi->image);
 		gdi_DeleteDC(gdi->hdc);
-		rfx_context_free((RFX_CONTEXT*)gdi->rfx_context);
+		rfx_context_free((RFX_CONTEXT*) gdi->rfx_context);
+		nsc_context_free((NSC_CONTEXT*) gdi->nsc_context);
+		free(gdi->clrconv->palette);
 		free(gdi->clrconv);
 		free(gdi);
 	}

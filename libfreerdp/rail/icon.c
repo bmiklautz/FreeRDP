@@ -21,10 +21,10 @@
 #include "config.h"
 #endif
 
-#include <freerdp/utils/stream.h>
-#include <freerdp/utils/memory.h>
-#include <freerdp/utils/hexdump.h>
-#include <freerdp/utils/unicode.h>
+#include <winpr/crt.h>
+#include <winpr/print.h>
+
+#include <winpr/stream.h>
 
 #include <freerdp/rail/icon.h>
 
@@ -34,13 +34,13 @@ ICON_INFO* icon_cache_get(rdpIconCache* cache, BYTE id, UINT16 index, void** ext
 
 	if (id >= cache->numCaches)
 	{
-		printf("invalid window icon cache id:%d\n", id);
+		fprintf(stderr, "invalid window icon cache id:%d\n", id);
 		return (ICON_INFO*) NULL;
 	}
 
 	if (index >= cache->numCacheEntries)
 	{
-		printf("invalid window icon cache index:%d in cache id:%d\n", index, id);
+		fprintf(stderr, "invalid window icon cache index:%d in cache id:%d\n", index, id);
 		return (ICON_INFO*) NULL;
 	}
 
@@ -56,13 +56,13 @@ void icon_cache_put(rdpIconCache* cache, BYTE id, UINT16 index, ICON_INFO* entry
 {
 	if (id >= cache->numCaches)
 	{
-		printf("invalid window icon cache id:%d\n", id);
+		fprintf(stderr, "invalid window icon cache id:%d\n", id);
 		return;
 	}
 
 	if (index >= cache->numCacheEntries)
 	{
-		printf("invalid window icon cache index:%d in cache id:%d\n", index, id);
+		fprintf(stderr, "invalid window icon cache index:%d in cache id:%d\n", index, id);
 		return;
 	}
 
@@ -76,21 +76,25 @@ rdpIconCache* icon_cache_new(rdpRail* rail)
 {
 	rdpIconCache* cache;
 
-	cache = (rdpIconCache*) xzalloc(sizeof(rdpIconCache));
+	cache = (rdpIconCache*) malloc(sizeof(rdpIconCache));
 
 	if (cache != NULL)
 	{
 		int i;
 
-		cache->rail = rail;
-		cache->numCaches = (BYTE) rail->settings->num_icon_cache_entries;
-		cache->numCacheEntries = rail->settings->num_icon_cache_entries;
+		ZeroMemory(cache, sizeof(rdpIconCache));
 
-		cache->caches = xzalloc(cache->numCaches * sizeof(WINDOW_ICON_CACHE));
+		cache->rail = rail;
+		cache->numCaches = (BYTE) rail->settings->RemoteAppNumIconCacheEntries;
+		cache->numCacheEntries = rail->settings->RemoteAppNumIconCacheEntries;
+
+		cache->caches = malloc(cache->numCaches * sizeof(WINDOW_ICON_CACHE));
+		ZeroMemory(cache->caches, cache->numCaches * sizeof(WINDOW_ICON_CACHE));
 
 		for (i = 0; i < cache->numCaches; i++)
 		{
-			cache->caches[i].entries = xzalloc(cache->numCacheEntries * sizeof(rdpIconCache));
+			cache->caches[i].entries = malloc(cache->numCacheEntries * sizeof(rdpIconCache));
+			ZeroMemory(cache->caches[i].entries, cache->numCacheEntries * sizeof(rdpIconCache));
 		}
 	}
 

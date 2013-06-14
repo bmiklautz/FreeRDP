@@ -18,8 +18,8 @@
  */
 
 #include <freerdp/freerdp.h>
-#include <freerdp/utils/hexdump.h>
-#include <freerdp/utils/stream.h>
+#include <winpr/print.h>
+#include <winpr/stream.h>
 #include <freerdp/codec/bitmap.h>
 
 #include "test_bitmap.h"

@@ -536,7 +536,7 @@ static int BitBlt_MERGEPAINT_8bpp(HGDI_DC hdcDest, int nXDest, int nYDest, int n
 
 static int BitBlt_PATCOPY_8bpp(HGDI_DC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight)
 {
-	int x, y;
+	int x, y, xOffset, yOffset;
 	BYTE* dstp;
 	BYTE* patp;
 	BYTE palIndex;
@@ -559,6 +559,19 @@ static int BitBlt_PATCOPY_8bpp(HGDI_DC hdcDest, int nXDest, int nYDest, int nWid
 	}
 	else
 	{
+		/* align pattern to 8x8 grid to make sure transition
+		between different pattern blocks are smooth */
+
+		if (hdcDest->brush->style == GDI_BS_HATCHED)
+		{
+			xOffset = nXDest % 8;
+			yOffset = nYDest % 8 + 2; // +2 added after comparison to mstsc
+		}
+		else
+		{
+			xOffset = 0;
+			yOffset = 0;
+		}
 		for (y = 0; y < nHeight; y++)
 		{
 			dstp = gdi_get_bitmap_pointer(hdcDest, nXDest, nYDest + y);
@@ -567,7 +580,7 @@ static int BitBlt_PATCOPY_8bpp(HGDI_DC hdcDest, int nXDest, int nYDest, int nWid
 			{
 				for (x = 0; x < nWidth; x++)
 				{
-					patp = gdi_get_brush_pointer(hdcDest, x, y);
+					patp = gdi_get_brush_pointer(hdcDest, x+xOffset, y+yOffset);
 
 					*dstp = *patp;
 					patp++;
@@ -749,7 +762,7 @@ int BitBlt_8bpp(HGDI_DC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight
 			break;
 	}
 	
-	printf("BitBlt: unknown rop: 0x%08X\n", rop);
+	fprintf(stderr, "BitBlt: unknown rop: 0x%08X\n", rop);
 	return 1;
 }
 
@@ -794,7 +807,7 @@ int PatBlt_8bpp(HGDI_DC hdc, int nXLeft, int nYLeft, int nWidth, int nHeight, in
 			break;
 	}
 	
-	printf("PatBlt: unknown rop: 0x%08X\n", rop);
+	fprintf(stderr, "PatBlt: unknown rop: 0x%08X\n", rop);
 	return 1;
 }
 

@@ -17,13 +17,14 @@
  * limitations under the License.
  */
 
-#ifndef __CACHE_H
-#define __CACHE_H
+#ifndef FREERDP_CACHE_H
+#define FREERDP_CACHE_H
 
 #include <freerdp/api.h>
 #include <freerdp/types.h>
 #include <freerdp/update.h>
-#include <freerdp/utils/stream.h>
+
+#include <winpr/stream.h>
 
 #include <freerdp/cache/glyph.h>
 #include <freerdp/cache/brush.h>
@@ -48,7 +49,15 @@ struct rdp_cache
 	rdpSettings* settings;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 FREERDP_API rdpCache* cache_new(rdpSettings* settings);
 FREERDP_API void cache_free(rdpCache* cache);
 
-#endif /* __CACHE_H */
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* FREERDP_CACHE_H */

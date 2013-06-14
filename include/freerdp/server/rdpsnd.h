@@ -17,8 +17,8 @@
  * limitations under the License.
  */
 
-#ifndef __SERVER_RDPSND_H
-#define __SERVER_RDPSND_H
+#ifndef FREERDP_CHANNEL_RDPSND_SERVER_H
+#define FREERDP_CHANNEL_RDPSND_SERVER_H
 
 #include <freerdp/channels/wtsvc.h>
 #include <freerdp/channels/rdpsnd.h>
@@ -41,14 +41,14 @@ struct _rdpsnd_server_context
 	void* data;
 
 	/* Server supported formats. Set by server. */
-	const rdpsndFormat* server_formats;
+	const AUDIO_FORMAT* server_formats;
 	int num_server_formats;
 
 	/* Server source PCM audio format. Set by server. */
-	rdpsndFormat src_format;
+	AUDIO_FORMAT src_format;
 
 	/* Client supported formats. */
-	rdpsndFormat* client_formats;
+	AUDIO_FORMAT* client_formats;
 	int num_client_formats;
 	int selected_client_format;
 
@@ -91,7 +91,15 @@ struct _rdpsnd_server_context
 	psRdpsndServerActivated Activated;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 FREERDP_API rdpsnd_server_context* rdpsnd_server_context_new(WTSVirtualChannelManager* vcm);
 FREERDP_API void rdpsnd_server_context_free(rdpsnd_server_context* context);
 
+#ifdef __cplusplus
+}
 #endif
+
+#endif /* FREERDP_CHANNEL_RDPSND_SERVER_H */

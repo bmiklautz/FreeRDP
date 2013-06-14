@@ -23,10 +23,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include <winpr/winpr.h>
 #include <winpr/wtypes.h>
-
+#include <winpr/error.h>
 #include <winpr/handle.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifndef _WIN32
 
@@ -144,6 +149,7 @@ typedef struct _RTL_CRITICAL_SECTION
 	ULONG SpinCount;
 } RTL_CRITICAL_SECTION, *PRTL_CRITICAL_SECTION;
 
+typedef RTL_CRITICAL_SECTION CRITICAL_SECTION;
 typedef PRTL_CRITICAL_SECTION PCRITICAL_SECTION;
 typedef PRTL_CRITICAL_SECTION LPCRITICAL_SECTION;
 
@@ -187,7 +193,11 @@ WINPR_API BOOL WaitOnAddress(VOID volatile *Address, PVOID CompareAddress, SIZE_
 
 #define WAIT_OBJECT_0		0x00000000L
 #define WAIT_ABANDONED		0x00000080L
+
+#ifndef WAIT_TIMEOUT
 #define WAIT_TIMEOUT		0x00000102L
+#endif
+
 #define WAIT_FAILED		((DWORD) 0xFFFFFFFF)
 
 WINPR_API DWORD WaitForSingleObject(HANDLE hHandle, DWORD dwMilliseconds);
@@ -242,6 +252,33 @@ WINPR_API BOOL CancelWaitableTimer(HANDLE hTimer);
 #define OpenWaitableTimer		OpenWaitableTimerA
 #endif
 
+#endif
+
+/* Extended API */
+
+WINPR_API VOID USleep(DWORD dwMicroseconds);
+
+WINPR_API HANDLE CreateFileDescriptorEventW(LPSECURITY_ATTRIBUTES lpEventAttributes,
+		BOOL bManualReset, BOOL bInitialState, int FileDescriptor);
+WINPR_API HANDLE CreateFileDescriptorEventA(LPSECURITY_ATTRIBUTES lpEventAttributes,
+		BOOL bManualReset, BOOL bInitialState, int FileDescriptor);
+
+WINPR_API HANDLE CreateWaitObjectEvent(LPSECURITY_ATTRIBUTES lpEventAttributes,
+		BOOL bManualReset, BOOL bInitialState, void* pObject);
+
+#ifdef UNICODE
+#define CreateFileDescriptorEvent	CreateFileDescriptorEventW
+#else
+#define CreateFileDescriptorEvent	CreateFileDescriptorEventA
+#endif
+
+WINPR_API int GetEventFileDescriptor(HANDLE hEvent);
+WINPR_API int SetEventFileDescriptor(HANDLE hEvent, int FileDescriptor);
+
+WINPR_API void* GetEventWaitObject(HANDLE hEvent);
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* WINPR_SYNCH_H */

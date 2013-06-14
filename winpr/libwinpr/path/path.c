@@ -57,7 +57,7 @@
 
 #ifdef _WIN32
 #define SHARED_LIBRARY_EXT		SHARED_LIBRARY_EXT_DLL
-#elif __APPLE__
+#elif defined(__APPLE__)
 #define SHARED_LIBRARY_EXT		SHARED_LIBRARY_EXT_DYLIB
 #else
 #define SHARED_LIBRARY_EXT		SHARED_LIBRARY_EXT_SO
@@ -491,7 +491,33 @@ HRESULT PathCchCombineExW(PWSTR pszPathOut, size_t cchPathOut, PCWSTR pszPathIn,
 
 HRESULT PathCchFindExtensionA(PCSTR pszPath, size_t cchPath, PCSTR* ppszExt)
 {
-	return 0;
+	char* p = (char*) pszPath;
+
+	/* find end of string */
+
+	while (*p && cchPath)
+	{
+		cchPath--;
+		p++;
+	}
+
+	/* search backwards for '.' */
+
+	while (p > pszPath)
+	{
+		if (*p == '.')
+		{
+			*ppszExt = (PCSTR) p;
+			return S_OK;
+		}
+
+		if ((*p == '\\') || (*p == '/') || (*p == ':'))
+			return S_FALSE;
+
+		p--;
+	}
+
+	return S_FALSE;
 }
 
 HRESULT PathCchFindExtensionW(PCWSTR pszPath, size_t cchPath, PCWSTR* ppszExt)
@@ -693,7 +719,7 @@ HRESULT PathCchConvertStyleA(PSTR pszPath, size_t cchPath, unsigned long dwFlags
 {
 	size_t index;
 
-	if (dwFlags & PATH_STYLE_WINDOWS)
+	if (dwFlags == PATH_STYLE_WINDOWS)
 	{
 		for (index = 0; index < cchPath; index++)
 		{
@@ -701,7 +727,7 @@ HRESULT PathCchConvertStyleA(PSTR pszPath, size_t cchPath, unsigned long dwFlags
 				pszPath[index] = PATH_BACKSLASH_CHR;
 		}
 	}
-	else if (dwFlags & PATH_STYLE_UNIX)
+	else if (dwFlags == PATH_STYLE_UNIX)
 	{
 		for (index = 0; index < cchPath; index++)
 		{
@@ -709,7 +735,7 @@ HRESULT PathCchConvertStyleA(PSTR pszPath, size_t cchPath, unsigned long dwFlags
 				pszPath[index] = PATH_SLASH_CHR;
 		}
 	}
-	else if (dwFlags & PATH_STYLE_NATIVE)
+	else if (dwFlags == PATH_STYLE_NATIVE)
 	{
 		if (PATH_SEPARATOR_CHR == PATH_BACKSLASH_CHR)
 		{
@@ -750,7 +776,7 @@ HRESULT PathCchConvertStyleW(PWSTR pszPath, size_t cchPath, unsigned long dwFlag
 {
 	size_t index;
 
-	if (dwFlags & PATH_STYLE_WINDOWS)
+	if (dwFlags == PATH_STYLE_WINDOWS)
 	{
 		for (index = 0; index < cchPath; index++)
 		{
@@ -758,7 +784,7 @@ HRESULT PathCchConvertStyleW(PWSTR pszPath, size_t cchPath, unsigned long dwFlag
 				pszPath[index] = PATH_BACKSLASH_CHR;
 		}
 	}
-	else if (dwFlags & PATH_STYLE_UNIX)
+	else if (dwFlags == PATH_STYLE_UNIX)
 	{
 		for (index = 0; index < cchPath; index++)
 		{
@@ -766,7 +792,7 @@ HRESULT PathCchConvertStyleW(PWSTR pszPath, size_t cchPath, unsigned long dwFlag
 				pszPath[index] = PATH_SLASH_CHR;
 		}
 	}
-	else if (dwFlags & PATH_STYLE_NATIVE)
+	else if (dwFlags == PATH_STYLE_NATIVE)
 	{
 		if (PATH_SEPARATOR_CHR == PATH_BACKSLASH_CHR)
 		{
@@ -855,7 +881,7 @@ PCSTR PathGetSharedLibraryExtensionA(unsigned long dwFlags)
 	{
 #ifdef _WIN32
 		return SharedLibraryExtensionDotDllA;
-#elif __APPLE__
+#elif defined(__APPLE__)
 		if (dwFlags & PATH_SHARED_LIB_EXT_APPLE_SO)
 			return SharedLibraryExtensionDotSoA;
 		else
@@ -868,7 +894,7 @@ PCSTR PathGetSharedLibraryExtensionA(unsigned long dwFlags)
 	{
 #ifdef _WIN32
 		return SharedLibraryExtensionDllA;
-#elif __APPLE__
+#elif defined(__APPLE__)
 		if (dwFlags & PATH_SHARED_LIB_EXT_APPLE_SO)
 			return SharedLibraryExtensionSoA;
 		else
@@ -913,7 +939,7 @@ PCWSTR PathGetSharedLibraryExtensionW(unsigned long dwFlags)
 	{
 #ifdef _WIN32
 		return SharedLibraryExtensionDotDllW;
-#elif __APPLE__
+#elif defined(__APPLE__)
 		if (dwFlags & PATH_SHARED_LIB_EXT_APPLE_SO)
 			return SharedLibraryExtensionDotSoW;
 		else
@@ -926,7 +952,7 @@ PCWSTR PathGetSharedLibraryExtensionW(unsigned long dwFlags)
 	{
 #ifdef _WIN32
 		return SharedLibraryExtensionDllW;
-#elif __APPLE__
+#elif defined(__APPLE__)
 		if (dwFlags & PATH_SHARED_LIB_EXT_APPLE_SO)
 			return SharedLibraryExtensionSoW;
 		else

@@ -21,6 +21,8 @@
 #include "config.h"
 #endif
 
+#include <winpr/crt.h>
+
 #include <freerdp/crypto/crypto.h>
 
 CryptoSha1 crypto_sha1_init(void)
@@ -144,6 +146,7 @@ void crypto_hmac_free(CryptoHmac hmac)
 {
 	if (hmac == NULL)
 		return;
+
 	HMAC_CTX_cleanup(&hmac->hmac_ctx);
 	free(hmac);
 }
@@ -177,7 +180,7 @@ BOOL crypto_cert_get_public_key(CryptoCert cert, BYTE** PublicKey, DWORD* Public
 
 	if (!pkey)
 	{
-		printf("crypto_cert_get_public_key: X509_get_pubkey() failed\n");
+		fprintf(stderr, "crypto_cert_get_public_key: X509_get_pubkey() failed\n");
 		status = FALSE;
 		goto exit;
 	}
@@ -186,7 +189,7 @@ BOOL crypto_cert_get_public_key(CryptoCert cert, BYTE** PublicKey, DWORD* Public
 
 	if (length < 1)
 	{
-		printf("crypto_cert_get_public_key: i2d_PublicKey() failed\n");
+		fprintf(stderr, "crypto_cert_get_public_key: i2d_PublicKey() failed\n");
 		status = FALSE;
 		goto exit;
 	}
@@ -256,37 +259,31 @@ static void crypto_rsa_public(const BYTE* input, int length, UINT32 key_length, 
 
 static void crypto_rsa_private(const BYTE* input, int length, UINT32 key_length, const BYTE* modulus, const BYTE* private_exponent, BYTE* output)
 {
-
 	crypto_rsa_common(input, length, key_length, modulus, private_exponent, key_length, output);
 }
 
 void crypto_rsa_public_encrypt(const BYTE* input, int length, UINT32 key_length, const BYTE* modulus, const BYTE* exponent, BYTE* output)
 {
-
 	crypto_rsa_public(input, length, key_length, modulus, exponent, output);
 }
 
 void crypto_rsa_public_decrypt(const BYTE* input, int length, UINT32 key_length, const BYTE* modulus, const BYTE* exponent, BYTE* output)
 {
-
 	crypto_rsa_public(input, length, key_length, modulus, exponent, output);
 }
 
 void crypto_rsa_private_encrypt(const BYTE* input, int length, UINT32 key_length, const BYTE* modulus, const BYTE* private_exponent, BYTE* output)
 {
-
 	crypto_rsa_private(input, length, key_length, modulus, private_exponent, output);
 }
 
 void crypto_rsa_private_decrypt(const BYTE* input, int length, UINT32 key_length, const BYTE* modulus, const BYTE* private_exponent, BYTE* output)
 {
-
 	crypto_rsa_private(input, length, key_length, modulus, private_exponent, output);
 }
 
 void crypto_rsa_decrypt(const BYTE* input, int length, UINT32 key_length, const BYTE* modulus, const BYTE* private_exponent, BYTE* output)
 {
-
 	crypto_rsa_common(input, length, key_length, modulus, private_exponent, key_length, output);
 }
 
@@ -318,7 +315,9 @@ char* crypto_cert_fingerprint(X509* xcert)
 
 	X509_digest(xcert, EVP_sha1(), fp, &fp_len);
 
-	fp_buffer = (char*) xzalloc(3 * fp_len);
+	fp_buffer = (char*) malloc(3 * fp_len);
+	ZeroMemory(fp_buffer, 3 * fp_len);
+
 	p = fp_buffer;
 
 	for (i = 0; i < (int) (fp_len - 1); i++)
@@ -339,15 +338,16 @@ char* crypto_print_name(X509_NAME* name)
 	if (X509_NAME_print_ex(outBIO, name, 0, XN_FLAG_ONELINE) > 0)
 	{
 		unsigned long size = BIO_number_written(outBIO);
-		buffer = xzalloc(size + 1);
+		buffer = malloc(size + 1);
+		ZeroMemory(buffer, size + 1);
 		memset(buffer, 0, size + 1);
 		BIO_read(outBIO, buffer, size);
 	}
 
 	BIO_free(outBIO);
+
 	return buffer;
 }
-
 
 char* crypto_cert_subject(X509* xcert)
 {
@@ -430,6 +430,7 @@ char** crypto_cert_subject_alt_name(X509* xcert, int* count, int** lengths)
 		*lengths = NULL ;
 		return NULL;
 	}
+	GENERAL_NAMES_free(subject_alt_names);
 
 	return strings;
 }
@@ -512,59 +513,15 @@ void crypto_cert_print_info(X509* xcert)
 	issuer = crypto_cert_issuer(xcert);
 	fp = crypto_cert_fingerprint(xcert);
 
-	printf("Certificate details:\n");
-	printf("\tSubject: %s\n", subject);
-	printf("\tIssuer: %s\n", issuer);
-	printf("\tThumbprint: %s\n", fp);
-	printf("The above X.509 certificate could not be verified, possibly because you do not have "
+	fprintf(stderr, "Certificate details:\n");
+	fprintf(stderr, "\tSubject: %s\n", subject);
+	fprintf(stderr, "\tIssuer: %s\n", issuer);
+	fprintf(stderr, "\tThumbprint: %s\n", fp);
+	fprintf(stderr, "The above X.509 certificate could not be verified, possibly because you do not have "
 			"the CA certificate in your certificate store, or the certificate has expired. "
 			"Please look at the documentation on how to create local certificate store for a private CA.\n");
 
 	free(subject);
 	free(issuer);
 	free(fp);
-}
-
-char* crypto_base64_encode(BYTE* data, int length)
-{
-	BIO* bmem;
-	BIO* b64;
-	BUF_MEM *bptr;
-	char* base64_string;
-
-	b64 = BIO_new(BIO_f_base64());
-	BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
-	bmem = BIO_new(BIO_s_mem());
-	b64 = BIO_push(b64, bmem);
-	BIO_write(b64, data, length);
-
-	if (BIO_flush(b64) < 1)
-		return NULL;
-
-	BIO_get_mem_ptr(b64, &bptr);
-
-	base64_string = malloc(bptr->length);
-	memcpy(base64_string, bptr->data, bptr->length - 1);
-	base64_string[bptr->length - 1] = '\0';
-
-	BIO_free_all(b64);
-
-	return base64_string;
-}
-
-void crypto_base64_decode(BYTE* enc_data, int length, BYTE** dec_data, int* res_length)
-{
-      BIO *b64, *bmem;
-
-      *dec_data = malloc(length);
-      memset(*dec_data, 0, length);
-
-      b64 = BIO_new(BIO_f_base64());
-      BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
-      bmem = BIO_new_mem_buf(enc_data, length);
-      bmem = BIO_push(b64, bmem);
-
-      *res_length = BIO_read(bmem, *dec_data, length);
-
-      BIO_free_all(bmem);
 }

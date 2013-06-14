@@ -23,8 +23,9 @@
 
 #include <stdio.h>
 
-#include <freerdp/utils/stream.h>
-#include <freerdp/utils/memory.h>
+#include <winpr/crt.h>
+
+#include <winpr/stream.h>
 
 #include <freerdp/cache/offscreen.h>
 
@@ -79,7 +80,7 @@ rdpBitmap* offscreen_cache_get(rdpOffscreenCache* offscreen_cache, UINT32 index)
 
 	if (index >= offscreen_cache->maxEntries)
 	{
-		printf("invalid offscreen bitmap index: 0x%04X\n", index);
+		fprintf(stderr, "invalid offscreen bitmap index: 0x%04X\n", index);
 		return NULL;
 	}
 
@@ -87,7 +88,7 @@ rdpBitmap* offscreen_cache_get(rdpOffscreenCache* offscreen_cache, UINT32 index)
 
 	if (bitmap == NULL)
 	{
-		printf("invalid offscreen bitmap at index: 0x%04X\n", index);
+		fprintf(stderr, "invalid offscreen bitmap at index: 0x%04X\n", index);
 		return NULL;
 	}
 
@@ -98,7 +99,7 @@ void offscreen_cache_put(rdpOffscreenCache* offscreen, UINT32 index, rdpBitmap* 
 {
 	if (index >= offscreen->maxEntries)
 	{
-		printf("invalid offscreen bitmap index: 0x%04X\n", index);
+		fprintf(stderr, "invalid offscreen bitmap index: 0x%04X\n", index);
 		return;
 	}
 
@@ -112,7 +113,7 @@ void offscreen_cache_delete(rdpOffscreenCache* offscreen, UINT32 index)
 
 	if (index >= offscreen->maxEntries)
 	{
-		printf("invalid offscreen bitmap index (delete): 0x%04X\n", index);
+		fprintf(stderr, "invalid offscreen bitmap index (delete): 0x%04X\n", index);
 		return;
 	}
 
@@ -134,7 +135,8 @@ rdpOffscreenCache* offscreen_cache_new(rdpSettings* settings)
 {
 	rdpOffscreenCache* offscreen_cache;
 
-	offscreen_cache = (rdpOffscreenCache*) xzalloc(sizeof(rdpOffscreenCache));
+	offscreen_cache = (rdpOffscreenCache*) malloc(sizeof(rdpOffscreenCache));
+	ZeroMemory(offscreen_cache, sizeof(rdpOffscreenCache));
 
 	if (offscreen_cache != NULL)
 	{
@@ -145,10 +147,11 @@ rdpOffscreenCache* offscreen_cache_new(rdpSettings* settings)
 		offscreen_cache->maxSize = 7680;
 		offscreen_cache->maxEntries = 2000;
 
-		settings->offscreen_bitmap_cache_size = offscreen_cache->maxSize;
-		settings->offscreen_bitmap_cache_entries = offscreen_cache->maxEntries;
+		settings->OffscreenCacheSize = offscreen_cache->maxSize;
+		settings->OffscreenCacheEntries = offscreen_cache->maxEntries;
 
-		offscreen_cache->entries = (rdpBitmap**) xzalloc(sizeof(rdpBitmap*) * offscreen_cache->maxEntries);
+		offscreen_cache->entries = (rdpBitmap**) malloc(sizeof(rdpBitmap*) * offscreen_cache->maxEntries);
+		ZeroMemory(offscreen_cache->entries, sizeof(rdpBitmap*) * offscreen_cache->maxEntries);
 	}
 
 	return offscreen_cache;

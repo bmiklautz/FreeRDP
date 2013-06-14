@@ -23,57 +23,60 @@
 
 #include <winpr/winpr.h>
 #include <winpr/wtypes.h>
+#include <winpr/endian.h>
 
-struct stream
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct _wStreamPool wStreamPool;
+
+struct _wStream
 {
-	BYTE* pointer;
 	BYTE* buffer;
-	size_t size;
+	BYTE* pointer;
 	size_t length;
+	size_t capacity;
+
+	DWORD count;
+	wStreamPool* pool;
 };
-typedef struct stream Stream;
-typedef struct stream* PStream;
+typedef struct _wStream wStream;
 
-WINPR_API PStream PStreamAlloc(size_t size);
-WINPR_API void StreamAlloc(PStream s, size_t size);
-WINPR_API void StreamReAlloc(PStream s, size_t size);
-WINPR_API PStream PStreamAllocAttach(BYTE* buffer, size_t size);
-WINPR_API void StreamAllocAttach(PStream s, BYTE* buffer, size_t size);
-WINPR_API void PStreamFree(PStream s);
-WINPR_API void StreamFree(PStream s);
-WINPR_API void PStreamFreeDetach(PStream s);
-WINPR_API void StreamFreeDetach(PStream s);
-WINPR_API void StreamAttach(PStream s, BYTE* buffer, size_t size);
-WINPR_API void StreamDetach(PStream s);
+WINPR_API void Stream_EnsureCapacity(wStream* s, size_t size);
+WINPR_API void Stream_EnsureRemainingCapacity(wStream* s, size_t size);
 
-#define StreamRead_UINT8(_s, _v) do { _v = \
+WINPR_API wStream* Stream_New(BYTE* buffer, size_t size);
+WINPR_API void Stream_Free(wStream* s, BOOL bFreeBuffer);
+
+#define Stream_Read_UINT8(_s, _v) do { _v = \
 	*_s->pointer++; } while (0)
 
-#define StreamRead_UINT16(_s, _v) do { _v = \
+#define Stream_Read_UINT16(_s, _v) do { _v = \
 	(UINT16)(*_s->pointer) + \
 	(((UINT16)(*(_s->pointer + 1))) << 8); \
 	_s->pointer += 2; } while (0)
 
-#define StreamRead_UINT16_BE(_s, _v) do { _v = \
+#define Stream_Read_UINT16_BE(_s, _v) do { _v = \
 	(((UINT16)(*_s->pointer)) << 8) + \
 	(UINT16)(*(_s->pointer + 1)); \
 	_s->pointer += 2; } while (0)
 
-#define StreamRead_UINT32(_s, _v) do { _v = \
+#define Stream_Read_UINT32(_s, _v) do { _v = \
 	(UINT32)(*_s->pointer) + \
 	(((UINT32)(*(_s->pointer + 1))) << 8) + \
 	(((UINT32)(*(_s->pointer + 2))) << 16) + \
 	(((UINT32)(*(_s->pointer + 3))) << 24); \
 	_s->pointer += 4; } while (0)
 
-#define StreamRead_UINT32_BE(_s, _v) do { _v = \
-	(((uint32)(*(_s->pointer))) << 24) + \
-	(((uint32)(*(_s->pointer + 1))) << 16) + \
-	(((uint32)(*(_s->pointer + 2))) << 8) + \
-	(((uint32)(*(_s->pointer + 3)))); \
+#define Stream_Read_UINT32_BE(_s, _v) do { _v = \
+	(((UINT32)(*(_s->pointer))) << 24) + \
+	(((UINT32)(*(_s->pointer + 1))) << 16) + \
+	(((UINT32)(*(_s->pointer + 2))) << 8) + \
+	(((UINT32)(*(_s->pointer + 3)))); \
 	_s->pointer += 4; } while (0)
 
-#define StreamRead_UINT64(_s, _v) do { _v = \
+#define Stream_Read_UINT64(_s, _v) do { _v = \
 	(UINT64)(*_s->pointer) + \
 	(((UINT64)(*(_s->pointer + 1))) << 8) + \
 	(((UINT64)(*(_s->pointer + 2))) << 16) + \
@@ -84,34 +87,34 @@ WINPR_API void StreamDetach(PStream s);
 	(((UINT64)(*(_s->pointer + 7))) << 56); \
 	_s->pointer += 8; } while (0)
 
-#define StreamRead(_s, _b, _n) do { \
+#define Stream_Read(_s, _b, _n) do { \
 	memcpy(_b, (_s->pointer), (_n)); \
 	_s->pointer += (_n); \
 	} while (0)
 
-#define StreamWrite_UINT8(_s, _v) do { \
+#define Stream_Write_UINT8(_s, _v) do { \
 	*_s->pointer++ = (UINT8)(_v); } while (0)
 
-#define StreamWrite_UINT16(_s, _v) do { \
+#define Stream_Write_UINT16(_s, _v) do { \
 	*_s->pointer++ = (_v) & 0xFF; \
 	*_s->pointer++ = ((_v) >> 8) & 0xFF; } while (0)
 
-#define StreamWrite_UINT16_BE(_s, _v) do { \
+#define Stream_Write_UINT16_BE(_s, _v) do { \
 	*_s->pointer++ = ((_v) >> 8) & 0xFF; \
 	*_s->pointer++ = (_v) & 0xFF; } while (0)
 
-#define StreamWrite_UINT32(_s, _v) do { \
+#define Stream_Write_UINT32(_s, _v) do { \
 	*_s->pointer++ = (_v) & 0xFF; \
 	*_s->pointer++ = ((_v) >> 8) & 0xFF; \
 	*_s->pointer++ = ((_v) >> 16) & 0xFF; \
 	*_s->pointer++ = ((_v) >> 24) & 0xFF; } while (0)
 
-#define StreamWrite_UINT32_BE(_s, _v) do { \
-	StreamWrite_UINT16_BE(_s, ((_v) >> 16 & 0xFFFF)); \
-	StreamWrite_UINT16_BE(_s, ((_v) & 0xFFFF)); \
+#define Stream_Write_UINT32_BE(_s, _v) do { \
+	Stream_Write_UINT16_BE(_s, ((_v) >> 16 & 0xFFFF)); \
+	Stream_Write_UINT16_BE(_s, ((_v) & 0xFFFF)); \
 	} while (0)
 
-#define StreamWrite_UINT64(_s, _v) do { \
+#define Stream_Write_UINT64(_s, _v) do { \
 	*_s->pointer++ = (UINT64)(_v) & 0xFF; \
 	*_s->pointer++ = ((UINT64)(_v) >> 8) & 0xFF; \
 	*_s->pointer++ = ((UINT64)(_v) >> 16) & 0xFF; \
@@ -121,27 +124,27 @@ WINPR_API void StreamDetach(PStream s);
 	*_s->pointer++ = ((UINT64)(_v) >> 48) & 0xFF; \
 	*_s->pointer++ = ((UINT64)(_v) >> 56) & 0xFF; } while (0)
 
-#define StreamWrite(_s, _b, _n) do { \
+#define Stream_Write(_s, _b, _n) do { \
 	memcpy(_s->pointer, (_b), (_n)); \
 	_s->pointer += (_n); \
 	} while (0)
 
-#define StreamPeek_UINT8(_s, _v) do { _v = \
+#define Stream_Peek_UINT8(_s, _v) do { _v = \
 	*_s->pointer; } while (0)
 
-#define StreamPeek_UINT16(_s, _v) do { _v = \
+#define Stream_Peek_UINT16(_s, _v) do { _v = \
 	(UINT16)(*_s->pointer) + \
 	(((UINT16)(*(_s->pointer + 1))) << 8); \
 	} while (0)
 
-#define StreamPeek_UINT32(_s, _v) do { _v = \
+#define Stream_Peek_UINT32(_s, _v) do { _v = \
 	(UINT32)(*_s->pointer) + \
 	(((UINT32)(*(_s->pointer + 1))) << 8) + \
 	(((UINT32)(*(_s->pointer + 2))) << 16) + \
 	(((UINT32)(*(_s->pointer + 3))) << 24); \
 	} while (0)
 
-#define StreamPeek_UINT64(_s, _v) do { _v = \
+#define Stream_Peek_UINT64(_s, _v) do { _v = \
 	(UINT64)(*_s->pointer) + \
 	(((UINT64)(*(_s->pointer + 1))) << 8) + \
 	(((UINT64)(*(_s->pointer + 2))) << 16) + \
@@ -152,51 +155,104 @@ WINPR_API void StreamDetach(PStream s);
 	(((UINT64)(*(_s->pointer + 7))) << 56); \
 	} while (0)
 
-#define StreamPeek(_s, _b, _n) do { \
+#define Stream_Peek(_s, _b, _n) do { \
 	memcpy(_b, (_s->pointer), (_n)); \
 	} while (0)
 
-#define StreamSeek(_s,_offset)		_s->pointer += (_offset)
-#define StreamRewind(_s,_offset)	_s->pointer -= (_offset)
+#define Stream_Seek(_s,_offset)		_s->pointer += (_offset)
+#define Stream_Rewind(_s,_offset)	_s->pointer -= (_offset)
 
-#define StreamSeek_UINT8(_s)		StreamSeek(_s, 1)
-#define StreamSeek_UINT16(_s)		StreamSeek(_s, 2)
-#define StreamSeek_UINT32(_s)		StreamSeek(_s, 4)
-#define StreamSeek_UINT64(_s)		StreamSeek(_s, 8)
+#define Stream_Seek_UINT8(_s)		Stream_Seek(_s, 1)
+#define Stream_Seek_UINT16(_s)		Stream_Seek(_s, 2)
+#define Stream_Seek_UINT32(_s)		Stream_Seek(_s, 4)
+#define Stream_Seek_UINT64(_s)		Stream_Seek(_s, 8)
 
-#define StreamRewind_UINT8(_s)		StreamRewind(_s, 1)
-#define StreamRewind_UINT16(_s)		StreamRewind(_s, 2)
-#define StreamRewind_UINT32(_s)		StreamRewind(_s, 4)
-#define StreamRewind_UINT64(_s)		StreamRewind(_s, 8)
+#define Stream_Rewind_UINT8(_s)		Stream_Rewind(_s, 1)
+#define Stream_Rewind_UINT16(_s)	Stream_Rewind(_s, 2)
+#define Stream_Rewind_UINT32(_s)	Stream_Rewind(_s, 4)
+#define Stream_Rewind_UINT64(_s)	Stream_Rewind(_s, 8)
 
-#define StreamZero(_s, _n) do { \
+#define Stream_Zero(_s, _n) do { \
 	memset(_s->pointer, '\0', (_n)); \
 	_s->pointer += (_n); \
 	} while (0)
 
-#define StreamFill(_s, _v, _n) do { \
+#define Stream_Fill(_s, _v, _n) do { \
 	memset(_s->pointer, _v, (_n)); \
 	_s->pointer += (_n); \
 	} while (0)
 
-#define StreamCopy(_dst, _src, _n) do { \
+#define Stream_Copy(_dst, _src, _n) do { \
 	memcpy(_dst->pointer, _src->pointer, _n); \
 	_dst->pointer += _n; \
 	_src->pointer += _n; \
 	} while (0)
 
-#define StreamGetPointer(_s, _p)	_p = _s->pointer
-#define StreamSetPointer(_s, _p)	_s->pointer = _p
+#define Stream_Buffer(_s)			_s->buffer
+#define Stream_GetBuffer(_s, _b)	_b = _s->buffer
+#define Stream_SetBuffer(_s, _b)	_s->buffer = _b
 
-#define StreamGetPosition(_s)		(_s->pointer - _s->buffer)
-#define StreamSetPosition(_s, _p)	_s->pointer = _s->buffer + (_p)
+#define Stream_Pointer(_s)			_s->pointer
+#define Stream_GetPointer(_s, _p)	_p = _s->pointer
+#define Stream_SetPointer(_s, _p)	_s->pointer = _p
 
-#define StreamPointer(_s)		_s->pointer
-#define StreamBuffer(_s)		_s->buffer
-#define StreamSize(_s)			_s->size
-#define StreamLength(_s)		_s->length
+#define Stream_Length(_s)			_s->length
+#define Stream_GetLength(_s, _l)	_l = _s->length
+#define Stream_SetLength(_s, _l)	_s->length = _l
 
-#define StreamRemainingSize(_s)		(_s->size - (_s->pointer - _s->buffer))
-#define StreamRemainingLength(_s)	(_s->length - (_s->pointer - _s->buffer))
+#define Stream_Capacity(_s)			_s->capacity
+#define Stream_GetCapacity(_s, _c)	_c = _s->capacity
+#define Stream_SetCapacity(_s, _c)	_s->capacity = _c
+
+#define Stream_GetPosition(_s)		(_s->pointer - _s->buffer)
+#define Stream_SetPosition(_s, _p)	_s->pointer = _s->buffer + (_p)
+
+#define Stream_SealLength(_s)		_s->length = (_s->pointer - _s->buffer)
+#define Stream_GetRemainingLength(_s)	(_s->length - (_s->pointer - _s->buffer))
+
+#define Stream_Clear(_s)		memset(_s->buffer, 0, _s->capacity)
+
+static INLINE BOOL Stream_SafeSeek(wStream* s, size_t size) {
+	if (Stream_GetRemainingLength(s) < size)
+		return FALSE;
+	Stream_Seek(s, size);
+	return TRUE;
+}
+
+/* StreamPool */
+
+struct _wStreamPool
+{
+	int aSize;
+	int aCapacity;
+	wStream** aArray;
+
+	int uSize;
+	int uCapacity;
+	wStream** uArray;
+
+	HANDLE mutex;
+	BOOL synchronized;
+	size_t defaultSize;
+};
+
+WINPR_API wStream* StreamPool_Take(wStreamPool* pool, size_t size);
+WINPR_API void StreamPool_Return(wStreamPool* pool, wStream* s);
+
+WINPR_API void Stream_AddRef(wStream* s);
+WINPR_API void Stream_Release(wStream* s);
+
+WINPR_API wStream* StreamPool_Find(wStreamPool* pool, BYTE* ptr);
+WINPR_API void StreamPool_AddRef(wStreamPool* pool, BYTE* ptr);
+WINPR_API void StreamPool_Release(wStreamPool* pool, BYTE* ptr);
+
+WINPR_API void StreamPool_Clear(wStreamPool* pool);
+
+WINPR_API wStreamPool* StreamPool_New(BOOL synchronized, size_t defaultSize);
+WINPR_API void StreamPool_Free(wStreamPool* pool);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* WINPR_UTILS_STREAM_H */

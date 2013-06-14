@@ -22,7 +22,7 @@
 #endif
 
 #include <freerdp/utils/event.h>
-#include <freerdp/utils/hexdump.h>
+#include <winpr/print.h>
 #include <freerdp/utils/rail.h>
 #include <freerdp/rail/rail.h>
 
@@ -45,7 +45,7 @@ void wf_rail_send_activate(wfInfo* wfi, HWND window, BOOL enabled)
 {
 }
 
-void wf_process_rail_event(wfInfo* wfi, rdpChannels* chanman, RDP_EVENT* event)
+void wf_process_rail_event(wfInfo* wfi, rdpChannels* chanman, wMessage* event)
 {
 }
 

@@ -17,15 +17,16 @@
  * limitations under the License.
  */
 
-#ifndef __POINTER_CACHE_H
-#define __POINTER_CACHE_H
+#ifndef FREERDP_POINTER_CACHE_H
+#define FREERDP_POINTER_CACHE_H
 
 #include <freerdp/api.h>
 #include <freerdp/types.h>
 #include <freerdp/update.h>
 #include <freerdp/freerdp.h>
 #include <freerdp/graphics.h>
-#include <freerdp/utils/stream.h>
+
+#include <winpr/stream.h>
 
 typedef struct rdp_pointer_cache rdpPointerCache;
 
@@ -42,6 +43,10 @@ struct rdp_pointer_cache
 	rdpSettings* settings;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 FREERDP_API rdpPointer* pointer_cache_get(rdpPointerCache* pointer_cache, UINT32 index);
 FREERDP_API void pointer_cache_put(rdpPointerCache* pointer_cache, UINT32 index, rdpPointer* pointer);
 
@@ -50,4 +55,8 @@ FREERDP_API void pointer_cache_register_callbacks(rdpUpdate* update);
 FREERDP_API rdpPointerCache* pointer_cache_new(rdpSettings* settings);
 FREERDP_API void pointer_cache_free(rdpPointerCache* pointer_cache);
 
-#endif /* __POINTER_CACHE_H */
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* FREERDP_POINTER_CACHE_H */

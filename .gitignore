@@ -13,6 +13,8 @@ CPackConfig.cmake
 CPackSourceConfig.cmake
 DartConfiguration.tcl
 _CPack_Packages
+external/*
+!external/README
 
 # Packages
 *.zip
@@ -39,6 +41,12 @@ client/X11/xfreerdp.1
 # Mac OS X
 .DS_Store
 *.xcodeproj/
+DerivedData/
+
+# iOS
+FreeRDP.build
+Debug-*
+Release-*
 
 # Windows
 *.vcxproj
@@ -50,6 +58,7 @@ client/X11/xfreerdp.1
 *.suo
 *.ncb
 *.opensdf
+Thumbs.db
 ipch
 Debug
 RelWithDebInfo
@@ -75,7 +84,12 @@ xcode
 *.dir
 Release
 Win32
+build/
+*.orig
 
 default.log
 *Amplifier XE*
 *Inspector XE*
+
+*.cbp
+*.txt.user

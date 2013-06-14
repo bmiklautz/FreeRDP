@@ -27,6 +27,8 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
+#include <winpr/crt.h>
+
 #ifdef WITH_XINERAMA
 #include <X11/extensions/Xinerama.h>
 #endif
@@ -35,9 +37,57 @@
 
 /* See MSDN Section on Multiple Display Monitors: http://msdn.microsoft.com/en-us/library/dd145071 */
 
+int xf_list_monitors(xfInfo* xfi)
+{
+#ifdef WITH_XINERAMA
+	Display* display;
+	int i, nmonitors = 0;
+	int ignored, ignored2;
+	XineramaScreenInfo* screen = NULL;
+
+	display = XOpenDisplay(NULL);
+
+	if (XineramaQueryExtension(display, &ignored, &ignored2))
+	{
+		if (XineramaIsActive(display))
+		{
+			screen = XineramaQueryScreens(display, &nmonitors);
+
+			for (i = 0; i < nmonitors; i++)
+			{
+				printf("      %s [%d] %dx%d\t+%d+%d\n",
+				       (i == 0) ? "*" : " ", i,
+				       screen[i].width, screen[i].height,
+				       screen[i].x_org, screen[i].y_org);
+			}
+
+			XFree(screen);
+		}
+	}
+
+	XCloseDisplay(display);
+#else
+	Screen* screen;
+	Display* display;
+
+	display = XOpenDisplay(NULL);
+
+	screen = ScreenOfDisplay(display, DefaultScreen(display));
+	printf("      * [0] %dx%d\t+%d+%d\n", WidthOfScreen(screen), HeightOfScreen(screen), 0, 0);
+
+	XCloseDisplay(display);
+#endif
+
+	return 0;
+}
+
 BOOL xf_detect_monitors(xfInfo* xfi, rdpSettings* settings)
 {
-	int i;
+	int i, j;
+	int nmonitors;
+	int primaryMonitor;
+	int vWidth, vHeight;
+	int maxWidth, maxHeight;
 	VIRTUAL_SCREEN* vscreen;
 
 #ifdef WITH_XINERAMA
@@ -46,33 +96,6 @@ BOOL xf_detect_monitors(xfInfo* xfi, rdpSettings* settings)
 #endif
 
 	vscreen = &xfi->vscreen;
-
-	if (xf_GetWorkArea(xfi) != TRUE)
-	{
-		xfi->workArea.x = 0;
-		xfi->workArea.y = 0;
-		xfi->workArea.width = WidthOfScreen(xfi->screen);
-		xfi->workArea.height = HeightOfScreen(xfi->screen);
-	}
-
-	if (settings->fullscreen)
-	{
-		settings->width = WidthOfScreen(xfi->screen);
-		settings->height = HeightOfScreen(xfi->screen);	
-	}
-	else if (settings->workarea)
-	{
-		settings->width = xfi->workArea.width;
-		settings->height = xfi->workArea.height;
-	}
-	else if (settings->percent_screen)
-	{
-		settings->width = (xfi->workArea.width * settings->percent_screen) / 100;
-		settings->height = (xfi->workArea.height * settings->percent_screen) / 100;
-	}
-
-	if (settings->fullscreen != TRUE && settings->workarea != TRUE)
-		return TRUE;
 
 #ifdef WITH_XINERAMA
 	if (XineramaQueryExtension(xfi->display, &ignored, &ignored2))
@@ -84,7 +107,8 @@ BOOL xf_detect_monitors(xfInfo* xfi, rdpSettings* settings)
 			if (vscreen->nmonitors > 16)
 				vscreen->nmonitors = 0;
 
-			vscreen->monitors = xzalloc(sizeof(MONITOR_INFO) * vscreen->nmonitors);
+			vscreen->monitors = malloc(sizeof(MONITOR_INFO) * vscreen->nmonitors);
+			ZeroMemory(vscreen->monitors, sizeof(MONITOR_INFO) * vscreen->nmonitors);
 
 			if (vscreen->nmonitors)
 			{
@@ -105,36 +129,128 @@ BOOL xf_detect_monitors(xfInfo* xfi, rdpSettings* settings)
 	}
 #endif
 
-	settings->num_monitors = vscreen->nmonitors;
+	if (!xf_GetWorkArea(xfi))
+	{
+		xfi->workArea.x = 0;
+		xfi->workArea.y = 0;
+		xfi->workArea.width = WidthOfScreen(xfi->screen);
+		xfi->workArea.height = HeightOfScreen(xfi->screen);
+	}
+
+	if (settings->Fullscreen)
+	{
+		settings->DesktopWidth = WidthOfScreen(xfi->screen);
+		settings->DesktopHeight = HeightOfScreen(xfi->screen);
+		maxWidth = settings->DesktopWidth;
+		maxHeight = settings->DesktopHeight;
+	}
+	else if (settings->Workarea)
+	{
+		settings->DesktopWidth = xfi->workArea.width;
+		settings->DesktopHeight = xfi->workArea.height;
+		maxWidth = settings->DesktopWidth;
+		maxHeight = settings->DesktopHeight;
+	}
+	else if (settings->PercentScreen)
+	{
+		settings->DesktopWidth = (xfi->workArea.width * settings->PercentScreen) / 100;
+		settings->DesktopHeight = (xfi->workArea.height * settings->PercentScreen) / 100;
+		maxWidth = settings->DesktopWidth;
+		maxHeight = settings->DesktopHeight;
+	}
+	else
+	{
+		maxWidth = WidthOfScreen(xfi->screen);
+		maxHeight = HeightOfScreen(xfi->screen);
+	}
+
+	if (!settings->Fullscreen && !settings->Workarea && !settings->UseMultimon)
+		return TRUE;
+
+	if ((settings->Fullscreen && !settings->UseMultimon && !settings->SpanMonitors) ||
+			(settings->Workarea && !settings->RemoteApplicationMode))
+	{
+		/* Select a single monitor */
+
+		if (settings->NumMonitorIds != 1)
+		{
+			settings->NumMonitorIds = 1;
+			settings->MonitorIds = (UINT32*) malloc(sizeof(UINT32) * settings->NumMonitorIds);
+			settings->MonitorIds[0] = 0;
+
+			for (i = 0; i < vscreen->nmonitors; i++)
+			{
+				if (vscreen->monitors[i].primary)
+				{
+					settings->MonitorIds[0] = i;
+					break;
+				}
+			}
+		}
+	}
+
+	nmonitors = 0;
+	primaryMonitor = 0;
 
 	for (i = 0; i < vscreen->nmonitors; i++)
 	{
-		settings->monitors[i].x = vscreen->monitors[i].area.left;
-		settings->monitors[i].y = vscreen->monitors[i].area.top;
-		settings->monitors[i].width = vscreen->monitors[i].area.right - vscreen->monitors[i].area.left + 1;
-		settings->monitors[i].height = vscreen->monitors[i].area.bottom - vscreen->monitors[i].area.top + 1;
-		settings->monitors[i].is_primary = vscreen->monitors[i].primary;
+		if (settings->NumMonitorIds)
+		{
+			BOOL found = FALSE;
 
-		vscreen->area.left = MIN(vscreen->monitors[i].area.left, vscreen->area.left);
-		vscreen->area.right = MAX(vscreen->monitors[i].area.right, vscreen->area.right);
-		vscreen->area.top = MIN(vscreen->monitors[i].area.top, vscreen->area.top);
-		vscreen->area.bottom = MAX(vscreen->monitors[i].area.bottom, vscreen->area.bottom);
+			for (j = 0; j < settings->NumMonitorIds; j++)
+			{
+				if (settings->MonitorIds[j] == i)
+					found = TRUE;
+			}
+
+			if (!found)
+				continue;
+		}
+
+		settings->MonitorDefArray[nmonitors].x = vscreen->monitors[i].area.left;
+		settings->MonitorDefArray[nmonitors].y = vscreen->monitors[i].area.top;
+		settings->MonitorDefArray[nmonitors].width = MIN(vscreen->monitors[i].area.right - vscreen->monitors[i].area.left + 1, settings->DesktopWidth);
+		settings->MonitorDefArray[nmonitors].height = MIN(vscreen->monitors[i].area.bottom - vscreen->monitors[i].area.top + 1, settings->DesktopHeight);
+		settings->MonitorDefArray[nmonitors].is_primary = vscreen->monitors[i].primary;
+
+		primaryMonitor |= vscreen->monitors[i].primary;
+		nmonitors++;
 	}
 
-	//if no monitor information is present then make sure variables are set accordingly
-	if (settings->num_monitors == 0)
+	settings->MonitorCount = nmonitors;
+
+	vWidth = vHeight = 0;
+	settings->DesktopPosX = maxWidth - 1;
+	settings->DesktopPosY = maxHeight - 1;
+
+	for (i = 0; i < settings->MonitorCount; i++)
 	{
-	        vscreen->area.left = 0;
-	        vscreen->area.right = settings->width -1;
-                vscreen->area.top = 0;
-                vscreen->area.bottom = settings->height - 1;
+		settings->DesktopPosX = MIN(settings->DesktopPosX, settings->MonitorDefArray[i].x);
+		settings->DesktopPosY = MIN(settings->DesktopPosY, settings->MonitorDefArray[i].y);
+
+		vWidth += settings->MonitorDefArray[i].width;
+		vHeight = MAX(vHeight, settings->MonitorDefArray[i].height);
 	}
+
+	vscreen->area.left = 0;
+	vscreen->area.right = vWidth - 1;
+	vscreen->area.top = 0;
+	vscreen->area.bottom = vHeight - 1;
+
+	if (settings->Workarea)
+	{
+		vscreen->area.top = xfi->workArea.y;
+		vscreen->area.bottom = (vHeight - (vHeight - (xfi->workArea.height + xfi->workArea.y))) - 1;
+	}
+
+	if (nmonitors && !primaryMonitor)
+		settings->MonitorDefArray[0].is_primary = TRUE;
 	
-
-	if (settings->num_monitors)
+	if (settings->MonitorCount)
 	{
-		settings->width = vscreen->area.right - vscreen->area.left + 1;
-		settings->height = vscreen->area.bottom - vscreen->area.top + 1;
+		settings->DesktopWidth = vscreen->area.right - vscreen->area.left + 1;
+		settings->DesktopHeight = vscreen->area.bottom - vscreen->area.top + 1;
 	}
 
 	return TRUE;

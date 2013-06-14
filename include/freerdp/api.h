@@ -32,6 +32,10 @@
 #define INLINE	inline
 #endif
 
+#ifdef _WIN32
+#define __func__ __FUNCTION__
+#endif
+
 #if defined _WIN32 || defined __CYGWIN__
   #ifdef FREERDP_EXPORTS
     #ifdef __GNUC__
@@ -52,6 +56,12 @@
   #else
     #define FREERDP_API 
   #endif
+#endif
+
+#ifdef FREERDP_TEST_EXPORTS
+#define FREERDP_TEST_API	FREERDP_API
+#else
+#define FREERDP_TEST_API
 #endif
 
 #define IFCALL(_cb, ...) do { if (_cb != NULL) { _cb( __VA_ARGS__ ); } } while (0)

@@ -35,14 +35,16 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <freerdp/freerdp.h>
 #include <freerdp/constants.h>
 #include <freerdp/gdi/gdi.h>
-#include <freerdp/utils/args.h>
 #include <freerdp/utils/event.h>
-#include <freerdp/utils/memory.h>
+#include <freerdp/client/file.h>
+#include <freerdp/client/cmdline.h>
 #include <freerdp/client/cliprdr.h>
 #include <freerdp/channels/channels.h>
 
+#include <winpr/crt.h>
 #include <winpr/synch.h>
 
 struct tf_info
@@ -66,9 +68,6 @@ struct thread_data
 {
 	freerdp* instance;
 };
-
-#include <freerdp/freerdp.h>
-#include <freerdp/utils/args.h>
 
 void tf_context_new(freerdp* instance, rdpContext* context)
 {
@@ -99,22 +98,12 @@ int tf_receive_channel_data(freerdp* instance, int channelId, BYTE* data, int si
 	return freerdp_channels_data(instance, channelId, data, size, flags, total_size);
 }
 
-int tf_process_plugin_args(rdpSettings* settings, const char* name, RDP_PLUGIN_DATA* plugin_data, void* user_data)
-{
-	rdpChannels* channels = (rdpChannels*) user_data;
-
-	printf("Load plugin %s\n", name);
-	freerdp_channels_load_plugin(channels, settings, name, plugin_data);
-
-	return 1;
-}
-
 void tf_process_cb_monitor_ready_event(rdpChannels* channels, freerdp* instance)
 {
-	RDP_EVENT* event;
+	wMessage* event;
 	RDP_CB_FORMAT_LIST_EVENT* format_list_event;
 
-	event = freerdp_event_new(RDP_EVENT_CLASS_CLIPRDR, RDP_EVENT_TYPE_CB_FORMAT_LIST, NULL, NULL);
+	event = freerdp_event_new(CliprdrChannel_Class, CliprdrChannel_FormatList, NULL, NULL);
 
 	format_list_event = (RDP_CB_FORMAT_LIST_EVENT*) event;
 	format_list_event->num_formats = 0;
@@ -124,19 +113,20 @@ void tf_process_cb_monitor_ready_event(rdpChannels* channels, freerdp* instance)
 
 void tf_process_channel_event(rdpChannels* channels, freerdp* instance)
 {
-	RDP_EVENT* event;
+	wMessage* event;
 
 	event = freerdp_channels_pop_event(channels);
 
 	if (event)
 	{
-		switch (event->event_type)
+		switch (GetMessageType(event->id))
 		{
-			case RDP_EVENT_TYPE_CB_MONITOR_READY:
+			case CliprdrChannel_MonitorReady:
 				tf_process_cb_monitor_ready_event(channels, instance);
 				break;
+
 			default:
-				printf("tf_process_channel_event: unknown event type %d\n", event->event_type);
+				printf("tf_process_channel_event: unknown event type %d\n", GetMessageType(event->id));
 				break;
 		}
 
@@ -151,33 +141,36 @@ BOOL tf_pre_connect(freerdp* instance)
 	rdpSettings* settings;
 
 	context = (tfContext*) instance->context;
-	tfi = (tfInfo*) xzalloc(sizeof(tfInfo));
+
+	tfi = (tfInfo*) malloc(sizeof(tfInfo));
+	ZeroMemory(tfi, sizeof(tfInfo));
+
 	context->tfi = tfi;
 
 	settings = instance->settings;
 
-	settings->order_support[NEG_DSTBLT_INDEX] = TRUE;
-	settings->order_support[NEG_PATBLT_INDEX] = TRUE;
-	settings->order_support[NEG_SCRBLT_INDEX] = TRUE;
-	settings->order_support[NEG_OPAQUE_RECT_INDEX] = TRUE;
-	settings->order_support[NEG_DRAWNINEGRID_INDEX] = TRUE;
-	settings->order_support[NEG_MULTIDSTBLT_INDEX] = TRUE;
-	settings->order_support[NEG_MULTIPATBLT_INDEX] = TRUE;
-	settings->order_support[NEG_MULTISCRBLT_INDEX] = TRUE;
-	settings->order_support[NEG_MULTIOPAQUERECT_INDEX] = TRUE;
-	settings->order_support[NEG_MULTI_DRAWNINEGRID_INDEX] = TRUE;
-	settings->order_support[NEG_LINETO_INDEX] = TRUE;
-	settings->order_support[NEG_POLYLINE_INDEX] = TRUE;
-	settings->order_support[NEG_MEMBLT_INDEX] = TRUE;
-	settings->order_support[NEG_MEM3BLT_INDEX] = TRUE;
-	settings->order_support[NEG_SAVEBITMAP_INDEX] = TRUE;
-	settings->order_support[NEG_GLYPH_INDEX_INDEX] = TRUE;
-	settings->order_support[NEG_FAST_INDEX_INDEX] = TRUE;
-	settings->order_support[NEG_FAST_GLYPH_INDEX] = TRUE;
-	settings->order_support[NEG_POLYGON_SC_INDEX] = TRUE;
-	settings->order_support[NEG_POLYGON_CB_INDEX] = TRUE;
-	settings->order_support[NEG_ELLIPSE_SC_INDEX] = TRUE;
-	settings->order_support[NEG_ELLIPSE_CB_INDEX] = TRUE;
+	settings->OrderSupport[NEG_DSTBLT_INDEX] = TRUE;
+	settings->OrderSupport[NEG_PATBLT_INDEX] = TRUE;
+	settings->OrderSupport[NEG_SCRBLT_INDEX] = TRUE;
+	settings->OrderSupport[NEG_OPAQUE_RECT_INDEX] = TRUE;
+	settings->OrderSupport[NEG_DRAWNINEGRID_INDEX] = TRUE;
+	settings->OrderSupport[NEG_MULTIDSTBLT_INDEX] = TRUE;
+	settings->OrderSupport[NEG_MULTIPATBLT_INDEX] = TRUE;
+	settings->OrderSupport[NEG_MULTISCRBLT_INDEX] = TRUE;
+	settings->OrderSupport[NEG_MULTIOPAQUERECT_INDEX] = TRUE;
+	settings->OrderSupport[NEG_MULTI_DRAWNINEGRID_INDEX] = TRUE;
+	settings->OrderSupport[NEG_LINETO_INDEX] = TRUE;
+	settings->OrderSupport[NEG_POLYLINE_INDEX] = TRUE;
+	settings->OrderSupport[NEG_MEMBLT_INDEX] = TRUE;
+	settings->OrderSupport[NEG_MEM3BLT_INDEX] = TRUE;
+	settings->OrderSupport[NEG_SAVEBITMAP_INDEX] = TRUE;
+	settings->OrderSupport[NEG_GLYPH_INDEX_INDEX] = TRUE;
+	settings->OrderSupport[NEG_FAST_INDEX_INDEX] = TRUE;
+	settings->OrderSupport[NEG_FAST_GLYPH_INDEX] = TRUE;
+	settings->OrderSupport[NEG_POLYGON_SC_INDEX] = TRUE;
+	settings->OrderSupport[NEG_POLYGON_CB_INDEX] = TRUE;
+	settings->OrderSupport[NEG_ELLIPSE_SC_INDEX] = TRUE;
+	settings->OrderSupport[NEG_ELLIPSE_CB_INDEX] = TRUE;
 
 	freerdp_channels_pre_connect(instance->context->channels, instance);
 
@@ -212,8 +205,8 @@ int tfreerdp_run(freerdp* instance)
 	fd_set wfds_set;
 	rdpChannels* channels;
 
-	memset(rfds, 0, sizeof(rfds));
-	memset(wfds, 0, sizeof(wfds));
+	ZeroMemory(rfds, sizeof(rfds));
+	ZeroMemory(wfds, sizeof(wfds));
 
 	channels = instance->context->channels;
 
@@ -306,10 +299,11 @@ void* thread_func(void* param)
 
 int main(int argc, char* argv[])
 {
+	int status;
 	pthread_t thread;
 	freerdp* instance;
-	struct thread_data* data;
 	rdpChannels* channels;
+	struct thread_data* data;
 
 	freerdp_channels_global_init();
 
@@ -326,9 +320,17 @@ int main(int argc, char* argv[])
 	freerdp_context_new(instance);
 
 	channels = instance->context->channels;
-	freerdp_parse_args(instance->settings, argc, argv, tf_process_plugin_args, channels, NULL, NULL);
 
-	data = (struct thread_data*) xzalloc(sizeof(struct thread_data));
+	status = freerdp_client_parse_command_line_arguments(argc, argv, instance->settings);
+
+	if (status < 0)
+		exit(0);
+
+	freerdp_client_load_addins(instance->context->channels, instance->settings);
+
+	data = (struct thread_data*) malloc(sizeof(struct thread_data));
+	ZeroMemory(data, sizeof(sizeof(struct thread_data)));
+
 	data->instance = instance;
 
 	g_thread_count++;

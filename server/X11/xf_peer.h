@@ -20,33 +20,42 @@
 #ifndef __XF_PEER_H
 #define __XF_PEER_H
 
+#include <winpr/crt.h>
+#include <winpr/synch.h>
+#include <winpr/thread.h>
+#include <winpr/stream.h>
+#include <winpr/collections.h>
+
 #include <freerdp/gdi/gdi.h>
 #include <freerdp/gdi/dc.h>
 #include <freerdp/gdi/region.h>
 #include <freerdp/codec/rfx.h>
 #include <freerdp/listener.h>
-#include <freerdp/utils/stream.h>
 #include <freerdp/utils/stopwatch.h>
 
 typedef struct xf_peer_context xfPeerContext;
 
 #include "xfreerdp.h"
 
+#define PeerEvent_Base						0
+
+#define PeerEvent_Class						(PeerEvent_Base + 1)
+
+#define PeerEvent_EncodeRegion					1
+
 struct xf_peer_context
 {
 	rdpContext _p;
 
 	int fps;
-	STREAM* s;
-	HGDI_DC hdc;
+	wStream* s;
 	xfInfo* info;
-	int activations;
-	pthread_t thread;
+	HANDLE mutex;
 	BOOL activated;
-	pthread_mutex_t mutex;
+	HANDLE monitorThread;
+	HANDLE updateReadyEvent;
+	HANDLE updateSentEvent;
 	RFX_CONTEXT* rfx_context;
-	xfEventQueue* event_queue;
-	pthread_t frame_rate_thread;
 };
 
 void xf_peer_accepted(freerdp_listener* instance, freerdp_peer* client);

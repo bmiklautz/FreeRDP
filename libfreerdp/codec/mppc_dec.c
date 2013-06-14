@@ -26,7 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <freerdp/utils/memory.h>
+#include <winpr/crt.h>
 
 #include <freerdp/codec/mppc_dec.h>
 
@@ -151,7 +151,7 @@ int decompress_rdp(struct rdp_mppc_dec* dec, BYTE* cbuf, int len, int ctype, UIN
 			break;
 
 		default:
-			printf("mppc.c: invalid RDP compression code 0x%2.2x\n", type);
+			fprintf(stderr, "mppc.c: invalid RDP compression code 0x%2.2x\n", type);
 			return FALSE;
 	}
 }
@@ -184,11 +184,11 @@ int decompress_rdp_4(struct rdp_mppc_dec* dec, BYTE* cbuf, int len, int ctype, U
 	int       tmp;
 	UINT32    i32;
 
-	printf("decompress_rdp_4:\n");
+	fprintf(stderr, "decompress_rdp_4:\n");
 
 	if ((dec == NULL) || (dec->history_buf == NULL))
 	{
-		printf("decompress_rdp_4: null\n");
+		fprintf(stderr, "decompress_rdp_4: null\n");
 		return FALSE;
 	}
 
@@ -616,7 +616,7 @@ int decompress_rdp_5(struct rdp_mppc_dec* dec, BYTE* cbuf, int len, int ctype, U
 
 	if ((dec == NULL) || (dec->history_buf == NULL))
 	{
-		printf("decompress_rdp_5: null\n");
+		fprintf(stderr, "decompress_rdp_5: null\n");
 		return FALSE;
 	}
 
@@ -1082,7 +1082,7 @@ int decompress_rdp_6(struct rdp_mppc_dec* dec, BYTE* cbuf, int len, int ctype, U
 
 	if ((dec == NULL) || (dec->history_buf == NULL))
 	{
-		printf("decompress_rdp_6: null\n");
+		fprintf(stderr, "decompress_rdp_6: null\n");
 		return FALSE;
 	}
 
@@ -1417,15 +1417,19 @@ struct rdp_mppc_dec* mppc_dec_new(void)
 	ptr = (struct rdp_mppc_dec*) malloc(sizeof(struct rdp_mppc_dec));
 	if (!ptr)
 	{
-		printf("mppc_new(): system out of memory\n");
+		fprintf(stderr, "mppc_new(): system out of memory\n");
 		return NULL;
 	}
 
-	ptr->history_buf = (BYTE *) xzalloc(RDP6_HISTORY_BUF_SIZE);
-	ptr->offset_cache = (UINT16 *) xzalloc(RDP6_OFFSET_CACHE_SIZE);
+	ptr->history_buf = (BYTE*) malloc(RDP6_HISTORY_BUF_SIZE);
+	ZeroMemory(ptr->history_buf, RDP6_HISTORY_BUF_SIZE);
+
+	ptr->offset_cache = (UINT16*) malloc(RDP6_OFFSET_CACHE_SIZE);
+	ZeroMemory(ptr->offset_cache, RDP6_OFFSET_CACHE_SIZE);
+
 	if (!ptr->history_buf)
 	{
-		printf("mppc_new(): system out of memory\n");
+		fprintf(stderr, "mppc_new(): system out of memory\n");
 		free(ptr);
 		return NULL;
 	}

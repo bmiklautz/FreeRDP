@@ -25,10 +25,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <winpr/crt.h>
+#include <winpr/synch.h>
+#include <winpr/thread.h>
+#include <winpr/cmdline.h>
+
 #include <alsa/asoundlib.h>
-#include <freerdp/utils/memory.h>
-#include <freerdp/utils/thread.h>
-#include <freerdp/utils/dsp.h>
+
+#include <freerdp/addin.h>
+#include <freerdp/codec/dsp.h>
+#include <freerdp/channels/rdpsnd.h>
 
 #include "audin_main.h"
 
@@ -36,7 +42,7 @@ typedef struct _AudinALSADevice
 {
 	IAudinDevice iface;
 
-	char device_name[32];
+	char* device_name;
 	UINT32 frames_per_packet;
 	UINT32 target_rate;
 	UINT32 actual_rate;
@@ -49,7 +55,8 @@ typedef struct _AudinALSADevice
 
 	FREERDP_DSP_CONTEXT* dsp_context;
 
-	freerdp_thread* thread;
+	HANDLE thread;
+	HANDLE stopEvent;
 
 	BYTE* buffer;
 	int buffer_frames;
@@ -69,15 +76,12 @@ static BOOL audin_alsa_set_params(AudinALSADevice* alsa, snd_pcm_t* capture_hand
 			 snd_strerror(error));
 		return FALSE;
 	}
+
 	snd_pcm_hw_params_any(capture_handle, hw_params);
-	snd_pcm_hw_params_set_access(capture_handle, hw_params,
-		SND_PCM_ACCESS_RW_INTERLEAVED);
-	snd_pcm_hw_params_set_format(capture_handle, hw_params,
-		alsa->format);
-	snd_pcm_hw_params_set_rate_near(capture_handle, hw_params,
-		&alsa->actual_rate, NULL);
-	snd_pcm_hw_params_set_channels_near(capture_handle, hw_params,
-		&alsa->actual_channels);
+	snd_pcm_hw_params_set_access(capture_handle, hw_params, SND_PCM_ACCESS_RW_INTERLEAVED);
+	snd_pcm_hw_params_set_format(capture_handle, hw_params, alsa->format);
+	snd_pcm_hw_params_set_rate_near(capture_handle, hw_params, &alsa->actual_rate, NULL);
+	snd_pcm_hw_params_set_channels_near(capture_handle, hw_params, &alsa->actual_channels);
 	snd_pcm_hw_params(capture_handle, hw_params);
 	snd_pcm_hw_params_free(hw_params);
 	snd_pcm_prepare(capture_handle);
@@ -90,6 +94,7 @@ static BOOL audin_alsa_set_params(AudinALSADevice* alsa, snd_pcm_t* capture_hand
 			alsa->actual_rate, alsa->actual_channels,
 			alsa->target_rate, alsa->target_channels);
 	}
+
 	return TRUE;
 }
 
@@ -125,24 +130,29 @@ static BOOL audin_alsa_thread_receive(AudinALSADevice* alsa, BYTE* src, int size
 
 	while (frames > 0)
 	{
-		if (freerdp_thread_is_stopped(alsa->thread))
+		if (WaitForSingleObject(alsa->stopEvent, 0) == WAIT_OBJECT_0)
 			break;
 
 		cframes = alsa->frames_per_packet - alsa->buffer_frames;
+
 		if (cframes > frames)
 			cframes = frames;
-		memcpy(alsa->buffer + alsa->buffer_frames * tbytes_per_frame,
-			src, cframes * tbytes_per_frame);
+
+		CopyMemory(alsa->buffer + alsa->buffer_frames * tbytes_per_frame, src, cframes * tbytes_per_frame);
+
 		alsa->buffer_frames += cframes;
+
 		if (alsa->buffer_frames >= alsa->frames_per_packet)
 		{
-			if (alsa->wformat == 0x11)
+			if (alsa->wformat == WAVE_FORMAT_DVI_ADPCM)
 			{
 				alsa->dsp_context->encode_ima_adpcm(alsa->dsp_context,
 					alsa->buffer, alsa->buffer_frames * tbytes_per_frame,
 					alsa->target_channels, alsa->block_size);
+
 				encoded_data = alsa->dsp_context->adpcm_buffer;
 				encoded_size = alsa->dsp_context->adpcm_size;
+
 				DEBUG_DVC("encoded %d to %d",
 					alsa->buffer_frames * tbytes_per_frame, encoded_size);
 			}
@@ -152,17 +162,22 @@ static BOOL audin_alsa_thread_receive(AudinALSADevice* alsa, BYTE* src, int size
 				encoded_size = alsa->buffer_frames * tbytes_per_frame;
 			}
 
-			if (freerdp_thread_is_stopped(alsa->thread))
+			if (WaitForSingleObject(alsa->stopEvent, 0) == WAIT_OBJECT_0)
 			{
 				ret = 0;
 				frames = 0;
 			}
 			else
+			{
 				ret = alsa->receive(encoded_data, encoded_size, alsa->user_data);
+			}
+
 			alsa->buffer_frames = 0;
+
 			if (!ret)
 				break;
 		}
+
 		src += cframes * tbytes_per_frame;
 		frames -= cframes;
 	}
@@ -183,10 +198,13 @@ static void* audin_alsa_thread_func(void* arg)
 
 	rbytes_per_frame = alsa->actual_channels * alsa->bytes_per_channel;
 	tbytes_per_frame = alsa->target_channels * alsa->bytes_per_channel;
-	alsa->buffer = (BYTE*) xzalloc(tbytes_per_frame * alsa->frames_per_packet);
+	alsa->buffer = (BYTE*) malloc(tbytes_per_frame * alsa->frames_per_packet);
+	ZeroMemory(alsa->buffer, tbytes_per_frame * alsa->frames_per_packet);
 	alsa->buffer_frames = 0;
-	buffer = (BYTE*) xzalloc(rbytes_per_frame * alsa->frames_per_packet);
+	buffer = (BYTE*) malloc(rbytes_per_frame * alsa->frames_per_packet);
+	ZeroMemory(buffer, rbytes_per_frame * alsa->frames_per_packet);
 	freerdp_dsp_context_reset_adpcm(alsa->dsp_context);
+
 	do
 	{
 		if ((error = snd_pcm_open(&capture_handle, alsa->device_name, SND_PCM_STREAM_CAPTURE, 0)) < 0)
@@ -194,14 +212,16 @@ static void* audin_alsa_thread_func(void* arg)
 			DEBUG_WARN("snd_pcm_open (%s)", snd_strerror(error));
 			break;
 		}
+
 		if (!audin_alsa_set_params(alsa, capture_handle))
 		{
 			break;
 		}
 
-		while (!freerdp_thread_is_stopped(alsa->thread))
+		while (!(WaitForSingleObject(alsa->stopEvent, 0) == WAIT_OBJECT_0))
 		{
 			error = snd_pcm_readi(capture_handle, buffer, alsa->frames_per_packet);
+
 			if (error == -EPIPE)
 			{
 				snd_pcm_recover(capture_handle, error, 0);
@@ -212,18 +232,22 @@ static void* audin_alsa_thread_func(void* arg)
 				DEBUG_WARN("snd_pcm_readi (%s)", snd_strerror(error));
 				break;
 			}
+
 			if (!audin_alsa_thread_receive(alsa, buffer, error * rbytes_per_frame))
 				break;
 		}
-	} while (0);
+	}
+	while (0);
 
 	free(buffer);
+
 	free(alsa->buffer);
 	alsa->buffer = NULL;
+
 	if (capture_handle)
 		snd_pcm_close(capture_handle);
 
-	freerdp_thread_quit(alsa->thread);
+	SetEvent(alsa->stopEvent);
 
 	DEBUG_DVC("out");
 
@@ -234,8 +258,12 @@ static void audin_alsa_free(IAudinDevice* device)
 {
 	AudinALSADevice* alsa = (AudinALSADevice*) device;
 
-	freerdp_thread_free(alsa->thread);
+	SetEvent(alsa->stopEvent);
+
 	freerdp_dsp_context_free(alsa->dsp_context);
+
+	free(alsa->device_name);
+
 	free(alsa);
 }
 
@@ -243,7 +271,7 @@ static BOOL audin_alsa_format_supported(IAudinDevice* device, audinFormat* forma
 {
 	switch (format->wFormatTag)
 	{
-		case 1: /* PCM */
+		case WAVE_FORMAT_PCM:
 			if (format->cbSize == 0 &&
 				(format->nSamplesPerSec <= 48000) &&
 				(format->wBitsPerSample == 8 || format->wBitsPerSample == 16) &&
@@ -253,7 +281,7 @@ static BOOL audin_alsa_format_supported(IAudinDevice* device, audinFormat* forma
 			}
 			break;
 
-		case 0x11: /* IMA ADPCM */
+		case WAVE_FORMAT_DVI_ADPCM:
 			if ((format->nSamplesPerSec <= 48000) &&
 				(format->wBitsPerSample == 4) &&
 				(format->nChannels == 1 || format->nChannels == 2))
@@ -262,6 +290,7 @@ static BOOL audin_alsa_format_supported(IAudinDevice* device, audinFormat* forma
 			}
 			break;
 	}
+
 	return FALSE;
 }
 
@@ -274,9 +303,10 @@ static void audin_alsa_set_format(IAudinDevice* device, audinFormat* format, UIN
 	alsa->actual_rate = format->nSamplesPerSec;
 	alsa->target_channels = format->nChannels;
 	alsa->actual_channels = format->nChannels;
+
 	switch (format->wFormatTag)
 	{
-		case 1: /* PCM */
+		case WAVE_FORMAT_PCM:
 			switch (format->wBitsPerSample)
 			{
 				case 8:
@@ -290,7 +320,7 @@ static void audin_alsa_set_format(IAudinDevice* device, audinFormat* format, UIN
 			}
 			break;
 
-		case 0x11: /* IMA ADPCM */
+		case WAVE_FORMAT_DVI_ADPCM:
 			alsa->format = SND_PCM_FORMAT_S16_LE;
 			alsa->bytes_per_channel = 2;
 			bs = (format->nBlockAlign - 4 * format->nChannels) * 4;
@@ -300,6 +330,7 @@ static void audin_alsa_set_format(IAudinDevice* device, audinFormat* format, UIN
 				alsa->frames_per_packet);
 			break;
 	}
+
 	alsa->wformat = format->wFormatTag;
 	alsa->block_size = format->nBlockAlign;
 }
@@ -313,7 +344,8 @@ static void audin_alsa_open(IAudinDevice* device, AudinReceive receive, void* us
 	alsa->receive = receive;
 	alsa->user_data = user_data;
 
-	freerdp_thread_start(alsa->thread, audin_alsa_thread_func, alsa);
+	alsa->stopEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	alsa->thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) audin_alsa_thread_func, alsa, 0, NULL);
 }
 
 static void audin_alsa_close(IAudinDevice* device)
@@ -322,42 +354,72 @@ static void audin_alsa_close(IAudinDevice* device)
 
 	DEBUG_DVC("");
 
-	freerdp_thread_stop(alsa->thread);
+	SetEvent(alsa->stopEvent);
 
 	alsa->receive = NULL;
 	alsa->user_data = NULL;
 }
 
-int FreeRDPAudinDeviceEntry(PFREERDP_AUDIN_DEVICE_ENTRY_POINTS pEntryPoints)
+COMMAND_LINE_ARGUMENT_A audin_alsa_args[] =
 {
-	AudinALSADevice* alsa;
-	RDP_PLUGIN_DATA* data;
+	{ "audio-dev", COMMAND_LINE_VALUE_REQUIRED, "<device>", NULL, NULL, -1, NULL, "audio device name" },
+	{ NULL, 0, NULL, NULL, NULL, -1, NULL, NULL }
+};
 
-	alsa = xnew(AudinALSADevice);
+static void audin_alsa_parse_addin_args(AudinALSADevice* device, ADDIN_ARGV* args)
+{
+	int status;
+	DWORD flags;
+	COMMAND_LINE_ARGUMENT_A* arg;
+	AudinALSADevice* alsa = (AudinALSADevice*) device;
+
+	flags = COMMAND_LINE_SIGIL_NONE | COMMAND_LINE_SEPARATOR_COLON;
+
+	status = CommandLineParseArgumentsA(args->argc, (const char**) args->argv, audin_alsa_args, flags, alsa, NULL, NULL);
+
+	arg = audin_alsa_args;
+
+	do
+	{
+		if (!(arg->Flags & COMMAND_LINE_VALUE_PRESENT))
+			continue;
+
+		CommandLineSwitchStart(arg)
+
+		CommandLineSwitchCase(arg, "audio-dev")
+		{
+			alsa->device_name = _strdup(arg->Value);
+		}
+
+		CommandLineSwitchEnd(arg)
+	}
+	while ((arg = CommandLineFindNextArgumentA(arg)) != NULL);
+}
+
+#ifdef STATIC_CHANNELS
+#define freerdp_audin_client_subsystem_entry	alsa_freerdp_audin_client_subsystem_entry
+#endif
+
+int freerdp_audin_client_subsystem_entry(PFREERDP_AUDIN_DEVICE_ENTRY_POINTS pEntryPoints)
+{
+	ADDIN_ARGV* args;
+	AudinALSADevice* alsa;
+
+	alsa = (AudinALSADevice*) malloc(sizeof(AudinALSADevice));
+	ZeroMemory(alsa, sizeof(AudinALSADevice));
 
 	alsa->iface.Open = audin_alsa_open;
 	alsa->iface.FormatSupported = audin_alsa_format_supported;
 	alsa->iface.SetFormat = audin_alsa_set_format;
 	alsa->iface.Close = audin_alsa_close;
 	alsa->iface.Free = audin_alsa_free;
-	alsa->device_name[0] = '\0';
 
-	data = pEntryPoints->plugin_data;
-	if (data)
-	{
-		char *data2 = (char *) (data->data[2]);
-		if (data->data[0] && (strcmp(data->data[0], "audin") == 0) &&
-			data->data[1] && (strcmp(data->data[1], "alsa") == 0) &&
-			data2 && (*data2 != '\0'))
-		{
-			strncpy(alsa->device_name, data2, sizeof(alsa->device_name));
-		}
-	}
+	args = pEntryPoints->args;
 
-	if (alsa->device_name[0] == '\0')
-	{
-		strcpy(alsa->device_name, "default");
-	}
+	audin_alsa_parse_addin_args(alsa, args);
+
+	if (!alsa->device_name)
+		alsa->device_name = _strdup("default");
 
 	alsa->frames_per_packet = 128;
 	alsa->target_rate = 22050;
@@ -366,7 +428,6 @@ int FreeRDPAudinDeviceEntry(PFREERDP_AUDIN_DEVICE_ENTRY_POINTS pEntryPoints)
 	alsa->target_channels = 2;
 	alsa->actual_channels = 2;
 	alsa->bytes_per_channel = 2;
-	alsa->thread = freerdp_thread_new();
 
 	alsa->dsp_context = freerdp_dsp_context_new();
 
@@ -374,4 +435,3 @@ int FreeRDPAudinDeviceEntry(PFREERDP_AUDIN_DEVICE_ENTRY_POINTS pEntryPoints)
 
 	return 0;
 }
-

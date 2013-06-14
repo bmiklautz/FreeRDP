@@ -22,14 +22,25 @@ if(MONOLITHIC_BUILD)
 	set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
 
+# Create imported targets for Intel IPP libraries
+
+if(IPP_FOUND)
+    foreach(ipp_lib ${IPP_LIBRARIES})
+    	add_library("${ipp_lib}_imported" STATIC IMPORTED)
+		set_property(TARGET "${ipp_lib}_imported" PROPERTY IMPORTED_LOCATION "${IPP_LIBRARY_DIRS}/${ipp_lib}")
+	endforeach()
+endif()
+
 set(${MODULE_PREFIX}_SUBMODULES
 	utils
+	common
 	gdi
 	rail
 	cache
 	codec
 	crypto
 	locale
+	primitives
 	core)
 
 foreach(${MODULE_PREFIX}_SUBMODULE ${${MODULE_PREFIX}_SUBMODULES})
@@ -41,18 +52,17 @@ if(MONOLITHIC_BUILD)
 		set(${MODULE_PREFIX}_OBJECTS ${${MODULE_PREFIX}_OBJECTS} "$<TARGET_OBJECTS:${MODULE_NAME}-${${MODULE_PREFIX}_SUBMODULE}>")
 	endforeach()
 
-	add_library(${MODULE_NAME} ${${MODULE_PREFIX}_OBJECTS})
+	add_library(${MODULE_NAME} dummy.c ${${MODULE_PREFIX}_OBJECTS})
 
 	set_target_properties(${MODULE_NAME} PROPERTIES LINKER_LANGUAGE C)
-	set_target_properties(${MODULE_NAME} PROPERTIES VERSION ${FREERDP_VERSION_FULL} SOVERSION ${FREERDP_VERSION} PREFIX "lib")
+	set_target_properties(${MODULE_NAME} PROPERTIES VERSION ${FREERDP_VERSION} SOVERSION ${FREERDP_API_VERSION} PREFIX "lib")
 
 	target_link_libraries(${MODULE_NAME} ${${MODULE_PREFIX}_LIBS})
 
 	install(TARGETS ${MODULE_NAME}
-		RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-		LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-		ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+		DESTINATION ${CMAKE_INSTALL_LIBDIR}
 		COMPONENT libraries)
 	
 	set_property(TARGET ${MODULE_NAME} PROPERTY FOLDER "FreeRDP/libfreerdp")
 endif()
+

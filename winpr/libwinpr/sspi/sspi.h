@@ -22,16 +22,20 @@
 
 #include <winpr/sspi.h>
 
+#define SCHANNEL_CB_MAX_TOKEN	0x00006000
+
 struct _CREDENTIALS
 {
 	SEC_WINNT_AUTH_IDENTITY identity;
 };
 typedef struct _CREDENTIALS CREDENTIALS;
 
-CREDENTIALS* sspi_CredentialsNew();
+CREDENTIALS* sspi_CredentialsNew(void);
 void sspi_CredentialsFree(CREDENTIALS* credentials);
 
-SecHandle* sspi_SecureHandleAlloc();
+PSecBuffer sspi_FindSecBuffer(PSecBufferDesc pMessage, ULONG BufferType);
+
+SecHandle* sspi_SecureHandleAlloc(void);
 void sspi_SecureHandleInit(SecHandle* handle);
 void sspi_SecureHandleInvalidate(SecHandle* handle);
 void* sspi_SecureHandleGetLowerPointer(SecHandle* handle);

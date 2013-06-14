@@ -17,14 +17,22 @@
  * limitations under the License.
  */
 
-#ifndef __EVENT_UTILS_H
-#define __EVENT_UTILS_H
+#ifndef FREERDP_UTILS_EVENT_H
+#define FREERDP_UTILS_EVENT_H
 
 #include <freerdp/api.h>
 #include <freerdp/types.h>
 
-FREERDP_API RDP_EVENT* freerdp_event_new(UINT16 event_class, UINT16 event_type,
-	RDP_EVENT_CALLBACK on_event_free_callback, void* user_data);
-FREERDP_API void freerdp_event_free(RDP_EVENT* event);
-
+#ifdef __cplusplus
+extern "C" {
 #endif
+
+FREERDP_API wMessage* freerdp_event_new(UINT16 event_class, UINT16 event_type,
+	MESSAGE_FREE_FN on_event_free_callback, void* user_data);
+FREERDP_API void freerdp_event_free(wMessage* event);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* FREERDP_UTILS_EVENT_H */

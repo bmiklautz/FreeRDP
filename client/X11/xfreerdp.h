@@ -20,22 +20,9 @@
 #ifndef __XFREERDP_H
 #define __XFREERDP_H
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-#include <freerdp/freerdp.h>
-#include <freerdp/channels/channels.h>
-#include <freerdp/gdi/gdi.h>
-#include <freerdp/gdi/dc.h>
-#include <freerdp/gdi/region.h>
-#include <freerdp/rail/rail.h>
-#include <freerdp/cache/cache.h>
-
-typedef struct xf_info xfInfo;
-
 #include "xf_window.h"
 #include "xf_monitor.h"
+#include "xf_channels.h"
 
 struct xf_WorkArea
 {
@@ -82,6 +69,9 @@ struct xf_info
 	xfContext* context;
 	rdpContext* _context;
 
+	rdpClient* client;
+	rdpSettings* settings;
+
 	GC gc;
 	int bpp;
 	int xfds;
@@ -105,7 +95,6 @@ struct xf_info
 	BOOL fullscreen;
 	BOOL grab_keyboard;
 	BOOL unobscured;
-	BOOL decorations;
 	BOOL debug;
 	xfWindow* window;
 	xfWorkArea workArea;
@@ -113,10 +102,11 @@ struct xf_info
 	BOOL remote_app;
 	BOOL disconnect;
 	HCLRCONV clrconv;
-	Window parent_window;
+	HANDLE mutex;
+	HANDLE thread;
+	BOOL UseXThreads;
 
 	HGDI_DC hdc;
-	BOOL sw_gdi;
 	BYTE* primary_buffer;
 
 	BOOL frame_begin;
@@ -125,9 +115,16 @@ struct xf_info
 	UINT16 frame_x2;
 	UINT16 frame_y2;
 
+	double scale;
+	int originalWidth;
+	int originalHeight;
+	int currentWidth;
+	int currentHeight;
+	int XInputOpcode;
+	BOOL enableScaling;
+
 	BOOL focused;
 	BOOL mouse_active;
-	BOOL mouse_motion;
 	BOOL suppress_output;
 	BOOL fullscreen_toggle;
 	UINT32 keyboard_layout_id;
@@ -166,6 +163,9 @@ struct xf_info
 	Atom WM_STATE;
 	Atom WM_PROTOCOLS;
 	Atom WM_DELETE_WINDOW;
+
+	/* Channels */
+	RdpeiClientContext* rdpei;
 };
 
 void xf_create_window(xfInfo* xfi);
@@ -213,16 +213,12 @@ enum XF_EXIT_CODE
 	XF_EXIT_UNKNOWN = 255,
 };
 
-#ifdef WITH_DEBUG_X11
-#define DEBUG_X11(fmt, ...) DEBUG_CLASS(X11, fmt, ## __VA_ARGS__)
-#else
-#define DEBUG_X11(fmt, ...) DEBUG_NULL(fmt, ## __VA_ARGS__)
-#endif
+void xf_lock_x11(xfInfo* xfi, BOOL display);
+void xf_unlock_x11(xfInfo* xfi, BOOL display);
 
-#ifdef WITH_DEBUG_X11_LOCAL_MOVESIZE
-#define DEBUG_X11_LMS(fmt, ...) DEBUG_CLASS(X11_LMS, fmt, ## __VA_ARGS__)
-#else
-#define DEBUG_X11_LMS(fmt, ...) DEBUG_NULL(fmt, ## __VA_ARGS__)
-#endif
+void xf_draw_screen_scaled(xfInfo* xfi);
+
+DWORD xf_exit_code_from_disconnect_reason(DWORD reason);
 
 #endif /* __XFREERDP_H */
+

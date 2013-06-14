@@ -40,11 +40,9 @@
 #endif
 
 #define EXPONENT_MAX_SIZE			4
-#define MODULUS_MAX_SIZE			256
 
 #include <freerdp/api.h>
 #include <freerdp/freerdp.h>
-#include <freerdp/utils/memory.h>
 
 struct crypto_sha1_struct
 {

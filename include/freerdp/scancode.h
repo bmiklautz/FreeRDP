@@ -17,8 +17,10 @@
  * limitations under the License.
  */
 
-#ifndef __FREERDP_LOCALE_KEYBOARD_RDP_SCANCODE_H
-#define __FREERDP_LOCALE_KEYBOARD_RDP_SCANCODE_H
+#ifndef FREERDP_LOCALE_KEYBOARD_RDP_SCANCODE_H
+#define FREERDP_LOCALE_KEYBOARD_RDP_SCANCODE_H
+
+#include <winpr/input.h>
 
 /* @msdn{cc240584} says:
  * "... (a scancode is an 8-bit value specifying a key location on the keyboard).
@@ -27,10 +29,9 @@
  * The extended flag is for all practical an important 9th bit with a strange encoding - not just a modifier.
  */
 
-typedef UINT32 RDP_SCANCODE;	/* Our own representation of a RDP protocol scancode */
 #define RDP_SCANCODE_CODE(_rdp_scancode) ((BYTE)(_rdp_scancode & 0xFF))
-#define RDP_SCANCODE_EXTENDED(_rdp_scancode) (((_rdp_scancode) & 0x100) ? TRUE : FALSE)
-#define MAKE_RDP_SCANCODE(_code, _extended) (((_code) & 0xFF) | ((_extended) ? 0x100 : 0))
+#define RDP_SCANCODE_EXTENDED(_rdp_scancode) (((_rdp_scancode) & KBDEXT) ? TRUE : FALSE)
+#define MAKE_RDP_SCANCODE(_code, _extended) (((_code) & 0xFF) | ((_extended) ? KBDEXT : 0))
 
 /* Defines for known RDP_SCANCODE protocol values.
  * Mostly the same as the PKBDLLHOOKSTRUCT scanCode, "A hardware scan code for the key", @msdn{ms644967}.
@@ -147,8 +148,8 @@ typedef UINT32 RDP_SCANCODE;	/* Our own representation of a RDP protocol scancod
 #define RDP_SCANCODE_KANA_HANGUL   MAKE_RDP_SCANCODE(0x72, FALSE) /* VK_KANA / VK_HANGUL (undocumented?) */
 #define RDP_SCANCODE_ABNT_C1       MAKE_RDP_SCANCODE(0x73, FALSE) /* VK_ABNT_C1 JP OEM_102 */
 #define RDP_SCANCODE_F24_JP        MAKE_RDP_SCANCODE(0x76, FALSE) /* JP F24 */
-#define RDP_SCANCODE_CONVERT_JP    MAKE_RDP_SCANCODE(0x79, FALSE) /* JP CONVERT */
-#define RDP_SCANCODE_NONCONVERT_JP MAKE_RDP_SCANCODE(0x7B, FALSE) /* JP NONCONVERT */
+#define RDP_SCANCODE_CONVERT_JP    MAKE_RDP_SCANCODE(0x79, FALSE) /* JP VK_CONVERT */
+#define RDP_SCANCODE_NONCONVERT_JP MAKE_RDP_SCANCODE(0x7B, FALSE) /* JP VK_NONCONVERT */
 #define RDP_SCANCODE_TAB_JP        MAKE_RDP_SCANCODE(0x7C, FALSE) /* JP TAB */
 #define RDP_SCANCODE_BACKSLASH_JP  MAKE_RDP_SCANCODE(0x7D, FALSE) /* JP OEM_5 ('\') */
 #define RDP_SCANCODE_ABNT_C2       MAKE_RDP_SCANCODE(0x7E, FALSE) /* VK_ABNT_C2, JP */
@@ -182,4 +183,4 @@ typedef UINT32 RDP_SCANCODE;	/* Our own representation of a RDP protocol scancod
 #define RDP_SCANCODE_NUMLOCK_EXTENDED  MAKE_RDP_SCANCODE(0x45, TRUE)  /* should be RDP_SCANCODE_NUMLOCK */
 #define RDP_SCANCODE_RSHIFT_EXTENDED   MAKE_RDP_SCANCODE(0x36, TRUE)  /* should be RDP_SCANCODE_RSHIFT */
 
-#endif /* __FREERDP_LOCALE_KEYBOARD_RDP_SCANCODE_H */
+#endif /* FREERDP_LOCALE_KEYBOARD_RDP_SCANCODE_H */

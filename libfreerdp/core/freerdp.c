@@ -28,13 +28,15 @@
 #include "transport.h"
 #include "connection.h"
 #include "extension.h"
+#include "message.h"
+
+#include <winpr/crt.h>
 
 #include <freerdp/freerdp.h>
-#include <freerdp/errorcodes.h>
-#include <freerdp/utils/memory.h>
+#include <freerdp/error.h>
 #include <freerdp/locale/keyboard.h>
 
-/* connectErrorCode is 'extern' in errorcodes.h. See comment there.*/
+/* connectErrorCode is 'extern' in error.h. See comment there.*/
 
 /** Creates a new connection based on the settings found in the "instance" parameter
  *  It will use the callbacks registered on the structure to process the pre/post connect operations
@@ -61,19 +63,19 @@ BOOL freerdp_connect(freerdp* instance)
 
 	IFCALLRET(instance->PreConnect, status, instance);
 
-	if (settings->kbd_layout == KBD_JAPANESE_INPUT_SYSTEM_MS_IME2002)
+	if (settings->KeyboardLayout == KBD_JAPANESE_INPUT_SYSTEM_MS_IME2002)
 	{
-		settings->kbd_type = 7;
-		settings->kbd_subtype = 2;
-		settings->kbd_fn_keys = 12;
+		settings->KeyboardType = 7;
+		settings->KeyboardSubType = 2;
+		settings->KeyboardFunctionKey = 12;
 	}
 
 	extension_load_and_init_plugins(rdp->extension);
 	extension_pre_connect(rdp->extension);
 
-	if (status != TRUE)
+	if (!status)
 	{
-		if(!connectErrorCode)
+		if (!connectErrorCode)
 		{
 			connectErrorCode = PREECONNECTERROR;
 		}
@@ -82,8 +84,9 @@ BOOL freerdp_connect(freerdp* instance)
 	}
 
 	status = rdp_client_connect(rdp);
+
 	/* --authonly tests the connection without a UI */
-	if (instance->settings->authentication_only)
+	if (instance->settings->AuthenticationOnly)
 	{
 		fprintf(stderr, "%s:%d: Authentication only, exit status %d\n", __FILE__, __LINE__, !status);
 		return status;
@@ -91,9 +94,9 @@ BOOL freerdp_connect(freerdp* instance)
 
 	if (status)
 	{
-		if (instance->settings->dump_rfx)
+		if (instance->settings->DumpRemoteFx)
 		{
-			instance->update->pcap_rfx = pcap_open(instance->settings->dump_rfx_file, TRUE);
+			instance->update->pcap_rfx = pcap_open(instance->settings->DumpRemoteFxFile, TRUE);
 			if (instance->update->pcap_rfx)
 				instance->update->dump_rfx = TRUE;
 		}
@@ -101,59 +104,67 @@ BOOL freerdp_connect(freerdp* instance)
 		extension_post_connect(rdp->extension);
 
 		IFCALLRET(instance->PostConnect, status, instance);
+		update_post_connect(instance->update);
 
-		if (status != TRUE)
+		if (!status)
 		{
-			printf("freerdp_post_connect failed\n");
-			
+			fprintf(stderr, "freerdp_post_connect failed\n");
+
 			if (!connectErrorCode)
 			{
 				connectErrorCode = POSTCONNECTERROR;
 			}
-			
+
 			return FALSE;
 		}
 
-		if (instance->settings->play_rfx)
+		if (instance->settings->PlayRemoteFx)
 		{
-			STREAM* s;
+			wStream* s;
 			rdpUpdate* update;
 			pcap_record record;
 
-			s = stream_new(1024);
-			instance->update->pcap_rfx = pcap_open(instance->settings->play_rfx_file, FALSE);
-
-			if (instance->update->pcap_rfx)
-				instance->update->play_rfx = TRUE;
-			
 			update = instance->update;
 
-			while (instance->update->play_rfx && pcap_has_next_record(update->pcap_rfx))
+			s = StreamPool_Take(rdp->transport->ReceivePool, 0);
+			instance->update->pcap_rfx = pcap_open(settings->PlayRemoteFxFile, FALSE);
+
+			if (update->pcap_rfx)
+				update->play_rfx = TRUE;
+			
+			while (update->play_rfx && pcap_has_next_record(update->pcap_rfx))
 			{
 				pcap_get_next_record_header(update->pcap_rfx, &record);
 
-				s->data = (BYTE*) realloc(s->data, record.length);
-				record.data = s->data;
-				s->size = record.length;
+				Stream_EnsureCapacity(s, record.length);
+				record.data = Stream_Buffer(s);
 
 				pcap_get_next_record_content(update->pcap_rfx, &record);
-				stream_set_pos(s, 0);
+				Stream_SetPosition(s, 0);
 
 				update->BeginPaint(update->context);
-				update_recv_surfcmds(update, s->size, s);
+				update_recv_surfcmds(update, Stream_Capacity(s), s);
 				update->EndPaint(update->context);
 			}
 
-			free(s->data);
+			Stream_Release(s);
+
 			return TRUE;
 		}
+	}
+
+	if (rdp->errorInfo == ERRINFO_SERVER_INSUFFICIENT_PRIVILEGES)
+	{
+		connectErrorCode = INSUFFICIENTPRIVILEGESERROR;
 	}
 
 	if (!connectErrorCode)
 	{
 		connectErrorCode = UNDEFINEDCONNECTERROR;
 	}
-	
+
+	SetEvent(rdp->transport->connectedEvent);
+
 	return status;
 }
 
@@ -182,6 +193,73 @@ BOOL freerdp_check_fds(freerdp* instance)
 	return TRUE;
 }
 
+wMessageQueue* freerdp_get_message_queue(freerdp* instance, DWORD id)
+{
+	wMessageQueue* queue = NULL;
+
+	switch (id)
+	{
+		case FREERDP_UPDATE_MESSAGE_QUEUE:
+			queue = instance->update->queue;
+			break;
+
+		case FREERDP_INPUT_MESSAGE_QUEUE:
+			queue = instance->input->queue;
+			break;
+	}
+
+	return queue;
+}
+
+HANDLE freerdp_get_message_queue_event_handle(freerdp* instance, DWORD id)
+{
+	HANDLE event = NULL;
+	wMessageQueue* queue = NULL;
+
+	queue = freerdp_get_message_queue(instance, id);
+
+	if (queue)
+		event = MessageQueue_Event(queue);
+
+	return event;
+}
+
+int freerdp_message_queue_process_message(freerdp* instance, DWORD id, wMessage* message)
+{
+	int status = -1;
+
+	switch (id)
+	{
+		case FREERDP_UPDATE_MESSAGE_QUEUE:
+			status = update_message_queue_process_message(instance->update, message);
+			break;
+
+		case FREERDP_INPUT_MESSAGE_QUEUE:
+			status = input_message_queue_process_message(instance->input, message);
+			break;
+	}
+
+	return status;
+}
+
+int freerdp_message_queue_process_pending_messages(freerdp* instance, DWORD id)
+{
+	int status = -1;
+
+	switch (id)
+	{
+		case FREERDP_UPDATE_MESSAGE_QUEUE:
+			status = update_message_queue_process_pending_messages(instance->update);
+			break;
+
+		case FREERDP_INPUT_MESSAGE_QUEUE:
+			status = input_message_queue_process_pending_messages(instance->input);
+			break;
+	}
+
+	return status;
+}
+
 static int freerdp_send_channel_data(freerdp* instance, int channel_id, BYTE* data, int size)
 {
 	return rdp_send_channel_data(instance->context->rdp, channel_id, data, size);
@@ -200,6 +278,22 @@ BOOL freerdp_disconnect(freerdp* instance)
 BOOL freerdp_shall_disconnect(freerdp* instance)
 {
 	return instance->context->rdp->disconnect;
+}
+
+FREERDP_API BOOL freerdp_focus_required(freerdp* instance)
+{
+	rdpRdp* rdp;
+	BOOL bRetCode = FALSE;
+
+	rdp = instance->context->rdp;
+
+	if (rdp->resendFocus)
+	{
+		bRetCode = TRUE;
+		rdp->resendFocus = FALSE;
+	}
+
+	return bRetCode;
 }
 
 void freerdp_get_version(int* major, int* minor, int* revision)
@@ -233,10 +327,19 @@ void freerdp_context_new(freerdp* instance)
 	instance->update = rdp->update;
 	instance->settings = rdp->settings;
 
-	instance->context = (rdpContext*) xzalloc(instance->context_size);
+	instance->context = (rdpContext*) malloc(instance->context_size);
+	ZeroMemory(instance->context, instance->context_size);
+
 	instance->context->graphics = graphics_new(instance->context);
 	instance->context->instance = instance;
 	instance->context->rdp = rdp;
+
+	instance->context->input = instance->input;
+	instance->context->update = instance->update;
+	instance->context->settings = instance->settings;
+
+	instance->context->client = (rdpClient*) malloc(sizeof(rdpClient));
+	ZeroMemory(instance->context->client, sizeof(rdpClient));
 
 	instance->update->context = instance->context;
 	instance->update->pointer->context = instance->context;
@@ -261,13 +364,15 @@ void freerdp_context_new(freerdp* instance)
  */
 void freerdp_context_free(freerdp* instance)
 {
-	if (instance->context == NULL)
+	if (!instance->context)
 		return;
 
 	IFCALL(instance->ContextFree, instance, instance->context);
 
 	rdp_free(instance->context->rdp);
 	graphics_free(instance->context->graphics);
+
+	free(instance->context->client);
 
 	free(instance->context);
 	instance->context = NULL;
@@ -285,10 +390,11 @@ freerdp* freerdp_new()
 {
 	freerdp* instance;
 
-	instance = (freerdp*) xzalloc(sizeof(freerdp));
+	instance = (freerdp*) malloc(sizeof(freerdp));
 
-	if (instance != NULL)
+	if (instance)
 	{
+		ZeroMemory(instance, sizeof(freerdp));
 		instance->context_size = sizeof(rdpContext);
 		instance->SendChannelData = freerdp_send_channel_data;
 	}

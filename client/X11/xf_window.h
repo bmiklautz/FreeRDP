@@ -21,12 +21,13 @@
 #define __XF_WINDOW_H
 
 #include <X11/Xlib.h>
+
 #include <freerdp/freerdp.h>
-#include <freerdp/utils/memory.h>
 
 typedef struct xf_localmove xfLocalMove;
 typedef struct xf_window xfWindow;
 
+#include "xf_interface.h"
 #include "xfreerdp.h"
 
 // Extended ICCM flags http://standards.freedesktop.org/wm-spec/wm-spec-latest.html

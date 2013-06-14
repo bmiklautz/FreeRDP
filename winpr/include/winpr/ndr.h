@@ -34,8 +34,6 @@ typedef union _CLIENT_CALL_RETURN
 	LONG_PTR Simple;
 } CLIENT_CALL_RETURN;
 
-typedef void* RPC_IF_HANDLE;
-
 typedef struct _RPC_VERSION
 {
 	unsigned short MajorVersion;
@@ -525,7 +523,15 @@ typedef void (*NDR_TYPE_MARSHALL_ROUTINE)(PMIDL_STUB_MESSAGE pStubMsg, unsigned 
 typedef void (*NDR_TYPE_UNMARSHALL_ROUTINE)(PMIDL_STUB_MESSAGE pStubMsg, unsigned char* pMemory, unsigned char FormatChar);
 typedef void (*NDR_TYPE_FREE_ROUTINE)(PMIDL_STUB_MESSAGE pStubMsg, unsigned char* pMemory, PFORMAT_STRING pFormat);
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 WINPR_API CLIENT_CALL_RETURN NdrClientCall2(PMIDL_STUB_DESC pStubDescriptor, PFORMAT_STRING pFormat, ...);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

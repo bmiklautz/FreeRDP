@@ -23,39 +23,7 @@
 #include <freerdp/api.h>
 #include <freerdp/types.h>
 
-typedef struct rdpsnd_format rdpsndFormat;
-
-struct rdpsnd_format
-{
-	UINT16 wFormatTag;
-	UINT16 nChannels;
-	UINT32 nSamplesPerSec;
-	UINT16 nBlockAlign;
-	UINT16 wBitsPerSample;
-	UINT16 cbSize;
-	BYTE* data;
-};
-
-#define SNDC_CLOSE         1
-#define SNDC_WAVE          2
-#define SNDC_SETVOLUME     3
-#define SNDC_SETPITCH      4
-#define SNDC_WAVECONFIRM   5
-#define SNDC_TRAINING      6
-#define SNDC_FORMATS       7
-#define SNDC_CRYPTKEY      8
-#define SNDC_WAVEENCRYPT   9
-#define SNDC_UDPWAVE       10
-#define SNDC_UDPWAVELAST   11
-#define SNDC_QUALITYMODE   12
-
-#define TSSNDCAPS_ALIVE  1
-#define TSSNDCAPS_VOLUME 2
-#define TSSNDCAPS_PITCH  4
-
-#define DYNAMIC_QUALITY  0x0000
-#define MEDIUM_QUALITY   0x0001
-#define HIGH_QUALITY     0x0002
+#include <freerdp/codec/audio.h>
 
 #endif /* FREERDP_CHANNEL_RDPSND_H */
 

@@ -21,6 +21,8 @@
 #include "config.h"
 #endif
 
+#include <winpr/crt.h>
+
 #include <freerdp/gdi/dc.h>
 #include <freerdp/gdi/brush.h>
 #include <freerdp/gdi/shape.h>
@@ -28,11 +30,11 @@
 #include <freerdp/gdi/bitmap.h>
 #include <freerdp/codec/jpeg.h>
 #include <freerdp/codec/rfx.h>
+#include <freerdp/codec/nsc.h>
 #include <freerdp/gdi/drawing.h>
 #include <freerdp/gdi/clipping.h>
 #include <freerdp/codec/color.h>
 #include <freerdp/codec/bitmap.h>
-#include <freerdp/utils/memory.h>
 #include <freerdp/codec/bitmap.h>
 #include <freerdp/cache/glyph.h>
 
@@ -114,16 +116,18 @@ void gdi_Bitmap_Decompress(rdpContext* context, rdpBitmap* bitmap,
 
 	switch (codec_id)
 	{
-		case CODEC_ID_NSCODEC:
-			printf("gdi_Bitmap_Decompress: nsc not done\n");
+		case RDP_CODEC_ID_NSCODEC:
+			gdi = context->gdi;
+			nsc_process_message(gdi->nsc_context, bpp, width, height, data, length);
+			freerdp_image_flip(((NSC_CONTEXT*)gdi->nsc_context)->bmpdata, bitmap->data, width, height, bpp);
 			break;
-		case CODEC_ID_REMOTEFX:
+		case RDP_CODEC_ID_REMOTEFX:
 			gdi = context->gdi;
 			rfx_context_set_pixel_format(gdi->rfx_context, RDP_PIXEL_FORMAT_B8G8R8A8);
 			msg = rfx_process_message(gdi->rfx_context, data, length);
 			if (msg == NULL)
 			{
-				printf("gdi_Bitmap_Decompress: rfx Decompression Failed\n");
+				fprintf(stderr, "gdi_Bitmap_Decompress: rfx Decompression Failed\n");
 			}
 			else
 			{
@@ -142,11 +146,11 @@ void gdi_Bitmap_Decompress(rdpContext* context, rdpBitmap* bitmap,
 				rfx_message_free(gdi->rfx_context, msg);
 			}
 			break;
-		case CODEC_ID_JPEG:
+		case RDP_CODEC_ID_JPEG:
 #ifdef WITH_JPEG
 			if (!jpeg_decompress(data, bitmap->data, width, height, length, bpp))
 			{
-				printf("gdi_Bitmap_Decompress: jpeg Decompression Failed\n");
+				fprintf(stderr, "gdi_Bitmap_Decompress: jpeg Decompression Failed\n");
 			}
 #endif
 			break;
@@ -157,7 +161,7 @@ void gdi_Bitmap_Decompress(rdpContext* context, rdpBitmap* bitmap,
 
 				if (status == FALSE)
 				{
-					printf("gdi_Bitmap_Decompress: Bitmap Decompression Failed\n");
+					fprintf(stderr, "gdi_Bitmap_Decompress: Bitmap Decompression Failed\n");
 				}
 			}
 			else
@@ -243,8 +247,8 @@ void gdi_Glyph_BeginDraw(rdpContext* context, int x, int y, int width, int heigh
 	gdi_CRgnToRect(x, y, width, height, &rect);
 
 	brush = gdi_CreateSolidBrush(fgcolor);
-
 	gdi_FillRect(gdi->drawing->hdc, &rect, brush);
+	gdi_DeleteObject((HGDIOBJECT) brush);
 
 	gdi->textColor = gdi_SetTextColor(gdi->drawing->hdc, bgcolor);
 }
@@ -264,7 +268,8 @@ void gdi_register_graphics(rdpGraphics* graphics)
 	rdpBitmap* bitmap;
 	rdpGlyph* glyph;
 
-	bitmap = xnew(rdpBitmap);
+	bitmap = (rdpBitmap*) malloc(sizeof(rdpBitmap));
+	ZeroMemory(bitmap, sizeof(rdpBitmap));
 	bitmap->size = sizeof(gdiBitmap);
 
 	bitmap->New = gdi_Bitmap_New;
@@ -276,7 +281,8 @@ void gdi_register_graphics(rdpGraphics* graphics)
 	graphics_register_bitmap(graphics, bitmap);
 	free(bitmap);
 
-	glyph = xnew(rdpGlyph);
+	glyph = (rdpGlyph*) malloc(sizeof(rdpGlyph));
+	ZeroMemory(glyph, sizeof(rdpGlyph));
 	glyph->size = sizeof(gdiGlyph);
 
 	glyph->New = gdi_Glyph_New;

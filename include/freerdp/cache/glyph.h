@@ -17,13 +17,14 @@
  * limitations under the License.
  */
 
-#ifndef __GLYPH_CACHE_H
-#define __GLYPH_CACHE_H
+#ifndef FREERDP_GLYPH_CACHE_H
+#define FREERDP_GLYPH_CACHE_H
 
 #include <freerdp/api.h>
 #include <freerdp/types.h>
 #include <freerdp/update.h>
-#include <freerdp/utils/stream.h>
+
+#include <winpr/stream.h>
 
 typedef struct _GLYPH_CACHE GLYPH_CACHE;
 typedef struct _FRAGMENT_CACHE_ENTRY FRAGMENT_CACHE_ENTRY;
@@ -59,6 +60,10 @@ struct rdp_glyph_cache
 	rdpSettings* settings;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 FREERDP_API rdpGlyph* glyph_cache_get(rdpGlyphCache* glyph_cache, UINT32 id, UINT32 index);
 FREERDP_API void glyph_cache_put(rdpGlyphCache* glyph_cache, UINT32 id, UINT32 index, rdpGlyph* entry);
 
@@ -70,4 +75,8 @@ FREERDP_API void glyph_cache_register_callbacks(rdpUpdate* update);
 FREERDP_API rdpGlyphCache* glyph_cache_new(rdpSettings* settings);
 FREERDP_API void glyph_cache_free(rdpGlyphCache* glyph);
 
-#endif /* __GLYPH_CACHE_H */
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* FREERDP_GLYPH_CACHE_H */

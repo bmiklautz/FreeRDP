@@ -19,8 +19,10 @@ set(MODULE_NAME "freerdp-codec")
 set(MODULE_PREFIX "FREERDP_CODEC")
 
 set(${MODULE_PREFIX}_SRCS
+	dsp.c
 	bitmap.c
 	color.c
+	audio.c
 	rfx_bitstream.h
 	rfx_constants.h
 	rfx_decode.c
@@ -31,8 +33,6 @@ set(${MODULE_PREFIX}_SRCS
 	rfx_dwt.h
 	rfx_encode.c
 	rfx_encode.h
-	rfx_pool.c
-	rfx_pool.h
 	rfx_quantization.c
 	rfx_quantization.h
 	rfx_rlgr.c
@@ -70,15 +70,8 @@ if(WITH_SSE2)
 endif()
 
 if(WITH_NEON)
-	if(ANDROID)
-		set(ANDROID_CPU_FEATURES_PATH "${ANDROID_NDK}/sources/android/cpufeatures")
-		include_directories(${ANDROID_CPU_FEATURES_PATH})
-		set(${MODULE_PREFIX}_NEON_SRCS ${${MODULE_PREFIX}_NEON_SRCS}
-			${ANDROID_CPU_FEATURES_PATH}/cpu-features.c
-			${ANDROID_CPU_FEATURES_PATH}/cpu-features.h)
-	endif()
 	set(${MODULE_PREFIX}_SRCS ${${MODULE_PREFIX}_SRCS} ${${MODULE_PREFIX}_NEON_SRCS})
-	set_source_files_properties(${${MODULE_PREFIX}_NEON_SRCS} PROPERTIES COMPILE_FLAGS "-mfpu=neon -mfloat-abi=softfp -Wno-unused-variable")
+	set_source_files_properties(${${MODULE_PREFIX}_NEON_SRCS} PROPERTIES COMPILE_FLAGS "-mfpu=neon -mfloat-abi=${ARM_FP_ABI} -Wno-unused-variable")
 endif()
 
 if(WITH_JPEG)
@@ -89,7 +82,7 @@ add_complex_library(MODULE ${MODULE_NAME} TYPE "OBJECT"
 	MONOLITHIC ${MONOLITHIC_BUILD}
 	SOURCES ${${MODULE_PREFIX}_SRCS})
 
-set_target_properties(${MODULE_NAME} PROPERTIES VERSION ${FREERDP_VERSION_FULL} SOVERSION ${FREERDP_VERSION} PREFIX "lib")
+set_target_properties(${MODULE_NAME} PROPERTIES VERSION ${FREERDP_VERSION} SOVERSION ${FREERDP_API_VERSION} PREFIX "lib")
 
 set(${MODULE_PREFIX}_LIBS
 	${FREERDP_JPEG_LIBS})
@@ -97,7 +90,12 @@ set(${MODULE_PREFIX}_LIBS
 set_complex_link_libraries(VARIABLE ${MODULE_PREFIX}_LIBS
 	MONOLITHIC ${MONOLITHIC_BUILD} INTERNAL
 	MODULE freerdp
-	MODULES freerdp-utils)
+	MODULES freerdp-primitives freerdp-utils)
+	
+set_complex_link_libraries(VARIABLE ${MODULE_PREFIX}_LIBS
+	MONOLITHIC ${MONOLITHIC_BUILD}
+	MODULE winpr
+	MODULES winpr-crt winpr-pool winpr-registry winpr-sysinfo winpr-utils)
 
 if(MONOLITHIC_BUILD)
 	set(FREERDP_LIBS ${FREERDP_LIBS} ${${MODULE_PREFIX}_LIBS} PARENT_SCOPE)

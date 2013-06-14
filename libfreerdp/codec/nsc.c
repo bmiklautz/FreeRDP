@@ -25,19 +25,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
 #endif
 
+#include <winpr/crt.h>
+
 #include <freerdp/codec/nsc.h>
-#include <freerdp/utils/memory.h>
 
 #include "nsc_types.h"
 #include "nsc_encode.h"
 
-#ifdef WITH_SSE2
 #include "nsc_sse2.h"
-#endif
 
 #ifndef NSC_INIT_SIMD
 #define NSC_INIT_SIMD(_nsc_context) do { } while (0)
@@ -169,21 +169,21 @@ static void nsc_rle_decompress_data(NSC_CONTEXT* context)
 	}
 }
 
-static void nsc_stream_initialize(NSC_CONTEXT* context, STREAM* s)
+static void nsc_stream_initialize(NSC_CONTEXT* context, wStream* s)
 {
 	int i;
 
 	for (i = 0; i < 4; i++)
-		stream_read_UINT32(s, context->nsc_stream.PlaneByteCount[i]);
+		Stream_Read_UINT32(s, context->nsc_stream.PlaneByteCount[i]);
 
-	stream_read_BYTE(s, context->nsc_stream.ColorLossLevel);
-	stream_read_BYTE(s, context->nsc_stream.ChromaSubSamplingLevel);
-	stream_seek(s, 2);
+	Stream_Read_UINT8(s, context->nsc_stream.ColorLossLevel);
+	Stream_Read_UINT8(s, context->nsc_stream.ChromaSubSamplingLevel);
+	Stream_Seek(s, 2);
 
-	context->nsc_stream.Planes = stream_get_tail(s);
+	context->nsc_stream.Planes = Stream_Pointer(s);
 }
 
-static void nsc_context_initialize(NSC_CONTEXT* context, STREAM* s)
+static void nsc_context_initialize(NSC_CONTEXT* context, wStream* s)
 {
 	int i;
 	UINT32 length;
@@ -194,7 +194,8 @@ static void nsc_context_initialize(NSC_CONTEXT* context, STREAM* s)
 	length = context->width * context->height * 4;
 	if (context->bmpdata == NULL)
 	{
-		context->bmpdata = xzalloc(length + 16);
+		context->bmpdata = malloc(length + 16);
+		ZeroMemory(context->bmpdata, length + 16);
 		context->bmpdata_length = length;
 	}
 	else if (length > context->bmpdata_length)
@@ -244,7 +245,10 @@ void nsc_context_free(NSC_CONTEXT* context)
 	for (i = 0; i < 4; i++)
 	{
 		if (context->priv->plane_buf[i])
+		{
 			free(context->priv->plane_buf[i]);
+			context->priv->plane_buf[i] = NULL;
+		}
 	}
 	if (context->bmpdata)
 		free(context->bmpdata);
@@ -257,14 +261,21 @@ void nsc_context_free(NSC_CONTEXT* context)
 
 	free(context->priv);
 	free(context);
+	context = NULL;
 }
 
 NSC_CONTEXT* nsc_context_new(void)
 {
 	NSC_CONTEXT* nsc_context;
+	UINT8 i;
 
-	nsc_context = xnew(NSC_CONTEXT);
-	nsc_context->priv = xnew(NSC_CONTEXT_PRIV);
+	nsc_context = (NSC_CONTEXT*) calloc(1, sizeof(NSC_CONTEXT));
+	nsc_context->priv = (NSC_CONTEXT_PRIV*) calloc(1, sizeof(NSC_CONTEXT_PRIV));
+	for (i=0; i < 5; ++i)
+	{
+		nsc_context->priv->plane_buf[i] = NULL;
+	}
+	nsc_context->bmpdata = NULL;
 
 	nsc_context->decode = nsc_decode;
 	nsc_context->encode = nsc_encode;
@@ -278,13 +289,10 @@ NSC_CONTEXT* nsc_context_new(void)
 	nsc_context->nsc_stream.ColorLossLevel = 3;
 	nsc_context->nsc_stream.ChromaSubSamplingLevel = 1;
 
-	return nsc_context;
-}
+	/* init optimized methods */
+	NSC_INIT_SIMD(nsc_context);
 
-void nsc_context_set_cpu_opt(NSC_CONTEXT* context, UINT32 cpu_opt)
-{
-	if (cpu_opt)
-		NSC_INIT_SIMD(context);
+	return nsc_context;
 }
 
 void nsc_context_set_pixel_format(NSC_CONTEXT* context, RDP_PIXEL_FORMAT pixel_format)
@@ -319,16 +327,14 @@ void nsc_context_set_pixel_format(NSC_CONTEXT* context, RDP_PIXEL_FORMAT pixel_f
 void nsc_process_message(NSC_CONTEXT* context, UINT16 bpp,
 	UINT16 width, UINT16 height, BYTE* data, UINT32 length)
 {
-	STREAM* s;
+	wStream* s;
 
-	s = stream_new(0);
-	stream_attach(s, data, length);
+	s = Stream_New(data, length);
 	context->bpp = bpp;
 	context->width = width;
 	context->height = height;
 	nsc_context_initialize(context, s);
-	stream_detach(s);
-	stream_free(s);
+	Stream_Free(s, FALSE);
 
 	/* RLE decode */
 	PROFILER_ENTER(context->priv->prof_nsc_rle_decompress_data);

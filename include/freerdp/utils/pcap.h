@@ -17,8 +17,8 @@
  * limitations under the License.
  */
 
-#ifndef __UTILS_PCAP_H
-#define __UTILS_PCAP_H
+#ifndef FREERDP_UTILS_PCAP_H
+#define FREERDP_UTILS_PCAP_H
 
 #include <freerdp/api.h>
 #include <freerdp/types.h>
@@ -68,6 +68,10 @@ struct rdp_pcap
 };
 typedef struct rdp_pcap rdpPcap;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 FREERDP_API rdpPcap* pcap_open(char* name, BOOL write);
 FREERDP_API void pcap_close(rdpPcap* pcap);
 
@@ -78,4 +82,8 @@ FREERDP_API BOOL pcap_get_next_record_header(rdpPcap* pcap, pcap_record* record)
 FREERDP_API BOOL pcap_get_next_record_content(rdpPcap* pcap, pcap_record* record);
 FREERDP_API void pcap_flush(rdpPcap* pcap);
 
-#endif /* __UTILS_PCAP_H */
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* FREERDP_UTILS_PCAP_H */

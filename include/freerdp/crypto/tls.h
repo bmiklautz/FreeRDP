@@ -23,12 +23,16 @@
 #include "crypto.h"
 #include "certificate.h"
 
+#include <winpr/crt.h>
+#include <winpr/sspi.h>
+
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
 #include <freerdp/api.h>
 #include <freerdp/types.h>
-#include <freerdp/utils/stream.h>
+
+#include <winpr/stream.h>
 
 typedef struct rdp_tls rdpTls;
 
@@ -40,6 +44,7 @@ struct rdp_tls
 	BYTE* PublicKey;
 	DWORD PublicKeyLength;
 	rdpSettings* settings;
+	SecPkgContext_Bindings* Bindings;
 	rdpCertificateStore* certificate_store;
 };
 
@@ -53,8 +58,11 @@ FREERDP_API int tls_write(rdpTls* tls, BYTE* data, int length);
 FREERDP_API int tls_read_all(rdpTls* tls, BYTE* data, int length);
 FREERDP_API int tls_write_all(rdpTls* tls, BYTE* data, int length);
 
+FREERDP_API int tls_wait_read(rdpTls* tls);
+FREERDP_API int tls_wait_write(rdpTls* tls);
+
 FREERDP_API BOOL tls_verify_certificate(rdpTls* tls, CryptoCert cert, char* hostname);
-FREERDP_API void tls_print_certificate_error(char* hostname, char* fingerprint);
+FREERDP_API void tls_print_certificate_error(char* hostname, char* fingerprint, char* hosts_file);
 FREERDP_API void tls_print_certificate_name_mismatch_error(char* hostname, char* common_name, char** alt_names, int alt_names_count);
 
 FREERDP_API BOOL tls_print_error(char* func, SSL* connection, int value);

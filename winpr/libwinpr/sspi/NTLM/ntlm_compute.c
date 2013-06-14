@@ -66,13 +66,13 @@ void ntlm_get_version_info(NTLM_VERSION_INFO* versionInfo)
  * @param s
  */
 
-void ntlm_read_version_info(PStream s, NTLM_VERSION_INFO* versionInfo)
+void ntlm_read_version_info(wStream* s, NTLM_VERSION_INFO* versionInfo)
 {
-	StreamRead_UINT8(s, versionInfo->ProductMajorVersion); /* ProductMajorVersion (1 byte) */
-	StreamRead_UINT8(s, versionInfo->ProductMinorVersion); /* ProductMinorVersion (1 byte) */
-	StreamRead_UINT16(s, versionInfo->ProductBuild); /* ProductBuild (2 bytes) */
-	StreamRead(s, versionInfo->Reserved, sizeof(versionInfo->Reserved)); /* Reserved (3 bytes) */
-	StreamRead_UINT8(s, versionInfo->NTLMRevisionCurrent); /* NTLMRevisionCurrent (1 byte) */
+	Stream_Read_UINT8(s, versionInfo->ProductMajorVersion); /* ProductMajorVersion (1 byte) */
+	Stream_Read_UINT8(s, versionInfo->ProductMinorVersion); /* ProductMinorVersion (1 byte) */
+	Stream_Read_UINT16(s, versionInfo->ProductBuild); /* ProductBuild (2 bytes) */
+	Stream_Read(s, versionInfo->Reserved, sizeof(versionInfo->Reserved)); /* Reserved (3 bytes) */
+	Stream_Read_UINT8(s, versionInfo->NTLMRevisionCurrent); /* NTLMRevisionCurrent (1 byte) */
 }
 
 /**
@@ -81,13 +81,13 @@ void ntlm_read_version_info(PStream s, NTLM_VERSION_INFO* versionInfo)
  * @param s
  */
 
-void ntlm_write_version_info(PStream s, NTLM_VERSION_INFO* versionInfo)
+void ntlm_write_version_info(wStream* s, NTLM_VERSION_INFO* versionInfo)
 {
-	StreamWrite_UINT8(s, versionInfo->ProductMajorVersion); /* ProductMajorVersion (1 byte) */
-	StreamWrite_UINT8(s, versionInfo->ProductMinorVersion); /* ProductMinorVersion (1 byte) */
-	StreamWrite_UINT16(s, versionInfo->ProductBuild); /* ProductBuild (2 bytes) */
-	StreamWrite(s, versionInfo->Reserved, sizeof(versionInfo->Reserved)); /* Reserved (3 bytes) */
-	StreamWrite_UINT8(s, versionInfo->NTLMRevisionCurrent); /* NTLMRevisionCurrent (1 byte) */
+	Stream_Write_UINT8(s, versionInfo->ProductMajorVersion); /* ProductMajorVersion (1 byte) */
+	Stream_Write_UINT8(s, versionInfo->ProductMinorVersion); /* ProductMinorVersion (1 byte) */
+	Stream_Write_UINT16(s, versionInfo->ProductBuild); /* ProductBuild (2 bytes) */
+	Stream_Write(s, versionInfo->Reserved, sizeof(versionInfo->Reserved)); /* Reserved (3 bytes) */
+	Stream_Write_UINT8(s, versionInfo->NTLMRevisionCurrent); /* NTLMRevisionCurrent (1 byte) */
 }
 
 /**
@@ -98,57 +98,57 @@ void ntlm_write_version_info(PStream s, NTLM_VERSION_INFO* versionInfo)
 
 void ntlm_print_version_info(NTLM_VERSION_INFO* versionInfo)
 {
-	printf("VERSION =\n{\n");
-	printf("\tProductMajorVersion: %d\n", versionInfo->ProductMajorVersion);
-	printf("\tProductMinorVersion: %d\n", versionInfo->ProductMinorVersion);
-	printf("\tProductBuild: %d\n", versionInfo->ProductBuild);
-	printf("\tReserved: 0x%02X%02X%02X\n", versionInfo->Reserved[0],
+	fprintf(stderr, "VERSION =\n{\n");
+	fprintf(stderr, "\tProductMajorVersion: %d\n", versionInfo->ProductMajorVersion);
+	fprintf(stderr, "\tProductMinorVersion: %d\n", versionInfo->ProductMinorVersion);
+	fprintf(stderr, "\tProductBuild: %d\n", versionInfo->ProductBuild);
+	fprintf(stderr, "\tReserved: 0x%02X%02X%02X\n", versionInfo->Reserved[0],
 			versionInfo->Reserved[1], versionInfo->Reserved[2]);
-	printf("\tNTLMRevisionCurrent: 0x%02X\n", versionInfo->NTLMRevisionCurrent);
+	fprintf(stderr, "\tNTLMRevisionCurrent: 0x%02X\n", versionInfo->NTLMRevisionCurrent);
 }
 
-void ntlm_read_ntlm_v2_client_challenge(PStream s, NTLMv2_CLIENT_CHALLENGE* challenge)
+void ntlm_read_ntlm_v2_client_challenge(wStream* s, NTLMv2_CLIENT_CHALLENGE* challenge)
 {
 	size_t size;
 
-	StreamRead_UINT8(s, challenge->RespType);
-	StreamRead_UINT8(s, challenge->HiRespType);
-	StreamRead_UINT16(s, challenge->Reserved1);
-	StreamRead_UINT32(s, challenge->Reserved2);
-	StreamRead(s, challenge->Timestamp, 8);
-	StreamRead(s, challenge->ClientChallenge, 8);
-	StreamRead_UINT32(s, challenge->Reserved3);
+	Stream_Read_UINT8(s, challenge->RespType);
+	Stream_Read_UINT8(s, challenge->HiRespType);
+	Stream_Read_UINT16(s, challenge->Reserved1);
+	Stream_Read_UINT32(s, challenge->Reserved2);
+	Stream_Read(s, challenge->Timestamp, 8);
+	Stream_Read(s, challenge->ClientChallenge, 8);
+	Stream_Read_UINT32(s, challenge->Reserved3);
 
-	size = StreamRemainingSize(s);
+	size = Stream_Length(s) - Stream_GetPosition(s);
 	challenge->AvPairs = (NTLM_AV_PAIR*) malloc(size);
-	StreamRead(s, challenge->AvPairs, size);
+	Stream_Read(s, challenge->AvPairs, size);
 }
 
-void ntlm_write_ntlm_v2_client_challenge(PStream s, NTLMv2_CLIENT_CHALLENGE* challenge)
+void ntlm_write_ntlm_v2_client_challenge(wStream* s, NTLMv2_CLIENT_CHALLENGE* challenge)
 {
 	ULONG length;
 
-	StreamWrite_UINT8(s, challenge->RespType);
-	StreamWrite_UINT8(s, challenge->HiRespType);
-	StreamWrite_UINT16(s, challenge->Reserved1);
-	StreamWrite_UINT32(s, challenge->Reserved2);
-	StreamWrite(s, challenge->Timestamp, 8);
-	StreamWrite(s, challenge->ClientChallenge, 8);
-	StreamWrite_UINT32(s, challenge->Reserved3);
+	Stream_Write_UINT8(s, challenge->RespType);
+	Stream_Write_UINT8(s, challenge->HiRespType);
+	Stream_Write_UINT16(s, challenge->Reserved1);
+	Stream_Write_UINT32(s, challenge->Reserved2);
+	Stream_Write(s, challenge->Timestamp, 8);
+	Stream_Write(s, challenge->ClientChallenge, 8);
+	Stream_Write_UINT32(s, challenge->Reserved3);
 
 	length = ntlm_av_pair_list_length(challenge->AvPairs);
-	StreamWrite(s, challenge->AvPairs, length);
+	Stream_Write(s, challenge->AvPairs, length);
 }
 
-void ntlm_read_ntlm_v2_response(PStream s, NTLMv2_RESPONSE* response)
+void ntlm_read_ntlm_v2_response(wStream* s, NTLMv2_RESPONSE* response)
 {
-	StreamRead(s, response->Response, 16);
+	Stream_Read(s, response->Response, 16);
 	ntlm_read_ntlm_v2_client_challenge(s, &(response->Challenge));
 }
 
-void ntlm_write_ntlm_v2_response(PStream s, NTLMv2_RESPONSE* response)
+void ntlm_write_ntlm_v2_response(wStream* s, NTLMv2_RESPONSE* response)
 {
-	StreamWrite(s, response->Response, 16);
+	Stream_Write(s, response->Response, 16);
 	ntlm_write_ntlm_v2_client_challenge(s, &(response->Challenge));
 }
 
@@ -162,7 +162,7 @@ void ntlm_write_ntlm_v2_response(PStream s, NTLMv2_RESPONSE* response)
 
 void ntlm_output_restriction_encoding(NTLM_CONTEXT* context)
 {
-	PStream s;
+	wStream* s;
 	AV_PAIR* restrictions = &context->av_pairs->Restrictions;
 
 	BYTE machineID[32] =
@@ -174,15 +174,15 @@ void ntlm_output_restriction_encoding(NTLM_CONTEXT* context)
 
 	s = PStreamAllocAttach(restrictions->value, restrictions->length);
 
-	StreamWrite_UINT32(s, 48); /* Size */
-	StreamZero(s, 4); /* Z4 (set to zero) */
+	Stream_Write_UINT32(s, 48); /* Size */
+	Stream_Zero(s, 4); /* Z4 (set to zero) */
 
 	/* IntegrityLevel (bit 31 set to 1) */
-	StreamWrite_UINT8(s, 1);
-	StreamZero(s, 3);
+	Stream_Write_UINT8(s, 1);
+	Stream_Zero(s, 3);
 
-	StreamWrite_UINT32(s, 0x00002000); /* SubjectIntegrityLevel */
-	StreamWrite(s, machineID, 32); /* MachineID */
+	Stream_Write_UINT32(s, 0x00002000); /* SubjectIntegrityLevel */
+	Stream_Write(s, machineID, 32); /* MachineID */
 
 	PStreamFreeDetach(s);
 }
@@ -240,7 +240,7 @@ void ntlm_fetch_ntlm_v2_hash(NTLM_CONTEXT* context, char* hash)
 	if (entry != NULL)
 	{
 #ifdef WITH_DEBUG_NTLM
-		printf("NTLM Hash:\n");
+		fprintf(stderr, "NTLM Hash:\n");
 		winpr_HexDump(entry->NtHash, 16);
 #endif
 
@@ -261,7 +261,7 @@ void ntlm_fetch_ntlm_v2_hash(NTLM_CONTEXT* context, char* hash)
 	if (entry != NULL)
 	{
 #ifdef WITH_DEBUG_NTLM
-		printf("NTLM Hash:\n");
+		fprintf(stderr, "NTLM Hash:\n");
 		winpr_HexDump(entry->NtHash, 16);
 #endif
 
@@ -277,7 +277,7 @@ void ntlm_fetch_ntlm_v2_hash(NTLM_CONTEXT* context, char* hash)
 	}
 	else
 	{
-		printf("Error: Could not find user in SAM database\n");
+		fprintf(stderr, "Error: Could not find user in SAM database\n");
 	}
 }
 
@@ -339,8 +339,11 @@ void ntlm_compute_ntlm_v2_response(NTLM_CONTEXT* context)
 	BYTE nt_proof_str[16];
 	SecBuffer ntlm_v2_temp;
 	SecBuffer ntlm_v2_temp_chal;
+	PSecBuffer TargetInfo;
 
-	sspi_SecBufferAlloc(&ntlm_v2_temp, context->ChallengeTargetInfo.cbBuffer + 28);
+	TargetInfo = &context->ChallengeTargetInfo;
+
+	sspi_SecBufferAlloc(&ntlm_v2_temp, TargetInfo->cbBuffer + 28);
 
 	ZeroMemory(ntlm_v2_temp.pvBuffer, ntlm_v2_temp.cbBuffer);
 	blob = (BYTE*) ntlm_v2_temp.pvBuffer;
@@ -349,25 +352,25 @@ void ntlm_compute_ntlm_v2_response(NTLM_CONTEXT* context)
 	ntlm_compute_ntlm_v2_hash(context, (char*) ntlm_v2_hash);
 
 #ifdef WITH_DEBUG_NTLM
-	printf("Password (length = %d)\n", context->identity.PasswordLength * 2);
+	fprintf(stderr, "Password (length = %d)\n", context->identity.PasswordLength * 2);
 	winpr_HexDump((BYTE*) context->identity.Password, context->identity.PasswordLength * 2);
-	printf("\n");
+	fprintf(stderr, "\n");
 
-	printf("Username (length = %d)\n", context->identity.UserLength * 2);
+	fprintf(stderr, "Username (length = %d)\n", context->identity.UserLength * 2);
 	winpr_HexDump((BYTE*) context->identity.User, context->identity.UserLength * 2);
-	printf("\n");
+	fprintf(stderr, "\n");
 
-	printf("Domain (length = %d)\n", context->identity.DomainLength * 2);
+	fprintf(stderr, "Domain (length = %d)\n", context->identity.DomainLength * 2);
 	winpr_HexDump((BYTE*) context->identity.Domain, context->identity.DomainLength * 2);
-	printf("\n");
+	fprintf(stderr, "\n");
 
-	printf("Workstation (length = %d)\n", context->Workstation.Length);
+	fprintf(stderr, "Workstation (length = %d)\n", context->Workstation.Length);
 	winpr_HexDump((BYTE*) context->Workstation.Buffer, context->Workstation.Length);
-	printf("\n");
+	fprintf(stderr, "\n");
 
-	printf("NTOWFv2, NTLMv2 Hash\n");
+	fprintf(stderr, "NTOWFv2, NTLMv2 Hash\n");
 	winpr_HexDump(ntlm_v2_hash, 16);
-	printf("\n");
+	fprintf(stderr, "\n");
 #endif
 
 	/* Construct temp */
@@ -378,12 +381,12 @@ void ntlm_compute_ntlm_v2_response(NTLM_CONTEXT* context)
 	CopyMemory(&blob[8], context->Timestamp, 8); /* Timestamp (8 bytes) */
 	CopyMemory(&blob[16], context->ClientChallenge, 8); /* ClientChallenge (8 bytes) */
 	/* Reserved3 (4 bytes) */
-	CopyMemory(&blob[28], context->ChallengeTargetInfo.pvBuffer, context->ChallengeTargetInfo.cbBuffer);
+	CopyMemory(&blob[28], TargetInfo->pvBuffer, TargetInfo->cbBuffer);
 
 #ifdef WITH_DEBUG_NTLM
-	printf("NTLMv2 Response Temp Blob\n");
+	fprintf(stderr, "NTLMv2 Response Temp Blob\n");
 	winpr_HexDump(ntlm_v2_temp.pvBuffer, ntlm_v2_temp.cbBuffer);
-	printf("\n");
+	fprintf(stderr, "\n");
 #endif
 
 	/* Concatenate server challenge with temp */

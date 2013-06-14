@@ -22,8 +22,10 @@
 #endif
 
 #include <stddef.h>
+
+#include <winpr/crt.h>
+
 #include <freerdp/utils/signal.h>
-#include <freerdp/utils/memory.h>
 
 #ifdef _WIN32
 
@@ -35,7 +37,7 @@ int freerdp_handle_signals(void)
 	return -1;
 }
 
-#elif (!ANDROID)
+#elif !defined(ANDROID)
 
 volatile sig_atomic_t terminal_needs_reset = 0;
 int terminal_fildes = 0;
@@ -62,46 +64,49 @@ static void fatal_handler(int signum)
 	raise(signum);
 }
 
-int freerdp_handle_signals(void)
+const int fatal_signals[] =
 {
-	const int fatal_signals[] = {
-		SIGABRT,
-		SIGALRM,
-		SIGBUS,
-		SIGFPE,
-		SIGHUP,
-		SIGILL,
-		SIGINT,
-		SIGKILL,
-		SIGPIPE,
-		SIGQUIT,
-		SIGSEGV,
-		SIGSTOP,
-		SIGTERM,
-		SIGTSTP,
-		SIGTTIN,
-		SIGTTOU,
-		SIGUSR1,
-		SIGUSR2,
+	SIGABRT,
+	SIGALRM,
+	SIGBUS,
+	SIGFPE,
+	SIGHUP,
+	SIGILL,
+	SIGINT,
+	SIGKILL,
+	SIGPIPE,
+	SIGQUIT,
+	SIGSEGV,
+	SIGSTOP,
+	SIGTERM,
+	SIGTSTP,
+	SIGTTIN,
+	SIGTTOU,
+	SIGUSR1,
+	SIGUSR2,
 #ifdef SIGPOLL
-		SIGPOLL,
+	SIGPOLL,
 #endif
 #ifdef SIGPROF
-		SIGPROF,
+	SIGPROF,
 #endif
 #ifdef SIGSYS
-		SIGSYS,
+	SIGSYS,
 #endif
-		SIGTRAP,
+	SIGTRAP,
 #ifdef SIGVTALRM
-		SIGVTALRM,
+	SIGVTALRM,
 #endif
-		SIGXCPU,
-		SIGXFSZ
-	};
+	SIGXCPU,
+	SIGXFSZ
+};
+
+int freerdp_handle_signals(void)
+{
 	int signal_index;
 	sigset_t orig_set;
-	struct sigaction orig_sigaction, fatal_sigaction;
+	struct sigaction orig_sigaction;
+	struct sigaction fatal_sigaction;
 
 	sigfillset(&(fatal_sigaction.sa_mask));
 	sigdelset(&(fatal_sigaction.sa_mask), SIGCONT);
@@ -110,16 +115,19 @@ int freerdp_handle_signals(void)
 	fatal_sigaction.sa_handler = fatal_handler;
 	fatal_sigaction.sa_flags  = 0;
 
-	for (signal_index = 0;
-		signal_index < ARRAY_SIZE(fatal_signals);
-		signal_index++)
-		if (sigaction(fatal_signals[signal_index],
-			NULL, &orig_sigaction) == 0)
+	for (signal_index = 0; signal_index < ARRAYSIZE(fatal_signals); signal_index++)
+	{
+		if (sigaction(fatal_signals[signal_index], NULL, &orig_sigaction) == 0)
+		{
 			if (orig_sigaction.sa_handler != SIG_IGN)
-				sigaction(fatal_signals[signal_index],
-					&fatal_sigaction, NULL); 
+			{
+				sigaction(fatal_signals[signal_index], &fatal_sigaction, NULL);
+			}
+		}
+	}
 
 	pthread_sigmask(SIG_SETMASK, &orig_set, NULL);
+
 	return 0;
 }
 

@@ -23,7 +23,7 @@ set(${MODULE_PREFIX}_SRCS
 	der.c
 	ber.c
 	per.c
-	nla.c
+	base64.c
 	certificate.c
 	crypto.c
 	tls.c)
@@ -35,7 +35,7 @@ add_complex_library(MODULE ${MODULE_NAME} TYPE "OBJECT"
 include_directories(${OPENSSL_INCLUDE_DIR})
 include_directories(${ZLIB_INCLUDE_DIRS})
 
-set_target_properties(${MODULE_NAME} PROPERTIES VERSION ${FREERDP_VERSION_FULL} SOVERSION ${FREERDP_VERSION} PREFIX "lib")
+set_target_properties(${MODULE_NAME} PROPERTIES VERSION ${FREERDP_VERSION} SOVERSION ${FREERDP_API_VERSION} PREFIX "lib")
 
 set(${MODULE_PREFIX}_LIBS
 	${OPENSSL_LIBRARIES})
@@ -43,7 +43,7 @@ set(${MODULE_PREFIX}_LIBS
 if(MONOLITHIC_BUILD)
 	set(${MODULE_PREFIX}_LIBS ${${MODULE_PREFIX}_LIBS} winpr)
 else()
-	set(${MODULE_PREFIX}_LIBS ${${MODULE_PREFIX}_LIBS} winpr-sspi winpr-library)
+	set(${MODULE_PREFIX}_LIBS ${${MODULE_PREFIX}_LIBS} winpr-sspi winpr-library winpr-path winpr-file)
 endif()
 
 if(WIN32)
@@ -60,7 +60,7 @@ set_complex_link_libraries(VARIABLE ${MODULE_PREFIX}_LIBS
 set_complex_link_libraries(VARIABLE ${MODULE_PREFIX}_LIBS
 	MONOLITHIC ${MONOLITHIC_BUILD}
 	MODULE winpr
-	MODULES winpr-crt)
+	MODULES winpr-crt winpr-library)
 
 if(MONOLITHIC_BUILD)
 	set(FREERDP_LIBS ${FREERDP_LIBS} ${${MODULE_PREFIX}_LIBS} PARENT_SCOPE)

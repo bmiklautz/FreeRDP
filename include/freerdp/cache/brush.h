@@ -17,14 +17,15 @@
  * limitations under the License.
  */
 
-#ifndef __BRUSH_CACHE_H
-#define __BRUSH_CACHE_H
+#ifndef FREERDP_BRUSH_CACHE_H
+#define FREERDP_BRUSH_CACHE_H
 
 #include <freerdp/api.h>
 #include <freerdp/types.h>
 #include <freerdp/freerdp.h>
 #include <freerdp/update.h>
-#include <freerdp/utils/stream.h>
+
+#include <winpr/stream.h>
 
 typedef struct _BRUSH_ENTRY BRUSH_ENTRY;
 typedef struct rdp_brush_cache rdpBrushCache;
@@ -56,6 +57,10 @@ struct rdp_brush_cache
 	rdpSettings* settings;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 FREERDP_API void* brush_cache_get(rdpBrushCache* brush, UINT32 index, UINT32* bpp);
 FREERDP_API void brush_cache_put(rdpBrushCache* brush, UINT32 index, void* entry, UINT32 bpp);
 
@@ -64,4 +69,8 @@ FREERDP_API void brush_cache_register_callbacks(rdpUpdate* update);
 FREERDP_API rdpBrushCache* brush_cache_new(rdpSettings* settings);
 FREERDP_API void brush_cache_free(rdpBrushCache* brush);
 
-#endif /* __BRUSH_CACHE_H */
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* FREERDP_BRUSH_CACHE_H */

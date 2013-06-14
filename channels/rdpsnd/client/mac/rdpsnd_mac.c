@@ -29,9 +29,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <winpr/crt.h>
+
 #include <freerdp/types.h>
-#include <freerdp/utils/memory.h>
-#include <freerdp/utils/dsp.h>
+#include <freerdp/codec/dsp.h>
 #include <freerdp/utils/svc_plugin.h>
 
 #include <AudioToolbox/AudioToolbox.h>
@@ -71,7 +72,7 @@ static void rdpsnd_audio_close(rdpsndDevicePlugin* device)
 	aq_plugin_p->is_open = 0;
 }
 
-static void rdpsnd_audio_open(rdpsndDevicePlugin* device, rdpsndFormat* format, int latency)
+static void rdpsnd_audio_open(rdpsndDevicePlugin* device, AUDIO_FORMAT* format, int latency)
 {
 	int rv;
 	int i;
@@ -96,19 +97,20 @@ static void rdpsnd_audio_open(rdpsndDevicePlugin* device, rdpsndFormat* format, 
 	aq_plugin_p->data_format.mChannelsPerFrame = 2;
 	aq_plugin_p->data_format.mBitsPerChannel = 16;
     
-	rv = AudioQueueNewOutput(&aq_plugin_p->data_format, // audio stream basic desc
-				 aq_playback_cb,            // callback when more data is required
-				 aq_plugin_p,               // data to pass to callback
-				 CFRunLoopGetCurrent(),     // The current run loop, and the one on 
-							    // which the audio queue playback callback 
-							    // will be invoked
-				 kCFRunLoopCommonModes,     // run loop modes in which callbacks can 
-							    // be invoked
-				 0,                         // flags - reserved
-				 &aq_plugin_p->aq_ref
+	rv = AudioQueueNewOutput(
+                             &aq_plugin_p->data_format, // audio stream basic desc
+                             aq_playback_cb,            // callback when more data is required
+                             aq_plugin_p,               // data to pass to callback
+                             CFRunLoopGetCurrent(),     // The current run loop, and the one on 
+                             // which the audio queue playback callback
+                             // will be invoked
+                             kCFRunLoopCommonModes,     // run loop modes in which callbacks can
+                             // be invoked
+                             0,                         // flags - reserved
+                             &aq_plugin_p->aq_ref
 				);
 	if (rv != 0) {
-		printf("rdpsnd_audio_open: AudioQueueNewOutput() failed with error %d\n", rv);
+		fprintf(stderr, "rdpsnd_audio_open: AudioQueueNewOutput() failed with error %d\n", rv);
 		aq_plugin_p->is_open = 1;
 		return;
 	}
@@ -125,7 +127,7 @@ static void rdpsnd_audio_free(rdpsndDevicePlugin* device)
 {
 }
 
-static BOOL rdpsnd_audio_format_supported(rdpsndDevicePlugin* device, rdpsndFormat* format)
+static BOOL rdpsnd_audio_format_supported(rdpsndDevicePlugin* device, AUDIO_FORMAT* format)
 {
 	switch (format->wFormatTag)
 	{
@@ -142,7 +144,7 @@ static BOOL rdpsnd_audio_format_supported(rdpsndDevicePlugin* device, rdpsndForm
 	return 0;
 }
 
-static void rdpsnd_audio_set_format(rdpsndDevicePlugin* device, rdpsndFormat* format, int latency)
+static void rdpsnd_audio_set_format(rdpsndDevicePlugin* device, AUDIO_FORMAT* format, int latency)
 {
 }
 
@@ -192,19 +194,24 @@ static void rdpsnd_audio_start(rdpsndDevicePlugin* device)
  * our job here is to fill aq_buf_ref with audio data and enqueue it
  */
 
-static void aq_playback_cb(void *user_data,
-			   AudioQueueRef aq_ref,
-			   AudioQueueBufferRef aq_buf_ref
-			  )
+static void aq_playback_cb(void* user_data, AudioQueueRef aq_ref, AudioQueueBufferRef aq_buf_ref)
 {
+
 }
 
-int FreeRDPRdpsndDeviceEntry(PFREERDP_RDPSND_DEVICE_ENTRY_POINTS pEntryPoints)
+#ifdef STATIC_CHANNELS
+#define freerdp_rdpsnd_client_subsystem_entry	mac_freerdp_rdpsnd_client_subsystem_entry
+#endif
+
+int freerdp_rdpsnd_client_subsystem_entry(PFREERDP_RDPSND_DEVICE_ENTRY_POINTS pEntryPoints)
 {
-	rdpsndAudioQPlugin* aqPlugin;
-	RDP_PLUGIN_DATA* data;
+    fprintf(stderr, "freerdp_rdpsnd_client_subsystem_entry()\n\n");
     
-	aqPlugin = xnew(rdpsndAudioQPlugin);
+	ADDIN_ARGV* args;
+	rdpsndAudioQPlugin* aqPlugin;
+    
+	aqPlugin = (rdpsndAudioQPlugin*) malloc(sizeof(rdpsndAudioQPlugin));
+	ZeroMemory(aqPlugin, sizeof(rdpsndAudioQPlugin));
 
 	aqPlugin->device.Open = rdpsnd_audio_open;
 	aqPlugin->device.FormatSupported = rdpsnd_audio_format_supported;
@@ -215,15 +222,14 @@ int FreeRDPRdpsndDeviceEntry(PFREERDP_RDPSND_DEVICE_ENTRY_POINTS pEntryPoints)
 	aqPlugin->device.Close = rdpsnd_audio_close;
 	aqPlugin->device.Free = rdpsnd_audio_free;
 
-	data = pEntryPoints->plugin_data;
+	args = pEntryPoints->args;
     
-	if (data && strcmp((char *)data->data[0], "macaudio") == 0) {
-		if(strlen((char *)data->data[1]) > 0)
-			aqPlugin->device_name = strdup((char *)data->data[1]);
-		else
-			aqPlugin->device_name = NULL;
+	if (args->argc > 2)
+	{
+		/* TODO: parse device name */
 	}
-	pEntryPoints->pRegisterRdpsndDevice(pEntryPoints->rdpsnd, (rdpsndDevicePlugin*)aqPlugin);
+
+	pEntryPoints->pRegisterRdpsndDevice(pEntryPoints->rdpsnd, (rdpsndDevicePlugin*) aqPlugin);
+
 	return 0;
 }
-

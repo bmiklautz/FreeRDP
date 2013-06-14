@@ -236,7 +236,11 @@ LONG InterlockedCompareExchange(LONG volatile *Destination, LONG Exchange, LONG 
 
 #endif /* _WIN32 */
 
-#if (_WIN32 && (_WIN32_WINNT < 0x0502))
+#if defined(_WIN64)
+
+/* InterlockedCompareExchange64 already defined */
+
+#elif (_WIN32 && (_WIN32_WINNT < 0x0502))
 
 static volatile HANDLE mutex = NULL;
 
@@ -271,7 +275,7 @@ LONGLONG InterlockedCompareExchange64(LONGLONG volatile *Destination, LONGLONG E
 	return previousValue;
 }
 
-#elif ANDROID
+#elif ANDROID || (defined(__GNUC__) && !defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8))
 
 #include <pthread.h>
 

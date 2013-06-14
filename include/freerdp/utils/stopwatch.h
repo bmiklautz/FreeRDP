@@ -17,13 +17,13 @@
  * limitations under the License.
  */
 
-#ifndef __UTILS_STOPWATCH_H
-#define __UTILS_STOPWATCH_H
+#ifndef FREERDP_UTILS_STOPWATCH_H
+#define FREERDP_UTILS_STOPWATCH_H
 
 #include <time.h>
+
 #include <freerdp/api.h>
 #include <freerdp/types.h>
-#include <freerdp/utils/memory.h>
 
 struct _STOPWATCH
 {
@@ -34,7 +34,11 @@ struct _STOPWATCH
 };
 typedef struct _STOPWATCH STOPWATCH;
 
-FREERDP_API STOPWATCH* stopwatch_create();
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+FREERDP_API STOPWATCH* stopwatch_create(void);
 FREERDP_API void stopwatch_free(STOPWATCH* stopwatch);
 
 FREERDP_API void stopwatch_start(STOPWATCH* stopwatch);
@@ -44,4 +48,8 @@ FREERDP_API void stopwatch_reset(STOPWATCH* stopwatch);
 FREERDP_API double stopwatch_get_elapsed_time_in_seconds(STOPWATCH* stopwatch);
 FREERDP_API void stopwatch_get_elapsed_time_in_useconds(STOPWATCH* stopwatch, UINT32* sec, UINT32* usec);
 
-#endif /* __UTILS_STOPWATCH_H */
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* FREERDP_UTILS_STOPWATCH_H */

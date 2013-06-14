@@ -24,8 +24,7 @@
 #include <freerdp/constants.h>
 #include <freerdp/channels/channels.h>
 #include <freerdp/utils/event.h>
-#include <freerdp/utils/hexdump.h>
-#include <freerdp/utils/memory.h>
+#include <winpr/print.h>
 #include <freerdp/client/cliprdr.h>
 
 #include "test_cliprdr.h"
@@ -90,13 +89,13 @@ static const BYTE test_data_response_data[] =
 static int test_rdp_channel_data(freerdp* instance, int chan_id, BYTE* data, int data_size)
 {
 	printf("chan_id %d data_size %d\n", chan_id, data_size);
-	freerdp_hexdump(data, data_size);
+	winpr_HexDump(data, data_size);
 	return 0;
 }
 
 static int event_processed;
 
-static void event_process_callback(RDP_EVENT* event)
+static void event_process_callback(wMessage* event)
 {
 	printf("Event %d processed.\n", event->event_type);
 	event_processed = 1;
@@ -108,12 +107,12 @@ void test_cliprdr(void)
 	rdpChannels* channels;
 	rdpSettings settings = { 0 };
 	freerdp instance = { 0 };
-	RDP_EVENT* event;
+	wMessage* event;
 	RDP_CB_FORMAT_LIST_EVENT* format_list_event;
 	RDP_CB_DATA_REQUEST_EVENT* data_request_event;
 	RDP_CB_DATA_RESPONSE_EVENT* data_response_event;
 
-	settings.hostname = "testhost";
+	settings.Hostname = "testhost";
 	instance.settings = &settings;
 	instance.SendChannelData = test_rdp_channel_data;
 
@@ -239,7 +238,7 @@ void test_cliprdr(void)
 	{
 		data_response_event = (RDP_CB_DATA_RESPONSE_EVENT*)event;
 		printf("Data response size: %d\n", data_response_event->size);
-		freerdp_hexdump(data_response_event->data, data_response_event->size);
+		winpr_HexDump(data_response_event->data, data_response_event->size);
 	}
 	freerdp_event_free(event);
 

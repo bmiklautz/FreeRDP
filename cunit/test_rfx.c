@@ -25,11 +25,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <winpr/crt.h>
+
 #include <freerdp/types.h>
 #include <freerdp/utils/print.h>
-#include <freerdp/utils/memory.h>
-#include <freerdp/utils/hexdump.h>
+#include <winpr/print.h>
 #include <freerdp/codec/rfx.h>
+
 #include "rfx_types.h"
 #include "rfx_bitstream.h"
 #include "rfx_rlgr.h"
@@ -191,8 +194,11 @@ void test_bitstream(void)
 	UINT16 b;
 	RFX_BITSTREAM* bs;
 
-	bs = xnew(RFX_BITSTREAM);
+	bs = (RFX_BITSTREAM*) malloc(sizeof(RFX_BITSTREAM));
+	ZeroMemory(bs, sizeof(RFX_BITSTREAM));
+
 	rfx_bitstream_attach(bs, (BYTE*) y_data, sizeof(y_data));
+
 	while (!rfx_bitstream_eos(bs))
 	{
 		rfx_bitstream_get_bits(bs, 3, b);
@@ -210,7 +216,9 @@ void test_bitstream_enc(void)
 	RFX_BITSTREAM* bs;
 	int i;
 
-	bs = xnew(RFX_BITSTREAM);
+	bs = (RFX_BITSTREAM*) malloc(sizeof(RFX_BITSTREAM));
+	ZeroMemory(bs, sizeof(RFX_BITSTREAM));
+
 	memset(buffer, 0, sizeof(buffer));
 	rfx_bitstream_attach(bs, buffer, sizeof(buffer));
 	for (i = 0; i < 16; i++)
@@ -245,7 +253,7 @@ void test_rlgr(void)
 {
 	int n;
 
-	n = rfx_rlgr_decode(RLGR3, y_data, sizeof(y_data), buffer, ARRAY_SIZE(buffer));
+	n = rfx_rlgr_decode(RLGR3, y_data, sizeof(y_data), buffer, ARRAYSIZE(buffer));
 
 	//printf("RLGR decode %d bytes to %d values.", sizeof(y_data), n);
 	//dump_buffer(buffer, n);
@@ -296,13 +304,13 @@ void test_decode(void)
 {
 	RFX_CONTEXT* context;
 	BYTE decode_buffer[4096 * 3];
-	STREAM* s;
+	wStream* s;
 
 	s = stream_new(sizeof(y_data) + sizeof(cb_data) + sizeof(cr_data));
-	stream_write(s, y_data, sizeof(y_data));
-	stream_write(s, cb_data, sizeof(cb_data));
-	stream_write(s, cr_data, sizeof(cr_data));
-	stream_set_pos(s, 0);
+	Stream_Write(s, y_data, sizeof(y_data));
+	Stream_Write(s, cb_data, sizeof(cb_data));
+	Stream_Write(s, cr_data, sizeof(cr_data));
+	Stream_SetPosition(s, 0);
 
 	context = rfx_context_new();
 	context->mode = RLGR3;
@@ -313,7 +321,7 @@ void test_decode(void)
 		sizeof(cr_data), test_quantization_values,
 		decode_buffer);
 	rfx_context_free(context);
-	stream_free(s);
+	Stream_Free(s, TRUE);
 
 	dump_ppm_image(decode_buffer);
 }
@@ -321,7 +329,7 @@ void test_decode(void)
 void test_encode(void)
 {
 	RFX_CONTEXT* context;
-	STREAM* enc_stream;
+	wStream* enc_stream;
 	int y_size, cb_size, cr_size;
 	int i;
 	BYTE decode_buffer[4096 * 3];
@@ -329,7 +337,7 @@ void test_encode(void)
 	rgb_data = (BYTE *) malloc(64 * 64 * 3);
 	for (i = 0; i < 64; i++)
 		memcpy(rgb_data + i * 64 * 3, rgb_scanline_data, 64 * 3);
-	//freerdp_hexdump(rgb_data, 64 * 64 * 3);
+	//winpr_HexDump(rgb_data, 64 * 64 * 3);
 
 	enc_stream = stream_new(65536);
 	stream_clear(enc_stream);
@@ -344,13 +352,13 @@ void test_encode(void)
 	//dump_buffer(context->priv->cb_g_buffer, 4096);
 
 	/*printf("*** Y ***\n");
-	freerdp_hexdump(stream_get_head(enc_stream), y_size);
+	winpr_HexDump(Stream_Buffer(enc_stream), y_size);
 	printf("*** Cb ***\n");
-	freerdp_hexdump(stream_get_head(enc_stream) + y_size, cb_size);
+	winpr_HexDump(Stream_Buffer(enc_stream) + y_size, cb_size);
 	printf("*** Cr ***\n");
-	freerdp_hexdump(stream_get_head(enc_stream) + y_size + cb_size, cr_size);*/
+	winpr_HexDump(Stream_Buffer(enc_stream) + y_size + cb_size, cr_size);*/
 
-	stream_set_pos(enc_stream, 0);
+	Stream_SetPosition(enc_stream, 0);
 	rfx_decode_rgb(context, enc_stream,
 		y_size, test_quantization_values,
 		cb_size, test_quantization_values,
@@ -366,7 +374,7 @@ void test_encode(void)
 void test_message(void)
 {
 	RFX_CONTEXT* context;
-	STREAM* s;
+	wStream* s;
 	int i, j;
 	RFX_RECT rect = {0, 0, 100, 80};
 	RFX_MESSAGE * message;
@@ -390,10 +398,10 @@ void test_message(void)
 		stream_clear(s);
 		rfx_compose_message(context, s,
 			&rect, 1, rgb_data, 100, 80, 100 * 3);
-		stream_seal(s);
+		Stream_SealLength(s);
 		/*hexdump(buffer, size);*/
-		stream_set_pos(s, 0);
-		message = rfx_process_message(context, s->p, s->size);
+		Stream_SetPosition(s, 0);
+		message = rfx_process_message(context, s->pointer, s->capacity);
 		if (i == 0)
 		{
 			for (j = 0; j < message->num_tiles; j++)
@@ -402,7 +410,7 @@ void test_message(void)
 			}
 		}
 		rfx_message_free(context, message);
-		stream_free(s);
+		Stream_Free(s, TRUE);
 	}
 
 	rfx_context_free(context);

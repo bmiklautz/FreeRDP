@@ -27,20 +27,23 @@
 
 #include <freerdp/freerdp.h>
 
-#include "wfreerdp.h"
+#include "wf_interface.h"
 
+#include "wf_gdi.h"
 #include "wf_event.h"
 
 static HWND g_focus_hWnd;
-extern HCURSOR g_default_cursor;
 
-#define X_POS(lParam) (lParam & 0xffff)
-#define Y_POS(lParam) ((lParam >> 16) & 0xffff)
+#define X_POS(lParam) (lParam & 0xFFFF)
+#define Y_POS(lParam) ((lParam >> 16) & 0xFFFF)
+
+BOOL wf_scale_blt(wfInfo* wfi, HDC hdc, int x, int y, int w, int h, HDC hdcSrc, int x1, int y1, DWORD rop);
+void wf_scale_mouse_event(wfInfo* wfi, rdpInput* input, UINT16 flags, UINT16 x, UINT16 y);
 
 LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 {
 	wfInfo* wfi;
-	RDP_SCANCODE rdp_scancode;
+	DWORD rdp_scancode;
 	rdpInput* input;
 	PKBDLLHOOKSTRUCT p;
 
@@ -56,8 +59,10 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 			case WM_SYSKEYUP:
 				wfi = (wfInfo*) GetWindowLongPtr(g_focus_hWnd, GWLP_USERDATA);
 				p = (PKBDLLHOOKSTRUCT) lParam;
+
 				if (!wfi || !p)
 					return 1;
+				
 				input = wfi->instance->input;
 				rdp_scancode = MAKE_RDP_SCANCODE((BYTE) p->scanCode, p->flags & LLKHF_EXTENDED);
 
@@ -70,8 +75,10 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 					(GetAsyncKeyState(VK_MENU) & 0x8000)) /* could also use flags & LLKHF_ALTDOWN */
 				{
 					if (wParam == WM_KEYDOWN)
-						//wf_toggle_fullscreen(wfi);
-					return 1;
+					{
+						wf_toggle_fullscreen(wfi);
+						return 1;
+					}
 				}
 
 				if (rdp_scancode == RDP_SCANCODE_NUMLOCK_EXTENDED)
@@ -143,6 +150,41 @@ static int wf_event_process_WM_MOUSEWHEEL(wfInfo* wfi, HWND hWnd, UINT Msg, WPAR
 	return 0;
 }
 
+void wf_sizing(wfInfo* wfi, WPARAM wParam, LPARAM lParam)
+{
+	// Holding the CTRL key down while resizing the window will force the desktop aspect ratio.
+	LPRECT rect;
+	if (wfi->instance->settings->SmartSizing && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
+	{
+		rect = (LPRECT) wParam;
+
+		switch(lParam)
+		{
+			case WMSZ_LEFT:
+			case WMSZ_RIGHT:
+			case WMSZ_BOTTOMRIGHT:
+				// Adjust height
+				rect->bottom = rect->top + wfi->height * (rect->right - rect->left) / wfi->instance->settings->DesktopWidth;
+				break;
+
+			case WMSZ_TOP:
+			case WMSZ_BOTTOM:
+			case WMSZ_TOPRIGHT:			
+				// Adjust width
+				rect->right = rect->left + wfi->width * (rect->bottom - rect->top) / wfi->instance->settings->DesktopHeight;
+				break;
+
+			case WMSZ_BOTTOMLEFT:
+			case WMSZ_TOPLEFT:
+				// adjust width
+				rect->left = rect->right - (wfi->width * (rect->bottom - rect->top) / wfi->instance->settings->DesktopHeight);
+
+				break;
+		}
+	}
+
+}
+
 LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	HDC hdc;
@@ -152,6 +194,10 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 	PAINTSTRUCT ps;
 	rdpInput* input;
 	BOOL processed;
+
+	RECT windowRect, clientRect;
+	MINMAXINFO *minmax;
+	SCROLLINFO si;
 
 	processed = TRUE;
 	ptr = GetWindowLongPtr(hWnd, GWLP_USERDATA);
@@ -163,6 +209,67 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 
 		switch (Msg)
 		{
+			case WM_MOVE:
+				if (!wfi->disablewindowtracking)
+				{
+					int x = (int)(short) LOWORD(lParam);
+					int y = (int)(short) HIWORD(lParam);
+					((wfContext*) wfi->instance->context)->wfi->client_x = x;
+					((wfContext*) wfi->instance->context)->wfi->client_y = y;
+				}
+				break;
+
+			case WM_GETMINMAXINFO:
+				if (wfi->instance->settings->SmartSizing)
+				{
+					processed = FALSE;
+				}
+				else
+				{
+					// Set maximum window size for resizing
+
+					minmax = (MINMAXINFO*) lParam;
+					wf_update_canvas_diff(wfi);
+					if (!wfi->fullscreen)
+					{
+						// add window decoration
+						minmax->ptMaxTrackSize.x = wfi->width + wfi->diff.x; 
+						minmax->ptMaxTrackSize.y = wfi->height + wfi->diff.y; 
+					}
+				}
+				break;
+
+			case WM_SIZING:
+				wf_sizing(wfi, lParam, wParam);
+				break;
+			
+			case WM_SIZE:
+				GetWindowRect(wfi->hwnd, &windowRect);
+				
+				if (!wfi->fullscreen)
+				{
+					wfi->client_width = LOWORD(lParam);
+					wfi->client_height = HIWORD(lParam);
+					wfi->client_x = windowRect.left;
+					wfi->client_y = windowRect.top;
+				}
+				
+				wf_size_scrollbars(wfi, LOWORD(lParam), HIWORD(lParam));
+
+				// Workaround: when the window is maximized, the call to "ShowScrollBars" returns TRUE but has no effect.
+				if (wParam == SIZE_MAXIMIZED && !wfi->fullscreen)
+					SetWindowPos(wfi->hwnd, HWND_TOP, 0, 0, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, SWP_NOMOVE | SWP_FRAMECHANGED);
+
+				break;
+
+			case WM_EXITSIZEMOVE:
+				wf_size_scrollbars(wfi, wfi->client_width, wfi->client_height);
+				break;
+
+			case WM_ERASEBKGND:
+				/* Say we handled it - prevents flickering */
+				return (LRESULT) 1;
+
 			case WM_PAINT:
 				hdc = BeginPaint(hWnd, &ps);
 
@@ -171,31 +278,29 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 				w = ps.rcPaint.right - ps.rcPaint.left + 1;
 				h = ps.rcPaint.bottom - ps.rcPaint.top + 1;
 
-				//printf("WM_PAINT: x:%d y:%d w:%d h:%d\n", x, y, w, h);
-
-				BitBlt(hdc, x, y, w, h, wfi->primary->hdc, x, y, SRCCOPY);
+				wf_scale_blt(wfi, hdc, x, y, w, h, wfi->primary->hdc, x - wfi->offset_x + wfi->xCurrentScroll, y - wfi->offset_y + wfi->yCurrentScroll, SRCCOPY);
 
 				EndPaint(hWnd, &ps);
 				break;
 
 			case WM_LBUTTONDOWN:
-				input->MouseEvent(input, PTR_FLAGS_DOWN | PTR_FLAGS_BUTTON1, X_POS(lParam), Y_POS(lParam));
+				wf_scale_mouse_event(wfi, input,PTR_FLAGS_DOWN | PTR_FLAGS_BUTTON1, X_POS(lParam) - wfi->offset_x, Y_POS(lParam) - wfi->offset_y);
 				break;
 
 			case WM_LBUTTONUP:
-				input->MouseEvent(input, PTR_FLAGS_BUTTON1, X_POS(lParam), Y_POS(lParam));
+				wf_scale_mouse_event(wfi, input, PTR_FLAGS_BUTTON1, X_POS(lParam) - wfi->offset_x, Y_POS(lParam) - wfi->offset_y);
 				break;
 
 			case WM_RBUTTONDOWN:
-				input->MouseEvent(input, PTR_FLAGS_DOWN | PTR_FLAGS_BUTTON2, X_POS(lParam), Y_POS(lParam));
+				wf_scale_mouse_event(wfi, input, PTR_FLAGS_DOWN | PTR_FLAGS_BUTTON2, X_POS(lParam) - wfi->offset_x, Y_POS(lParam) - wfi->offset_y);
 				break;
 
 			case WM_RBUTTONUP:
-				input->MouseEvent(input, PTR_FLAGS_BUTTON2, X_POS(lParam), Y_POS(lParam));
+				wf_scale_mouse_event(wfi, input, PTR_FLAGS_BUTTON2, X_POS(lParam) - wfi->offset_x, Y_POS(lParam) - wfi->offset_y);
 				break;
 
 			case WM_MOUSEMOVE:
-				input->MouseEvent(input, PTR_FLAGS_MOVE, X_POS(lParam), Y_POS(lParam));
+				wf_scale_mouse_event(wfi, input, PTR_FLAGS_MOVE, X_POS(lParam) - wfi->offset_x, Y_POS(lParam) - wfi->offset_y);
 				break;
 
 			case WM_MOUSEWHEEL:
@@ -207,6 +312,167 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 					SetCursor(wfi->cursor);
 				else
 					DefWindowProc(hWnd, Msg, wParam, lParam);
+				break;
+
+			case WM_HSCROLL:
+				{
+					int xDelta;     // xDelta = new_pos - current_pos  
+					int xNewPos;    // new position 
+					int yDelta = 0; 
+ 
+					switch (LOWORD(wParam)) 
+					{ 
+						// User clicked the scroll bar shaft left of the scroll box. 
+						case SB_PAGEUP: 
+							xNewPos = wfi->xCurrentScroll - 50; 
+							break; 
+ 
+						// User clicked the scroll bar shaft right of the scroll box. 
+						case SB_PAGEDOWN: 
+							xNewPos = wfi->xCurrentScroll + 50; 
+							break; 
+ 
+						// User clicked the left arrow. 
+						case SB_LINEUP: 
+							xNewPos = wfi->xCurrentScroll - 5; 
+							break; 
+ 
+						// User clicked the right arrow. 
+						case SB_LINEDOWN: 
+							xNewPos = wfi->xCurrentScroll + 5; 
+							break; 
+ 
+						// User dragged the scroll box. 
+						case SB_THUMBPOSITION: 
+							xNewPos = HIWORD(wParam); 
+
+						// user is dragging the scrollbar
+						case SB_THUMBTRACK :
+							xNewPos = HIWORD(wParam); 
+							break; 
+ 
+						default: 
+							xNewPos = wfi->xCurrentScroll; 
+					} 
+ 
+					// New position must be between 0 and the screen width. 
+					xNewPos = MAX(0, xNewPos); 
+					xNewPos = MIN(wfi->xMaxScroll, xNewPos); 
+ 
+					// If the current position does not change, do not scroll.
+					if (xNewPos == wfi->xCurrentScroll) 
+						break; 
+ 
+					// Determine the amount scrolled (in pixels). 
+					xDelta = xNewPos - wfi->xCurrentScroll; 
+ 
+					// Reset the current scroll position. 
+					wfi->xCurrentScroll = xNewPos; 
+ 
+					// Scroll the window. (The system repaints most of the 
+					// client area when ScrollWindowEx is called; however, it is 
+					// necessary to call UpdateWindow in order to repaint the 
+					// rectangle of pixels that were invalidated.) 
+					ScrollWindowEx(wfi->hwnd, -xDelta, -yDelta, (CONST RECT *) NULL, 
+						(CONST RECT *) NULL, (HRGN) NULL, (PRECT) NULL, 
+						SW_INVALIDATE); 
+					UpdateWindow(wfi->hwnd); 
+ 
+					// Reset the scroll bar. 
+					si.cbSize = sizeof(si); 
+					si.fMask  = SIF_POS; 
+					si.nPos   = wfi->xCurrentScroll; 
+					SetScrollInfo(wfi->hwnd, SB_HORZ, &si, TRUE); 
+				}
+				break;
+
+				case WM_VSCROLL: 
+				{ 
+					int xDelta = 0; 
+					int yDelta;     // yDelta = new_pos - current_pos 
+					int yNewPos;    // new position 
+ 
+					switch (LOWORD(wParam)) 
+					{ 
+						// User clicked the scroll bar shaft above the scroll box. 
+						case SB_PAGEUP: 
+							yNewPos = wfi->yCurrentScroll - 50; 
+							break; 
+ 
+						// User clicked the scroll bar shaft below the scroll box. 
+						case SB_PAGEDOWN: 
+							yNewPos = wfi->yCurrentScroll + 50; 
+							break; 
+ 
+						// User clicked the top arrow. 
+						case SB_LINEUP: 
+							yNewPos = wfi->yCurrentScroll - 5; 
+							break; 
+ 
+						// User clicked the bottom arrow. 
+						case SB_LINEDOWN: 
+							yNewPos = wfi->yCurrentScroll + 5; 
+							break; 
+ 
+						// User dragged the scroll box. 
+						case SB_THUMBPOSITION: 
+							yNewPos = HIWORD(wParam); 
+							break; 
+ 
+						// user is dragging the scrollbar
+						case SB_THUMBTRACK :
+							yNewPos = HIWORD(wParam); 
+							break; 
+
+						default: 
+							yNewPos = wfi->yCurrentScroll; 
+					} 
+ 
+					// New position must be between 0 and the screen height. 
+					yNewPos = MAX(0, yNewPos); 
+					yNewPos = MIN(wfi->yMaxScroll, yNewPos); 
+ 
+					// If the current position does not change, do not scroll.
+					if (yNewPos == wfi->yCurrentScroll) 
+						break; 
+ 
+					// Determine the amount scrolled (in pixels). 
+					yDelta = yNewPos - wfi->yCurrentScroll; 
+ 
+					// Reset the current scroll position. 
+					wfi->yCurrentScroll = yNewPos; 
+ 
+					// Scroll the window. (The system repaints most of the 
+					// client area when ScrollWindowEx is called; however, it is 
+					// necessary to call UpdateWindow in order to repaint the 
+					// rectangle of pixels that were invalidated.) 
+					ScrollWindowEx(wfi->hwnd, -xDelta, -yDelta, (CONST RECT *) NULL, 
+						(CONST RECT *) NULL, (HRGN) NULL, (PRECT) NULL, 
+						SW_INVALIDATE); 
+					UpdateWindow(wfi->hwnd); 
+ 
+					// Reset the scroll bar. 
+					si.cbSize = sizeof(si); 
+					si.fMask  = SIF_POS; 
+					si.nPos   = wfi->yCurrentScroll; 
+					SetScrollInfo(wfi->hwnd, SB_VERT, &si, TRUE);     
+				}
+				break; 
+
+				case WM_SYSCOMMAND:
+				{
+					if (wParam == SYSCOMMAND_ID_SMARTSIZING)
+					{
+						HMENU hMenu = GetSystemMenu(wfi->hwnd, FALSE);
+						freerdp_set_param_bool(wfi->instance->settings, FreeRDP_SmartSizing, !wfi->instance->settings->SmartSizing);
+						CheckMenuItem(hMenu, SYSCOMMAND_ID_SMARTSIZING, wfi->instance->settings->SmartSizing ? MF_CHECKED : MF_UNCHECKED);
+
+					}
+					else
+					{
+						processed = FALSE;
+					}
+				}
 				break;
 
 			default:
@@ -230,7 +496,7 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 
 		case WM_SETCURSOR:
 			if (LOWORD(lParam) == HTCLIENT)
-				SetCursor(g_default_cursor);
+				SetCursor(wfi->hDefaultCursor);
 			else
 				DefWindowProc(hWnd, Msg, wParam, lParam);
 			break;
@@ -241,10 +507,25 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 			break;
 
 		case WM_KILLFOCUS:
-			DEBUG_KBD("loosing focus %X", hWnd);
-			if (g_focus_hWnd == hWnd)
+			if (g_focus_hWnd == hWnd && wfi && !wfi->fullscreen)
+			{
+				DEBUG_KBD("loosing focus %X", hWnd);
 				g_focus_hWnd = NULL;
+			}
 			break;
+
+		case WM_ACTIVATE:
+			{
+				int activate = (int)(short) LOWORD(lParam);
+				if (activate != WA_INACTIVE)
+				{
+					g_focus_hWnd = hWnd;
+				}
+				else
+				{
+					g_focus_hWnd = NULL;
+				}
+			}
 
 		default:
 			return DefWindowProc(hWnd, Msg, wParam, lParam);
@@ -252,4 +533,61 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 	}
 
 	return 0;
+}
+
+BOOL wf_scale_blt(wfInfo* wfi, HDC hdc, int x, int y, int w, int h, HDC hdcSrc, int x1, int y1, DWORD rop)
+{
+	int ww, wh, dw, dh;
+
+	if (!wfi->client_width)
+		wfi->client_width = wfi->width;
+
+	if (!wfi->client_height)
+		wfi->client_height = wfi->height;
+
+	ww = wfi->client_width;
+	wh = wfi->client_height;
+	dw = wfi->instance->settings->DesktopWidth;
+	dh = wfi->instance->settings->DesktopHeight;
+
+	if (!ww)
+		ww = dw;
+
+	if (!wh)
+		wh = dh;
+
+	if (wfi->fullscreen || !wfi->instance->settings->SmartSizing || (ww == dw && wh == dh))
+	{
+		return BitBlt(hdc, x, y, w, h, wfi->primary->hdc, x1, y1, SRCCOPY);
+	}
+	else
+	{
+		SetStretchBltMode(hdc, HALFTONE);
+		SetBrushOrgEx(hdc, 0, 0, NULL);
+
+		return StretchBlt(hdc, 0, 0, ww, wh, wfi->primary->hdc, 0, 0, dw, dh, SRCCOPY);
+	}
+
+	return TRUE;
+}
+
+void wf_scale_mouse_event(wfInfo* wfi, rdpInput* input, UINT16 flags, UINT16 x, UINT16 y)
+{
+	int ww, wh, dw, dh;
+
+	if (!wfi->client_width)
+		wfi->client_width = wfi->width;
+
+	if (!wfi->client_height)
+		wfi->client_height = wfi->height;
+
+	ww = wfi->client_width;
+	wh = wfi->client_height;
+	dw = wfi->instance->settings->DesktopWidth;
+	dh = wfi->instance->settings->DesktopHeight;
+
+	if (!wfi->instance->settings->SmartSizing || (ww == dw) && (wh == dh))
+		input->MouseEvent(input, flags, x + wfi->xCurrentScroll, y + wfi->yCurrentScroll);
+	else
+		input->MouseEvent(input, flags, x * dw / ww + wfi->xCurrentScroll, y * dh / wh + wfi->yCurrentScroll);
 }

@@ -29,7 +29,6 @@
 
 #include <freerdp/freerdp.h>
 #include <freerdp/gdi/gdi.h>
-#include <freerdp/utils/memory.h>
 
 #include <freerdp/gdi/32bpp.h>
 #include <freerdp/gdi/16bpp.h>
@@ -74,6 +73,15 @@ HGDI_BRUSH gdi_CreatePatternBrush(HGDI_BITMAP hbmp)
 	HGDI_BRUSH hBrush = (HGDI_BRUSH) malloc(sizeof(GDI_BRUSH));
 	hBrush->objectType = GDIOBJECT_BRUSH;
 	hBrush->style = GDI_BS_PATTERN;
+	hBrush->pattern = hbmp;
+	return hBrush;
+}
+
+HGDI_BRUSH gdi_CreateHatchBrush(HGDI_BITMAP hbmp)
+{
+	HGDI_BRUSH hBrush = (HGDI_BRUSH) malloc(sizeof(GDI_BRUSH));
+	hBrush->objectType = GDIOBJECT_BRUSH;
+	hBrush->style = GDI_BS_HATCHED;
 	hBrush->pattern = hbmp;
 	return hBrush;
 }

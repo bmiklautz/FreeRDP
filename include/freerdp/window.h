@@ -17,8 +17,8 @@
  * limitations under the License.
  */
 
-#ifndef __UPDATE_WINDOW_H
-#define __UPDATE_WINDOW_H
+#ifndef FREERDP_UPDATE_WINDOW_H
+#define FREERDP_UPDATE_WINDOW_H
 
 #include <freerdp/types.h>
 
@@ -119,6 +119,13 @@
 #define WS_EX_TRANSPARENT		0x00000020
 #define WS_EX_WINDOWEDGE		0x00000100
 #endif
+
+/**
+ * This is a custom extended window style used by XRDP
+ * instructing the client to use local window decorations
+ */
+
+#define WS_EX_DECORATIONS		0x40000000
 
 struct _WINDOW_ORDER_INFO
 {
@@ -258,4 +265,4 @@ struct rdp_window_update
 };
 typedef struct rdp_window_update rdpWindowUpdate;
 
-#endif /* __UPDATE_WINDOW_H */
+#endif /* FREERDP_UPDATE_WINDOW_H */

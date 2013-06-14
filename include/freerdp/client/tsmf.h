@@ -17,21 +17,12 @@
  * limitations under the License.
  */
 
-#ifndef __TSMF_PLUGIN
-#define __TSMF_PLUGIN
-
-/**
- * Event Types
- */
-enum RDP_EVENT_TYPE_TSMF
-{
-	RDP_EVENT_TYPE_TSMF_VIDEO_FRAME = 1,
-	RDP_EVENT_TYPE_TSMF_REDRAW
-};
+#ifndef FREERDP_CHANNEL_CLIENT_TSMF_H
+#define FREERDP_CHANNEL_CLIENT_TSMF_H
 
 struct _RDP_VIDEO_FRAME_EVENT
 {
-	RDP_EVENT event;
+	wMessage event;
 	BYTE* frame_data;
 	UINT32 frame_size;
 	UINT32 frame_pixfmt;
@@ -48,7 +39,7 @@ typedef struct _RDP_VIDEO_FRAME_EVENT RDP_VIDEO_FRAME_EVENT;
 
 struct _RDP_REDRAW_EVENT
 {
-	RDP_EVENT event;
+	wMessage event;
 	INT16 x;
 	INT16 y;
 	INT16 width;
@@ -61,4 +52,4 @@ typedef struct _RDP_REDRAW_EVENT RDP_REDRAW_EVENT;
 #define RDP_PIXFMT_I420		0x30323449
 #define RDP_PIXFMT_YV12		0x32315659
 
-#endif /* __TSMF_PLUGIN */
+#endif /* FREERDP_CHANNEL_CLIENT_TSMF_H */

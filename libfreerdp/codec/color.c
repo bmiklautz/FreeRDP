@@ -25,17 +25,18 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <winpr/crt.h>
+
 #include <freerdp/api.h>
 #include <freerdp/freerdp.h>
 #include <freerdp/codec/color.h>
-#include <freerdp/utils/memory.h>
 
-int freerdp_get_pixel(BYTE * data, int x, int y, int width, int height, int bpp)
+int freerdp_get_pixel(BYTE* data, int x, int y, int width, int height, int bpp)
 {
 	int start;
 	int shift;
-	UINT16 *src16;
-	UINT32 *src32;
+	UINT16* src16;
+	UINT32* src32;
 	int red, green, blue;
 
 	switch (bpp)
@@ -341,6 +342,17 @@ UINT32 freerdp_color_convert_var(UINT32 srcColor, int srcBpp, int dstBpp, HCLRCO
 
 UINT32 freerdp_color_convert_var_rgb(UINT32 srcColor, int srcBpp, int dstBpp, HCLRCONV clrconv)
 {
+	if (srcBpp == 8)
+	{
+		BYTE alpha = 0xFF;
+		UINT32 dstColor = 0;
+		PALETTE_ENTRY* entry = &clrconv->palette->entries[srcColor & 0xFF];
+
+		freerdp_color_make_bgr(&dstColor, dstBpp, &entry->red, &entry->green, &entry->blue, &alpha, clrconv);
+
+		return dstColor;
+	}
+
 	if (srcBpp > 16)
 		return freerdp_color_convert_bgr_rgb(srcColor, srcBpp, dstBpp, clrconv);
 	else
@@ -349,6 +361,17 @@ UINT32 freerdp_color_convert_var_rgb(UINT32 srcColor, int srcBpp, int dstBpp, HC
 
 UINT32 freerdp_color_convert_var_bgr(UINT32 srcColor, int srcBpp, int dstBpp, HCLRCONV clrconv)
 {
+	if (srcBpp == 8)
+	{
+		BYTE alpha = 0xFF;
+		UINT32 dstColor = 0;
+		PALETTE_ENTRY* entry = &clrconv->palette->entries[srcColor & 0xFF];
+
+		freerdp_color_make_rgb(&dstColor, dstBpp, &entry->red, &entry->green, &entry->blue, &alpha, clrconv);
+
+		return dstColor;
+	}
+
 	if (srcBpp > 16)
 		return freerdp_color_convert_bgr(srcColor, srcBpp, dstBpp, clrconv);
 	else
@@ -591,22 +614,61 @@ BYTE* freerdp_image_convert_16bpp(BYTE* srcData, BYTE* dstData, int width, int h
 		src16 = (UINT16*) srcData;
 		dst32 = (UINT32*) dstData;
 
-		for (i = width * height; i > 0; i--)
+		if (clrconv->alpha)
 		{
-			pixel = *src16;
-			src16++;
-			GetBGR16(red, green, blue, pixel);
-			if (clrconv->alpha)
+			if (clrconv->invert)
 			{
-				pixel = (clrconv->invert) ? ARGB32(0xFF, red, green, blue) : ABGR32(0xFF, red, green, blue);
+				for (i = width * height; i > 0; i--)
+				{
+					pixel = *src16;
+					src16++;
+					GetBGR16(red, green, blue, pixel);
+					pixel = ARGB32(0xFF, red, green, blue);
+					*dst32 = pixel;
+					dst32++;
+				}
 			}
 			else
 			{
-				pixel = (clrconv->invert) ? RGB32(red, green, blue) : BGR32(red, green, blue);
+				for (i = width * height; i > 0; i--)
+				{
+					pixel = *src16;
+					src16++;
+					GetBGR16(red, green, blue, pixel);
+					pixel = ABGR32(0xFF, red, green, blue);
+					*dst32 = pixel;
+					dst32++;
+				}
 			}
-			*dst32 = pixel;
-			dst32++;
 		}
+		else
+		{
+			if (clrconv->invert)
+			{
+				for (i = width * height; i > 0; i--)
+				{
+					pixel = *src16;
+					src16++;
+					GetBGR16(red, green, blue, pixel);
+					pixel = RGB32(red, green, blue);
+					*dst32 = pixel;
+					dst32++;
+				}
+			}
+			else
+			{
+				for (i = width * height; i > 0; i--)
+				{
+					pixel = *src16;
+					src16++;
+					GetBGR16(red, green, blue, pixel);
+					pixel = BGR32(red, green, blue);
+					*dst32 = pixel;
+					dst32++;
+				}
+			}
+		}
+
 		return dstData;
 	}
 
@@ -750,7 +812,7 @@ BYTE* freerdp_image_convert(BYTE* srcData, BYTE* dstData, int width, int height,
 		return 0;
 }
 
-void   freerdp_bitmap_flip(BYTE * src, BYTE * dst, int scanLineSz, int height)
+void freerdp_bitmap_flip(BYTE * src, BYTE * dst, int scanLineSz, int height)
 {
 	int i;
 
@@ -1076,12 +1138,17 @@ void freerdp_image_swap_color_order(BYTE* data, int width, int height)
 
 HCLRCONV freerdp_clrconv_new(UINT32 flags)
 {
-	HCLRCONV clrconv = xnew(CLRCONV);
+	HCLRCONV clrconv;
+
+	clrconv = (CLRCONV*) malloc(sizeof(CLRCONV));
+	ZeroMemory(clrconv, sizeof(CLRCONV));
 
 	clrconv->alpha = (flags & CLRCONV_ALPHA) ? TRUE : FALSE;
 	clrconv->invert = (flags & CLRCONV_INVERT) ? TRUE : FALSE;
 	clrconv->rgb555 = (flags & CLRCONV_RGB555) ? TRUE : FALSE;
-	clrconv->palette = xnew(rdpPalette);
+
+	clrconv->palette = (rdpPalette*) malloc(sizeof(rdpPalette));
+	ZeroMemory(clrconv->palette, sizeof(rdpPalette));
 
 	return clrconv;
 }

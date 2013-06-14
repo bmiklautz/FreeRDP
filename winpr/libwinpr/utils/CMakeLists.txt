@@ -18,12 +18,44 @@
 set(MODULE_NAME "winpr-utils")
 set(MODULE_PREFIX "WINPR_UTILS")
 
+set(${MODULE_PREFIX}_COLLECTIONS_SRCS
+	collections/Queue.c
+	collections/Stack.c
+	collections/Reference.c
+	collections/ArrayList.c
+	collections/Dictionary.c
+	collections/ListDictionary.c
+	collections/KeyValuePair.c
+	collections/CountdownEvent.c
+	collections/BufferPool.c
+	collections/ObjectPool.c
+	collections/StreamPool.c
+	collections/MessageQueue.c
+	collections/MessagePipe.c)
+
+set(${MODULE_PREFIX}_TRIO_SRCS
+	trio/strio.h
+	trio/trio.c
+	trio/trio.h
+	trio/triodef.h
+	trio/trionan.c
+	trio/trionan.h
+	trio/triop.h
+	trio/triostr.c
+	trio/triostr.h)
+
 set(${MODULE_PREFIX}_SRCS
+	sam.c
 	ntlm.c
 	print.c
-	sam.c
-	stream.c)
+	stream.c
+	cmdline.c)
 
+set(${MODULE_PREFIX}_SRCS ${${MODULE_PREFIX}_SRCS}
+	${${MODULE_PREFIX}_COLLECTIONS_SRCS}
+	${${MODULE_PREFIX}_TRIO_SRCS})
+
+include_directories("trio")
 include_directories(${ZLIB_INCLUDE_DIRS})
 include_directories(${OPENSSL_INCLUDE_DIR})
 
@@ -36,11 +68,15 @@ set_target_properties(${MODULE_NAME} PROPERTIES VERSION ${WINPR_VERSION_FULL} SO
 set(${MODULE_PREFIX}_LIBS
 	${ZLIB_LIBRARIES}
 	${OPENSSL_LIBRARIES})
-	
+
+if(UNIX)
+	set(${MODULE_PREFIX}_LIBS ${${MODULE_PREFIX}_LIBS} m)
+endif()
+
 set_complex_link_libraries(VARIABLE ${MODULE_PREFIX}_LIBS
 	MONOLITHIC ${MONOLITHIC_BUILD} INTERNAL
 	MODULE winpr
-	MODULES winpr-crt)
+	MODULES winpr-crt winpr-synch winpr-sysinfo)
 
 if(MONOLITHIC_BUILD)
 	set(WINPR_LIBS ${WINPR_LIBS} ${${MODULE_PREFIX}_LIBS} PARENT_SCOPE)
@@ -50,3 +86,8 @@ else()
 endif()
 
 set_property(TARGET ${MODULE_NAME} PROPERTY FOLDER "WinPR")
+
+if(BUILD_TESTING)
+	add_subdirectory(test)
+endif()
+

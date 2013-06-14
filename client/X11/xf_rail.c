@@ -25,16 +25,22 @@
 #include <X11/Xutil.h>
 
 #include <freerdp/utils/event.h>
-#include <freerdp/utils/hexdump.h>
+#include <winpr/print.h>
 #include <freerdp/utils/rail.h>
 #include <freerdp/rail/rail.h>
 
 #include "xf_window.h"
 #include "xf_rail.h"
 
+#ifdef WITH_DEBUG_X11_LOCAL_MOVESIZE
+#define DEBUG_X11_LMS(fmt, ...) DEBUG_CLASS(X11_LMS, fmt, ## __VA_ARGS__)
+#else
+#define DEBUG_X11_LMS(fmt, ...) DEBUG_NULL(fmt, ## __VA_ARGS__)
+#endif
+
 void xf_rail_enable_remoteapp_mode(xfInfo* xfi)
 {
-	if (xfi->remote_app == FALSE)
+	if (!xfi->remote_app)
 	{
 		xfi->remote_app = TRUE;
 		xfi->drawable = DefaultRootWindow(xfi->display);
@@ -45,7 +51,7 @@ void xf_rail_enable_remoteapp_mode(xfInfo* xfi)
 
 void xf_rail_disable_remoteapp_mode(xfInfo* xfi)
 {
-	if (xfi->remote_app == TRUE)
+	if (xfi->remote_app)
 	{
 		xfi->remote_app = FALSE;
 		xf_create_window(xfi);
@@ -70,9 +76,9 @@ void xf_rail_paint(xfInfo* xfi, rdpRail* rail, INT32 uleft, INT32 utop, UINT32 u
 		window = window_list_get_next(rail->list);
 		xfw = (xfWindow*) window->extra;
 
-                // RDP can have zero width or height windows.  X cannot, so we ignore these.
+                /* RDP can have zero width or height windows. X cannot, so we ignore these. */
 
-                if (window->windowWidth == 0 || window->windowHeight == 0)
+                if ((window->windowWidth == 0) || (window->windowHeight == 0))
                 {
                         continue;
                 }
@@ -101,11 +107,11 @@ void xf_rail_paint(xfInfo* xfi, rdpRail* rail, INT32 uleft, INT32 utop, UINT32 u
 
 void xf_rail_DesktopNonMonitored(rdpRail *rail, rdpWindow* window)
 {
-       xfInfo* xfi;
-       xfi = (xfInfo*) rail->extra;
-       xf_rail_disable_remoteapp_mode(xfi);
-}
+	xfInfo* xfi;
 
+	xfi = (xfInfo*) rail->extra;
+	xf_rail_disable_remoteapp_mode(xfi);
+}
 
 static void xf_rail_CreateWindow(rdpRail* rail, rdpWindow* window)
 {
@@ -137,25 +143,27 @@ static void xf_rail_MoveWindow(rdpRail* rail, rdpWindow* window)
 	xfi = (xfInfo*) rail->extra;
 	xfw = (xfWindow*) window->extra;
 
-	//The rail server like to set the window to a small size when it is minimized even though it is hidden
-	//in some cases this can cause the window not to restore back to its original size. Therefore we dont update
-	//our local window when that rail window state is minimized
+	/*
+	 * The rail server like to set the window to a small size when it is minimized even though it is hidden
+	 * in some cases this can cause the window not to restore back to its original size. Therefore we don't
+	 * update our local window when that rail window state is minimized
+	 */
 	if (xfw->rail_state == WINDOW_SHOW_MINIMIZED)
                return;
 
-	// Do nothing if window is already in the correct position	
+	/* Do nothing if window is already in the correct position */
         if ( xfw->left == window->visibleOffsetX && 
              xfw->top == window->visibleOffsetY &&  
              xfw->width == window->windowWidth &&
              xfw->height == window->windowHeight)
         {
-	     //Just ensure entire window area is updated to
-	     //handle cases where we have drawn locally before getting new bitmap
-	     //from the server
+	     /*
+	      * Just ensure entire window area is updated to handle cases where we
+	      * have drawn locally before getting new bitmap from the server
+	      */
              xf_UpdateWindowArea(xfi, xfw, 0, 0, window->windowWidth, window->windowHeight);
              return;
         }
-
 
 	xf_MoveWindow(xfi, xfw,
 		window->visibleOffsetX, window->visibleOffsetY,
@@ -241,24 +249,23 @@ void xf_rail_register_callbacks(xfInfo* xfi, rdpRail* rail)
 	rail->rail_DesktopNonMonitored = xf_rail_DesktopNonMonitored;
 }
 
-static void xf_on_free_rail_client_event(RDP_EVENT* event)
+static void xf_on_free_rail_client_event(wMessage* event)
 {
-	if (event->event_class == RDP_EVENT_CLASS_RAIL)
-	{
-		rail_free_cloned_order(event->event_type, event->user_data);
-	}
+	rail_free_cloned_order(GetMessageType(event->id), event->wParam);
 }
 
 static void xf_send_rail_client_event(rdpChannels* channels, UINT16 event_type, void* param)
 {
-	RDP_EVENT* out_event = NULL;
-	void * payload = NULL;
+	wMessage* out_event = NULL;
+	void* payload = NULL;
 
 	payload = rail_clone_order(event_type, param);
+
 	if (payload != NULL)
 	{
-		out_event = freerdp_event_new(RDP_EVENT_CLASS_RAIL, event_type,
+		out_event = freerdp_event_new(RailChannel_Class, event_type,
 			xf_on_free_rail_client_event, payload);
+
 		freerdp_channels_send_event(channels, out_event);
 	}
 }
@@ -281,7 +288,7 @@ void xf_rail_send_activate(xfInfo* xfi, Window xwindow, BOOL enabled)
 	activate.windowId = rail_window->windowId;
 	activate.enabled = enabled;
 
-	xf_send_rail_client_event(channels, RDP_EVENT_TYPE_RAIL_CLIENT_ACTIVATE, &activate);
+	xf_send_rail_client_event(channels, RailChannel_ClientActivate, &activate);
 }
 
 void xf_rail_send_client_system_command(xfInfo* xfi, UINT32 windowId, UINT16 command)
@@ -294,7 +301,7 @@ void xf_rail_send_client_system_command(xfInfo* xfi, UINT32 windowId, UINT16 com
 	syscommand.windowId = windowId;
 	syscommand.command = command;
 
-	xf_send_rail_client_event(channels, RDP_EVENT_TYPE_RAIL_CLIENT_SYSCOMMAND, &syscommand);
+	xf_send_rail_client_event(channels, RailChannel_ClientSystemCommand, &syscommand);
 }
 
 /**
@@ -303,7 +310,7 @@ void xf_rail_send_client_system_command(xfInfo* xfi, UINT32 windowId, UINT16 com
  * send an update to the RDP server informing it of the new window position
  * and size.
  */
-void xf_rail_adjust_position(xfInfo* xfi, rdpWindow *window)
+void xf_rail_adjust_position(xfInfo* xfi, rdpWindow* window)
 {
 	xfWindow* xfw;
 	rdpChannels* channels;
@@ -315,16 +322,17 @@ void xf_rail_adjust_position(xfInfo* xfi, rdpWindow *window)
 	if (! xfw->is_mapped || xfw->local_move.state != LMS_NOT_ACTIVE)
 		return;
 
-	// If current window position disagrees with RDP window position, send
-	// update to RDP server
+	/* If current window position disagrees with RDP window position, send update to RDP server */
 	if ( xfw->left != window->visibleOffsetX ||
         	xfw->top != window->visibleOffsetY ||
                 xfw->width != window->windowWidth ||
                 xfw->height != window->windowHeight)
         {
-	       //Although the rail server can give negative window coordinates when updating windowOffsetX and windowOffsetY,
-	       //we can only send unsigned integers to the rail server. Therefore, we always bring negative coordinates up to 0 when
-	       //attempting to adjust the rail window.
+	       /*
+	        * Although the rail server can give negative window coordinates when updating windowOffsetX and windowOffsetY,
+	        * we can only send unsigned integers to the rail server. Therefore, we always bring negative coordinates up to 0
+	        * when attempting to adjust the rail window.
+	        */
 	       UINT32 offsetX = 0;
                UINT32 offsetY = 0;
 
@@ -333,13 +341,18 @@ void xf_rail_adjust_position(xfInfo* xfi, rdpWindow *window)
 
                if (window->windowOffsetY < 0)
                        offsetY = offsetY - window->windowOffsetY;
-		//windowOffset corresponds to the window location on the rail server
-		//but our local window is based on the visibleOffset since using the windowOffset
-		//can result in blank areas for a maximized window
+
+		/*
+		 * windowOffset corresponds to the window location on the rail server
+		 * but our local window is based on the visibleOffset since using the windowOffset
+		 * can result in blank areas for a maximized window
+		 */
 		window_move.windowId = window->windowId;
 
-		//Calculate new offsets for the rail server window
-		//Negative offset correction + rail server window offset + (difference in visibleOffset and new window local offset)
+		/*
+		 * Calculate new offsets for the rail server window
+		 * Negative offset correction + rail server window offset + (difference in visibleOffset and new window local offset)
+		 */
 		window_move.left = offsetX + window->windowOffsetX +  (xfw->left - window->visibleOffsetX);
                 window_move.top = offsetY + window->windowOffsetY + (xfw->top - window->visibleOffsetY);
                
@@ -354,7 +367,7 @@ void xf_rail_adjust_position(xfInfo* xfi, rdpWindow *window)
 			window->windowOffsetX, window->windowOffsetY, 
 			window->windowWidth, window->windowHeight);
 
-		xf_send_rail_client_event(channels, RDP_EVENT_TYPE_RAIL_CLIENT_WINDOW_MOVE, &window_move);
+		xf_send_rail_client_event(channels, RailChannel_ClientWindowMove, &window_move);
         }
 }
 
@@ -379,9 +392,11 @@ void xf_rail_end_local_move(xfInfo* xfi, rdpWindow *window)
 		xfw->left, xfw->top, xfw->right, xfw->bottom,
 		xfw->width, xfw->height);
 
-	//Although the rail server can give negative window coordinates when updating windowOffsetX and windowOffsetY,
-	//we can only send unsigned integers to the rail server. Therefore, we always bring negative coordinates up to 0 when
-	//attempting to adjust the rail window.
+	/*
+	 * Although the rail server can give negative window coordinates when updating windowOffsetX and windowOffsetY,
+	 * we can only send unsigned integers to the rail server. Therefore, we always bring negative coordinates up to 0 when
+	 * attempting to adjust the rail window.
+	 */
 	UINT32 offsetX = 0;
         UINT32 offsetY = 0;
 
@@ -396,17 +411,17 @@ void xf_rail_end_local_move(xfInfo* xfi, rdpWindow *window)
 	 */ 
 	window_move.windowId = window->windowId;
 
-	//Calculate new offsets for the rail server window
-	//Negative offset correction + rail server window offset + (difference in visibleOffset and new window local offset)
+	/*
+	 * Calculate new offsets for the rail server window
+	 * Negative offset correction + rail server window offset + (difference in visibleOffset and new window local offset)
+	 */
 	window_move.left = offsetX + window->windowOffsetX +  (xfw->left - window->visibleOffsetX);
         window_move.top = offsetY + window->windowOffsetY + (xfw->top - window->visibleOffsetY);
        
-        window_move.right = window_move.left + xfw->width;   // In the update to RDP the position is one past the window
+        window_move.right = window_move.left + xfw->width; /* In the update to RDP the position is one past the window */
         window_move.bottom = window_move.top + xfw->height;
 
-
-	xf_send_rail_client_event(channels, 
-		RDP_EVENT_TYPE_RAIL_CLIENT_WINDOW_MOVE, &window_move);
+	xf_send_rail_client_event(channels, RailChannel_ClientWindowMove, &window_move);
 	
 	/*
 	 * Simulate button up at new position to end the local move (per RDP spec)
@@ -417,7 +432,7 @@ void xf_rail_end_local_move(xfInfo* xfi, rdpWindow *window)
 		&x, &y, &child_x, &child_y, &mask);
         input->MouseEvent(input, PTR_FLAGS_BUTTON1, x, y);
 
-	//only send the mouse coordinates if not a keyboard move or size
+	/* only send the mouse coordinates if not a keyboard move or size */
 	if ((xfw->local_move.direction != _NET_WM_MOVERESIZE_MOVE_KEYBOARD) &&
             (xfw->local_move.direction != _NET_WM_MOVERESIZE_SIZE_KEYBOARD))
         {       
@@ -425,9 +440,11 @@ void xf_rail_end_local_move(xfInfo* xfi, rdpWindow *window)
                 DEBUG_X11_LMS("Mouse coordinates.  x= %i, y= %i", x, y);
         }
 	
-	// Proactively update the RAIL window dimensions.  There is a race condition where
-	// we can start to receive GDI orders for the new window dimensions before we 
-	// receive the RAIL ORDER for the new window size.  This avoids that race condition.
+	/*
+	 * Proactively update the RAIL window dimensions.  There is a race condition where
+	 * we can start to receive GDI orders for the new window dimensions before we
+	 * receive the RAIL ORDER for the new window size.  This avoids that race condition.
+	 */
 
 	window->windowOffsetX = offsetX + window->windowOffsetX +  (xfw->left - window->visibleOffsetX);
         window->windowOffsetY = offsetY + window->windowOffsetY + (xfw->top - window->visibleOffsetY);
@@ -437,11 +454,11 @@ void xf_rail_end_local_move(xfInfo* xfi, rdpWindow *window)
 	xfw->local_move.state = LMS_TERMINATING;
 }
 
-void xf_process_rail_get_sysparams_event(xfInfo* xfi, rdpChannels* channels, RDP_EVENT* event)
+void xf_process_rail_get_sysparams_event(xfInfo* xfi, rdpChannels* channels, wMessage* event)
 {
 	RAIL_SYSPARAM_ORDER* sysparam;
 
-	sysparam = (RAIL_SYSPARAM_ORDER*) event->user_data;
+	sysparam = (RAIL_SYSPARAM_ORDER*) event->wParam;
 
 	sysparam->workArea.left = xfi->workArea.x;
 	sysparam->workArea.top = xfi->workArea.y;
@@ -455,7 +472,7 @@ void xf_process_rail_get_sysparams_event(xfInfo* xfi, rdpChannels* channels, RDP
 
 	sysparam->dragFullWindows = FALSE;
 
-	xf_send_rail_client_event(channels, RDP_EVENT_TYPE_RAIL_CLIENT_SET_SYSPARAMS, sysparam);
+	xf_send_rail_client_event(channels, RailChannel_ClientSystemParam, sysparam);
 }
 
 const char* error_code_names[] =
@@ -469,15 +486,15 @@ const char* error_code_names[] =
 		"RAIL_EXEC_E_SESSION_LOCKED"
 };
 
-void xf_process_rail_exec_result_event(xfInfo* xfi, rdpChannels* channels, RDP_EVENT* event)
+void xf_process_rail_exec_result_event(xfInfo* xfi, rdpChannels* channels, wMessage* event)
 {
 	RAIL_EXEC_RESULT_ORDER* exec_result;
 
-	exec_result = (RAIL_EXEC_RESULT_ORDER*) event->user_data;
+	exec_result = (RAIL_EXEC_RESULT_ORDER*) event->wParam;
 
 	if (exec_result->execResult != RAIL_EXEC_S_OK)
 	{
-		printf("RAIL exec error: execResult=%s NtError=0x%X\n",
+		fprintf(stderr, "RAIL exec error: execResult=%s NtError=0x%X\n",
 			error_code_names[exec_result->execResult], exec_result->rawResult);
 		xfi->disconnect = True;
 	}
@@ -487,9 +504,9 @@ void xf_process_rail_exec_result_event(xfInfo* xfi, rdpChannels* channels, RDP_E
 	}
 }
 
-void xf_process_rail_server_sysparam_event(xfInfo* xfi, rdpChannels* channels, RDP_EVENT* event)
+void xf_process_rail_server_sysparam_event(xfInfo* xfi, rdpChannels* channels, wMessage* event)
 {
-	RAIL_SYSPARAM_ORDER* sysparam = (RAIL_SYSPARAM_ORDER*) event->user_data;
+	RAIL_SYSPARAM_ORDER* sysparam = (RAIL_SYSPARAM_ORDER*) event->wParam;
 
 	switch (sysparam->param)
 	{
@@ -501,11 +518,11 @@ void xf_process_rail_server_sysparam_event(xfInfo* xfi, rdpChannels* channels, R
 	}
 }
 
-void xf_process_rail_server_minmaxinfo_event(xfInfo* xfi, rdpChannels* channels, RDP_EVENT* event)
+void xf_process_rail_server_minmaxinfo_event(xfInfo* xfi, rdpChannels* channels, wMessage* event)
 {
 	rdpRail* rail;
 	rdpWindow* rail_window = NULL;
-	RAIL_MINMAXINFO_ORDER* minmax = (RAIL_MINMAXINFO_ORDER*) event->user_data;
+	RAIL_MINMAXINFO_ORDER* minmax = (RAIL_MINMAXINFO_ORDER*) event->wParam;
 
 	rail = ((rdpContext*) xfi->context)->rail;
 	rail_window = window_list_get_by_id(rail->list, minmax->windowId);
@@ -543,14 +560,14 @@ const char* movetype_names[] =
 	"RAIL_WMSZ_KEYSIZE"
 };
 
-void xf_process_rail_server_localmovesize_event(xfInfo* xfi, rdpChannels* channels, RDP_EVENT* event)
+void xf_process_rail_server_localmovesize_event(xfInfo* xfi, rdpChannels* channels, wMessage* event)
 {
+	int x, y;
 	rdpRail* rail;
-	rdpWindow* rail_window = NULL;
-	RAIL_LOCALMOVESIZE_ORDER* movesize = (RAIL_LOCALMOVESIZE_ORDER*) event->user_data;
 	int direction = 0;
 	Window child_window;
-	int x,y;
+	rdpWindow* rail_window = NULL;
+	RAIL_LOCALMOVESIZE_ORDER* movesize = (RAIL_LOCALMOVESIZE_ORDER*) event->wParam;
 
 	rail = ((rdpContext*) xfi->context)->rail;
 	rail_window = window_list_get_by_id(rail->list, movesize->windowId);
@@ -635,56 +652,56 @@ void xf_process_rail_server_localmovesize_event(xfInfo* xfi, rdpChannels* channe
 	}
 }
 
-void xf_process_rail_appid_resp_event(xfInfo* xfi, rdpChannels* channels, RDP_EVENT* event)
+void xf_process_rail_appid_resp_event(xfInfo* xfi, rdpChannels* channels, wMessage* event)
 {
 	RAIL_GET_APPID_RESP_ORDER* appid_resp =
-		(RAIL_GET_APPID_RESP_ORDER*)event->user_data;
+		(RAIL_GET_APPID_RESP_ORDER*) event->wParam;
 
-	printf("Server Application ID Response PDU: windowId=0x%X "
+	fprintf(stderr, "Server Application ID Response PDU: windowId=0x%X "
 		"applicationId=(length=%d dump)\n",
 		appid_resp->windowId, appid_resp->applicationId.length);
 
-	freerdp_hexdump(appid_resp->applicationId.string, appid_resp->applicationId.length);
+	winpr_HexDump(appid_resp->applicationId.string, appid_resp->applicationId.length);
 }
 
-void xf_process_rail_langbarinfo_event(xfInfo* xfi, rdpChannels* channels, RDP_EVENT* event)
+void xf_process_rail_langbarinfo_event(xfInfo* xfi, rdpChannels* channels, wMessage* event)
 {
 	RAIL_LANGBAR_INFO_ORDER* langbar =
-		(RAIL_LANGBAR_INFO_ORDER*) event->user_data;
+		(RAIL_LANGBAR_INFO_ORDER*) event->wParam;
 
-	printf("Language Bar Information PDU: languageBarStatus=0x%X\n",
+	fprintf(stderr, "Language Bar Information PDU: languageBarStatus=0x%X\n",
 		langbar->languageBarStatus);
 }
 
-void xf_process_rail_event(xfInfo* xfi, rdpChannels* channels, RDP_EVENT* event)
+void xf_process_rail_event(xfInfo* xfi, rdpChannels* channels, wMessage* event)
 {
-	switch (event->event_type)
+	switch (GetMessageType(event->id))
 	{
-		case RDP_EVENT_TYPE_RAIL_CHANNEL_GET_SYSPARAMS:
+		case RailChannel_GetSystemParam:
 			xf_process_rail_get_sysparams_event(xfi, channels, event);
 			break;
 
-		case RDP_EVENT_TYPE_RAIL_CHANNEL_EXEC_RESULTS:
+		case RailChannel_ServerExecuteResult:
 			xf_process_rail_exec_result_event(xfi, channels, event);
 			break;
 
-		case RDP_EVENT_TYPE_RAIL_CHANNEL_SERVER_SYSPARAM:
+		case RailChannel_ServerSystemParam:
 			xf_process_rail_server_sysparam_event(xfi, channels, event);
 			break;
 
-		case RDP_EVENT_TYPE_RAIL_CHANNEL_SERVER_MINMAXINFO:
+		case RailChannel_ServerMinMaxInfo:
 			xf_process_rail_server_minmaxinfo_event(xfi, channels, event);
 			break;
 
-		case RDP_EVENT_TYPE_RAIL_CHANNEL_SERVER_LOCALMOVESIZE:
+		case RailChannel_ServerLocalMoveSize:
 			xf_process_rail_server_localmovesize_event(xfi, channels, event);
 			break;
 
-		case RDP_EVENT_TYPE_RAIL_CHANNEL_APPID_RESP:
+		case RailChannel_ServerGetAppIdResponse:
 			xf_process_rail_appid_resp_event(xfi, channels, event);
 			break;
 
-		case RDP_EVENT_TYPE_RAIL_CHANNEL_LANGBARINFO:
+		case RailChannel_ServerLanguageBarInfo:
 			xf_process_rail_langbarinfo_event(xfi, channels, event);
 			break;
 

@@ -26,12 +26,12 @@
 #include <string.h>
 
 #include <winpr/crt.h>
+#include <winpr/cmdline.h>
 
 #include <pulse/pulseaudio.h>
 
 #include <freerdp/types.h>
-#include <freerdp/utils/memory.h>
-#include <freerdp/utils/dsp.h>
+#include <freerdp/codec/dsp.h>
 #include <freerdp/utils/svc_plugin.h>
 
 #include "rdpsnd_main.h"
@@ -43,10 +43,10 @@ struct rdpsnd_pulse_plugin
 	rdpsndDevicePlugin device;
 
 	char* device_name;
-	pa_threaded_mainloop *mainloop;
-	pa_context *context;
+	pa_threaded_mainloop* mainloop;
+	pa_context* context;
 	pa_sample_spec sample_spec;
-	pa_stream *stream;
+	pa_stream* stream;
 	int format;
 	int block_size;
 	int latency;
@@ -106,13 +106,16 @@ static BOOL rdpsnd_pulse_connect(rdpsndDevicePlugin* device)
 	for (;;)
 	{
 		state = pa_context_get_state(pulse->context);
+
 		if (state == PA_CONTEXT_READY)
 			break;
+
 		if (!PA_CONTEXT_IS_GOOD(state))
 		{
 			DEBUG_WARN("bad context state (%d)", pa_context_errno(pulse->context));
 			break;
 		}
+
 		pa_threaded_mainloop_wait(pulse->mainloop);
 	}
 
@@ -139,7 +142,7 @@ static void rdpsnd_pulse_stream_success_callback(pa_stream* stream, int success,
 
 static void rdpsnd_pulse_wait_for_operation(rdpsndPulsePlugin* pulse, pa_operation* operation)
 {
-	if (operation == NULL)
+	if (!operation)
 		return;
 
 	while (pa_operation_get_state(operation) == PA_OPERATION_RUNNING)
@@ -200,7 +203,7 @@ static void rdpsnd_pulse_close(rdpsndDevicePlugin* device)
 	pa_threaded_mainloop_unlock(pulse->mainloop);
 }
 
-static void rdpsnd_pulse_set_format_spec(rdpsndPulsePlugin* pulse, rdpsndFormat* format)
+static void rdpsnd_pulse_set_format_spec(rdpsndPulsePlugin* pulse, AUDIO_FORMAT* format)
 {
 	pa_sample_spec sample_spec = { 0 };
 
@@ -212,7 +215,7 @@ static void rdpsnd_pulse_set_format_spec(rdpsndPulsePlugin* pulse, rdpsndFormat*
 
 	switch (format->wFormatTag)
 	{
-		case 1: /* PCM */
+		case WAVE_FORMAT_PCM:
 			switch (format->wBitsPerSample)
 			{
 				case 8:
@@ -224,17 +227,20 @@ static void rdpsnd_pulse_set_format_spec(rdpsndPulsePlugin* pulse, rdpsndFormat*
 			}
 			break;
 
-		case 6: /* A-LAW */
+		case WAVE_FORMAT_ADPCM:
+		case WAVE_FORMAT_DVI_ADPCM:
+			sample_spec.format = PA_SAMPLE_S16LE;
+			break;
+
+		case WAVE_FORMAT_ALAW:
 			sample_spec.format = PA_SAMPLE_ALAW;
 			break;
 
-		case 7: /* U-LAW */
+		case WAVE_FORMAT_MULAW:
 			sample_spec.format = PA_SAMPLE_ULAW;
 			break;
 
-		case 2: /* MS ADPCM */
-		case 0x11: /* IMA ADPCM */
-			sample_spec.format = PA_SAMPLE_S16LE;
+		case WAVE_FORMAT_GSM610:
 			break;
 	}
 
@@ -243,7 +249,7 @@ static void rdpsnd_pulse_set_format_spec(rdpsndPulsePlugin* pulse, rdpsndFormat*
 	pulse->block_size = format->nBlockAlign;
 }
 
-static void rdpsnd_pulse_open(rdpsndDevicePlugin* device, rdpsndFormat* format, int latency)
+static void rdpsnd_pulse_open(rdpsndDevicePlugin* device, AUDIO_FORMAT* format, int latency)
 {
 	pa_stream_state_t state;
 	pa_stream_flags_t flags;
@@ -278,7 +284,7 @@ static void rdpsnd_pulse_open(rdpsndDevicePlugin* device, rdpsndFormat* format, 
 		return;
 	}
 
-	/* install essential callbacks */
+	/* register essential callbacks */
 	pa_stream_set_state_callback(pulse->stream, rdpsnd_pulse_stream_state_callback, pulse);
 	pa_stream_set_write_callback(pulse->stream, rdpsnd_pulse_stream_request_callback, pulse);
 
@@ -365,7 +371,7 @@ static void rdpsnd_pulse_free(rdpsndDevicePlugin* device)
 	free(pulse);
 }
 
-static BOOL rdpsnd_pulse_format_supported(rdpsndDevicePlugin* device, rdpsndFormat* format)
+static BOOL rdpsnd_pulse_format_supported(rdpsndDevicePlugin* device, AUDIO_FORMAT* format)
 {
 	rdpsndPulsePlugin* pulse = (rdpsndPulsePlugin*)device;
 
@@ -374,7 +380,7 @@ static BOOL rdpsnd_pulse_format_supported(rdpsndDevicePlugin* device, rdpsndForm
 
 	switch (format->wFormatTag)
 	{
-		case 1: /* PCM */
+		case WAVE_FORMAT_PCM:
 			if (format->cbSize == 0 &&
 				(format->nSamplesPerSec <= PA_RATE_MAX) &&
 				(format->wBitsPerSample == 8 || format->wBitsPerSample == 16) &&
@@ -384,8 +390,8 @@ static BOOL rdpsnd_pulse_format_supported(rdpsndDevicePlugin* device, rdpsndForm
 			}
 			break;
 
-		case 6: /* A-LAW */
-		case 7: /* U-LAW */
+		case WAVE_FORMAT_ALAW:
+		case WAVE_FORMAT_MULAW:
 			if (format->cbSize == 0 &&
 				(format->nSamplesPerSec <= PA_RATE_MAX) &&
 				(format->wBitsPerSample == 8) &&
@@ -395,8 +401,8 @@ static BOOL rdpsnd_pulse_format_supported(rdpsndDevicePlugin* device, rdpsndForm
 			}
 			break;
 
-		case 2: /* MS ADPCM */
-		case 0x11: /* IMA ADPCM */
+		case WAVE_FORMAT_ADPCM:
+		case WAVE_FORMAT_DVI_ADPCM:
 			if ((format->nSamplesPerSec <= PA_RATE_MAX) &&
 				(format->wBitsPerSample == 4) &&
 				(format->nChannels == 1 || format->nChannels == 2))
@@ -408,7 +414,7 @@ static BOOL rdpsnd_pulse_format_supported(rdpsndDevicePlugin* device, rdpsndForm
 	return FALSE;
 }
 
-static void rdpsnd_pulse_set_format(rdpsndDevicePlugin* device, rdpsndFormat* format, int latency)
+static void rdpsnd_pulse_set_format(rdpsndDevicePlugin* device, AUDIO_FORMAT* format, int latency)
 {
 	rdpsndPulsePlugin* pulse = (rdpsndPulsePlugin*) device;
 
@@ -463,17 +469,19 @@ static void rdpsnd_pulse_play(rdpsndDevicePlugin* device, BYTE* data, int size)
 	if (!pulse->stream)
 		return;
 
-	if (pulse->format == 2)
+	if (pulse->format == WAVE_FORMAT_ADPCM)
 	{
 		pulse->dsp_context->decode_ms_adpcm(pulse->dsp_context,
 			data, size, pulse->sample_spec.channels, pulse->block_size);
+
 		size = pulse->dsp_context->adpcm_size;
 		src = pulse->dsp_context->adpcm_buffer;
 	}
-	else if (pulse->format == 0x11)
+	else if (pulse->format == WAVE_FORMAT_DVI_ADPCM)
 	{
 		pulse->dsp_context->decode_ima_adpcm(pulse->dsp_context,
 			data, size, pulse->sample_spec.channels, pulse->block_size);
+
 		size = pulse->dsp_context->adpcm_size;
 		src = pulse->dsp_context->adpcm_buffer;
 	}
@@ -523,12 +531,54 @@ static void rdpsnd_pulse_start(rdpsndDevicePlugin* device)
 	pa_stream_trigger(pulse->stream, NULL, NULL);
 }
 
-int FreeRDPRdpsndDeviceEntry(PFREERDP_RDPSND_DEVICE_ENTRY_POINTS pEntryPoints)
+COMMAND_LINE_ARGUMENT_A rdpsnd_pulse_args[] =
 {
-	rdpsndPulsePlugin* pulse;
-	RDP_PLUGIN_DATA* data;
+	{ "dev", COMMAND_LINE_VALUE_REQUIRED, "<device>", NULL, NULL, -1, NULL, "device" },
+	{ NULL, 0, NULL, NULL, NULL, -1, NULL, NULL }
+};
 
-	pulse = xnew(rdpsndPulsePlugin);
+static void rdpsnd_pulse_parse_addin_args(rdpsndDevicePlugin* device, ADDIN_ARGV* args)
+{
+	int status;
+	DWORD flags;
+	COMMAND_LINE_ARGUMENT_A* arg;
+	rdpsndPulsePlugin* pulse = (rdpsndPulsePlugin*) device;
+
+	flags = COMMAND_LINE_SIGIL_NONE | COMMAND_LINE_SEPARATOR_COLON;
+
+	status = CommandLineParseArgumentsA(args->argc, (const char**) args->argv,
+			rdpsnd_pulse_args, flags, pulse, NULL, NULL);
+
+	arg = rdpsnd_pulse_args;
+
+	do
+	{
+		if (!(arg->Flags & COMMAND_LINE_VALUE_PRESENT))
+			continue;
+
+		CommandLineSwitchStart(arg)
+
+		CommandLineSwitchCase(arg, "dev")
+		{
+			pulse->device_name = _strdup(arg->Value);
+		}
+
+		CommandLineSwitchEnd(arg)
+	}
+	while ((arg = CommandLineFindNextArgumentA(arg)) != NULL);
+}
+
+#ifdef STATIC_CHANNELS
+#define freerdp_rdpsnd_client_subsystem_entry	pulse_freerdp_rdpsnd_client_subsystem_entry
+#endif
+
+int freerdp_rdpsnd_client_subsystem_entry(PFREERDP_RDPSND_DEVICE_ENTRY_POINTS pEntryPoints)
+{
+	ADDIN_ARGV* args;
+	rdpsndPulsePlugin* pulse;
+
+	pulse = (rdpsndPulsePlugin*) malloc(sizeof(rdpsndPulsePlugin));
+	ZeroMemory(pulse, sizeof(rdpsndPulsePlugin));
 
 	pulse->device.Open = rdpsnd_pulse_open;
 	pulse->device.FormatSupported = rdpsnd_pulse_format_supported;
@@ -539,15 +589,8 @@ int FreeRDPRdpsndDeviceEntry(PFREERDP_RDPSND_DEVICE_ENTRY_POINTS pEntryPoints)
 	pulse->device.Close = rdpsnd_pulse_close;
 	pulse->device.Free = rdpsnd_pulse_free;
 
-	data = pEntryPoints->plugin_data;
-
-	if (data && strcmp((char*)data->data[0], "pulse") == 0)
-	{
-		if(data->data[1] && strlen((char*)data->data[1]) > 0) 
-			pulse->device_name = _strdup((char*)data->data[1]);
-		else
-			pulse->device_name = NULL;
-	}
+	args = pEntryPoints->args;
+	rdpsnd_pulse_parse_addin_args((rdpsndDevicePlugin*) pulse, args);
 
 	pulse->dsp_context = freerdp_dsp_context_new();
 

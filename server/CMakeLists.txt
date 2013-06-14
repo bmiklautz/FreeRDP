@@ -24,11 +24,24 @@ if(NOT WIN32)
 		add_subdirectory(Sample)
 	endif()
 
-	find_suggested_package(X11)
 	if(WITH_X11)
 		add_subdirectory(X11)
 	endif()
+
+	if(APPLE AND (NOT IOS))
+		add_subdirectory(Mac)
+	endif()
 else()
 	add_subdirectory(Windows)
+endif()
+
+if(WITH_WAYK)
+	if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/WaykServer")
+		add_subdirectory(WaykServer)
+	endif()
+endif()
+
+if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/xrdp-ng")
+	add_subdirectory("xrdp-ng")
 endif()
 

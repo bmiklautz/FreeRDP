@@ -18,13 +18,11 @@
 set(MODULE_NAME "winpr-thread")
 set(MODULE_PREFIX "WINPR_THREAD")
 
-set(CMAKE_THREAD_PREFER_PTHREAD)
-find_required_package(Threads)
-
 set(${MODULE_PREFIX}_SRCS
 	process.c
 	processor.c
 	thread.c
+	thread.h
 	tls.c)
 
 if(MSVC AND (NOT MONOLITHIC_BUILD))

@@ -22,6 +22,7 @@
 
 #include "xf_keyboard.h"
 
+#include "xf_interface.h"
 #include "xfreerdp.h"
 
 BOOL xf_event_process(freerdp* instance, XEvent* event);

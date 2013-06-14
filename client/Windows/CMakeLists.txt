@@ -15,8 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set(MODULE_NAME "wfreerdp")
-set(MODULE_PREFIX "FREERDP_CLIENT_WINDOWS")
+set(MODULE_NAME "wfreerdp-client")
+set(MODULE_PREFIX "FREERDP_CLIENT_WINDOWS_CONTROL")
 
 set(${MODULE_PREFIX}_SRCS
 	wf_gdi.c
@@ -31,20 +31,42 @@ set(${MODULE_PREFIX}_SRCS
 	wf_window.h
 	wf_rail.c
 	wf_rail.h
-	wfreerdp.c
-	wfreerdp.h)
+	wf_interface.c
+	wf_interface.h
+	wfreerdp.rc
+	resource.h)
 
-add_executable(${MODULE_NAME} WIN32 ${${MODULE_PREFIX}_SRCS})
+if(WITH_CLIENT_INTERFACE)
+	if(CLIENT_INTERFACE_SHARED)
+		add_library(${MODULE_NAME} SHARED ${${MODULE_PREFIX}_SRCS})
+	else()
+		add_library(${MODULE_NAME} ${${MODULE_PREFIX}_SRCS})
+	endif()
+	set_target_properties(${MODULE_NAME} PROPERTIES VERSION ${FREERDP_VERSION} SOVERSION ${FREERDP_API_VERSION} PREFIX "lib")
+else()
+	set(${MODULE_PREFIX}_SRCS ${${MODULE_PREFIX}_SRCS} cli/wfreerdp.c cli/wfreerdp.h)
+	add_executable(${MODULE_NAME} WIN32 ${${MODULE_PREFIX}_SRCS})
+endif()
 
 set(${MODULE_PREFIX}_LIBS ${${MODULE_PREFIX}_LIBS} freerdp-client)
 
 set_complex_link_libraries(VARIABLE ${MODULE_PREFIX}_LIBS
 	MONOLITHIC ${MONOLITHIC_BUILD}
+	MODULE winpr
+	MODULES winpr-crt winpr-credui winpr-utils)
+
+set_complex_link_libraries(VARIABLE ${MODULE_PREFIX}_LIBS
+	MONOLITHIC ${MONOLITHIC_BUILD}
 	MODULE freerdp
-	MODULES freerdp-core freerdp-gdi freerdp-codec freerdp-utils)
+	MODULES freerdp-core freerdp-gdi freerdp-codec freerdp-primitives freerdp-utils)
 
 target_link_libraries(${MODULE_NAME} ${${MODULE_PREFIX}_LIBS})
 
-install(TARGETS ${MODULE_NAME} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT clients)
+if(WITH_CLIENT_INTERFACE)
+	install(TARGETS ${MODULE_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libraries)
+	add_subdirectory(cli)
+else()
+	install(TARGETS ${MODULE_NAME} DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT client)
+endif()
 
 set_property(TARGET ${MODULE_NAME} PROPERTY FOLDER "Client/Windows")
