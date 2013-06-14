@@ -171,6 +171,11 @@ int CommandLineParseArgumentsA(int argc, LPCSTR* argv, COMMAND_LINE_ARGUMENT_A* 
 				value_index = separator_index + separator_length;
 				value = (char*) &argv[i][value_index];
 				value_length = (length - value_index);
+
+				if ((flags & COMMAND_LINE_HIDE_PASSWORD) && (strncmp(keyword, "p", keyword_length) == 0))
+				{
+					memset((char*) &argv[i][value_index], '*', value_length);
+				}
 			}
 			else
 			{
@@ -291,7 +296,7 @@ int CommandLineParseArgumentsA(int argc, LPCSTR* argv, COMMAND_LINE_ARGUMENT_A* 
 							else if (sigil[0] == '-')
 								options[j].Value = BoolValueFalse;
 							else
-								options[j].Value = BoolValueTrue;
+ 								options[j].Value = BoolValueTrue;
 						}
 
 						options[j].Flags |= COMMAND_LINE_VALUE_PRESENT;
