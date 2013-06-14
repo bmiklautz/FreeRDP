@@ -51,6 +51,9 @@ int main(int argc, char* argv[])
 
 	freerdp_client_start(xfi);
 
+	int iresult;
+	iresult =	freerdp_client_hide_command_line_arguments(argc, argv);
+
 	WaitForSingleObject(xfi->thread, INFINITE);
 
 	GetExitCodeThread(xfi->thread, &dwExitCode);

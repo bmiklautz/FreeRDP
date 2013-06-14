@@ -949,6 +949,22 @@ BOOL freerdp_client_detect_command_line(int argc, char** argv, DWORD* flags)
 	return compatibility;
 }
 
+int freerdp_client_hide_command_line_arguments(int argc, char** argv)
+{
+	int status;
+	DWORD flags;
+	BOOL compatibility;
+	rdpSettings settings;
+
+	compatibility = freerdp_client_detect_command_line(argc, argv, &flags);
+
+	flags |= COMMAND_LINE_HIDE_PASSWORD;
+
+	status = CommandLineParseArgumentsA(argc, (const char**) argv, args, flags, &settings,
+			NULL, NULL);
+	return status;
+}
+
 int freerdp_client_parse_command_line_arguments(int argc, char** argv, rdpSettings* settings)
 {
 	char* p;
@@ -958,6 +974,8 @@ int freerdp_client_parse_command_line_arguments(int argc, char** argv, rdpSettin
 	DWORD flags;
 	BOOL compatibility;
 	COMMAND_LINE_ARGUMENT_A* arg;
+
+
 
 	freerdp_register_addin_provider(freerdp_channels_load_static_addin_entry, 0);
 
@@ -971,8 +989,10 @@ int freerdp_client_parse_command_line_arguments(int argc, char** argv, rdpSettin
 	else
 	{
 		CommandLineClearArgumentsA(args);
+
 		status = CommandLineParseArgumentsA(argc, (const char**) argv, args, flags, settings,
 				freerdp_client_command_line_pre_filter, freerdp_client_command_line_post_filter);
+
 	}
 
 	if (status == COMMAND_LINE_STATUS_PRINT_HELP)
