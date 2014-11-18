@@ -14,3 +14,4 @@ update pr 3
 update pr test 4
 test triggers
 trigger "trigger chain"
+don't waitfor
