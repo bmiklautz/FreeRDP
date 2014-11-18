@@ -7,3 +7,13 @@ quickbuild
 7
 8
 9
+pull request
+update pr
+update pr 2
+update pr 3
+update pr test 4
+test triggers
+trigger "trigger chain"
+don't waitfor
+join jobs
+join jobs part 2
