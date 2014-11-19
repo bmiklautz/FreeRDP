@@ -17,3 +17,4 @@ trigger "trigger chain"
 don't waitfor
 join jobs
 join jobs part 2
+pr notification
