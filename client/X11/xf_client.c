@@ -716,7 +716,7 @@ BOOL xf_get_pixmap_info(xfContext* xfc)
 		return FALSE;
 	}
 
-	vi = NULL;
+	vi = vis;
 
 	for (i = 0; i < vi_count; i++)
 	{
@@ -788,6 +788,7 @@ int _xf_error_handler(Display* d, XErrorEvent* ev)
 static void xf_post_disconnect(freerdp* instance)
 {
 	xfContext* xfc;
+	rdpChannels* channels = channels = instance->context->channels;
 
 	if (!instance || !instance->context || !instance->settings)
 		return;
@@ -802,6 +803,7 @@ static void xf_post_disconnect(freerdp* instance)
 	}
 
 	xf_monitors_free(xfc, instance->settings);
+	gdi_free(instance);
 }
 
 static void xf_play_sound(rdpContext* context, PLAY_SOUND_UPDATE* play_sound)
@@ -1637,7 +1639,7 @@ void* xf_thread(void *param)
 	}
 	/* Close the channels first. This will signal the internal message pipes
 	 * that the threads should quit. */
-	freerdp_channels_close(channels, instance);
+	freerdp_channels_disconnect(channels, instance);
 
 	if (async_input)
 	{
@@ -1657,7 +1659,6 @@ void* xf_thread(void *param)
 		exit_code = freerdp_error_info(instance);
 
 	freerdp_disconnect(instance);
-	gdi_free(instance);
 
 	ExitThread(exit_code);
 	return NULL;
@@ -1763,6 +1764,7 @@ static int xfreerdp_client_start(rdpContext* context)
 		WLog_ERR(TAG,  "error: server hostname was not specified with /v:<server>[:port]");
 		return -1;
 	}
+	xfc->disconnect = FALSE;
 	xfc->thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) xf_thread,
 							   context->instance, 0, NULL);
 	return 0;
@@ -1837,6 +1839,7 @@ static void xfreerdp_client_free(freerdp* instance, rdpContext* context)
 
 		if (context->channels)
 		{
+			freerdp_channels_close(context->channels, instance);
 			freerdp_channels_free(context->channels);
 			context->channels = NULL;
 		}
