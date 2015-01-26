@@ -1,8 +1,9 @@
 # rpmbuild -ta freerdp-<...>.tar.gz
 
 Name:           freerdp
-Version:        1.0.1
-Release:        1%{?dist}
+Version:        1.2.0
+Release:        dev%{?dist}
+
 Summary:        Remote Desktop Protocol functionality
 
 Group:          Applications/Communications
@@ -97,7 +98,6 @@ cmake \
         -DWITH_CUPS:BOOL=ON \
         -DWITH_PCSC:BOOL=ON \
         -DWITH_PULSE:BOOL=ON \
-		-DWITH_MACAUDIO:BOOL=ON \
         -DWITH_X11:BOOL=ON \
         -DWITH_XCURSOR:BOOL=ON \
         -DWITH_XEXT:BOOL=ON \
@@ -142,13 +142,15 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %defattr(-,root,root,-)
 %{_bindir}/xfreerdp
 %{_mandir}/man1/xfreerdp.*
+%{_libdir}/libxfreerdp-client.so*
 %{_datadir}/applications/xfreerdp.desktop
 %{_datadir}/icons/hicolor/256x256/apps/%{name}.png
 
 %files libs
 %defattr(-,root,root,-)
 %doc LICENSE README ChangeLog
-%{_libdir}/lib%{name}-*.so.*
+%{_libdir}/libfreerdp*.so*
+%{_libdir}/libwinpr*.so*
 %dir %{_libdir}/%{name}/
 
 %files plugins-standard
@@ -157,9 +159,10 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 %files devel
 %defattr(-,root,root,-)
-%{_includedir}/%{name}/
-%{_libdir}/lib%{name}-*.so
+%{_includedir}/freerdp/
+%{_includedir}/winpr/
 %{_libdir}/pkgconfig/%{name}.pc
-
+%{_libdir}/cmake/FreeRDP/*
+%{_libdir}/cmake/WinPR/*
 
 %changelog
