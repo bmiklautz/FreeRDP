@@ -24,10 +24,13 @@ Name:           freerdp2
 Version:        2.0.0
 Release:        0
 Summary:        Remote Desktop Protocol client
-License:        Apache-2.0
+License:        ASL 2.0
+%if !%{defined fedora}
 Group:          Productivity/Networking/Other
+%else
+Group:          Applications/Productivity
+%endif
 Url:            http://www.freerdp.com/
-#Source0:        https://github.com/FreeRDP/FreeRDP/archive/1.2.0-beta1+android7.tar.gz
 Source0:        FreeRDP-%{version}.tar.xz
 BuildRequires:  chrpath
 BuildRequires:  cmake >= 2.8
@@ -35,12 +38,21 @@ BuildRequires:  cups-devel
 BuildRequires:  ed
 BuildRequires:  gcc-c++
 BuildRequires:  hicolor-icon-theme
+%if %{defined fedora}
+BuildRequires:  gsm-devel
+BuildRequires:  pulseaudio-libs-devel
+BuildRequires:  gstreamer1-devel
+BuildRequires:  gstreamer1-plugins-base-devel
+%else
 BuildRequires:  libgsm-devel
+BuildRequires:  xorg-x11-devel
+BuildRequires:  xorg-x11-libs
+BuildRequires:  pkgconfig(libavcodec)
+BuildRequires:  pkgconfig(libavutil)
+%endif
 BuildRequires:  libjpeg-devel
 BuildRequires:  pkgconfig
 BuildRequires:  xmlto
-BuildRequires:  xorg-x11-devel
-BuildRequires:  xorg-x11-libs
 BuildRequires:  zlib-devel
 BuildRequires:  pkgconfig(alsa)
 BuildRequires:  pkgconfig(libpcsclite)
@@ -67,8 +79,6 @@ BuildRequires:  pkgconfig(libusb-1.0)
 BuildRequires:  pkgconfig(dbus-glib-1)
 BuildRequires:  pkgconfig(uuid)
 BuildRequires:  pkgconfig(libudev)
-BuildRequires:  pkgconfig(libavcodec)
-BuildRequires:  pkgconfig(libavutil)
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %if 0%{?suse_version} > 1220
 BuildRequires:  pkgconfig
@@ -81,111 +91,153 @@ BuildRequires:  pkgconfig(libpulse)
 %endif
 
 %description
-FreeRDP is a libre implementation of the Remote Desktop Protocol (RDP) (server and
-client side) following the Microsoft Open Specifications.
+FreeRDP is a libre implementation of the Remote Desktop Protocol (RDP)
+(server and client side) following the Microsoft Open Specifications.
 This package provides the X11 client application.
 
 %package wayland
 Summary:        Remote Desktop Viewer Client
+%if !%{defined fedora}
 Group:          Productivity/Networking/Other
+%else
+Group:          Applications/Productivity
+%endif
 
 %description wayland
-FreeRDP is a libre implementation of the Remote Desktop Protocol (RDP) (server and
-client side) following the Microsoft Open Specifications.
+FreeRDP is a libre implementation of the Remote Desktop Protocol (RDP)
+(server and client side) following the Microsoft Open Specifications.
 This package provides the wayland client application.
 
 %package -n libfreerdp%{lib_freerdp_version}
 Summary:        Remote Desktop Viewer client library
+%if !%{defined fedora}
 Group:          System/Libraries
+%else
+Group:          System Environment/Libraries
+%endif
 Provides:       libfreerdp%{lib_freerdp_version} = %{version}-%{release}
 
 %description -n libfreerdp%{lib_freerdp_version}
-FreeRDP is a libre implementation of the Remote Desktop Protocol (RDP) (server and
-client side) following the Microsoft Open Specifications.
+FreeRDP is a libre implementation of the Remote Desktop Protocol (RDP)
+(server and client side) following the Microsoft Open Specifications.
 This package provides the core library.
 
 %package -n libfreerdp-server%{lib_freerdp_version}
 Summary:        Remote Desktop Server
+%if !%{defined fedora}
 Group:          Productivity/Networking/Other
+%else
+Group:          Applications/Productivity
+%endif
 Provides:       libfreerdp-server%{lib_freerdp_version} = %{version}-%{release}
 
 %description -n libfreerdp-server%{lib_freerdp_version}
-FreeRDP is a libre implementation of the Remote Desktop Protocol (RDP) (server and
-client side) following the Microsoft Open Specifications.
+FreeRDP is a libre implementation of the Remote Desktop Protocol (RDP)
+(server and client side) following the Microsoft Open Specifications.
 This package contains the server side functionality and channels.
 
 %package -n libfreerdp-client%{lib_freerdp_version}
 Summary:        Remote Desktop Client
+%if !%{defined fedora}
 Group:          Productivity/Networking/Other
+%else
+Group:          Applications/Productivity
+%endif
 Provides:       libfreerdp-client%{lib_freerdp_version} = %{version}-%{release}
 Obsoletes:      freerdp-plugins < %{version}-%{release}
 Provides:       freerdp-plugins = %{version}-%{release}
 
 %description -n libfreerdp-client%{lib_freerdp_version}
-FreeRDP is a libre implementation of the Remote Desktop Protocol (RDP) (server and
-client side) following the Microsoft Open Specifications.
+FreeRDP is a libre implementation of the Remote Desktop Protocol (RDP)
+(server and client side) following the Microsoft Open Specifications.
 This package contains the client side functionality and channels.
 
 %package -n libfreerdp-shadow%{lib_freerdp_version}
 Summary:        Remote Desktop Client
+%if !%{defined fedora}
 Group:          Productivity/Networking/Other
+%else
+Group:          Applications/Productivity
+%endif
 Provides:       libfreerdp-shadow%{lib_freerdp_version} = %{version}-%{release}
 
 %description -n libfreerdp-shadow%{lib_freerdp_version}
-FreeRDP is a libre implementation of the Remote Desktop Protocol (RDP) (server and
-client side) following the Microsoft Open Specifications.
-This package provides the base libraries for sharing a running X11 desktop via RDP
-similar to VNC.
+FreeRDP is a libre implementation of the Remote Desktop Protocol (RDP)
+(server and client side) following the Microsoft Open Specifications.
+This package provides the base libraries for sharing a running X11
+desktop via RDP similar to VNC.
 
 %package devel
 Summary:        Development Files for %{name}
+%if !%{defined fedora}
 Group:          Development/Libraries/C and C++
+%else
+Group:          Development/Libraries
+%endif
 Requires:       libfreerdp%{lib_freerdp_version} = %{version}
 Requires:       libfreerdp-client%{lib_freerdp_version} = %{version}
 Requires:       libfreerdp-shadow%{lib_freerdp_version} = %{version}
 Requires:       libfreerdp-server%{lib_freerdp_version} = %{version}
 
 %description devel
-This package contains development files necessary for developing applications
-based on libfreerdp.
+FreeRDP is a libre implementation of the Remote Desktop Protocol (RDP)
+(server and client side) following the Microsoft Open Specifications.
+This package contains development files necessary for developing
+applications based on libfreerdp.
 
 %package -n     libwinpr%{lib_winpr_version}
 Summary:        Windows Portable Runtime
+%if !%{defined fedora}
 Group:          Productivity/Networking/Other
+%else
+Group:          Applications/Productivity
+%endif
 Provides:       libwinpr = %{version}-%{release}
 
 %description -n libwinpr%{lib_winpr_version}
-The windows portable runtime - WinPR  - provides API compatibility for applications
-targeting non-Windows environments. When on Windows, the original native API is
-being used instead of the equivalent WinPR implementation,
-without having to modify the code using it.
+The windows portable run time - WinPR  - provides API compatibility for
+applications targeting non-Windows environments. When on Windows, the
+original native API is being used instead of the equivalent WinPR
+implementation, without having to modify the code using it.
 
 %package -n     libwinpr-tools%{lib_winpr_version}
 Summary:        Windows Portable Runtime
+%if !%{defined fedora}
 Group:          Productivity/Networking/Other
+%else
+Group:          Applications/Productivity
+%endif
 
 %description -n libwinpr-tools%{lib_winpr_version}
-The windows portable runtime - WinPR  - provides API compatibility for applications
-targeting non-Windows environments. When on Windows, the original native API is
-being used instead of the equivalent WinPR implementation,
-without having to modify the code using it.
-This package contains the tools library that provides additional functionalty like
-certificate generation.
+The windows portable run time - WinPR  - provides API compatibility for
+applications targeting non-Windows environments. When on Windows, the
+original native API is being used instead of the equivalent WinPR
+implementation, without having to modify the code using it.
+This package contains the tools library that provides additional
+functionality like certificate generation.
 
 %package -n     winpr-utils
 Summary:        Windows Portable Runtime
+%if !%{defined fedora}
 Group:          Productivity/Networking/Other
+%else
+Group:          Applications/Productivity
+%endif
 
 %description -n winpr-utils
-The windows portable runtime - WinPR  - provides API compatibility for applications
-targeting non-Windows environments. When on Windows, the original native API is
-being used instead of the equivalent WinPR implementation,
-without having to modify the code using it.
+The windows portable run time - WinPR  - provides API compatibility for
+applications targeting non-Windows environments. When on Windows, the
+original native API is being used instead of the equivalent WinPR
+implementation, without having to modify the code using it.
 This package provides some useful utilities based on winpr.
 
 %package -n     libwinpr%{lib_winpr_version}-devel
 Summary:        Windows Portable Runtime development files
-Group:          Development/Languages/C and C++
+%if !%{defined fedora}
+Group:          Development/Libraries/C and C++
+%else
+Group:          Development/Libraries
+%endif
 Requires:       cmake >= 2.8
 Requires:       libwinpr%{lib_winpr_version} = %{version}-%{release}
 Requires:       libwinpr-tools%{lib_winpr_version} = %{version}-%{release}
@@ -197,7 +249,11 @@ developing applications that use libwinpr and libwinpr-tools.
 
 %package -n     libuwac%{lib_uwac_version}
 Summary:        Use wayland as a client
+%if !%{defined fedora}
 Group:          Productivity/Networking/Other
+%else
+Group:          Applications/Productivity
+%endif
 Provides:       libuwac = %{version}-%{release}
 Obsoletes:      libuwac < %{version}-%{release}
 
@@ -207,7 +263,11 @@ functionality for wayland clients.
 
 %package -n     libuwac%{lib_uwac_version}-devel
 Summary:        Remote Desktop Toolkit libuwac development files
-Group:          Development/Languages/C and C++
+%if !%{defined fedora}
+Group:          Development/Libraries/C and C++
+%else
+Group:          Development/Libraries
+%endif
 Requires:       cmake >= 2.8
 Requires:       libuwac%{lib_uwac_version} = %{version}-%{release}
 Requires:       pkgconfig
@@ -218,16 +278,20 @@ developing applications that use libuwac.
 
 %package -n     %{name}-shadow-x11
 Summary:        FreeRDP shadowing server for X11
+%if !%{defined fedora}
 Group:          Productivity/Networking/Other
-Provides:       freerdp-shdaow-x11
+%else
+Group:          Applications/Productivity
+%endif
+Provides:       freerdp-shdaow-x11 = %{version}-%{release}
 
 %description -n %{name}-shadow-x11
-FreeRDP is a libre implementation of the Remote Desktop Protocol (RDP) (server and
-client side) following the Microsoft Open Specifications.
-This package provides the base libraries for sharing a running X11 desktop via RDP
-similar to VNC.
-This package contains a X11 specific command line tool of the FreeRDP shadowing
-server.
+FreeRDP is a libre implementation of the Remote Desktop Protocol (RDP)
+(server and client side) following the Microsoft Open Specifications.
+This package provides the base libraries for sharing a running X11
+desktop via RDP similar to VNC.
+This package contains a X11 specific command line tool of the FreeRDP
+shadowing server.
 
 %prep
 %setup -q -n FreeRDP-%{version}
@@ -237,56 +301,60 @@ server.
 
 %build
 %cmake \
-	-DCMAKE_BUILD_TYPE=RELWITHDEBINFO \
-	-DCMAKE_INSTALL_PREFIX:PATH=%{_prefix} \
-	-DCMAKE_INSTALL_LIBDIR:PATH=%{_lib} \
-	-DCMAKE_SKIP_RPATH=TRUE \
-	-DCMAKE_SKIP_INSTALL_RPATH=TRUE \
-	-DWITH_ALSA=ON \
-	-DWITH_CUPS=ON \
-	-DWITH_CLIENT=ON \
-	-DWITH_PULSE=ON \
-	-DWITH_SERVER=ON \
-	-DWITH_CHANNELS=ON \
-	-DWITH_GSM=ON \
-%if 0%{?suse_version} > 1220
-	-DWITH_GSTREAMER_1_0=ON \
+    -DCMAKE_BUILD_TYPE=RELWITHDEBINFO \
+    -DCMAKE_INSTALL_PREFIX:PATH=%{_prefix} \
+    -DCMAKE_INSTALL_LIBDIR:PATH=%{_lib} \
+    -DCMAKE_SKIP_RPATH=TRUE \
+    -DCMAKE_SKIP_INSTALL_RPATH=TRUE \
+    -DWITH_ALSA=ON \
+    -DWITH_CUPS=ON \
+    -DWITH_CLIENT=ON \
+    -DWITH_PULSE=ON \
+    -DWITH_SERVER=ON \
+    -DWITH_CHANNELS=ON \
+    -DWITH_GSM=ON \
+%if 0%{?suse_version} > 1220 || 0%{?fedora}
+    -DWITH_GSTREAMER_1_0=ON \
 %else
-	-DWITH_GSTREAMER_1_0=OFF \
+    -DWITH_GSTREAMER_1_0=OFF \
 %endif
-	-DWITH_IPP=OFF \
-	-DWITH_JPEG=ON \
-	-DWITH_LIBRARY_VERSIONING=ON \
-	-DWITH_OPENSSL=ON \
-	-DWITH_PCSC=ON \
-	-DWITH_X11=ON \
-	-DWITH_XCURSOR=ON \
-	-DWITH_XEXT=ON \
-	-DWITH_XKBFILE=ON \
-	-DWITH_XI=ON \
-	-DWITH_XINERAMA=ON \
-	-DWITH_XRENDER=ON \
-	-DWITH_XV=ON \
-	-DWITH_ZLIB=ON \
-	-DWITH_CLIENT_INTERFACE=OFF \
-	-DWITH_WAYLAND=ON \
-	-DCHANNEL_URBDRC=ON \
-	-DCHANNEL_URBDRC_CLIENT=ON \
-	-DBUILD_TESTING=OFF \
+    -DWITH_IPP=OFF \
+    -DWITH_JPEG=ON \
+    -DWITH_LIBRARY_VERSIONING=ON \
+    -DWITH_OPENSSL=ON \
+    -DWITH_PCSC=ON \
+    -DWITH_X11=ON \
+    -DWITH_XCURSOR=ON \
+    -DWITH_XEXT=ON \
+    -DWITH_XKBFILE=ON \
+    -DWITH_XI=ON \
+    -DWITH_XINERAMA=ON \
+    -DWITH_XRENDER=ON \
+    -DWITH_XV=ON \
+    -DWITH_ZLIB=ON \
+    -DWITH_CLIENT_INTERFACE=OFF \
+    -DWITH_WAYLAND=ON \
+    -DCHANNEL_URBDRC=ON \
+    -DCHANNEL_URBDRC_CLIENT=ON \
+    -DBUILD_TESTING=OFF \
 %ifarch x86_64
-	-DWITH_SSE2=ON \
+    -DWITH_SSE2=ON \
 %else
-	-DWITH_SSE2=OFF \
+    -DWITH_SSE2=OFF \
 %endif
-	..
+%if %{defined fedora}
+    .
+%else
+    ..
+%endif
 
 make %{?_smp_mflags}
 
 %install
+%if !0%{?fedora}
 cd build
+%endif
 make %{?_smp_mflags} DESTDIR=%{buildroot} install
-
-find %{buildroot} -name "*.a" -delete
 
 %post   -n libfreerdp%{lib_freerdp_version} -p /sbin/ldconfig
 %postun -n libfreerdp%{lib_freerdp_version} -p /sbin/ldconfig
@@ -306,7 +374,11 @@ find %{buildroot} -name "*.a" -delete
 %files
 %defattr(-,root,root)
 %{_bindir}/xfreerdp
+%if %{defined fedora}
+%{_mandir}/man1/xfreerdp.1.*
+%else
 %{_mandir}/man1/xfreerdp.1%{ext_man}
+%endif
 
 %files wayland
 %defattr(-,root,root)

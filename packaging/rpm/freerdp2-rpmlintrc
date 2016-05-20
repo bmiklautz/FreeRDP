@@ -1,0 +1,7 @@
+addFilter('invalid-url')
+addFilter('non-standard-group')
+addFilter('spelling-error.*libre')
+addFilter('spelling-error.*libfreerdp')
+addFilter('spelling-error.*wayland')
+addFilter('spelling-error.*uwac')
+addFilter('spelling-error.*libwinpr')
