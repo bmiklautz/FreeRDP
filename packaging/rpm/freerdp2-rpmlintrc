@@ -1,3 +1,4 @@
+setOption("UsrLibBinaryException", '^/usr/lib(64)?/lib.*\.so')
 addFilter('invalid-url')
 addFilter('non-standard-group')
 addFilter('spelling-error.*libre')
