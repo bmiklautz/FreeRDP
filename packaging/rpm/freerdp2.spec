@@ -316,7 +316,7 @@ This package contains a X11 specific command line tool of the FreeRDP
 shadowing server.
 
 %prep
-%setup -q -n FreeRDP-%{version}
+%setup -q -n freerdp-%{version}
 %if 0%{?sles_version} == 11
     cp %{SOURCE1} cmake/
 %endif
