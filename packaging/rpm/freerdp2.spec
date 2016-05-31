@@ -19,10 +19,14 @@
 %define lib_winpr_version 2
 %define lib_uwac_version 0
 
-%if %{defined sle_version} && !%{defined is_opensuse}
+%if %{defined suse_version} && !%{defined is_opensuse}
 %bcond_with wayland
+%bcond_with avcodec
+%define SEL 1
 %else
 %bcond_without wayland
+%bcond_with avcodec
+%define SEL 0
 %endif
 
 Name:           freerdp2
@@ -56,8 +60,10 @@ BuildRequires:  gstreamer1-plugins-base-devel
 BuildRequires:  libgsm-devel
 BuildRequires:  xorg-x11-devel
 BuildRequires:  xorg-x11-libs
+%if %{with avcodec}
 BuildRequires:  pkgconfig(libavcodec)
 BuildRequires:  pkgconfig(libavutil)
+%endif
 %endif
 BuildRequires:  libjpeg-devel
 BuildRequires:  pkgconfig
