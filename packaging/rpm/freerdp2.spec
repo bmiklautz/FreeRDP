@@ -15,16 +15,25 @@
 # Please submit bugfixes or comments via http://bugs.opensuse.org/
 #
 
-
 %define lib_freerdp_version 2
 %define lib_winpr_version 2
 %define lib_uwac_version 0
+
+%if %{defined sle_version} && !%{defined is_opensuse}
+%bcond_with wayland
+%else
+%bcond_without wayland
+%endif
 
 Name:           freerdp2
 Version:        2.0.0
 Release:        0
 Summary:        Remote Desktop Protocol client
+%if %{defined fedora}
 License:        ASL 2.0
+%else
+License:        Apache-2.0
+%endif
 %if !%{defined fedora}
 Group:          Productivity/Networking/Other
 %else
@@ -59,8 +68,10 @@ BuildRequires:  pkgconfig(libpcsclite)
 BuildRequires:  pkgconfig(libsystemd-journal)
 BuildRequires:  pkgconfig(openssl)
 BuildRequires:  pkgconfig(pkg-config)
+%if %{with wayland}
 BuildRequires:  pkgconfig(wayland-client)
 BuildRequires:  pkgconfig(wayland-scanner)
+%endif
 BuildRequires:  pkgconfig(x11)
 BuildRequires:  pkgconfig(xcursor)
 BuildRequires:  pkgconfig(xdamage)
@@ -95,6 +106,7 @@ FreeRDP is a libre implementation of the Remote Desktop Protocol (RDP)
 (server and client side) following the Microsoft Open Specifications.
 This package provides the X11 client application.
 
+%if %{with wayland}
 %package wayland
 Summary:        Remote Desktop Viewer Client
 %if !%{defined fedora}
@@ -107,6 +119,7 @@ Group:          Applications/Productivity
 FreeRDP is a libre implementation of the Remote Desktop Protocol (RDP)
 (server and client side) following the Microsoft Open Specifications.
 This package provides the wayland client application.
+%endif
 
 %package -n libfreerdp%{lib_freerdp_version}
 Summary:        Remote Desktop Viewer client library
@@ -241,12 +254,14 @@ Group:          Development/Libraries
 Requires:       cmake >= 2.8
 Requires:       libwinpr%{lib_winpr_version} = %{version}-%{release}
 Requires:       libwinpr-tools%{lib_winpr_version} = %{version}-%{release}
+Requires:       winpr-utils = %{version}-%{release}
 Requires:       pkgconfig
 
 %description -n libwinpr%{lib_winpr_version}-devel
 The libwinpr-devel package contains libraries and header files for
 developing applications that use libwinpr and libwinpr-tools.
 
+%if %{with wayland}
 %package -n     libuwac%{lib_uwac_version}
 Summary:        Use wayland as a client
 %if !%{defined fedora}
@@ -275,6 +290,7 @@ Requires:       pkgconfig
 %description -n libuwac%{lib_uwac_version}-devel
 The libuwac-devel package contains libraries and header files for
 developing applications that use libuwac.
+%endif
 
 %package -n     %{name}-shadow-x11
 Summary:        FreeRDP shadowing server for X11
@@ -333,7 +349,9 @@ shadowing server.
     -DWITH_XV=ON \
     -DWITH_ZLIB=ON \
     -DWITH_CLIENT_INTERFACE=OFF \
+%if %{with wayland}
     -DWITH_WAYLAND=ON \
+%endif
     -DCHANNEL_URBDRC=ON \
     -DCHANNEL_URBDRC_CLIENT=ON \
     -DBUILD_TESTING=OFF \
@@ -368,8 +386,10 @@ make %{?_smp_mflags} DESTDIR=%{buildroot} install
 %postun -n libwinpr%{lib_winpr_version} -p /sbin/ldconfig
 %post -n libwinpr-tools%{lib_winpr_version} -p /sbin/ldconfig
 %postun -n libwinpr-tools%{lib_winpr_version} -p /sbin/ldconfig
+%if %{with wayland}
 %post -n libuwac%{lib_uwac_version} -p /sbin/ldconfig
 %postun -n libuwac%{lib_uwac_version} -p /sbin/ldconfig
+%endif
 
 %files
 %defattr(-,root,root)
@@ -380,9 +400,11 @@ make %{?_smp_mflags} DESTDIR=%{buildroot} install
 %{_mandir}/man1/xfreerdp.1%{ext_man}
 %endif
 
+%if %{with wayland}
 %files wayland
 %defattr(-,root,root)
 %{_bindir}/wlfreerdp
+%endif
 
 %files shadow-x11
 %defattr(-,root,root)
@@ -441,6 +463,7 @@ make %{?_smp_mflags} DESTDIR=%{buildroot} install
 %{_libdir}/pkgconfig/winpr%{lib_winpr_version}.pc
 %{_libdir}/pkgconfig/winpr-tools%{lib_winpr_version}.pc
 
+%if %{with wayland}
 %files -n libuwac%{lib_uwac_version}
 %defattr(-,root,root)
 %doc LICENSE
@@ -452,6 +475,7 @@ make %{?_smp_mflags} DESTDIR=%{buildroot} install
 %{_includedir}/uwac%{lib_uwac_version}
 %{_libdir}/libuwac.so
 %{_libdir}/pkgconfig/uwac%{lib_uwac_version}.pc
+%endif
 
 %changelog
 * Thu May 19 2016 FreeRDP Team <team@freerdp.com> - 2.0.0-0
