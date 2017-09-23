@@ -34,7 +34,7 @@
 		<varlistentry>
 			<term><command>/drive:home,/home/user</command></term>
 			<listitem>
-				<para>Activate drive redirection of <replaceable>/home/user</replaceable> as home drive</para>
+				<para>Redirect <replaceable>/home/user</replaceable> as share with the name home.</para>
 			</listitem>
 		</varlistentry>
 		<varlistentry>
