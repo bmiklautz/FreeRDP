@@ -38,7 +38,6 @@
 
 static BOOL g_winpr_openssl_initialized_by_winpr = FALSE;
 
-
 /**
  * Note from OpenSSL 1.1.0 "CHANGES":
  * OpenSSL now uses a new threading API. It is no longer necessary to
@@ -57,12 +56,8 @@ struct CRYPTO_dynlock_value
 	HANDLE mutex;
 };
 
-
 #if (OPENSSL_VERSION_NUMBER < 0x10000000L) || defined(LIBRESSL_VERSION_NUMBER)
-static unsigned long _winpr_openssl_id(void)
-{
-	return (unsigned long)GetCurrentThreadId();
-}
+static unsigned long _winpr_openssl_id(void) { return (unsigned long) GetCurrentThreadId(); }
 #endif
 
 static void _winpr_openssl_locking(int mode, int type, const char* file, int line)
@@ -93,8 +88,7 @@ static struct CRYPTO_dynlock_value* _winpr_openssl_dynlock_create(const char* fi
 	return dynlock;
 }
 
-static void _winpr_openssl_dynlock_lock(int mode, struct CRYPTO_dynlock_value* dynlock,
-                                        const char* file, int line)
+static void _winpr_openssl_dynlock_lock(int mode, struct CRYPTO_dynlock_value* dynlock, const char* file, int line)
 {
 	if (mode & CRYPTO_LOCK)
 	{
@@ -106,8 +100,7 @@ static void _winpr_openssl_dynlock_lock(int mode, struct CRYPTO_dynlock_value* d
 	}
 }
 
-static void _winpr_openssl_dynlock_destroy(struct CRYPTO_dynlock_value* dynlock, const char* file,
-        int line)
+static void _winpr_openssl_dynlock_destroy(struct CRYPTO_dynlock_value* dynlock, const char* file, int line)
 {
 	CloseHandle(dynlock->mutex);
 	free(dynlock);
@@ -160,8 +153,7 @@ static BOOL _winpr_openssl_initialize_locking(void)
 
 	/* OpenSSL dynamic locking */
 
-	if (CRYPTO_get_dynlock_create_callback() ||
-	    CRYPTO_get_dynlock_lock_callback()   ||
+	if (CRYPTO_get_dynlock_create_callback() || CRYPTO_get_dynlock_lock_callback() ||
 	    CRYPTO_get_dynlock_destroy_callback())
 	{
 		WLog_WARN(TAG, "dynamic locking callbacks are already set");
@@ -237,10 +229,9 @@ static BOOL _winpr_openssl_cleanup_locking(void)
 
 #endif /* OpenSSL < 1.1.0 */
 
-
 static BOOL CALLBACK _winpr_openssl_initialize(PINIT_ONCE once, PVOID param, PVOID* context)
 {
-	DWORD flags = param ? *(PDWORD)param : WINPR_SSL_INIT_DEFAULT;
+	DWORD flags = param ? *(PDWORD) param : WINPR_SSL_INIT_DEFAULT;
 
 	if (flags & WINPR_SSL_INIT_ALREADY_INITIALIZED)
 	{
@@ -267,11 +258,10 @@ static BOOL CALLBACK _winpr_openssl_initialize(PINIT_ONCE once, PVOID param, PVO
 	OpenSSL_add_all_ciphers();
 #else
 
-	if (OPENSSL_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS |
-	                     OPENSSL_INIT_LOAD_CRYPTO_STRINGS |
-	                     OPENSSL_INIT_ADD_ALL_CIPHERS |
-	                     OPENSSL_INIT_ADD_ALL_DIGESTS |
-	                     OPENSSL_INIT_ENGINE_ALL_BUILTIN, NULL) != 1)
+	if (OPENSSL_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS | OPENSSL_INIT_LOAD_CRYPTO_STRINGS |
+	                       OPENSSL_INIT_ADD_ALL_CIPHERS | OPENSSL_INIT_ADD_ALL_DIGESTS |
+	                       OPENSSL_INIT_ENGINE_ALL_BUILTIN,
+	                     NULL) != 1)
 		return FALSE;
 
 #endif
@@ -297,7 +287,6 @@ static BOOL CALLBACK _winpr_openssl_initialize(PINIT_ONCE once, PVOID param, PVO
 
 	return TRUE;
 }
-
 
 /* exported functions */
 
@@ -357,19 +346,10 @@ BOOL winpr_FIPSMode(void)
 
 #else
 
-BOOL winpr_InitializeSSL(DWORD flags)
-{
-	return TRUE;
-}
+BOOL winpr_InitializeSSL(DWORD flags) { return TRUE; }
 
-BOOL winpr_CleanupSSL(DWORD flags)
-{
-	return TRUE;
-}
+BOOL winpr_CleanupSSL(DWORD flags) { return TRUE; }
 
-BOOL winpr_FIPSMode(void)
-{
-	return FALSE;
-}
+BOOL winpr_FIPSMode(void) { return FALSE; }
 
 #endif

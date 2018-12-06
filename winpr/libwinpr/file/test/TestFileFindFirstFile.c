@@ -58,8 +58,7 @@ int TestFileFindFirstFile(int argc, char* argv[])
 
 	if (_tcscmp(FindData.cFileName, testFile1) != 0)
 	{
-		_tprintf(_T("FindFirstFile failure: Expected: %s, Actual: %s\n"),
-		         testFile1, FindData.cFileName);
+		_tprintf(_T("FindFirstFile failure: Expected: %s, Actual: %s\n"), testFile1, FindData.cFileName);
 		return -1;
 	}
 

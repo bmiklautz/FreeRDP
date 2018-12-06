@@ -65,15 +65,9 @@ void profiler_free(PROFILER* profiler)
 	free(profiler);
 }
 
-void profiler_enter(PROFILER* profiler)
-{
-	stopwatch_start(profiler->stopwatch);
-}
+void profiler_enter(PROFILER* profiler) { stopwatch_start(profiler->stopwatch); }
 
-void profiler_exit(PROFILER* profiler)
-{
-	stopwatch_stop(profiler->stopwatch);
-}
+void profiler_exit(PROFILER* profiler) { stopwatch_stop(profiler->stopwatch); }
 
 void profiler_print_header(void)
 {
@@ -86,8 +80,8 @@ void profiler_print(PROFILER* profiler)
 {
 	double s = stopwatch_get_elapsed_time_in_seconds(profiler->stopwatch);
 	double avg = profiler->stopwatch->count == 0 ? 0 : s / profiler->stopwatch->count;
-	WLog_INFO(TAG, "%-30s | %10u | %10.4fs | %8.6fs | %6.0f",
-	          profiler->name, profiler->stopwatch->count, s, avg, profiler->stopwatch->count / s);
+	WLog_INFO(TAG, "%-30s | %10u | %10.4fs | %8.6fs | %6.0f", profiler->name, profiler->stopwatch->count, s, avg,
+	          profiler->stopwatch->count / s);
 }
 
 void profiler_print_footer(void)

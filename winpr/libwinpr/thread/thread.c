@@ -139,8 +139,7 @@ static DWORD ThreadCleanupHandle(HANDLE handle)
 
 		if (status != 0)
 		{
-			WLog_ERR(TAG, "pthread_join failure: [%d] %s",
-			         status, strerror(status));
+			WLog_ERR(TAG, "pthread_join failure: [%d] %s", status, strerror(status));
 			pthread_mutex_unlock(&thread->mutex);
 			return WAIT_FAILED;
 		}
@@ -154,30 +153,26 @@ static DWORD ThreadCleanupHandle(HANDLE handle)
 	return WAIT_OBJECT_0;
 }
 
-static HANDLE_OPS ops =
-{
-	ThreadIsHandled,
-	ThreadCloseHandle,
-	ThreadGetFd,
-	ThreadCleanupHandle,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
-
+static HANDLE_OPS ops = { ThreadIsHandled,
+	                      ThreadCloseHandle,
+	                      ThreadGetFd,
+	                      ThreadCleanupHandle,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL };
 
 static void dump_thread(WINPR_THREAD* thread)
 {
@@ -189,7 +184,7 @@ static void dump_thread(WINPR_THREAD* thread)
 	msg = winpr_backtrace_symbols(stack, &used);
 
 	for (i = 0; i < used; i++)
-		WLog_DBG(TAG, "[%"PRIdz"]: %s", i, msg[i]);
+		WLog_DBG(TAG, "[%" PRIdz "]: %s", i, msg[i]);
 
 	free(msg);
 	winpr_backtrace_free(stack);
@@ -197,7 +192,7 @@ static void dump_thread(WINPR_THREAD* thread)
 	msg = winpr_backtrace_symbols(thread->create_stack, &used);
 
 	for (i = 0; i < used; i++)
-		WLog_DBG(TAG, "[%"PRIdz"]: %s", i, msg[i]);
+		WLog_DBG(TAG, "[%" PRIdz "]: %s", i, msg[i]);
 
 	free(msg);
 
@@ -215,7 +210,7 @@ static void dump_thread(WINPR_THREAD* thread)
 		msg = winpr_backtrace_symbols(thread->exit_stack, &used);
 
 		for (i = 0; i < used; i++)
-			WLog_DBG(TAG, "[%"PRIdz"]: %s", i, msg[i]);
+			WLog_DBG(TAG, "[%" PRIdz "]: %s", i, msg[i]);
 
 		free(msg);
 	}
@@ -237,8 +232,7 @@ static BOOL set_event(WINPR_THREAD* thread)
 	do
 	{
 		length = eventfd_write(thread->pipe_fd[0], val);
-	}
-	while ((length < 0) && (errno == EINTR));
+	} while ((length < 0) && (errno == EINTR));
 
 	status = (length == 0) ? TRUE : FALSE;
 #else
@@ -269,8 +263,7 @@ static BOOL reset_event(WINPR_THREAD* thread)
 	do
 	{
 		length = eventfd_read(thread->pipe_fd[0], &value);
-	}
-	while ((length < 0) && (errno == EINTR));
+	} while ((length < 0) && (errno == EINTR));
 
 	if ((length > 0) && (!status))
 		status = TRUE;
@@ -310,7 +303,7 @@ static void* thread_launcher(void* arg)
 
 	if (!(fkt = thread->lpStartAddress))
 	{
-		WLog_ERR(TAG, "Thread function argument is %p", (void*)fkt);
+		WLog_ERR(TAG, "Thread function argument is %p", (void*) fkt);
 		goto exit;
 	}
 
@@ -391,10 +384,8 @@ error:
 	return FALSE;
 }
 
-HANDLE CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes,
-                    SIZE_T dwStackSize,
-                    LPTHREAD_START_ROUTINE lpStartAddress, LPVOID lpParameter,
-                    DWORD dwCreationFlags, LPDWORD lpThreadId)
+HANDLE CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize, LPTHREAD_START_ROUTINE lpStartAddress,
+                    LPVOID lpParameter, DWORD dwCreationFlags, LPDWORD lpThreadId)
 {
 	HANDLE handle;
 	WINPR_THREAD* thread;
@@ -510,20 +501,17 @@ void cleanup_handle(void* obj)
 	rc = pthread_cond_destroy(&thread->threadIsReady);
 
 	if (rc)
-		WLog_ERR(TAG, "failed to destroy a condition variable [%d] %s (%d)",
-		         rc, strerror(errno), errno);
+		WLog_ERR(TAG, "failed to destroy a condition variable [%d] %s (%d)", rc, strerror(errno), errno);
 
 	rc = pthread_mutex_destroy(&thread->threadIsReadyMutex);
 
 	if (rc)
-		WLog_ERR(TAG, "failed to destroy a condition variable mutex [%d] %s (%d)",
-		         rc, strerror(errno), errno);
+		WLog_ERR(TAG, "failed to destroy a condition variable mutex [%d] %s (%d)", rc, strerror(errno), errno);
 
 	rc = pthread_mutex_destroy(&thread->mutex);
 
 	if (rc)
-		WLog_ERR(TAG, "failed to destroy mutex [%d] %s (%d)",
-		         rc, strerror(errno), errno);
+		WLog_ERR(TAG, "failed to destroy mutex [%d] %s (%d)", rc, strerror(errno), errno);
 
 	if (thread->pipe_fd[0] >= 0)
 		close(thread->pipe_fd[0]);
@@ -588,10 +576,9 @@ BOOL ThreadCloseHandle(HANDLE handle)
 	return TRUE;
 }
 
-HANDLE CreateRemoteThread(HANDLE hProcess,
-                          LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize,
-                          LPTHREAD_START_ROUTINE lpStartAddress, LPVOID lpParameter,
-                          DWORD dwCreationFlags, LPDWORD lpThreadId)
+HANDLE CreateRemoteThread(HANDLE hProcess, LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize,
+                          LPTHREAD_START_ROUTINE lpStartAddress, LPVOID lpParameter, DWORD dwCreationFlags,
+                          LPDWORD lpThreadId)
 {
 	WLog_ERR(TAG, "%s: not implemented", __FUNCTION__);
 	SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
@@ -637,7 +624,7 @@ VOID ExitThread(DWORD dwExitCode)
 		if (thread->detached || !thread->started)
 			cleanup_handle(thread);
 
-		pthread_exit((void*)(size_t) rc);
+		pthread_exit((void*) (size_t) rc);
 	}
 }
 
@@ -688,7 +675,7 @@ DWORD GetCurrentThreadId(VOID)
 	tid = pthread_self();
 	/* Since pthread_t can be 64-bits on some systems, take just the    */
 	/* lower 32-bits of it for the thread ID returned by this function. */
-	return (DWORD)tid & 0xffffffffUL;
+	return (DWORD) tid & 0xffffffffUL;
 }
 
 DWORD ResumeThread(HANDLE hThread)
@@ -698,26 +685,26 @@ DWORD ResumeThread(HANDLE hThread)
 	WINPR_THREAD* thread;
 
 	if (!winpr_Handle_GetInfo(hThread, &Type, &Object))
-		return (DWORD) - 1;
+		return (DWORD) -1;
 
 	thread = (WINPR_THREAD*) Object;
 
 	if (pthread_mutex_lock(&thread->mutex))
-		return (DWORD) - 1;
+		return (DWORD) -1;
 
 	if (!thread->started)
 	{
 		if (!winpr_StartThread(thread))
 		{
 			pthread_mutex_unlock(&thread->mutex);
-			return (DWORD) - 1;
+			return (DWORD) -1;
 		}
 	}
 	else
 		WLog_WARN(TAG, "Thread already started!");
 
 	if (pthread_mutex_unlock(&thread->mutex))
-		return (DWORD) - 1;
+		return (DWORD) -1;
 
 	return 0;
 }
@@ -726,7 +713,7 @@ DWORD SuspendThread(HANDLE hThread)
 {
 	WLog_ERR(TAG, "%s: not implemented", __FUNCTION__);
 	SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
-	return (DWORD) - 1;
+	return (DWORD) -1;
 }
 
 BOOL SwitchToThread(VOID)
@@ -781,7 +768,7 @@ VOID DumpThreadHandles(void)
 
 	for (i = 0; i < used; i++)
 	{
-		WLog_DBG(TAG, "[%"PRIdz"]: %s", i, msg[i]);
+		WLog_DBG(TAG, "[%" PRIdz "]: %s", i, msg[i]);
 	}
 
 	free(msg);
@@ -801,21 +788,20 @@ VOID DumpThreadHandles(void)
 
 		for (x = 0; x < count; x++)
 		{
-			WINPR_THREAD* thread = ListDictionary_GetItemValue(thread_list,
-			                       (void*) keys[x]);
+			WINPR_THREAD* thread = ListDictionary_GetItemValue(thread_list, (void*) keys[x]);
 			WLog_DBG(TAG, "Thread [%d] handle created still not closed!", x);
 			msg = winpr_backtrace_symbols(thread->create_stack, &used);
 
 			for (i = 0; i < used; i++)
 			{
-				WLog_DBG(TAG, "[%"PRIdz"]: %s", i, msg[i]);
+				WLog_DBG(TAG, "[%" PRIdz "]: %s", i, msg[i]);
 			}
 
 			free(msg);
 
 			if (thread->started)
 			{
-				WLog_DBG(TAG, "Thread [%d] still running!",	x);
+				WLog_DBG(TAG, "Thread [%d] still running!", x);
 			}
 			else
 			{
@@ -823,7 +809,7 @@ VOID DumpThreadHandles(void)
 				msg = winpr_backtrace_symbols(thread->exit_stack, &used);
 
 				for (i = 0; i < used; i++)
-					WLog_DBG(TAG, "[%"PRIdz"]: %s", i, msg[i]);
+					WLog_DBG(TAG, "[%" PRIdz "]: %s", i, msg[i]);
 
 				free(msg);
 			}
@@ -837,4 +823,3 @@ VOID DumpThreadHandles(void)
 }
 #endif
 #endif
-

@@ -29,15 +29,9 @@
 
 #include <winpr/nt.h>
 
-UINT GetErrorMode(void)
-{
-	return 0;
-}
+UINT GetErrorMode(void) { return 0; }
 
-UINT SetErrorMode(UINT uMode)
-{
-	return 0;
-}
+UINT SetErrorMode(UINT uMode) { return 0; }
 
 DWORD GetLastError(VOID)
 {
@@ -58,44 +52,26 @@ VOID SetLastError(DWORD dwErrCode)
 	}
 }
 
-VOID RestoreLastError(DWORD dwErrCode)
-{
+VOID RestoreLastError(DWORD dwErrCode) {}
 
+VOID RaiseException(DWORD dwExceptionCode, DWORD dwExceptionFlags, DWORD nNumberOfArguments,
+                    CONST ULONG_PTR* lpArguments)
+{
 }
 
-VOID RaiseException(DWORD dwExceptionCode, DWORD dwExceptionFlags, DWORD nNumberOfArguments, CONST ULONG_PTR* lpArguments)
-{
-
-}
-
-LONG UnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
-{
-	return 0;
-}
+LONG UnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo) { return 0; }
 
 LPTOP_LEVEL_EXCEPTION_FILTER SetUnhandledExceptionFilter(LPTOP_LEVEL_EXCEPTION_FILTER lpTopLevelExceptionFilter)
 {
 	return NULL;
 }
 
-PVOID AddVectoredExceptionHandler(ULONG First, PVECTORED_EXCEPTION_HANDLER Handler)
-{
-	return NULL;
-}
+PVOID AddVectoredExceptionHandler(ULONG First, PVECTORED_EXCEPTION_HANDLER Handler) { return NULL; }
 
-ULONG RemoveVectoredExceptionHandler(PVOID Handle)
-{
-	return 0;
-}
+ULONG RemoveVectoredExceptionHandler(PVOID Handle) { return 0; }
 
-PVOID AddVectoredContinueHandler(ULONG First, PVECTORED_EXCEPTION_HANDLER Handler)
-{
-	return NULL;
-}
+PVOID AddVectoredContinueHandler(ULONG First, PVECTORED_EXCEPTION_HANDLER Handler) { return NULL; }
 
-ULONG RemoveVectoredContinueHandler(PVOID Handle)
-{
-	return 0;
-}
+ULONG RemoveVectoredContinueHandler(PVOID Handle) { return 0; }
 
 #endif

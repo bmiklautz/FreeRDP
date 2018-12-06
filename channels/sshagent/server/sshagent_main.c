@@ -94,7 +94,6 @@
 
 #include <freerdp/channels/wtsvc.h>
 
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -108,18 +107,16 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
-#define _PATH_DEVNULL  "/dev/null"
+#define _PATH_DEVNULL "/dev/null"
 
 static char socket_name[PATH_MAX];
 static char socket_dir[PATH_MAX];
 static int sa_uds_fd = -1;
 static int is_going = 1;
 
-
 /* Make a template filename for mk[sd]temp() */
 /* This is from mktemp_proto() in misc.c from openssh */
-void
-mktemp_proto(char* s, size_t len)
+void mktemp_proto(char* s, size_t len)
 {
 	const char* tmpdir;
 	int r;
@@ -128,23 +125,21 @@ mktemp_proto(char* s, size_t len)
 	{
 		r = snprintf(s, len, "%s/ssh-XXXXXXXXXXXX", tmpdir);
 
-		if (r > 0 && (size_t)r < len)
+		if (r > 0 && (size_t) r < len)
 			return;
 	}
 
 	r = snprintf(s, len, "/tmp/ssh-XXXXXXXXXXXX");
 
-	if (r < 0 || (size_t)r >= len)
+	if (r < 0 || (size_t) r >= len)
 	{
 		fprintf(stderr, "%s: template string too short", __func__);
 		exit(1);
 	}
 }
 
-
 /* This uses parts of main() in ssh-agent.c from openssh */
-static void
-setup_ssh_agent(struct sockaddr_un* addr)
+static void setup_ssh_agent(struct sockaddr_un* addr)
 {
 	int rc;
 	/* Create private directory for agent socket */
@@ -156,8 +151,7 @@ setup_ssh_agent(struct sockaddr_un* addr)
 		exit(1);
 	}
 
-	snprintf(socket_name, sizeof(socket_name), "%s/agent.%ld", socket_dir,
-	         (long)getpid());
+	snprintf(socket_name, sizeof(socket_name), "%s/agent.%ld", socket_dir, (long) getpid());
 	/* Create unix domain socket */
 	unlink(socket_name);
 	sa_uds_fd = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -174,7 +168,7 @@ setup_ssh_agent(struct sockaddr_un* addr)
 	addr->sun_path[sizeof(addr->sun_path) - 1] = 0;
 	/* Create with privileges rw------- so other users can't access the UDS */
 	mode_t umask_sav = umask(0177);
-	rc = bind(sa_uds_fd, (struct sockaddr*)addr, sizeof(struct sockaddr_un));
+	rc = bind(sa_uds_fd, (struct sockaddr*) addr, sizeof(struct sockaddr_un));
 
 	if (rc != 0)
 	{
@@ -222,15 +216,15 @@ setup_ssh_agent(struct sockaddr_un* addr)
 		exit(1);
 	}
 
-	(void)chdir("/");
+	(void) chdir("/");
 	int devnullfd;
 
 	if ((devnullfd = open(_PATH_DEVNULL, O_RDWR, 0)) != -1)
 	{
 		/* XXX might close listen socket */
-		(void)dup2(devnullfd, STDIN_FILENO);
-		(void)dup2(devnullfd, STDOUT_FILENO);
-		(void)dup2(devnullfd, STDERR_FILENO);
+		(void) dup2(devnullfd, STDIN_FILENO);
+		(void) dup2(devnullfd, STDOUT_FILENO);
+		(void) dup2(devnullfd, STDERR_FILENO);
 
 		if (devnullfd > 2)
 			close(devnullfd);
@@ -247,15 +241,11 @@ setup_ssh_agent(struct sockaddr_un* addr)
 	}
 }
 
-
-static void
-handle_connection(int client_fd)
+static void handle_connection(int client_fd)
 {
-	int     rdp_fd = -1;
-	int     rc;
-	void* channel = WTSVirtualChannelOpenEx(WTS_CURRENT_SESSION,
-	                                        "SSHAGENT",
-	                                        WTS_CHANNEL_OPTION_DYNAMIC_PRI_MED);
+	int rdp_fd = -1;
+	int rc;
+	void* channel = WTSVirtualChannelOpenEx(WTS_CURRENT_SESSION, "SSHAGENT", WTS_CHANNEL_OPTION_DYNAMIC_PRI_MED);
 
 	if (channel == NULL)
 	{
@@ -264,10 +254,7 @@ handle_connection(int client_fd)
 
 	unsigned int retlen;
 	int* retdata;
-	rc = WTSVirtualChannelQuery(channel,
-	                            WTSVirtualFileHandle,
-	                            (void**)&retdata,
-	                            &retlen);
+	rc = WTSVirtualChannelQuery(channel, WTSVirtualFileHandle, (void**) &retdata, &retlen);
 
 	if (!rc)
 	{
@@ -276,8 +263,7 @@ handle_connection(int client_fd)
 
 	if (retlen != sizeof(rdp_fd))
 	{
-		fprintf(stderr, "WTSVirtualChannelQuery() returned wrong length %d\n",
-		        retlen);
+		fprintf(stderr, "WTSVirtualChannelQuery() returned wrong length %d\n", retlen);
 	}
 
 	rdp_fd = *retdata;
@@ -298,10 +284,7 @@ handle_connection(int client_fd)
 			char buffer[4096];
 			unsigned int bytes_to_write;
 			rc = WTSVirtualChannelRead(channel,
-			                           /* TimeOut = */ 5000,
-			                           buffer,
-			                           sizeof(buffer),
-			                           &bytes_to_write);
+			                           /* TimeOut = */ 5000, buffer, sizeof(buffer), &bytes_to_write);
 
 			if (rc == 1)
 			{
@@ -350,15 +333,11 @@ handle_connection(int client_fd)
 				while (bytes_to_write > 0)
 				{
 					unsigned int bytes_written;
-					int rc = WTSVirtualChannelWrite(channel,
-					                                pos,
-					                                bytes_to_write,
-					                                &bytes_written);
+					int rc = WTSVirtualChannelWrite(channel, pos, bytes_to_write, &bytes_written);
 
 					if (rc == 0)
 					{
-						fprintf(stderr, "WTSVirtualChannelWrite() failed: %d\n",
-						        errno);
+						fprintf(stderr, "WTSVirtualChannelWrite() failed: %d\n", errno);
 						client_going = 0;
 					}
 					else
@@ -385,9 +364,7 @@ handle_connection(int client_fd)
 	WTSVirtualChannelClose(channel);
 }
 
-
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
 	/* Setup the Unix domain socket and daemon process */
 	struct sockaddr_un addr;
@@ -406,9 +383,7 @@ main(int argc, char** argv)
 		if (FD_ISSET(sa_uds_fd, &readfds))
 		{
 			socklen_t addrsize = sizeof(addr);
-			int client_fd = accept(sa_uds_fd,
-			                       (struct sockaddr*)&addr,
-			                       &addrsize);
+			int client_fd = accept(sa_uds_fd, (struct sockaddr*) &addr, &addrsize);
 			handle_connection(client_fd);
 			close(client_fd);
 		}

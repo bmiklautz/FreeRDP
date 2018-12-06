@@ -159,8 +159,8 @@ LPSTR* CommandLineToArgvA(LPCSTR lpCmdLine, int* pNumArgs)
 				pBeg--;
 			}
 
-			n = (int)((pEnd - pBeg) - 1);
-			length = (int)(pBeg - pLastEnd);
+			n = (int) ((pEnd - pBeg) - 1);
+			length = (int) (pBeg - pLastEnd);
 			CopyMemory(pOutput, p, length);
 			pOutput += length;
 			p += length;
@@ -223,7 +223,7 @@ LPSTR* CommandLineToArgvA(LPCSTR lpCmdLine, int* pNumArgs)
 		if (*p != '"')
 		{
 			/* no whitespace escaped with double quotes */
-			length = (int)(p - pBeg);
+			length = (int) (p - pBeg);
 			CopyMemory(pOutput, pBeg, length);
 			pOutput[length] = '\0';
 			pArgs[numArgs++] = pOutput;
@@ -273,9 +273,6 @@ LPSTR* CommandLineToArgvA(LPCSTR lpCmdLine, int* pNumArgs)
 
 #ifndef _WIN32
 
-LPWSTR* CommandLineToArgvW(LPCWSTR lpCmdLine, int* pNumArgs)
-{
-	return NULL;
-}
+LPWSTR* CommandLineToArgvW(LPCWSTR lpCmdLine, int* pNumArgs) { return NULL; }
 
 #endif

@@ -49,7 +49,8 @@ STOPWATCH* stopwatch_create()
 {
 	STOPWATCH* sw;
 #ifdef _WIN32
-	if (stopwatch_freq.QuadPart == 0) {
+	if (stopwatch_freq.QuadPart == 0)
+	{
 		QueryPerformanceFrequency(&stopwatch_freq);
 	}
 #endif
@@ -62,10 +63,7 @@ STOPWATCH* stopwatch_create()
 	return sw;
 }
 
-void stopwatch_free(STOPWATCH* stopwatch)
-{
-	free(stopwatch);
-}
+void stopwatch_free(STOPWATCH* stopwatch) { free(stopwatch); }
 
 void stopwatch_start(STOPWATCH* stopwatch)
 {
@@ -87,14 +85,10 @@ void stopwatch_reset(STOPWATCH* stopwatch)
 	stopwatch->count = 0;
 }
 
-double stopwatch_get_elapsed_time_in_seconds(STOPWATCH* stopwatch)
-{
-	return (stopwatch->elapsed/1000000.0);
-}
+double stopwatch_get_elapsed_time_in_seconds(STOPWATCH* stopwatch) { return (stopwatch->elapsed / 1000000.0); }
 
 void stopwatch_get_elapsed_time_in_useconds(STOPWATCH* stopwatch, UINT32* sec, UINT32* usec)
 {
 	*sec = (UINT32) stopwatch->elapsed / 1000000;
 	*usec = (UINT32) stopwatch->elapsed % 1000000;
 }
-

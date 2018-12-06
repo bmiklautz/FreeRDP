@@ -28,14 +28,13 @@
 
 #define TAG SERVER_TAG("shadow.win")
 
-static int win_shadow_input_synchronize_event(rdpShadowSubsystem* subsystem,
-        rdpShadowClient* client, UINT32 flags)
+static int win_shadow_input_synchronize_event(rdpShadowSubsystem* subsystem, rdpShadowClient* client, UINT32 flags)
 {
 	return 0;
 }
 
-static int win_shadow_input_keyboard_event(rdpShadowSubsystem* subsystem,
-        rdpShadowClient* client, UINT16 flags, UINT16 code)
+static int win_shadow_input_keyboard_event(rdpShadowSubsystem* subsystem, rdpShadowClient* client, UINT16 flags,
+                                           UINT16 code)
 {
 	INPUT event;
 	event.type = INPUT_KEYBOARD;
@@ -54,8 +53,8 @@ static int win_shadow_input_keyboard_event(rdpShadowSubsystem* subsystem,
 	return SendInput(1, &event, sizeof(INPUT));
 }
 
-static int win_shadow_input_unicode_keyboard_event(rdpShadowSubsystem* subsystem,
-        rdpShadowClient* client, UINT16 flags, UINT16 code)
+static int win_shadow_input_unicode_keyboard_event(rdpShadowSubsystem* subsystem, rdpShadowClient* client, UINT16 flags,
+                                                   UINT16 code)
 {
 	INPUT event;
 	event.type = INPUT_KEYBOARD;
@@ -71,8 +70,8 @@ static int win_shadow_input_unicode_keyboard_event(rdpShadowSubsystem* subsystem
 	return SendInput(1, &event, sizeof(INPUT));
 }
 
-static int win_shadow_input_mouse_event(rdpShadowSubsystem* subsystem,
-                                        rdpShadowClient* client, UINT16 flags, UINT16 x, UINT16 y)
+static int win_shadow_input_mouse_event(rdpShadowSubsystem* subsystem, rdpShadowClient* client, UINT16 flags, UINT16 x,
+                                        UINT16 y)
 {
 	INPUT event;
 	float width;
@@ -138,8 +137,8 @@ static int win_shadow_input_mouse_event(rdpShadowSubsystem* subsystem,
 	return 0;
 }
 
-static int win_shadow_input_extended_mouse_event(rdpShadowSubsystem* subsystem,
-        rdpShadowClient* client, UINT16 flags, UINT16 x, UINT16 y)
+static int win_shadow_input_extended_mouse_event(rdpShadowSubsystem* subsystem, rdpShadowClient* client, UINT16 flags,
+                                                 UINT16 x, UINT16 y)
 {
 	INPUT event;
 	float width;
@@ -178,9 +177,7 @@ static int win_shadow_input_extended_mouse_event(rdpShadowSubsystem* subsystem,
 	return 0;
 }
 
-
-static int win_shadow_invalidate_region(winShadowSubsystem* subsystem, int x, int y,
-                                        int width, int height)
+static int win_shadow_invalidate_region(winShadowSubsystem* subsystem, int x, int y, int width, int height)
 {
 	rdpShadowServer* server;
 	rdpShadowSurface* surface;
@@ -192,8 +189,7 @@ static int win_shadow_invalidate_region(winShadowSubsystem* subsystem, int x, in
 	invalidRect.right = x + width;
 	invalidRect.bottom = y + height;
 	EnterCriticalSection(&(surface->lock));
-	region16_union_rect(&(surface->invalidRegion), &(surface->invalidRegion),
-	                    &invalidRect);
+	region16_union_rect(&(surface->invalidRegion), &(surface->invalidRegion), &invalidRect);
 	LeaveCriticalSection(&(surface->lock));
 	return 1;
 }
@@ -223,8 +219,7 @@ static int win_shadow_surface_copy(winShadowSubsystem* subsystem)
 	surfaceRect.top = surface->y;
 	surfaceRect.right = surface->x + surface->width;
 	surfaceRect.bottom = surface->y + surface->height;
-	region16_intersect_rect(&(surface->invalidRegion), &(surface->invalidRegion),
-	                        &surfaceRect);
+	region16_intersect_rect(&(surface->invalidRegion), &(surface->invalidRegion), &surfaceRect);
 
 	if (region16_is_empty(&(surface->invalidRegion)))
 		return 1;
@@ -245,9 +240,8 @@ static int win_shadow_surface_copy(winShadowSubsystem* subsystem)
 		height = surface->height;
 	}
 
-	WLog_INFO(TAG,
-	          "SurfaceCopy x: %d y: %d width: %d height: %d right: %d bottom: %d",
-	          x, y, width, height, x + width, y + height);
+	WLog_INFO(TAG, "SurfaceCopy x: %d y: %d width: %d height: %d right: %d bottom: %d", x, y, width, height, x + width,
+	          y + height);
 #if defined(WITH_WDS_API)
 	{
 		rdpGdi* gdi;
@@ -262,16 +256,14 @@ static int win_shadow_surface_copy(winShadowSubsystem* subsystem)
 	}
 #elif defined(WITH_DXGI_1_2)
 	DstFormat = PIXEL_FORMAT_BGRX32;
-	status = win_shadow_dxgi_fetch_frame_data(subsystem, &pDstData, &nDstStep, x, y,
-	         width, height);
+	status = win_shadow_dxgi_fetch_frame_data(subsystem, &pDstData, &nDstStep, x, y, width, height);
 #endif
 
 	if (status <= 0)
 		return status;
 
-	if (!freerdp_image_copy(surface->data, surface->format,
-	                        surface->scanline, x, y, width, height,
-	                        pDstData, DstFormat, nDstStep, x, y, NULL, FREERDP_FLIP_NONE))
+	if (!freerdp_image_copy(surface->data, surface->format, surface->scanline, x, y, width, height, pDstData, DstFormat,
+	                        nDstStep, x, y, NULL, FREERDP_FLIP_NONE))
 		return ERROR_INTERNAL_ERROR;
 
 	ArrayList_Lock(server->clients);
@@ -286,7 +278,7 @@ static int win_shadow_surface_copy(winShadowSubsystem* subsystem)
 
 static DWORD WINAPI win_shadow_subsystem_thread(LPVOID arg)
 {
-	winShadowSubsystem* subsystem = (winShadowSubsystem*)arg;
+	winShadowSubsystem* subsystem = (winShadowSubsystem*) arg;
 	DWORD status;
 	DWORD nCount;
 	HANDLE events[32];
@@ -321,7 +313,7 @@ static DWORD WINAPI win_shadow_subsystem_thread(LPVOID arg)
 
 static DWORD WINAPI win_shadow_subsystem_thread(LPVOID arg)
 {
-	winShadowSubsystem* subsystem = (winShadowSubsystem*)arg;
+	winShadowSubsystem* subsystem = (winShadowSubsystem*) arg;
 	int fps;
 	DWORD status;
 	DWORD nCount;
@@ -406,7 +398,7 @@ static UINT32 win_shadow_enum_monitors(MONITOR_DEF* monitors, UINT32 maxMonitors
 
 static int win_shadow_subsystem_init(rdpShadowSubsystem* arg)
 {
-	winShadowSubsystem* subsystem = (winShadowSubsystem*)arg;
+	winShadowSubsystem* subsystem = (winShadowSubsystem*) arg;
 	int status;
 	MONITOR_DEF* virtualScreen;
 	subsystem->base.numMonitors = win_shadow_enum_monitors(subsystem->base.monitors, 16);
@@ -427,7 +419,7 @@ static int win_shadow_subsystem_init(rdpShadowSubsystem* arg)
 
 static int win_shadow_subsystem_uninit(rdpShadowSubsystem* arg)
 {
-	winShadowSubsystem* subsystem = (winShadowSubsystem*)arg;
+	winShadowSubsystem* subsystem = (winShadowSubsystem*) arg;
 
 	if (!subsystem)
 		return -1;
@@ -442,15 +434,13 @@ static int win_shadow_subsystem_uninit(rdpShadowSubsystem* arg)
 
 static int win_shadow_subsystem_start(rdpShadowSubsystem* arg)
 {
-	winShadowSubsystem* subsystem = (winShadowSubsystem*)arg;
+	winShadowSubsystem* subsystem = (winShadowSubsystem*) arg;
 	HANDLE thread;
 
 	if (!subsystem)
 		return -1;
 
-	if (!(thread = CreateThread(NULL, 0,
-	                            win_shadow_subsystem_thread,
-	                            (void*) subsystem, 0, NULL)))
+	if (!(thread = CreateThread(NULL, 0, win_shadow_subsystem_thread, (void*) subsystem, 0, NULL)))
 	{
 		WLog_ERR(TAG, "Failed to create thread");
 		return -1;
@@ -461,7 +451,7 @@ static int win_shadow_subsystem_start(rdpShadowSubsystem* arg)
 
 static int win_shadow_subsystem_stop(rdpShadowSubsystem* arg)
 {
-	winShadowSubsystem* subsystem = (winShadowSubsystem*)arg;
+	winShadowSubsystem* subsystem = (winShadowSubsystem*) arg;
 
 	if (!subsystem)
 		return -1;
@@ -471,7 +461,7 @@ static int win_shadow_subsystem_stop(rdpShadowSubsystem* arg)
 
 static void win_shadow_subsystem_free(rdpShadowSubsystem* arg)
 {
-	winShadowSubsystem* subsystem = (winShadowSubsystem*)arg;
+	winShadowSubsystem* subsystem = (winShadowSubsystem*) arg;
 
 	if (!subsystem)
 		return;

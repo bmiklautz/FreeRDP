@@ -115,9 +115,8 @@ HRESULT PATH_CCH_APPEND(PSTR pszPath, size_t cchPath, PCSTR pszMore)
 #endif
 
 /*
-#undef DEFINE_UNICODE	
-#undef _PATH_SEPARATOR_CHR	
-#undef _PATH_SEPARATOR_STR	
-#undef PATH_CCH_APPEND	
+#undef DEFINE_UNICODE
+#undef _PATH_SEPARATOR_CHR
+#undef _PATH_SEPARATOR_STR
+#undef PATH_CCH_APPEND
 */
-

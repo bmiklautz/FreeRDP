@@ -31,9 +31,7 @@
 #include "uwac-utils.h"
 #include "uwac-os.h"
 
-
 #define UWAC_INITIAL_BUFFERS 3
-
 
 static int bppFromShmFormat(enum wl_shm_format format)
 {
@@ -46,17 +44,13 @@ static int bppFromShmFormat(enum wl_shm_format format)
 	}
 }
 
-
 static void buffer_release(void* data, struct wl_buffer* buffer)
 {
-	UwacBuffer* uwacBuffer = (UwacBuffer*)data;
+	UwacBuffer* uwacBuffer = (UwacBuffer*) data;
 	uwacBuffer->used = false;
 }
 
-static const struct wl_buffer_listener buffer_listener =
-{
-	buffer_release
-};
+static const struct wl_buffer_listener buffer_listener = { buffer_release };
 
 void UwacWindowDestroyBuffers(UwacWindow* w)
 {
@@ -78,15 +72,13 @@ void UwacWindowDestroyBuffers(UwacWindow* w)
 	w->buffers = NULL;
 }
 
+int UwacWindowShmAllocBuffers(UwacWindow* w, int nbuffers, int allocSize, uint32_t width, uint32_t height,
+                              enum wl_shm_format format);
 
-int UwacWindowShmAllocBuffers(UwacWindow* w, int nbuffers, int allocSize, uint32_t width,
-                              uint32_t height, enum wl_shm_format format);
-
-static void xdg_handle_configure(void* data, struct xdg_surface* surface,
-                                 int32_t width, int32_t height,
+static void xdg_handle_configure(void* data, struct xdg_surface* surface, int32_t width, int32_t height,
                                  struct wl_array* states, uint32_t serial)
 {
-	UwacWindow* window = (UwacWindow*)data;
+	UwacWindow* window = (UwacWindow*) data;
 	UwacConfigureEvent* event;
 	int ret, surfaceState;
 	enum xdg_surface_state* state;
@@ -116,12 +108,11 @@ static void xdg_handle_configure(void* data, struct xdg_surface* surface,
 		}
 	}
 	window->surfaceStates = surfaceState;
-	event = (UwacConfigureEvent*)UwacDisplayNewEvent(window->display, UWAC_EVENT_CONFIGURE);
+	event = (UwacConfigureEvent*) UwacDisplayNewEvent(window->display, UWAC_EVENT_CONFIGURE);
 
 	if (!event)
 	{
-		assert(uwacErrorHandler(window->display, UWAC_ERROR_NOMEMORY,
-		                        "failed to allocate a configure event\n"));
+		assert(uwacErrorHandler(window->display, UWAC_ERROR_NOMEMORY, "failed to allocate a configure event\n"));
 		goto ack;
 	}
 
@@ -136,8 +127,8 @@ static void xdg_handle_configure(void* data, struct xdg_surface* surface,
 		window->width = width;
 		window->stride = width * bppFromShmFormat(window->format);
 		window->height = height;
-		ret = UwacWindowShmAllocBuffers(window, UWAC_INITIAL_BUFFERS, window->stride * height,
-		                                width, height, window->format);
+		ret = UwacWindowShmAllocBuffers(window, UWAC_INITIAL_BUFFERS, window->stride * height, width, height,
+		                                window->format);
 
 		if (ret != UWAC_SUCCESS)
 		{
@@ -161,39 +152,35 @@ ack:
 static void xdg_handle_close(void* data, struct xdg_surface* xdg_surface)
 {
 	UwacCloseEvent* event;
-	UwacWindow* window = (UwacWindow*)data;
-	event = (UwacCloseEvent*)UwacDisplayNewEvent(window->display, UWAC_EVENT_CLOSE);
+	UwacWindow* window = (UwacWindow*) data;
+	event = (UwacCloseEvent*) UwacDisplayNewEvent(window->display, UWAC_EVENT_CLOSE);
 
 	if (!event)
 	{
-		assert(uwacErrorHandler(window->display, UWAC_ERROR_INTERNAL,
-		                        "failed to allocate a close event\n"));
+		assert(uwacErrorHandler(window->display, UWAC_ERROR_INTERNAL, "failed to allocate a close event\n"));
 		return;
 	}
 
 	event->window = window;
 }
 
-static const struct xdg_surface_listener xdg_surface_listener =
-{
+static const struct xdg_surface_listener xdg_surface_listener = {
 	xdg_handle_configure,
 	xdg_handle_close,
 };
 
 #if BUILD_IVI
 
-static void ivi_handle_configure(void* data, struct ivi_surface* surface,
-                                 int32_t width, int32_t height)
+static void ivi_handle_configure(void* data, struct ivi_surface* surface, int32_t width, int32_t height)
 {
-	UwacWindow* window = (UwacWindow*)data;
+	UwacWindow* window = (UwacWindow*) data;
 	UwacConfigureEvent* event;
 	int ret;
-	event = (UwacConfigureEvent*)UwacDisplayNewEvent(window->display, UWAC_EVENT_CONFIGURE);
+	event = (UwacConfigureEvent*) UwacDisplayNewEvent(window->display, UWAC_EVENT_CONFIGURE);
 
 	if (!event)
 	{
-		assert(uwacErrorHandler(window->display, UWAC_ERROR_NOMEMORY,
-		                        "failed to allocate a configure event\n"));
+		assert(uwacErrorHandler(window->display, UWAC_ERROR_NOMEMORY, "failed to allocate a configure event\n"));
 		return;
 	}
 
@@ -208,8 +195,8 @@ static void ivi_handle_configure(void* data, struct ivi_surface* surface,
 		window->width = width;
 		window->stride = width * bppFromShmFormat(window->format);
 		window->height = height;
-		ret = UwacWindowShmAllocBuffers(window, UWAC_INITIAL_BUFFERS, window->stride * height,
-		                                width, height, window->format);
+		ret = UwacWindowShmAllocBuffers(window, UWAC_INITIAL_BUFFERS, window->stride * height, width, height,
+		                                window->format);
 
 		if (ret != UWAC_SUCCESS)
 		{
@@ -227,8 +214,7 @@ static void ivi_handle_configure(void* data, struct ivi_surface* surface,
 	}
 }
 
-static const struct ivi_surface_listener ivi_surface_listener =
-{
+static const struct ivi_surface_listener ivi_surface_listener = {
 	ivi_handle_configure,
 };
 #endif
@@ -238,18 +224,16 @@ void shell_ping(void* data, struct wl_shell_surface* surface, uint32_t serial)
 	wl_shell_surface_pong(surface, serial);
 }
 
-void shell_configure(void* data, struct wl_shell_surface* surface, uint32_t edges,
-                     int32_t width, int32_t height)
+void shell_configure(void* data, struct wl_shell_surface* surface, uint32_t edges, int32_t width, int32_t height)
 {
-	UwacWindow* window = (UwacWindow*)data;
+	UwacWindow* window = (UwacWindow*) data;
 	UwacConfigureEvent* event;
 	int ret;
-	event = (UwacConfigureEvent*)UwacDisplayNewEvent(window->display, UWAC_EVENT_CONFIGURE);
+	event = (UwacConfigureEvent*) UwacDisplayNewEvent(window->display, UWAC_EVENT_CONFIGURE);
 
 	if (!event)
 	{
-		assert(uwacErrorHandler(window->display, UWAC_ERROR_NOMEMORY,
-		                        "failed to allocate a configure event\n"));
+		assert(uwacErrorHandler(window->display, UWAC_ERROR_NOMEMORY, "failed to allocate a configure event\n"));
 		return;
 	}
 
@@ -264,8 +248,8 @@ void shell_configure(void* data, struct wl_shell_surface* surface, uint32_t edge
 		window->width = width;
 		window->stride = width * bppFromShmFormat(window->format);
 		window->height = height;
-		ret = UwacWindowShmAllocBuffers(window, UWAC_INITIAL_BUFFERS, window->stride * height,
-		                                width, height, window->format);
+		ret = UwacWindowShmAllocBuffers(window, UWAC_INITIAL_BUFFERS, window->stride * height, width, height,
+		                                window->format);
 
 		if (ret != UWAC_SUCCESS)
 		{
@@ -283,22 +267,12 @@ void shell_configure(void* data, struct wl_shell_surface* surface, uint32_t edge
 	}
 }
 
+void shell_popup_done(void* data, struct wl_shell_surface* surface) {}
 
-void shell_popup_done(void* data, struct wl_shell_surface* surface)
-{
-}
+static const struct wl_shell_surface_listener shell_listener = { shell_ping, shell_configure, shell_popup_done };
 
-
-static const struct wl_shell_surface_listener shell_listener =
-{
-	shell_ping,
-	shell_configure,
-	shell_popup_done
-};
-
-
-int UwacWindowShmAllocBuffers(UwacWindow* w, int nbuffers, int allocSize, uint32_t width,
-                              uint32_t height, enum wl_shm_format format)
+int UwacWindowShmAllocBuffers(UwacWindow* w, int nbuffers, int allocSize, uint32_t width, uint32_t height,
+                              enum wl_shm_format format)
 {
 	int ret = UWAC_SUCCESS;
 	UwacBuffer* newBuffers;
@@ -345,8 +319,7 @@ int UwacWindowShmAllocBuffers(UwacWindow* w, int nbuffers, int allocSize, uint32
 		region16_init(&buffer->damage);
 #endif
 		buffer->data = data + (allocSize * i);
-		buffer->wayland_buffer = wl_shm_pool_create_buffer(pool, allocSize * i, width, height, w->stride,
-		                         format);
+		buffer->wayland_buffer = wl_shm_pool_create_buffer(pool, allocSize * i, width, height, w->stride, format);
 		wl_buffer_add_listener(buffer->wayland_buffer, &buffer_listener, buffer);
 	}
 
@@ -382,9 +355,7 @@ UwacBuffer* UwacWindowFindFreeBuffer(UwacWindow* w)
 	return &w->buffers[i];
 }
 
-
-UwacWindow* UwacCreateWindowShm(UwacDisplay* display, uint32_t width, uint32_t height,
-                                enum wl_shm_format format)
+UwacWindow* UwacCreateWindowShm(UwacDisplay* display, uint32_t width, uint32_t height, enum wl_shm_format format)
 {
 	UwacWindow* w;
 	int allocSize, ret;
@@ -476,7 +447,6 @@ out_error_free:
 	return NULL;
 }
 
-
 UwacReturnCode UwacDestroyWindow(UwacWindow** pwindow)
 {
 	UwacWindow* w;
@@ -510,9 +480,7 @@ UwacReturnCode UwacDestroyWindow(UwacWindow** pwindow)
 	return UWAC_SUCCESS;
 }
 
-
-UwacReturnCode UwacWindowSetOpaqueRegion(UwacWindow* window, uint32_t x, uint32_t y, uint32_t width,
-        uint32_t height)
+UwacReturnCode UwacWindowSetOpaqueRegion(UwacWindow* window, uint32_t x, uint32_t y, uint32_t width, uint32_t height)
 {
 	assert(window);
 
@@ -529,8 +497,7 @@ UwacReturnCode UwacWindowSetOpaqueRegion(UwacWindow* window, uint32_t x, uint32_
 	return UWAC_SUCCESS;
 }
 
-UwacReturnCode UwacWindowSetInputRegion(UwacWindow* window, uint32_t x, uint32_t y, uint32_t width,
-                                        uint32_t height)
+UwacReturnCode UwacWindowSetInputRegion(UwacWindow* window, uint32_t x, uint32_t y, uint32_t width, uint32_t height)
 {
 	assert(window);
 
@@ -547,19 +514,11 @@ UwacReturnCode UwacWindowSetInputRegion(UwacWindow* window, uint32_t x, uint32_t
 	return UWAC_SUCCESS;
 }
 
-
-void* UwacWindowGetDrawingBuffer(UwacWindow* window)
-{
-	return window->drawingBuffer->data;
-}
+void* UwacWindowGetDrawingBuffer(UwacWindow* window) { return window->drawingBuffer->data; }
 
 static void frame_done_cb(void* data, struct wl_callback* callback, uint32_t time);
 
-static const struct wl_callback_listener frame_listener =
-{
-	frame_done_cb
-};
-
+static const struct wl_callback_listener frame_listener = { frame_done_cb };
 
 static void UwacSubmitBufferPtr(UwacWindow* window, UwacBuffer* buffer)
 {
@@ -580,8 +539,7 @@ static void UwacSubmitBufferPtr(UwacWindow* window, UwacBuffer* buffer)
 	box = region16_rects(&buffer->damage, &nrects);
 
 	for (i = 0; i < nrects; i++, box++)
-		wl_surface_damage(window->surface, box->left, box->top, (box->right - box->left),
-		                  (box->bottom - box->top));
+		wl_surface_damage(window->surface, box->left, box->top, (box->right - box->left), (box->bottom - box->top));
 
 #endif
 
@@ -598,26 +556,23 @@ static void UwacSubmitBufferPtr(UwacWindow* window, UwacBuffer* buffer)
 #endif
 }
 
-
 static void frame_done_cb(void* data, struct wl_callback* callback, uint32_t time)
 {
-	UwacWindow* window = (UwacWindow*)data;
+	UwacWindow* window = (UwacWindow*) data;
 	UwacFrameDoneEvent* event;
 	window->pendingBuffer = NULL;
-	event = (UwacFrameDoneEvent*)UwacDisplayNewEvent(window->display, UWAC_EVENT_FRAME_DONE);
+	event = (UwacFrameDoneEvent*) UwacDisplayNewEvent(window->display, UWAC_EVENT_FRAME_DONE);
 
 	if (event)
 		event->window = window;
 }
 
-
-UwacReturnCode UwacWindowAddDamage(UwacWindow* window, uint32_t x, uint32_t y, uint32_t width,
-                                   uint32_t height)
+UwacReturnCode UwacWindowAddDamage(UwacWindow* window, uint32_t x, uint32_t y, uint32_t width, uint32_t height)
 {
 #ifdef HAVE_PIXMAN_REGION
 
-	if (!pixman_region32_union_rect(&window->drawingBuffer->damage, &window->drawingBuffer->damage, x,
-	                                y, width, height))
+	if (!pixman_region32_union_rect(&window->drawingBuffer->damage, &window->drawingBuffer->damage, x, y, width,
+	                                height))
 #else
 	RECTANGLE_16 box;
 
@@ -632,7 +587,6 @@ UwacReturnCode UwacWindowAddDamage(UwacWindow* window, uint32_t x, uint32_t y, u
 
 	return UWAC_SUCCESS;
 }
-
 
 UwacReturnCode UwacWindowSubmitBuffer(UwacWindow* window, bool copyContentForNextFrame)
 {
@@ -668,9 +622,7 @@ UwacReturnCode UwacWindowGetGeometry(UwacWindow* window, UwacSize* geometry)
 	return UWAC_SUCCESS;
 }
 
-
-UwacReturnCode UwacWindowSetFullscreenState(UwacWindow* window, UwacOutput* output,
-        bool isFullscreen)
+UwacReturnCode UwacWindowSetFullscreenState(UwacWindow* window, UwacOutput* output, bool isFullscreen)
 {
 	if (window->xdg_surface)
 	{
@@ -687,9 +639,7 @@ UwacReturnCode UwacWindowSetFullscreenState(UwacWindow* window, UwacOutput* outp
 	{
 		if (isFullscreen)
 		{
-			wl_shell_surface_set_fullscreen(window->shell_surface,
-			                                WL_SHELL_SURFACE_FULLSCREEN_METHOD_DEFAULT,
-			                                0,
+			wl_shell_surface_set_fullscreen(window->shell_surface, WL_SHELL_SURFACE_FULLSCREEN_METHOD_DEFAULT, 0,
 			                                output ? output->output : NULL);
 		}
 		else

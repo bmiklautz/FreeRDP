@@ -1,9 +1,9 @@
 /*
  Password Encryptor
- 
+
  Copyright 2013 Thincast Technologies GmbH, Author: Dorian Johnson
- 
- This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. 
+
+ This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
  If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
@@ -23,20 +23,19 @@
 #define TSXEncryptorPBKDF2SaltLen TSXEncryptorBlockCipherOptions
 #define TSXEncryptorPBKDF2KeySize TSXEncryptorBlockCipherKeySize
 
-
 @interface Encryptor : NSObject {
 @private
-	NSData* _encryption_key;
-	NSString* _plaintext_password;
+	NSData *_encryption_key;
+	NSString *_plaintext_password;
 }
 
-@property(readonly) NSString* plaintextPassword;
+@property(readonly) NSString *plaintextPassword;
 
-- (id)initWithPassword:(NSString*)plaintext_password;
+- (id)initWithPassword:(NSString *)plaintext_password;
 
-- (NSData*)encryptData:(NSData*)plaintext_data;
-- (NSData*)decryptData:(NSData*)encrypted_data;
-- (NSData*)encryptString:(NSString*)plaintext_string;
-- (NSString*)decryptString:(NSData*)encrypted_string;
+- (NSData *)encryptData:(NSData *)plaintext_data;
+- (NSData *)decryptData:(NSData *)encrypted_data;
+- (NSData *)encryptString:(NSString *)plaintext_string;
+- (NSString *)decryptString:(NSData *)encrypted_string;
 
 @end

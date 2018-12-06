@@ -39,15 +39,13 @@ struct _H264_CONTEXT_OPENH264
 };
 typedef struct _H264_CONTEXT_OPENH264 H264_CONTEXT_OPENH264;
 
-static void openh264_trace_callback(H264_CONTEXT* h264, int level,
-                                    const char* message)
+static void openh264_trace_callback(H264_CONTEXT* h264, int level, const char* message)
 {
 	if (h264)
 		WLog_Print(h264->log, WLOG_TRACE, "%d - %s", level, message);
 }
 
-static int openh264_decompress(H264_CONTEXT* h264, const BYTE* pSrcData,
-                               UINT32 SrcSize)
+static int openh264_decompress(H264_CONTEXT* h264, const BYTE* pSrcData, UINT32 SrcSize)
 {
 	DECODING_STATE state;
 	SBufferInfo sBufferInfo;
@@ -66,22 +64,19 @@ static int openh264_decompress(H264_CONTEXT* h264, const BYTE* pSrcData,
 	pYUVData[1] = NULL;
 	pYUVData[2] = NULL;
 	ZeroMemory(&sBufferInfo, sizeof(sBufferInfo));
-	state = (*sys->pDecoder)->DecodeFrame2(sys->pDecoder, pSrcData, SrcSize,
-	                                       pYUVData, &sBufferInfo);
+	state = (*sys->pDecoder)->DecodeFrame2(sys->pDecoder, pSrcData, SrcSize, pYUVData, &sBufferInfo);
 
 	if (sBufferInfo.iBufferStatus != 1)
 	{
 		if (state == dsNoParamSets)
 		{
 			/* this happens on the first frame due to missing parameter sets */
-			state = (*sys->pDecoder)->DecodeFrame2(sys->pDecoder, NULL, 0, pYUVData,
-			                                       &sBufferInfo);
+			state = (*sys->pDecoder)->DecodeFrame2(sys->pDecoder, NULL, 0, pYUVData, &sBufferInfo);
 		}
 		else if (state == dsErrorFree)
 		{
 			/* call DecodeFrame2 again to decode without delay */
-			state = (*sys->pDecoder)->DecodeFrame2(sys->pDecoder, NULL, 0, pYUVData,
-			                                       &sBufferInfo);
+			state = (*sys->pDecoder)->DecodeFrame2(sys->pDecoder, NULL, 0, pYUVData, &sBufferInfo);
 		}
 		else
 		{
@@ -125,8 +120,8 @@ static int openh264_decompress(H264_CONTEXT* h264, const BYTE* pSrcData,
 	return 1;
 }
 
-static int openh264_compress(H264_CONTEXT* h264, const BYTE** pYUVData, const UINT32* iStride,
-                             BYTE** ppDstData, UINT32* pDstSize)
+static int openh264_compress(H264_CONTEXT* h264, const BYTE** pYUVData, const UINT32* iStride, BYTE** ppDstData,
+                             UINT32* pDstSize)
 {
 	int i, j;
 	int status;
@@ -142,8 +137,7 @@ static int openh264_compress(H264_CONTEXT* h264, const BYTE** pYUVData, const UI
 	if (!pYUVData[0] || !pYUVData[1] || !pYUVData[2])
 		return -1;
 
-	if ((sys->EncParamExt.iPicWidth != h264->width)
-	    || (sys->EncParamExt.iPicHeight != h264->height))
+	if ((sys->EncParamExt.iPicWidth != h264->width) || (sys->EncParamExt.iPicHeight != h264->height))
 	{
 		status = (*sys->pEncoder)->GetDefaultParams(sys->pEncoder, &sys->EncParamExt);
 
@@ -166,16 +160,14 @@ static int openh264_compress(H264_CONTEXT* h264, const BYTE** pYUVData, const UI
 		sys->EncParamExt.sSpatialLayers[0].fFrameRate = h264->FrameRate;
 		sys->EncParamExt.sSpatialLayers[0].iVideoWidth = sys->EncParamExt.iPicWidth;
 		sys->EncParamExt.sSpatialLayers[0].iVideoHeight = sys->EncParamExt.iPicHeight;
-		sys->EncParamExt.sSpatialLayers[0].iMaxSpatialBitrate =
-		    sys->EncParamExt.iMaxBitrate;
+		sys->EncParamExt.sSpatialLayers[0].iMaxSpatialBitrate = sys->EncParamExt.iMaxBitrate;
 
 		switch (h264->RateControlMode)
 		{
 			case H264_RATECONTROL_VBR:
 				sys->EncParamExt.iRCMode = RC_BITRATE_MODE;
 				sys->EncParamExt.iTargetBitrate = h264->BitRate;
-				sys->EncParamExt.sSpatialLayers[0].iSpatialBitrate =
-				    sys->EncParamExt.iTargetBitrate;
+				sys->EncParamExt.sSpatialLayers[0].iSpatialBitrate = sys->EncParamExt.iTargetBitrate;
 				break;
 
 			case H264_RATECONTROL_CQP:
@@ -201,14 +193,11 @@ static int openh264_compress(H264_CONTEXT* h264, const BYTE** pYUVData, const UI
 			return status;
 		}
 
-		status = (*sys->pEncoder)->GetOption(sys->pEncoder,
-		                                     ENCODER_OPTION_SVC_ENCODE_PARAM_EXT,
-		                                     &sys->EncParamExt);
+		status = (*sys->pEncoder)->GetOption(sys->pEncoder, ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &sys->EncParamExt);
 
 		if (status < 0)
 		{
-			WLog_Print(h264->log, WLOG_ERROR, "Failed to get initial OpenH264 encoder parameters (status=%d)",
-			           status);
+			WLog_Print(h264->log, WLOG_ERROR, "Failed to get initial OpenH264 encoder parameters (status=%d)", status);
 			return status;
 		}
 	}
@@ -222,8 +211,7 @@ static int openh264_compress(H264_CONTEXT* h264, const BYTE** pYUVData, const UI
 					sys->EncParamExt.iTargetBitrate = h264->BitRate;
 					bitrate.iLayer = SPATIAL_LAYER_ALL;
 					bitrate.iBitrate = h264->BitRate;
-					status = (*sys->pEncoder)->SetOption(sys->pEncoder, ENCODER_OPTION_BITRATE,
-					                                     &bitrate);
+					status = (*sys->pEncoder)->SetOption(sys->pEncoder, ENCODER_OPTION_BITRATE, &bitrate);
 
 					if (status < 0)
 					{
@@ -235,8 +223,8 @@ static int openh264_compress(H264_CONTEXT* h264, const BYTE** pYUVData, const UI
 				if (sys->EncParamExt.fMaxFrameRate != h264->FrameRate)
 				{
 					sys->EncParamExt.fMaxFrameRate = h264->FrameRate;
-					status = (*sys->pEncoder)->SetOption(sys->pEncoder, ENCODER_OPTION_FRAME_RATE,
-					                                     &sys->EncParamExt.fMaxFrameRate);
+					status = (*sys->pEncoder)
+					           ->SetOption(sys->pEncoder, ENCODER_OPTION_FRAME_RATE, &sys->EncParamExt.fMaxFrameRate);
 
 					if (status < 0)
 					{
@@ -251,9 +239,8 @@ static int openh264_compress(H264_CONTEXT* h264, const BYTE** pYUVData, const UI
 				if (sys->EncParamExt.sSpatialLayers[0].iDLayerQp != h264->QP)
 				{
 					sys->EncParamExt.sSpatialLayers[0].iDLayerQp = h264->QP;
-					status = (*sys->pEncoder)->SetOption(sys->pEncoder,
-					                                     ENCODER_OPTION_SVC_ENCODE_PARAM_EXT,
-					                                     &sys->EncParamExt);
+					status = (*sys->pEncoder)
+					           ->SetOption(sys->pEncoder, ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &sys->EncParamExt);
 
 					if (status < 0)
 					{
@@ -268,15 +255,15 @@ static int openh264_compress(H264_CONTEXT* h264, const BYTE** pYUVData, const UI
 
 	memset(&info, 0, sizeof(SFrameBSInfo));
 	memset(&pic, 0, sizeof(SSourcePicture));
-	pic.iPicWidth = (int)h264->width;
-	pic.iPicHeight = (int)h264->height;
+	pic.iPicWidth = (int) h264->width;
+	pic.iPicHeight = (int) h264->height;
 	pic.iColorFormat = videoFormatI420;
-	pic.iStride[0] = (int)iStride[0];
-	pic.iStride[1] = (int)iStride[1];
-	pic.iStride[2] = (int)iStride[2];
-	pic.pData[0] = (unsigned char*)pYUVData[0];
-	pic.pData[1] = (unsigned char*)pYUVData[1];
-	pic.pData[2] = (unsigned char*)pYUVData[2];
+	pic.iStride[0] = (int) iStride[0];
+	pic.iStride[1] = (int) iStride[1];
+	pic.iStride[2] = (int) iStride[2];
+	pic.pData[0] = (unsigned char*) pYUVData[0];
+	pic.pData[1] = (unsigned char*) pYUVData[1];
+	pic.pData[2] = (unsigned char*) pYUVData[2];
 	status = (*sys->pEncoder)->EncodeFrame(sys->pEncoder, &pic, &info);
 
 	if (status < 0)
@@ -340,11 +327,9 @@ static BOOL openh264_init(H264_CONTEXT* h264)
 #if (OPENH264_MAJOR == 1) && (OPENH264_MINOR <= 5)
 	static EVideoFormatType videoFormat = videoFormatI420;
 #endif
-	static WelsTraceCallback traceCallback = (WelsTraceCallback)
-	        openh264_trace_callback;
+	static WelsTraceCallback traceCallback = (WelsTraceCallback) openh264_trace_callback;
 	h264->numSystemData = 1;
-	sysContexts = (H264_CONTEXT_OPENH264*) calloc(h264->numSystemData,
-	              sizeof(H264_CONTEXT_OPENH264));
+	sysContexts = (H264_CONTEXT_OPENH264*) calloc(h264->numSystemData, sizeof(H264_CONTEXT_OPENH264));
 
 	if (!sysContexts)
 		goto EXCEPTION;
@@ -377,7 +362,7 @@ static BOOL openh264_init(H264_CONTEXT* h264)
 
 			ZeroMemory(&sDecParam, sizeof(sDecParam));
 #if (OPENH264_MAJOR == 1) && (OPENH264_MINOR <= 5)
-			sDecParam.eOutputColorFormat  = videoFormatI420;
+			sDecParam.eOutputColorFormat = videoFormatI420;
 #endif
 			sDecParam.eEcActiveIdc = ERROR_CON_FRAME_COPY;
 			sDecParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_AVC;
@@ -385,61 +370,47 @@ static BOOL openh264_init(H264_CONTEXT* h264)
 
 			if (status != 0)
 			{
-				WLog_Print(h264->log, WLOG_ERROR, "Failed to initialize OpenH264 decoder (status=%ld)",
-				           status);
+				WLog_Print(h264->log, WLOG_ERROR, "Failed to initialize OpenH264 decoder (status=%ld)", status);
 				goto EXCEPTION;
 			}
 
 #if (OPENH264_MAJOR == 1) && (OPENH264_MINOR <= 5)
-			status = (*sys->pDecoder)->SetOption(
-			             sys->pDecoder, DECODER_OPTION_DATAFORMAT,
-			             &videoFormat);
+			status = (*sys->pDecoder)->SetOption(sys->pDecoder, DECODER_OPTION_DATAFORMAT, &videoFormat);
 #endif
 
 			if (status != 0)
 			{
-				WLog_Print(h264->log, WLOG_ERROR,
-				           "Failed to set data format option on OpenH264 decoder (status=%ld)",
+				WLog_Print(h264->log, WLOG_ERROR, "Failed to set data format option on OpenH264 decoder (status=%ld)",
 				           status);
 				goto EXCEPTION;
 			}
 
 			if (WLog_GetLogLevel(h264->log) == WLOG_TRACE)
 			{
-				status = (*sys->pDecoder)->SetOption(
-				             sys->pDecoder, DECODER_OPTION_TRACE_LEVEL,
-				             &traceLevel);
+				status = (*sys->pDecoder)->SetOption(sys->pDecoder, DECODER_OPTION_TRACE_LEVEL, &traceLevel);
 
 				if (status != 0)
 				{
 					WLog_Print(h264->log, WLOG_ERROR,
-					           "Failed to set trace level option on OpenH264 decoder (status=%ld)",
-					           status);
+					           "Failed to set trace level option on OpenH264 decoder (status=%ld)", status);
 					goto EXCEPTION;
 				}
 
-				status = (*sys->pDecoder)->SetOption(
-				             sys->pDecoder,
-				             DECODER_OPTION_TRACE_CALLBACK_CONTEXT,
-				             &h264);
+				status = (*sys->pDecoder)->SetOption(sys->pDecoder, DECODER_OPTION_TRACE_CALLBACK_CONTEXT, &h264);
 
 				if (status != 0)
 				{
 					WLog_Print(h264->log, WLOG_ERROR,
-					           "Failed to set trace callback context option on OpenH264 decoder (status=%ld)",
-					           status);
+					           "Failed to set trace callback context option on OpenH264 decoder (status=%ld)", status);
 					goto EXCEPTION;
 				}
 
-				status = (*sys->pDecoder)->SetOption(
-				             sys->pDecoder, DECODER_OPTION_TRACE_CALLBACK,
-				             &traceCallback);
+				status = (*sys->pDecoder)->SetOption(sys->pDecoder, DECODER_OPTION_TRACE_CALLBACK, &traceCallback);
 
 				if (status != 0)
 				{
 					WLog_Print(h264->log, WLOG_ERROR,
-					           "Failed to set trace callback option on OpenH264 decoder (status=%ld)",
-					           status);
+					           "Failed to set trace callback option on OpenH264 decoder (status=%ld)", status);
 					goto EXCEPTION;
 				}
 			}
@@ -452,11 +423,5 @@ EXCEPTION:
 	return FALSE;
 }
 
-H264_CONTEXT_SUBSYSTEM g_Subsystem_OpenH264 =
-{
-	"OpenH264",
-	openh264_init,
-	openh264_uninit,
-	openh264_decompress,
-	openh264_compress
-};
+H264_CONTEXT_SUBSYSTEM g_Subsystem_OpenH264 = { "OpenH264", openh264_init, openh264_uninit, openh264_decompress,
+	                                            openh264_compress };

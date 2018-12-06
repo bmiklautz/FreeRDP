@@ -30,8 +30,8 @@ int TestAcquireCredentialsHandle(int argc, char* argv[])
 	identity.DomainLength = strlen(test_Domain);
 	identity.PasswordLength = strlen(test_Password);
 	identity.Flags = SEC_WINNT_AUTH_IDENTITY_ANSI;
-	status = table->AcquireCredentialsHandle(NULL, NTLM_SSP_NAME,
-	         SECPKG_CRED_OUTBOUND, NULL, &identity, NULL, NULL, &credentials, &expiration);
+	status = table->AcquireCredentialsHandle(NULL, NTLM_SSP_NAME, SECPKG_CRED_OUTBOUND, NULL, &identity, NULL, NULL,
+	                                         &credentials, &expiration);
 
 	if (status != SEC_E_OK)
 		goto fail;
@@ -53,4 +53,3 @@ fail:
 	sspi_GlobalFinish();
 	return rc;
 }
-

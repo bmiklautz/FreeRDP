@@ -128,8 +128,8 @@ BOOL shadow_screen_resize(rdpShadowScreen* screen)
 	width = primary->right - primary->left;
 	height = primary->bottom - primary->top;
 
-	if (shadow_surface_resize(screen->primary, x, y, width, height)
-			&& shadow_surface_resize(screen->lobby, x, y, width, height))
+	if (shadow_surface_resize(screen->primary, x, y, width, height) &&
+	    shadow_surface_resize(screen->lobby, x, y, width, height))
 	{
 		if ((width != screen->width) || (height != screen->height))
 		{
@@ -139,7 +139,7 @@ BOOL shadow_screen_resize(rdpShadowScreen* screen)
 			shadow_client_init_lobby(screen->server);
 		}
 		return TRUE;
-	} 
+	}
 
 	return FALSE;
 }

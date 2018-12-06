@@ -99,13 +99,11 @@ static char* string_strnstr(char* str1, const char* str2, size_t slen)
 			{
 				if (slen-- < 1 || (sc = *str1++) == '\0')
 					return NULL;
-			}
-			while (sc != c);
+			} while (sc != c);
 
 			if (len > slen)
 				return NULL;
-		}
-		while (strncmp(str1, str2, len) != 0);
+		} while (strncmp(str1, str2, len) != 0);
 
 		str1--;
 	}
@@ -121,10 +119,7 @@ static BOOL strings_equals_nocase(const void* obj1, const void* obj2)
 	return _stricmp(obj1, obj2) == 0;
 }
 
-HttpContext* http_context_new(void)
-{
-	return (HttpContext*) calloc(1, sizeof(HttpContext));
-}
+HttpContext* http_context_new(void) { return (HttpContext*) calloc(1, sizeof(HttpContext)); }
 
 BOOL http_context_set_method(HttpContext* context, const char* Method)
 {
@@ -371,19 +366,19 @@ static BOOL http_encode_print(wStream* s, const char* fmt, ...)
 	length = vsnprintf(NULL, 0, fmt, ap) + 1;
 	va_end(ap);
 
-	if (!Stream_EnsureRemainingCapacity(s, (size_t)length))
+	if (!Stream_EnsureRemainingCapacity(s, (size_t) length))
 		return FALSE;
 
-	str = (char*)Stream_Pointer(s);
+	str = (char*) Stream_Pointer(s);
 	va_start(ap, fmt);
-	used = vsnprintf(str, (size_t)length, fmt, ap);
+	used = vsnprintf(str, (size_t) length, fmt, ap);
 	va_end(ap);
 
 	/* Strip the trailing '\0' from the string. */
 	if ((used + 1) != length)
 		return FALSE;
 
-	Stream_Seek(s, (size_t)used);
+	Stream_Seek(s, (size_t) used);
 	return TRUE;
 }
 
@@ -397,7 +392,7 @@ static BOOL http_encode_body_line(wStream* s, const char* param, const char* val
 
 static BOOL http_encode_content_length_line(wStream* s, size_t ContentLength)
 {
-	return http_encode_print(s, "Content-Length: %"PRIdz"\r\n", ContentLength);
+	return http_encode_print(s, "Content-Length: %" PRIdz "\r\n", ContentLength);
 }
 
 static BOOL http_encode_header_line(wStream* s, const char* Method, const char* URI)
@@ -408,8 +403,7 @@ static BOOL http_encode_header_line(wStream* s, const char* Method, const char* 
 	return http_encode_print(s, "%s %s HTTP/1.1\r\n", Method, URI);
 }
 
-static BOOL http_encode_authorization_line(wStream* s, const char* AuthScheme,
-        const char* AuthParam)
+static BOOL http_encode_authorization_line(wStream* s, const char* AuthScheme, const char* AuthParam)
 {
 	if (!s || !AuthScheme || !AuthParam)
 		return FALSE;
@@ -432,10 +426,8 @@ wStream* http_request_write(HttpContext* context, HttpRequest* request)
 	if (!http_encode_header_line(s, request->Method, request->URI) ||
 	    !http_encode_body_line(s, "Cache-Control", context->CacheControl) ||
 	    !http_encode_body_line(s, "Connection", context->Connection) ||
-	    !http_encode_body_line(s, "Pragma", context->Pragma) ||
-	    !http_encode_body_line(s, "Accept", context->Accept) ||
-	    !http_encode_body_line(s, "User-Agent", context->UserAgent) ||
-	    !http_encode_body_line(s, "Host", context->Host))
+	    !http_encode_body_line(s, "Pragma", context->Pragma) || !http_encode_body_line(s, "Accept", context->Accept) ||
+	    !http_encode_body_line(s, "User-Agent", context->UserAgent) || !http_encode_body_line(s, "Host", context->Host))
 		goto fail;
 
 	if (context->RdgConnectionId)
@@ -480,10 +472,7 @@ fail:
 	return NULL;
 }
 
-HttpRequest* http_request_new(void)
-{
-	return (HttpRequest*) calloc(1, sizeof(HttpRequest));
-}
+HttpRequest* http_request_new(void) { return (HttpRequest*) calloc(1, sizeof(HttpRequest)); }
 
 void http_request_free(HttpRequest* request)
 {
@@ -541,8 +530,7 @@ static BOOL http_response_parse_header_status_line(HttpResponse* response, char*
 	return TRUE;
 }
 
-static BOOL http_response_parse_header_field(HttpResponse* response, const char* name,
-        const char* value)
+static BOOL http_response_parse_header_field(HttpResponse* response, const char* name, const char* value)
 {
 	BOOL status = TRUE;
 
@@ -761,7 +749,7 @@ HttpResponse* http_response_recv(rdpTls* tls, BOOL readContentLength)
 #ifdef HAVE_VALGRIND_MEMCHECK_H
 		VALGRIND_MAKE_MEM_DEFINED(Stream_Pointer(response->data), status);
 #endif
-		Stream_Seek(response->data, (size_t)status);
+		Stream_Seek(response->data, (size_t) status);
 
 		if (!Stream_EnsureRemainingCapacity(response->data, 1024))
 			goto out_error;
@@ -772,14 +760,14 @@ HttpResponse* http_response_recv(rdpTls* tls, BOOL readContentLength)
 			continue;
 		else if (position > RESPONSE_SIZE_LIMIT)
 		{
-			WLog_ERR(TAG, "Request header too large! (%"PRIdz" bytes) Aborting!", bodyLength);
+			WLog_ERR(TAG, "Request header too large! (%" PRIdz " bytes) Aborting!", bodyLength);
 			goto out_error;
 		}
 
 		/* Always check at most the lase 8 bytes for occurance of the desired
 		 * sequence of \r\n\r\n */
 		s = (position > 8) ? 8 : position;
-		end = (char*)Stream_Pointer(response->data) - s;
+		end = (char*) Stream_Pointer(response->data) - s;
 
 		if (string_strnstr(end, "\r\n\r\n", s) != NULL)
 			payloadOffset = Stream_GetPosition(response->data);
@@ -788,7 +776,7 @@ HttpResponse* http_response_recv(rdpTls* tls, BOOL readContentLength)
 	if (payloadOffset)
 	{
 		size_t count = 0;
-		char* buffer = (char*)Stream_Buffer(response->data);
+		char* buffer = (char*) Stream_Buffer(response->data);
 		char* line = (char*) Stream_Buffer(response->data);
 
 		while ((line = string_strnstr(line, "\r\n", payloadOffset - (line - buffer) - 2UL)))
@@ -849,7 +837,7 @@ HttpResponse* http_response_recv(rdpTls* tls, BOOL readContentLength)
 
 		if (bodyLength > RESPONSE_SIZE_LIMIT)
 		{
-			WLog_ERR(TAG, "Expected request body too large! (%"PRIdz" bytes) Aborting!", bodyLength);
+			WLog_ERR(TAG, "Expected request body too large! (%" PRIdz " bytes) Aborting!", bodyLength);
 			goto out_error;
 		}
 
@@ -872,12 +860,12 @@ HttpResponse* http_response_recv(rdpTls* tls, BOOL readContentLength)
 				continue;
 			}
 
-			Stream_Seek(response->data, (size_t)status);
-			response->BodyLength += (unsigned long)status;
+			Stream_Seek(response->data, (size_t) status);
+			response->BodyLength += (unsigned long) status;
 
 			if (response->BodyLength > RESPONSE_SIZE_LIMIT)
 			{
-				WLog_ERR(TAG, "Request body too large! (%"PRIdz" bytes) Aborting!", response->BodyLength);
+				WLog_ERR(TAG, "Request body too large! (%" PRIdz " bytes) Aborting!", response->BodyLength);
 				goto out_error;
 			}
 		}
@@ -950,7 +938,7 @@ SSIZE_T http_request_get_content_length(HttpRequest* request)
 	if (!request)
 		return -1;
 
-	return (SSIZE_T)request->ContentLength;
+	return (SSIZE_T) request->ContentLength;
 }
 
 BOOL http_request_set_content_length(HttpRequest* request, size_t length)
@@ -975,7 +963,7 @@ SSIZE_T http_response_get_body_length(HttpResponse* response)
 	if (!response)
 		return -1;
 
-	return (SSIZE_T)response->BodyLength;
+	return (SSIZE_T) response->BodyLength;
 }
 
 const char* http_response_get_auth_token(HttpResponse* respone, const char* method)

@@ -40,7 +40,7 @@ static BOOL BufferPool_ShiftAvailable(wBufferPool* pool, int index, int count)
 	{
 		if (pool->aSize + count > pool->aCapacity)
 		{
-			wBufferPoolItem *newArray;
+			wBufferPoolItem* newArray;
 			int newCapacity = pool->aCapacity * 2;
 
 			newArray = (wBufferPoolItem*) realloc(pool->aArray, sizeof(wBufferPoolItem) * newCapacity);
@@ -68,7 +68,8 @@ static BOOL BufferPool_ShiftUsed(wBufferPool* pool, int index, int count)
 		if (pool->uSize + count > pool->uCapacity)
 		{
 			int newUCapacity = pool->uCapacity * 2;
-			wBufferPoolItem *newUArray = (wBufferPoolItem *)realloc(pool->uArray, sizeof(wBufferPoolItem) *newUCapacity);
+			wBufferPoolItem* newUArray =
+			  (wBufferPoolItem*) realloc(pool->uArray, sizeof(wBufferPoolItem) * newUCapacity);
 			if (!newUArray)
 				return FALSE;
 			pool->uCapacity = newUCapacity;
@@ -241,7 +242,7 @@ void* BufferPool_Take(wBufferPool* pool, int size)
 
 			if (maxSize < size)
 			{
-				void *newBuffer;
+				void* newBuffer;
 				if (pool->alignment)
 					newBuffer = _aligned_realloc(buffer, size, pool->alignment);
 				else
@@ -263,7 +264,8 @@ void* BufferPool_Take(wBufferPool* pool, int size)
 		if (pool->uSize + 1 > pool->uCapacity)
 		{
 			int newUCapacity = pool->uCapacity * 2;
-			wBufferPoolItem *newUArray = (wBufferPoolItem *)realloc(pool->uArray, sizeof(wBufferPoolItem) * newUCapacity);
+			wBufferPoolItem* newUArray =
+			  (wBufferPoolItem*) realloc(pool->uArray, sizeof(wBufferPoolItem) * newUCapacity);
 			if (!newUArray)
 				goto out_error;
 
@@ -312,7 +314,7 @@ BOOL BufferPool_Return(wBufferPool* pool, void* buffer)
 		if ((pool->size + 1) >= pool->capacity)
 		{
 			int newCapacity = pool->capacity * 2;
-			void **newArray = (void **)realloc(pool->array, sizeof(void*) * newCapacity);
+			void** newArray = (void**) realloc(pool->array, sizeof(void*) * newCapacity);
 			if (!newArray)
 				goto out_error;
 
@@ -347,7 +349,8 @@ BOOL BufferPool_Return(wBufferPool* pool, void* buffer)
 			if ((pool->aSize + 1) >= pool->aCapacity)
 			{
 				int newCapacity = pool->aCapacity * 2;
-				wBufferPoolItem *newArray = (wBufferPoolItem*) realloc(pool->aArray, sizeof(wBufferPoolItem) * newCapacity);
+				wBufferPoolItem* newArray =
+				  (wBufferPoolItem*) realloc(pool->aArray, sizeof(wBufferPoolItem) * newCapacity);
 				if (!newArray)
 					goto out_error;
 

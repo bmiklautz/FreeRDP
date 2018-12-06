@@ -30,15 +30,14 @@
 
 BOOL android_push_event(freerdp* inst, ANDROID_EVENT* event)
 {
-	androidContext* aCtx = (androidContext*)inst->context;
+	androidContext* aCtx = (androidContext*) inst->context;
 
 	if (aCtx->event_queue->count >= aCtx->event_queue->size)
 	{
 		int new_size;
 		void* new_events;
 		new_size = aCtx->event_queue->size * 2;
-		new_events = realloc((void*) aCtx->event_queue->events,
-		                     sizeof(ANDROID_EVENT*) * new_size);
+		new_events = realloc((void*) aCtx->event_queue->events, sizeof(ANDROID_EVENT*) * new_size);
 
 		if (!new_events)
 			return FALSE;
@@ -85,7 +84,7 @@ static BOOL android_process_event(ANDROID_EVENT_QUEUE* queue, freerdp* inst)
 {
 	ANDROID_EVENT* event;
 	rdpContext* context = inst->context;
-	androidContext* afc  = (androidContext*) context;
+	androidContext* afc = (androidContext*) context;
 
 	while (android_peek_event(queue))
 	{
@@ -95,21 +94,19 @@ static BOOL android_process_event(ANDROID_EVENT_QUEUE* queue, freerdp* inst)
 		{
 			ANDROID_EVENT_KEY* key_event = (ANDROID_EVENT_KEY*) event;
 			inst->input->KeyboardEvent(inst->input, key_event->flags, key_event->scancode);
-			android_event_free((ANDROID_EVENT*)key_event);
+			android_event_free((ANDROID_EVENT*) key_event);
 		}
 		else if (event->type == EVENT_TYPE_KEY_UNICODE)
 		{
 			ANDROID_EVENT_KEY* key_event = (ANDROID_EVENT_KEY*) event;
-			inst->input->UnicodeKeyboardEvent(inst->input, key_event->flags,
-			                                  key_event->scancode);
-			android_event_free((ANDROID_EVENT*)key_event);
+			inst->input->UnicodeKeyboardEvent(inst->input, key_event->flags, key_event->scancode);
+			android_event_free((ANDROID_EVENT*) key_event);
 		}
 		else if (event->type == EVENT_TYPE_CURSOR)
 		{
 			ANDROID_EVENT_CURSOR* cursor_event = (ANDROID_EVENT_CURSOR*) event;
-			inst->input->MouseEvent(inst->input, cursor_event->flags, cursor_event->x,
-			                        cursor_event->y);
-			android_event_free((ANDROID_EVENT*)cursor_event);
+			inst->input->MouseEvent(inst->input, cursor_event->flags, cursor_event->x, cursor_event->y);
+			android_event_free((ANDROID_EVENT*) cursor_event);
 		}
 		else if (event->type == EVENT_TYPE_CLIPBOARD)
 		{
@@ -125,7 +122,7 @@ static BOOL android_process_event(ANDROID_EVENT_QUEUE* queue, freerdp* inst)
 				ClipboardEmpty(afc->clipboard);
 
 			android_cliprdr_send_client_format_list(afc->cliprdr);
-			android_event_free((ANDROID_EVENT*)clipboard_event);
+			android_event_free((ANDROID_EVENT*) clipboard_event);
 		}
 		else if (event->type == EVENT_TYPE_DISCONNECT)
 		{
@@ -144,7 +141,7 @@ HANDLE android_get_handle(freerdp* inst)
 	if (!inst || !inst->context)
 		return NULL;
 
-	aCtx = (androidContext*)inst->context;
+	aCtx = (androidContext*) inst->context;
 
 	if (!aCtx->event_queue || !aCtx->event_queue->isSet)
 		return NULL;
@@ -159,7 +156,7 @@ BOOL android_check_handle(freerdp* inst)
 	if (!inst || !inst->context)
 		return FALSE;
 
-	aCtx = (androidContext*)inst->context;
+	aCtx = (androidContext*) inst->context;
 
 	if (!aCtx->event_queue || !aCtx->event_queue->isSet)
 		return FALSE;
@@ -190,10 +187,7 @@ ANDROID_EVENT_KEY* android_event_key_new(int flags, UINT16 scancode)
 	return event;
 }
 
-static void android_event_key_free(ANDROID_EVENT_KEY* event)
-{
-	free(event);
-}
+static void android_event_key_free(ANDROID_EVENT_KEY* event) { free(event); }
 
 ANDROID_EVENT_KEY* android_event_unicodekey_new(UINT16 key)
 {
@@ -208,10 +202,7 @@ ANDROID_EVENT_KEY* android_event_unicodekey_new(UINT16 key)
 	return event;
 }
 
-static void android_event_unicodekey_free(ANDROID_EVENT_KEY* event)
-{
-	free(event);
-}
+static void android_event_unicodekey_free(ANDROID_EVENT_KEY* event) { free(event); }
 
 ANDROID_EVENT_CURSOR* android_event_cursor_new(UINT16 flags, UINT16 x, UINT16 y)
 {
@@ -228,10 +219,7 @@ ANDROID_EVENT_CURSOR* android_event_cursor_new(UINT16 flags, UINT16 x, UINT16 y)
 	return event;
 }
 
-static void android_event_cursor_free(ANDROID_EVENT_CURSOR* event)
-{
-	free(event);
-}
+static void android_event_cursor_free(ANDROID_EVENT_CURSOR* event) { free(event); }
 
 ANDROID_EVENT* android_event_disconnect_new(void)
 {
@@ -245,13 +233,9 @@ ANDROID_EVENT* android_event_disconnect_new(void)
 	return event;
 }
 
-static void android_event_disconnect_free(ANDROID_EVENT* event)
-{
-	free(event);
-}
+static void android_event_disconnect_free(ANDROID_EVENT* event) { free(event); }
 
-ANDROID_EVENT_CLIPBOARD* android_event_clipboard_new(void* data,
-        int data_length)
+ANDROID_EVENT_CLIPBOARD* android_event_clipboard_new(void* data, int data_length)
 {
 	ANDROID_EVENT_CLIPBOARD* event;
 	event = (ANDROID_EVENT_CLIPBOARD*) calloc(1, sizeof(ANDROID_EVENT_CLIPBOARD));
@@ -289,7 +273,7 @@ static void android_event_clipboard_free(ANDROID_EVENT_CLIPBOARD* event)
 
 BOOL android_event_queue_init(freerdp* inst)
 {
-	androidContext* aCtx = (androidContext*)inst->context;
+	androidContext* aCtx = (androidContext*) inst->context;
 	ANDROID_EVENT_QUEUE* queue;
 	queue = (ANDROID_EVENT_QUEUE*) calloc(1, sizeof(ANDROID_EVENT_QUEUE));
 
@@ -331,7 +315,7 @@ void android_event_queue_uninit(freerdp* inst)
 	if (!inst || !inst->context)
 		return;
 
-	aCtx = (androidContext*)inst->context;
+	aCtx = (androidContext*) inst->context;
 	queue = aCtx->event_queue;
 
 	if (queue)
@@ -362,23 +346,23 @@ void android_event_free(ANDROID_EVENT* event)
 	switch (event->type)
 	{
 		case EVENT_TYPE_KEY:
-			android_event_key_free((ANDROID_EVENT_KEY*)event);
+			android_event_key_free((ANDROID_EVENT_KEY*) event);
 			break;
 
 		case EVENT_TYPE_KEY_UNICODE:
-			android_event_unicodekey_free((ANDROID_EVENT_KEY*)event);
+			android_event_unicodekey_free((ANDROID_EVENT_KEY*) event);
 			break;
 
 		case EVENT_TYPE_CURSOR:
-			android_event_cursor_free((ANDROID_EVENT_CURSOR*)event);
+			android_event_cursor_free((ANDROID_EVENT_CURSOR*) event);
 			break;
 
 		case EVENT_TYPE_DISCONNECT:
-			android_event_disconnect_free((ANDROID_EVENT*)event);
+			android_event_disconnect_free((ANDROID_EVENT*) event);
 			break;
 
 		case EVENT_TYPE_CLIPBOARD:
-			android_event_clipboard_free((ANDROID_EVENT_CLIPBOARD*)event);
+			android_event_clipboard_free((ANDROID_EVENT_CLIPBOARD*) event);
 			break;
 
 		default:

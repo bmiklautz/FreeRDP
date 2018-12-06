@@ -143,7 +143,8 @@ void NdrProcessParam(PMIDL_STUB_MESSAGE pStubMsg, NDR_PHASE phase, unsigned char
 	}
 }
 
-void NdrProcessParams(PMIDL_STUB_MESSAGE pStubMsg, PFORMAT_STRING pFormat, NDR_PHASE phase, void** fpuArgs, unsigned short numberParams)
+void NdrProcessParams(PMIDL_STUB_MESSAGE pStubMsg, PFORMAT_STRING pFormat, NDR_PHASE phase, void** fpuArgs,
+                      unsigned short numberParams)
 {
 	unsigned int i;
 	NDR_PARAM* params;
@@ -162,9 +163,8 @@ void NdrProcessParams(PMIDL_STUB_MESSAGE pStubMsg, PFORMAT_STRING pFormat, NDR_P
 		fmt = (PFORMAT_STRING) &pStubMsg->StubDesc->pFormatTypes[params[i].Type.Offset];
 #ifdef __x86_64__
 
-		if ((params[i].Attributes.IsBasetype) &&
-				!(params[i].Attributes.IsSimpleRef) &&
-				((params[i].Type.FormatChar) == FC_FLOAT) && !fpuArgs)
+		if ((params[i].Attributes.IsBasetype) && !(params[i].Attributes.IsSimpleRef) &&
+		    ((params[i].Type.FormatChar) == FC_FLOAT) && !fpuArgs)
 		{
 			tmp = *(double*) arg;
 			arg = (unsigned char*) &tmp;
@@ -182,8 +182,8 @@ void NdrProcessParams(PMIDL_STUB_MESSAGE pStubMsg, PFORMAT_STRING pFormat, NDR_P
 	}
 }
 
-void NdrClientInitializeNew(PRPC_MESSAGE pRpcMessage, PMIDL_STUB_MESSAGE pStubMsg,
-							PMIDL_STUB_DESC pStubDesc, unsigned int ProcNum)
+void NdrClientInitializeNew(PRPC_MESSAGE pRpcMessage, PMIDL_STUB_MESSAGE pStubMsg, PMIDL_STUB_DESC pStubDesc,
+                            unsigned int ProcNum)
 {
 	pRpcMessage->Handle = NULL;
 	pRpcMessage->RpcFlags = 0;
@@ -243,7 +243,8 @@ void NdrPrintExtFlags(INTERPRETER_OPT_FLAGS2 extFlags)
 		WLog_INFO(TAG, "HasNotify2, ");
 }
 
-CLIENT_CALL_RETURN NdrClientCall(PMIDL_STUB_DESC pStubDescriptor, PFORMAT_STRING pFormat, void** stackTop, void** fpuStack)
+CLIENT_CALL_RETURN NdrClientCall(PMIDL_STUB_DESC pStubDescriptor, PFORMAT_STRING pFormat, void** stackTop,
+                                 void** fpuStack)
 {
 	RPC_MESSAGE rpcMsg;
 	unsigned short procNum;
@@ -267,9 +268,8 @@ CLIENT_CALL_RETURN NdrClientCall(PMIDL_STUB_DESC pStubDescriptor, PFORMAT_STRING
 	/* The Header: http://msdn.microsoft.com/en-us/library/windows/desktop/aa378707/ */
 	/* Procedure Header Descriptor: http://msdn.microsoft.com/en-us/library/windows/desktop/aa374387/ */
 	/* Handles: http://msdn.microsoft.com/en-us/library/windows/desktop/aa373932/ */
-	WLog_DBG(TAG, "Oi Header: HandleType: 0x%02X OiFlags: 0x%02X ProcNum: %hu StackSize: 0x%04X",
-			 handleType, *((unsigned char*) &flags),
-			 procNum, stackSize);
+	WLog_DBG(TAG, "Oi Header: HandleType: 0x%02X OiFlags: 0x%02X ProcNum: %hu StackSize: 0x%04X", handleType,
+	         *((unsigned char*) &flags), procNum, stackSize);
 
 	if (handleType > 0)
 	{
@@ -289,10 +289,8 @@ CLIENT_CALL_RETURN NdrClientCall(PMIDL_STUB_DESC pStubDescriptor, PFORMAT_STRING
 	optFlags = oi2ProcHeader->Oi2Flags;
 	numberParams = oi2ProcHeader->NumberParams;
 	WLog_DBG(TAG, "Oi2 Header: Oi2Flags: 0x%02X, NumberParams: %u ClientBufferSize: %hu ServerBufferSize: %hu",
-			 *((unsigned char*) &optFlags),
-			 numberParams,
-			 oi2ProcHeader->ClientBufferSize,
-			 oi2ProcHeader->ServerBufferSize);
+	         *((unsigned char*) &optFlags), numberParams, oi2ProcHeader->ClientBufferSize,
+	         oi2ProcHeader->ServerBufferSize);
 	WLog_INFO(TAG, "Oi2Flags: ");
 	NdrPrintOptFlags(optFlags);
 	NdrClientInitializeNew(&rpcMsg, &stubMsg, pStubDescriptor, procNum);
@@ -303,14 +301,14 @@ CLIENT_CALL_RETURN NdrClientCall(PMIDL_STUB_DESC pStubDescriptor, PFORMAT_STRING
 		NDR_PROC_HEADER_EXTS* extensions = (NDR_PROC_HEADER_EXTS*) pFormat;
 		pFormat += extensions->Size;
 		extFlags = extensions->Flags2;
-		WLog_DBG(TAG, "Extensions: Size: %hhu, flags2: 0x%02X",
-				 extensions->Size, *((unsigned char*) &extensions->Flags2));
+		WLog_DBG(TAG, "Extensions: Size: %hhu, flags2: 0x%02X", extensions->Size,
+		         *((unsigned char*) &extensions->Flags2));
 #ifdef __x86_64__
 
 		if (extensions->Size > sizeof(*extensions) && fpuStack)
 		{
 			int i;
-			unsigned short fpuMask = *(unsigned short*)(extensions + 1);
+			unsigned short fpuMask = *(unsigned short*) (extensions + 1);
 
 			for (i = 0; i < 4; i++, fpuMask >>= 2)
 			{
@@ -334,7 +332,7 @@ CLIENT_CALL_RETURN NdrClientCall(PMIDL_STUB_DESC pStubDescriptor, PFORMAT_STRING
 
 	stubMsg.StackTop = (unsigned char*) stackTop;
 	NdrProcessParams(&stubMsg, pFormat, NDR_PHASE_SIZE, fpuStack, numberParams);
-	WLog_DBG(TAG, "stubMsg BufferLength: %"PRIu32"", stubMsg.BufferLength);
+	WLog_DBG(TAG, "stubMsg BufferLength: %" PRIu32 "", stubMsg.BufferLength);
 	return client_call_return;
 }
 

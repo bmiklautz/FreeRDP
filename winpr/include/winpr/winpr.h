@@ -38,13 +38,13 @@
 #endif
 #else
 #if __GNUC__ >= 4
-#define WINPR_API   __attribute__ ((visibility("default")))
+#define WINPR_API __attribute__((visibility("default")))
 #else
 #define WINPR_API
 #endif
 #endif
 #else /* WINPR_DLL */
-#define WINPR_API	
+#define WINPR_API
 #endif
 
 /* Thread local storage keyword define */
@@ -62,11 +62,10 @@
 #define WINPR_TLS
 #endif
 
-
 #ifdef _WIN32
-#define INLINE	__inline
+#define INLINE __inline
 #else
-#define INLINE	inline
+#define INLINE inline
 #endif
 
 WINPR_API void winpr_get_version(int* major, int* minor, int* revision);
@@ -75,6 +74,6 @@ WINPR_API const char* winpr_get_build_date(void);
 WINPR_API const char* winpr_get_build_revision(void);
 WINPR_API const char* winpr_get_build_config(void);
 
-#define WINPR_UNUSED(x) (void)(x)
+#define WINPR_UNUSED(x) (void) (x)
 
 #endif /* WINPR_H */

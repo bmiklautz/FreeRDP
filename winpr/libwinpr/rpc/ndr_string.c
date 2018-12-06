@@ -42,4 +42,3 @@ void NdrNonConformantStringBufferSize(PMIDL_STUB_MESSAGE pStubMsg, unsigned char
 }
 
 #endif
-

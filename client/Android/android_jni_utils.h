@@ -16,15 +16,13 @@
 #include <freerdp/api.h>
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 FREERDP_LOCAL JNIEnv* getJNIEnv();
 FREERDP_LOCAL JavaVM* getJavaVM();
 
-FREERDP_LOCAL char* get_string_from_string_builder(JNIEnv* env,
-        jobject strBuilder);
+FREERDP_LOCAL char* get_string_from_string_builder(JNIEnv* env, jobject strBuilder);
 FREERDP_LOCAL jobject create_string_builder(JNIEnv* env, char* initialStr);
 FREERDP_LOCAL jstring jniNewStringUTF(JNIEnv* env, const char* in, int len);
 

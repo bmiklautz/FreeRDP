@@ -44,7 +44,7 @@
 #include <X11/extensions/randr.h>
 
 #if (RANDR_MAJOR * 100 + RANDR_MINOR) >= 105
-#	define USABLE_XRANDR
+#define USABLE_XRANDR
 #endif
 
 #endif
@@ -68,19 +68,15 @@ int xf_list_monitors(xfContext* xfc)
 
 #if defined(USABLE_XRANDR)
 
-	if (XRRQueryExtension(xfc->display, &major, &minor) &&
-	    (XRRQueryVersion(xfc->display, &major, &minor) == True) &&
+	if (XRRQueryExtension(xfc->display, &major, &minor) && (XRRQueryVersion(xfc->display, &major, &minor) == True) &&
 	    (major * 100 + minor >= 105))
 	{
-		XRRMonitorInfo* monitors = XRRGetMonitors(xfc->display, DefaultRootWindow(xfc->display), 1,
-		                           &nmonitors);
+		XRRMonitorInfo* monitors = XRRGetMonitors(xfc->display, DefaultRootWindow(xfc->display), 1, &nmonitors);
 
 		for (i = 0; i < nmonitors; i++)
 		{
-			printf("      %s [%d] %dx%d\t+%d+%d\n",
-			       monitors[i].primary ? "*" : " ", i,
-			       monitors[i].width, monitors[i].height,
-			       monitors[i].x, monitors[i].y);
+			printf("      %s [%d] %dx%d\t+%d+%d\n", monitors[i].primary ? "*" : " ", i, monitors[i].width,
+			       monitors[i].height, monitors[i].x, monitors[i].y);
 		}
 
 		XRRFreeMonitors(monitors);
@@ -88,24 +84,22 @@ int xf_list_monitors(xfContext* xfc)
 	else
 #endif
 #ifdef WITH_XINERAMA
-		if (XineramaQueryExtension(display, &major, &minor))
+	  if (XineramaQueryExtension(display, &major, &minor))
+	{
+		if (XineramaIsActive(display))
 		{
-			if (XineramaIsActive(display))
+			XineramaScreenInfo* screen = XineramaQueryScreens(display, &nmonitors);
+
+			for (i = 0; i < nmonitors; i++)
 			{
-				XineramaScreenInfo* screen = XineramaQueryScreens(display, &nmonitors);
-
-				for (i = 0; i < nmonitors; i++)
-				{
-					printf("      %s [%d] %hdx%hd\t+%hd+%hd\n",
-					       (i == 0) ? "*" : " ", i,
-					       screen[i].width, screen[i].height,
-					       screen[i].x_org, screen[i].y_org);
-				}
-
-				XFree(screen);
+				printf("      %s [%d] %hdx%hd\t+%hd+%hd\n", (i == 0) ? "*" : " ", i, screen[i].width, screen[i].height,
+				       screen[i].x_org, screen[i].y_org);
 			}
+
+			XFree(screen);
 		}
-		else
+	}
+	else
 #else
 	{
 		Screen* screen = ScreenOfDisplay(display, DefaultScreen(display));
@@ -113,7 +107,7 @@ int xf_list_monitors(xfContext* xfc)
 	}
 
 #endif
-			XCloseDisplay(display);
+		XCloseDisplay(display);
 	return 0;
 }
 
@@ -159,19 +153,17 @@ BOOL xf_detect_monitors(xfContext* xfc, UINT32* pMaxWidth, UINT32* pMaxHeight)
 	*pMaxHeight = settings->DesktopHeight;
 
 	/* get mouse location */
-	if (!XQueryPointer(xfc->display, DefaultRootWindow(xfc->display),
-	                   &_dummy_w, &_dummy_w, &mouse_x, &mouse_y,
+	if (!XQueryPointer(xfc->display, DefaultRootWindow(xfc->display), &_dummy_w, &_dummy_w, &mouse_x, &mouse_y,
 	                   &_dummy_i, &_dummy_i, (void*) &_dummy_i))
 		mouse_x = mouse_y = 0;
 
 #if defined(USABLE_XRANDR)
 
-	if (XRRQueryExtension(xfc->display, &major, &minor) &&
-	    (XRRQueryVersion(xfc->display, &major, &minor) == True) &&
+	if (XRRQueryExtension(xfc->display, &major, &minor) && (XRRQueryVersion(xfc->display, &major, &minor) == True) &&
 	    (major * 100 + minor >= 105))
 	{
-		XRRMonitorInfo* rrmonitors = XRRGetMonitors(xfc->display, DefaultRootWindow(xfc->display), 1,
-		                             &vscreen->nmonitors);
+		XRRMonitorInfo* rrmonitors =
+		  XRRGetMonitors(xfc->display, DefaultRootWindow(xfc->display), 1, &vscreen->nmonitors);
 
 		if (vscreen->nmonitors > 16)
 			vscreen->nmonitors = 0;
@@ -194,40 +186,38 @@ BOOL xf_detect_monitors(xfContext* xfc, UINT32* pMaxWidth, UINT32* pMaxHeight)
 	else
 #endif
 #ifdef WITH_XINERAMA
-		if (XineramaQueryExtension(xfc->display, &major, &minor) && XineramaIsActive(xfc->display))
+	  if (XineramaQueryExtension(xfc->display, &major, &minor) && XineramaIsActive(xfc->display))
+	{
+		XineramaScreenInfo* screenInfo = XineramaQueryScreens(xfc->display, &vscreen->nmonitors);
+
+		if (vscreen->nmonitors > 16)
+			vscreen->nmonitors = 0;
+
+		if (vscreen->nmonitors)
 		{
-			XineramaScreenInfo* screenInfo = XineramaQueryScreens(xfc->display, &vscreen->nmonitors);
-
-			if (vscreen->nmonitors > 16)
-				vscreen->nmonitors = 0;
-
-			if (vscreen->nmonitors)
+			for (i = 0; i < vscreen->nmonitors; i++)
 			{
-				for (i = 0; i < vscreen->nmonitors; i++)
-				{
-					vscreen->monitors[i].area.left = screenInfo[i].x_org;
-					vscreen->monitors[i].area.top = screenInfo[i].y_org;
-					vscreen->monitors[i].area.right = screenInfo[i].x_org + screenInfo[i].width - 1;
-					vscreen->monitors[i].area.bottom = screenInfo[i].y_org + screenInfo[i].height - 1;
-				}
+				vscreen->monitors[i].area.left = screenInfo[i].x_org;
+				vscreen->monitors[i].area.top = screenInfo[i].y_org;
+				vscreen->monitors[i].area.right = screenInfo[i].x_org + screenInfo[i].width - 1;
+				vscreen->monitors[i].area.bottom = screenInfo[i].y_org + screenInfo[i].height - 1;
 			}
-
-			XFree(screenInfo);
 		}
 
+		XFree(screenInfo);
+	}
+
 #endif
-	xfc->fullscreenMonitors.top = xfc->fullscreenMonitors.bottom =
-	                                  xfc->fullscreenMonitors.left = xfc->fullscreenMonitors.right = 0;
+	xfc->fullscreenMonitors.top = xfc->fullscreenMonitors.bottom = xfc->fullscreenMonitors.left =
+	  xfc->fullscreenMonitors.right = 0;
 
 	/* Determine which monitor that the mouse cursor is on */
 	if (vscreen->monitors)
 	{
 		for (i = 0; i < vscreen->nmonitors; i++)
 		{
-			if ((mouse_x >= vscreen->monitors[i].area.left) &&
-			    (mouse_x <= vscreen->monitors[i].area.right) &&
-			    (mouse_y >= vscreen->monitors[i].area.top) &&
-			    (mouse_y <= vscreen->monitors[i].area.bottom))
+			if ((mouse_x >= vscreen->monitors[i].area.left) && (mouse_x <= vscreen->monitors[i].area.right) &&
+			    (mouse_y >= vscreen->monitors[i].area.top) && (mouse_y <= vscreen->monitors[i].area.bottom))
 			{
 				current_monitor = i;
 				break;
@@ -243,8 +233,7 @@ BOOL xf_detect_monitors(xfContext* xfc, UINT32* pMaxWidth, UINT32* pMaxHeight)
 	   without remote app, we force the number of monitors be 1 so later
 	   the rest of the client don't end up using more monitors than the user desires.
 	 */
-	if ((!settings->UseMultimon && !settings->SpanMonitors) ||
-	    (settings->Workarea && !settings->RemoteApplicationMode))
+	if ((!settings->UseMultimon && !settings->SpanMonitors) || (settings->Workarea && !settings->RemoteApplicationMode))
 	{
 		/* If no monitors were specified on the command-line then set the current monitor as active */
 		if (!settings->NumMonitorIds)
@@ -305,20 +294,22 @@ BOOL xf_detect_monitors(xfContext* xfc, UINT32* pMaxWidth, UINT32* pMaxHeight)
 		 */
 		if (vscreen->nmonitors > 0)
 		{
-			*pMaxWidth = vscreen->monitors[current_monitor].area.right -
-			             vscreen->monitors[current_monitor].area.left + 1;
-			*pMaxHeight = vscreen->monitors[current_monitor].area.bottom -
-			              vscreen->monitors[current_monitor].area.top + 1;
+			*pMaxWidth =
+			  vscreen->monitors[current_monitor].area.right - vscreen->monitors[current_monitor].area.left + 1;
+			*pMaxHeight =
+			  vscreen->monitors[current_monitor].area.bottom - vscreen->monitors[current_monitor].area.top + 1;
 
 			if (settings->PercentScreenUseWidth)
-				*pMaxWidth = ((vscreen->monitors[current_monitor].area.right -
-				               vscreen->monitors[current_monitor].area.left + 1) * settings->PercentScreen) /
-				             100;
+				*pMaxWidth =
+				  ((vscreen->monitors[current_monitor].area.right - vscreen->monitors[current_monitor].area.left + 1) *
+				   settings->PercentScreen) /
+				  100;
 
 			if (settings->PercentScreenUseHeight)
-				*pMaxHeight = ((vscreen->monitors[current_monitor].area.bottom -
-				                vscreen->monitors[current_monitor].area.top + 1) * settings->PercentScreen) /
-				              100;
+				*pMaxHeight =
+				  ((vscreen->monitors[current_monitor].area.bottom - vscreen->monitors[current_monitor].area.top + 1) *
+				   settings->PercentScreen) /
+				  100;
 		}
 		else
 		{
@@ -349,9 +340,9 @@ BOOL xf_detect_monitors(xfContext* xfc, UINT32* pMaxWidth, UINT32* pMaxHeight)
 		settings->MonitorDefArray[nmonitors].x = vscreen->monitors[i].area.left;
 		settings->MonitorDefArray[nmonitors].y = vscreen->monitors[i].area.top;
 		settings->MonitorDefArray[nmonitors].width =
-		    MIN(vscreen->monitors[i].area.right - vscreen->monitors[i].area.left + 1, *pMaxWidth);
+		  MIN(vscreen->monitors[i].area.right - vscreen->monitors[i].area.left + 1, *pMaxWidth);
 		settings->MonitorDefArray[nmonitors].height =
-		    MIN(vscreen->monitors[i].area.bottom - vscreen->monitors[i].area.top + 1, *pMaxHeight);
+		  MIN(vscreen->monitors[i].area.bottom - vscreen->monitors[i].area.top + 1, *pMaxHeight);
 		settings->MonitorDefArray[nmonitors].orig_screen = i;
 #ifdef USABLE_XRANDR
 
@@ -378,17 +369,17 @@ BOOL xf_detect_monitors(xfContext* xfc, UINT32* pMaxWidth, UINT32* pMaxHeight)
 		nmonitors++;
 	}
 
-	/* If no monitor is active(bogus command-line monitor specification) - then lets try to fallback to go fullscreen on the current monitor only */
+	/* If no monitor is active(bogus command-line monitor specification) - then lets try to fallback to go fullscreen on
+	 * the current monitor only */
 	if (nmonitors == 0 && vscreen->nmonitors > 0)
 	{
 		settings->MonitorDefArray[0].x = vscreen->monitors[current_monitor].area.left;
 		settings->MonitorDefArray[0].y = vscreen->monitors[current_monitor].area.top;
 		settings->MonitorDefArray[0].width = MIN(
-		        vscreen->monitors[current_monitor].area.right -
-		        vscreen->monitors[current_monitor].area.left + 1, *pMaxWidth);
-		settings->MonitorDefArray[0].height = MIN(
-		        vscreen->monitors[current_monitor].area.bottom -
-		        vscreen->monitors[current_monitor].area.top + 1, *pMaxHeight);
+		  vscreen->monitors[current_monitor].area.right - vscreen->monitors[current_monitor].area.left + 1, *pMaxWidth);
+		settings->MonitorDefArray[0].height =
+		  MIN(vscreen->monitors[current_monitor].area.bottom - vscreen->monitors[current_monitor].area.top + 1,
+		      *pMaxHeight);
 		settings->MonitorDefArray[0].orig_screen = current_monitor;
 		nmonitors = 1;
 	}
@@ -403,9 +394,8 @@ BOOL xf_detect_monitors(xfContext* xfc, UINT32* pMaxWidth, UINT32* pMaxHeight)
 		int vY = settings->MonitorDefArray[0].y;
 		int vR = vX + settings->MonitorDefArray[0].width;
 		int vB = vY + settings->MonitorDefArray[0].height;
-		xfc->fullscreenMonitors.top = xfc->fullscreenMonitors.bottom =
-		                                  xfc->fullscreenMonitors.left = xfc->fullscreenMonitors.right =
-		                                          settings->MonitorDefArray[0].orig_screen;
+		xfc->fullscreenMonitors.top = xfc->fullscreenMonitors.bottom = xfc->fullscreenMonitors.left =
+		  xfc->fullscreenMonitors.right = settings->MonitorDefArray[0].orig_screen;
 
 		/* Calculate bounding rectangle around all monitors to be used AND
 		 * also set the Xinerama indices which define left/top/right/bottom monitors.
@@ -415,10 +405,8 @@ BOOL xf_detect_monitors(xfContext* xfc, UINT32* pMaxWidth, UINT32* pMaxHeight)
 			/* does the same as gdk_rectangle_union */
 			int destX = MIN(vX, settings->MonitorDefArray[i].x);
 			int destY = MIN(vY, settings->MonitorDefArray[i].y);
-			int destR = MAX(vR, settings->MonitorDefArray[i].x +
-			                settings->MonitorDefArray[i].width);
-			int destB = MAX(vB, settings->MonitorDefArray[i].y +
-			                settings->MonitorDefArray[i].height);
+			int destR = MAX(vR, settings->MonitorDefArray[i].x + settings->MonitorDefArray[i].width);
+			int destB = MAX(vB, settings->MonitorDefArray[i].y + settings->MonitorDefArray[i].height);
 
 			if (vX != destX)
 				xfc->fullscreenMonitors.left = settings->MonitorDefArray[i].orig_screen;
@@ -455,7 +443,7 @@ BOOL xf_detect_monitors(xfContext* xfc, UINT32* pMaxWidth, UINT32* pMaxHeight)
 			if (settings->NumMonitorIds)
 			{
 				/* The first monitor is the first in the setting which should be used */
-				monitor_index =  settings->MonitorIds[0];
+				monitor_index = settings->MonitorIds[0];
 			}
 			else
 			{
@@ -482,8 +470,8 @@ BOOL xf_detect_monitors(xfContext* xfc, UINT32* pMaxWidth, UINT32* pMaxHeight)
 				/* Lets try to see if there is a monitor with a 0,0 coordinate and use it as a fallback*/
 				for (i = 0; i < settings->MonitorCount; i++)
 				{
-					if (!primaryMonitorFound && settings->MonitorDefArray[i].x == 0
-					    && settings->MonitorDefArray[i].y == 0)
+					if (!primaryMonitorFound && settings->MonitorDefArray[i].x == 0 &&
+					    settings->MonitorDefArray[i].y == 0)
 					{
 						settings->MonitorDefArray[i].is_primary = TRUE;
 						settings->MonitorLocalShiftX = settings->MonitorDefArray[i].x;
@@ -502,10 +490,8 @@ BOOL xf_detect_monitors(xfContext* xfc, UINT32* pMaxWidth, UINT32* pMaxHeight)
 		 */
 		for (i = 0; i < settings->MonitorCount; i++)
 		{
-			settings->MonitorDefArray[i].x = settings->MonitorDefArray[i].x -
-			                                 settings->MonitorLocalShiftX;
-			settings->MonitorDefArray[i].y = settings->MonitorDefArray[i].y -
-			                                 settings->MonitorLocalShiftY;
+			settings->MonitorDefArray[i].x = settings->MonitorDefArray[i].x - settings->MonitorLocalShiftX;
+			settings->MonitorDefArray[i].y = settings->MonitorDefArray[i].y - settings->MonitorLocalShiftY;
 		}
 
 		/* Set the desktop width and height according to the bounding rectangle around the active monitors */

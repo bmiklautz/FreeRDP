@@ -53,13 +53,13 @@ static BOOL MutexIsHandled(HANDLE handle)
 
 static int MutexGetFd(HANDLE handle)
 {
-	WINPR_MUTEX* mux = (WINPR_MUTEX*)handle;
+	WINPR_MUTEX* mux = (WINPR_MUTEX*) handle;
 
 	if (!MutexIsHandled(handle))
 		return -1;
 
 	/* TODO: Mutex does not support file handles... */
-	(void)mux;
+	(void) mux;
 	return -1;
 }
 
@@ -86,7 +86,7 @@ BOOL MutexCloseHandle(HANDLE handle)
 			if (msg)
 			{
 				for (i = 0; i < used; i++)
-					WLog_ERR(TAG, "%2"PRIdz": %s", i, msg[i]);
+					WLog_ERR(TAG, "%2" PRIdz ": %s", i, msg[i]);
 			}
 
 			free(msg);
@@ -103,29 +103,16 @@ BOOL MutexCloseHandle(HANDLE handle)
 	return TRUE;
 }
 
-static HANDLE_OPS ops =
-{
-	MutexIsHandled,
-	MutexCloseHandle,
-	MutexGetFd,
-	NULL, /* CleanupHandle */
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
+static HANDLE_OPS ops = { MutexIsHandled, MutexCloseHandle,
+	                      MutexGetFd,     NULL, /* CleanupHandle */
+	                      NULL,           NULL,
+	                      NULL,           NULL,
+	                      NULL,           NULL,
+	                      NULL,           NULL,
+	                      NULL,           NULL,
+	                      NULL,           NULL,
+	                      NULL,           NULL,
+	                      NULL,           NULL };
 
 HANDLE CreateMutexW(LPSECURITY_ATTRIBUTES lpMutexAttributes, BOOL bInitialOwner, LPCWSTR lpName)
 {
@@ -155,27 +142,19 @@ HANDLE CreateMutexA(LPSECURITY_ATTRIBUTES lpMutexAttributes, BOOL bInitialOwner,
 	return CreateMutexW(lpMutexAttributes, bInitialOwner, NULL);
 }
 
-HANDLE CreateMutexExA(LPSECURITY_ATTRIBUTES lpMutexAttributes, LPCTSTR lpName, DWORD dwFlags,
-                      DWORD dwDesiredAccess)
+HANDLE CreateMutexExA(LPSECURITY_ATTRIBUTES lpMutexAttributes, LPCTSTR lpName, DWORD dwFlags, DWORD dwDesiredAccess)
 {
 	return CreateMutexW(lpMutexAttributes, FALSE, NULL);
 }
 
-HANDLE CreateMutexExW(LPSECURITY_ATTRIBUTES lpMutexAttributes, LPCWSTR lpName, DWORD dwFlags,
-                      DWORD dwDesiredAccess)
+HANDLE CreateMutexExW(LPSECURITY_ATTRIBUTES lpMutexAttributes, LPCWSTR lpName, DWORD dwFlags, DWORD dwDesiredAccess)
 {
 	return CreateMutexW(lpMutexAttributes, FALSE, NULL);
 }
 
-HANDLE OpenMutexA(DWORD dwDesiredAccess, BOOL bInheritHandle, LPCSTR lpName)
-{
-	return NULL;
-}
+HANDLE OpenMutexA(DWORD dwDesiredAccess, BOOL bInheritHandle, LPCSTR lpName) { return NULL; }
 
-HANDLE OpenMutexW(DWORD dwDesiredAccess, BOOL bInheritHandle, LPCWSTR lpName)
-{
-	return NULL;
-}
+HANDLE OpenMutexW(DWORD dwDesiredAccess, BOOL bInheritHandle, LPCWSTR lpName) { return NULL; }
 
 BOOL ReleaseMutex(HANDLE hMutex)
 {

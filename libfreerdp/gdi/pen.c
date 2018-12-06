@@ -41,8 +41,7 @@
  * @return new pen
  */
 
-HGDI_PEN gdi_CreatePen(UINT32 fnPenStyle, UINT32 nWidth, UINT32 crColor,
-			   UINT32 format, const gdiPalette* palette)
+HGDI_PEN gdi_CreatePen(UINT32 fnPenStyle, UINT32 nWidth, UINT32 crColor, UINT32 format, const gdiPalette* palette)
 {
 	HGDI_PEN hPen = (HGDI_PEN) calloc(1, sizeof(GDI_PEN));
 	if (!hPen)

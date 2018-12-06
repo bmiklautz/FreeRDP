@@ -66,10 +66,7 @@ int der_get_content_length(int length)
 		return length - 2;
 }
 
-int der_skip_contextual_tag(int length)
-{
-	return _der_skip_length(length) + 1;
-}
+int der_skip_contextual_tag(int length) { return _der_skip_length(length) + 1; }
 
 int der_write_contextual_tag(wStream* s, BYTE tag, int length, BOOL pc)
 {
@@ -82,10 +79,7 @@ void der_write_universal_tag(wStream* s, BYTE tag, BOOL pc)
 	Stream_Write_UINT8(s, (ER_CLASS_UNIV | ER_PC(pc)) | (ER_TAG_MASK & tag));
 }
 
-int der_skip_octet_string(int length)
-{
-	return 1 + _der_skip_length(length) + length;
-}
+int der_skip_octet_string(int length) { return 1 + _der_skip_length(length) + length; }
 
 void der_write_octet_string(wStream* s, BYTE* oct_str, int length)
 {
@@ -94,14 +88,10 @@ void der_write_octet_string(wStream* s, BYTE* oct_str, int length)
 	Stream_Write(s, oct_str, length);
 }
 
-int der_skip_sequence_tag(int length)
-{
-	return 1 + _der_skip_length(length);
-}
+int der_skip_sequence_tag(int length) { return 1 + _der_skip_length(length); }
 
 int der_write_sequence_tag(wStream* s, int length)
 {
 	Stream_Write_UINT8(s, (ER_CLASS_UNIV | ER_CONSTRUCT) | (ER_TAG_MASK & ER_TAG_SEQUENCE));
 	return der_write_length(s, length) + 1;
 }
-

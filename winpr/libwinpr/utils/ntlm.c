@@ -37,8 +37,7 @@ BOOL NTOWFv1W(LPWSTR Password, UINT32 PasswordLength, BYTE* NtHash)
 	if (!Password || !NtHash)
 		return FALSE;
 
-	if (!winpr_Digest(WINPR_MD_MD4, (BYTE*) Password, (size_t) PasswordLength, NtHash,
-	                  WINPR_MD4_DIGEST_LENGTH))
+	if (!winpr_Digest(WINPR_MD_MD4, (BYTE*) Password, (size_t) PasswordLength, NtHash, WINPR_MD4_DIGEST_LENGTH))
 		return FALSE;
 
 	return TRUE;
@@ -73,8 +72,8 @@ out_fail:
  * EndDefine
  */
 
-BOOL NTOWFv2W(LPWSTR Password, UINT32 PasswordLength, LPWSTR User,
-              UINT32 UserLength, LPWSTR Domain, UINT32 DomainLength, BYTE* NtHash)
+BOOL NTOWFv2W(LPWSTR Password, UINT32 PasswordLength, LPWSTR User, UINT32 UserLength, LPWSTR Domain,
+              UINT32 DomainLength, BYTE* NtHash)
 {
 	BYTE* buffer;
 	BYTE NtHashV1[16];
@@ -95,8 +94,7 @@ BOOL NTOWFv2W(LPWSTR Password, UINT32 PasswordLength, LPWSTR User,
 	CopyMemory(&buffer[UserLength], Domain, DomainLength);
 
 	/* Compute the HMAC-MD5 hash of the above value using the NTLMv1 hash as the key, the result is the NTLMv2 hash */
-	if (!winpr_HMAC(WINPR_MD_MD5, NtHashV1, 16, buffer, UserLength + DomainLength, NtHash,
-	                WINPR_MD4_DIGEST_LENGTH))
+	if (!winpr_HMAC(WINPR_MD_MD5, NtHashV1, 16, buffer, UserLength + DomainLength, NtHash, WINPR_MD4_DIGEST_LENGTH))
 		goto out_fail;
 
 	result = TRUE;
@@ -105,8 +103,8 @@ out_fail:
 	return result;
 }
 
-BOOL NTOWFv2A(LPSTR Password, UINT32 PasswordLength, LPSTR User,
-              UINT32 UserLength, LPSTR Domain, UINT32 DomainLength, BYTE* NtHash)
+BOOL NTOWFv2A(LPSTR Password, UINT32 PasswordLength, LPSTR User, UINT32 UserLength, LPSTR Domain, UINT32 DomainLength,
+              BYTE* NtHash)
 {
 	LPWSTR UserW = NULL;
 	LPWSTR DomainW = NULL;
@@ -127,8 +125,7 @@ BOOL NTOWFv2A(LPSTR Password, UINT32 PasswordLength, LPSTR User,
 	MultiByteToWideChar(CP_ACP, 0, Domain, DomainLength, DomainW, DomainLength);
 	MultiByteToWideChar(CP_ACP, 0, Password, PasswordLength, PasswordW, PasswordLength);
 
-	if (!NTOWFv2W(PasswordW, PasswordLength * 2, UserW, UserLength * 2, DomainW, DomainLength * 2,
-	              NtHash))
+	if (!NTOWFv2W(PasswordW, PasswordLength * 2, UserW, UserLength * 2, DomainW, DomainLength * 2, NtHash))
 		goto out_fail;
 
 	result = TRUE;
@@ -139,8 +136,7 @@ out_fail:
 	return result;
 }
 
-BOOL NTOWFv2FromHashW(BYTE* NtHashV1, LPWSTR User, UINT32 UserLength, LPWSTR Domain,
-                      UINT32 DomainLength, BYTE* NtHash)
+BOOL NTOWFv2FromHashW(BYTE* NtHashV1, LPWSTR User, UINT32 UserLength, LPWSTR Domain, UINT32 DomainLength, BYTE* NtHash)
 {
 	BYTE* buffer;
 	BYTE result = FALSE;
@@ -161,8 +157,7 @@ BOOL NTOWFv2FromHashW(BYTE* NtHashV1, LPWSTR User, UINT32 UserLength, LPWSTR Dom
 	}
 
 	/* Compute the HMAC-MD5 hash of the above value using the NTLMv1 hash as the key, the result is the NTLMv2 hash */
-	if (!winpr_HMAC(WINPR_MD_MD5, NtHashV1, 16, buffer, UserLength + DomainLength, NtHash,
-	                WINPR_MD4_DIGEST_LENGTH))
+	if (!winpr_HMAC(WINPR_MD_MD5, NtHashV1, 16, buffer, UserLength + DomainLength, NtHash, WINPR_MD4_DIGEST_LENGTH))
 		goto out_fail;
 
 	result = TRUE;
@@ -171,8 +166,7 @@ out_fail:
 	return result;
 }
 
-BOOL NTOWFv2FromHashA(BYTE* NtHashV1, LPSTR User, UINT32 UserLength, LPSTR Domain,
-                      UINT32 DomainLength, BYTE* NtHash)
+BOOL NTOWFv2FromHashA(BYTE* NtHashV1, LPSTR User, UINT32 UserLength, LPSTR Domain, UINT32 DomainLength, BYTE* NtHash)
 {
 	LPWSTR UserW = NULL;
 	LPWSTR DomainW = NULL;

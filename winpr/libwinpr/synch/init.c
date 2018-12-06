@@ -43,16 +43,13 @@ BOOL winpr_InitOnceComplete(LPINIT_ONCE lpInitOnce, DWORD dwFlags, LPVOID lpCont
 	return FALSE;
 }
 
-VOID winpr_InitOnceInitialize(PINIT_ONCE InitOnce)
-{
-	WLog_ERR(TAG, "not implemented");
-}
+VOID winpr_InitOnceInitialize(PINIT_ONCE InitOnce) { WLog_ERR(TAG, "not implemented"); }
 
 BOOL winpr_InitOnceExecuteOnce(PINIT_ONCE InitOnce, PINIT_ONCE_FN InitFn, PVOID Parameter, LPVOID* Context)
 {
 	for (;;)
 	{
-		switch ((ULONG_PTR)InitOnce->Ptr & 3)
+		switch ((ULONG_PTR) InitOnce->Ptr & 3)
 		{
 			case 2:
 				/* already completed successfully */
@@ -61,7 +58,7 @@ BOOL winpr_InitOnceExecuteOnce(PINIT_ONCE InitOnce, PINIT_ONCE_FN InitFn, PVOID 
 			case 0:
 
 				/* first time */
-				if (InterlockedCompareExchangePointer(&InitOnce->Ptr, (PVOID)1, (PVOID)0) != (PVOID)0)
+				if (InterlockedCompareExchangePointer(&InitOnce->Ptr, (PVOID) 1, (PVOID) 0) != (PVOID) 0)
 				{
 					/* some other thread was faster */
 					break;
@@ -71,12 +68,12 @@ BOOL winpr_InitOnceExecuteOnce(PINIT_ONCE InitOnce, PINIT_ONCE_FN InitFn, PVOID 
 				if (InitFn(InitOnce, Parameter, Context))
 				{
 					/* success */
-					InitOnce->Ptr = (PVOID)2;
+					InitOnce->Ptr = (PVOID) 2;
 					return TRUE;
 				}
 
 				/* the init function returned an error,  reset the status */
-				InitOnce->Ptr = (PVOID)0;
+				InitOnce->Ptr = (PVOID) 0;
 				return FALSE;
 
 			case 1:

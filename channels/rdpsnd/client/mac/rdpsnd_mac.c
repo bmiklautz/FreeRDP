@@ -34,15 +34,19 @@
 #include <freerdp/types.h>
 
 #define __COREFOUNDATION_CFPLUGINCOM__ 1
-#define IUNKNOWN_C_GUTS void *_reserved; void* QueryInterface; void* AddRef; void* Release
+#define IUNKNOWN_C_GUTS                                                                                                \
+	void* _reserved;                                                                                                   \
+	void* QueryInterface;                                                                                              \
+	void* AddRef;                                                                                                      \
+	void* Release
 
 #include <AudioToolbox/AudioToolbox.h>
 #include <AudioToolbox/AudioQueue.h>
 
 #include "rdpsnd_main.h"
 
-#define MAC_AUDIO_QUEUE_NUM_BUFFERS	10
-#define MAC_AUDIO_QUEUE_BUFFER_SIZE	32768
+#define MAC_AUDIO_QUEUE_NUM_BUFFERS 10
+#define MAC_AUDIO_QUEUE_BUFFER_SIZE 32768
 
 struct rdpsnd_mac_plugin
 {
@@ -62,10 +66,9 @@ struct rdpsnd_mac_plugin
 };
 typedef struct rdpsnd_mac_plugin rdpsndMacPlugin;
 
-static void mac_audio_queue_output_cb(void* inUserData, AudioQueueRef inAQ,
-                                      AudioQueueBufferRef inBuffer)
+static void mac_audio_queue_output_cb(void* inUserData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer)
 {
-	rdpsndMacPlugin* mac = (rdpsndMacPlugin*)inUserData;
+	rdpsndMacPlugin* mac = (rdpsndMacPlugin*) inUserData;
 
 	if (inBuffer == mac->audioBuffers[mac->lastAudioBufferIndex])
 	{
@@ -74,8 +77,7 @@ static void mac_audio_queue_output_cb(void* inUserData, AudioQueueRef inAQ,
 	}
 }
 
-static BOOL rdpsnd_mac_set_format(rdpsndDevicePlugin* device, const AUDIO_FORMAT* format,
-                                  UINT32 latency)
+static BOOL rdpsnd_mac_set_format(rdpsndDevicePlugin* device, const AUDIO_FORMAT* format, UINT32 latency)
 {
 	rdpsndMacPlugin* mac = (rdpsndMacPlugin*) device;
 	mac->latency = (UINT32) latency;
@@ -85,10 +87,8 @@ static BOOL rdpsnd_mac_set_format(rdpsndDevicePlugin* device, const AUDIO_FORMAT
 	mac->audioFormat.mFramesPerPacket = 1;
 	mac->audioFormat.mChannelsPerFrame = format->nChannels;
 	mac->audioFormat.mBitsPerChannel = format->wBitsPerSample;
-	mac->audioFormat.mBytesPerFrame = mac->audioFormat.mBitsPerChannel *
-	                                  mac->audioFormat.mChannelsPerFrame / 8;
-	mac->audioFormat.mBytesPerPacket = mac->audioFormat.mBytesPerFrame *
-	                                   mac->audioFormat.mFramesPerPacket;
+	mac->audioFormat.mBytesPerFrame = mac->audioFormat.mBitsPerChannel * mac->audioFormat.mChannelsPerFrame / 8;
+	mac->audioFormat.mBytesPerPacket = mac->audioFormat.mBytesPerFrame * mac->audioFormat.mFramesPerPacket;
 	mac->audioFormat.mReserved = 0;
 
 	switch (format->wFormatTag)
@@ -184,9 +184,8 @@ static BOOL rdpsnd_mac_open(rdpsndDevicePlugin* device, const AUDIO_FORMAT* form
 	if (!rdpsnd_mac_set_format(device, format, latency))
 		return FALSE;
 
-	status = AudioQueueNewOutput(&(mac->audioFormat),
-	                             mac_audio_queue_output_cb, mac,
-	                             NULL, NULL, 0, &(mac->audioQueue));
+	status =
+	  AudioQueueNewOutput(&(mac->audioFormat), mac_audio_queue_output_cb, mac, NULL, NULL, 0, &(mac->audioQueue));
 
 	if (status != 0)
 	{
@@ -197,9 +196,7 @@ static BOOL rdpsnd_mac_open(rdpsndDevicePlugin* device, const AUDIO_FORMAT* form
 
 	UInt32 DecodeBufferSizeFrames;
 	UInt32 propertySize = sizeof(DecodeBufferSizeFrames);
-	status = AudioQueueGetProperty(mac->audioQueue,
-	                               kAudioQueueProperty_DecodeBufferSizeFrames,
-	                               &DecodeBufferSizeFrames,
+	status = AudioQueueGetProperty(mac->audioQueue, kAudioQueueProperty_DecodeBufferSizeFrames, &DecodeBufferSizeFrames,
 	                               &propertySize);
 
 	if (status != 0)
@@ -210,12 +207,11 @@ static BOOL rdpsnd_mac_open(rdpsndDevicePlugin* device, const AUDIO_FORMAT* form
 
 	for (index = 0; index < MAC_AUDIO_QUEUE_NUM_BUFFERS; index++)
 	{
-		status = AudioQueueAllocateBuffer(mac->audioQueue, MAC_AUDIO_QUEUE_BUFFER_SIZE,
-		                                  &mac->audioBuffers[index]);
+		status = AudioQueueAllocateBuffer(mac->audioQueue, MAC_AUDIO_QUEUE_BUFFER_SIZE, &mac->audioBuffers[index]);
 
 		if (status != 0)
 		{
-			WLog_ERR(TAG,  "AudioQueueAllocateBuffer failed\n");
+			WLog_ERR(TAG, "AudioQueueAllocateBuffer failed\n");
 			return FALSE;
 		}
 	}
@@ -284,7 +280,7 @@ static BOOL rdpsnd_mac_set_volume(rdpsndDevicePlugin* device, UINT32 value)
 
 	if (status != 0)
 	{
-		WLog_ERR(TAG,  "AudioQueueSetParameter kAudioQueueParam_Volume failed: %f\n", fVolume);
+		WLog_ERR(TAG, "AudioQueueSetParameter kAudioQueueParam_Volume failed: %f\n", fVolume);
 		return FALSE;
 	}
 
@@ -306,7 +302,7 @@ static void rdpsnd_mac_start(rdpsndDevicePlugin* device)
 
 		if (status != 0)
 		{
-			WLog_ERR(TAG,  "AudioQueueStart failed\n");
+			WLog_ERR(TAG, "AudioQueueStart failed\n");
 		}
 
 		mac->isPlaying = TRUE;
@@ -328,8 +324,7 @@ static UINT rdpsnd_mac_play(rdpsndDevicePlugin* device, const BYTE* data, size_t
 	CopyMemory(audioBuffer->mAudioData, data, length);
 	audioBuffer->mAudioDataByteSize = length;
 	audioBuffer->mUserData = mac;
-	AudioQueueEnqueueBufferWithParameters(mac->audioQueue, audioBuffer, 0, 0, 0, 0, 0, NULL, NULL,
-	                                      &outActualStartTime);
+	AudioQueueEnqueueBufferWithParameters(mac->audioQueue, audioBuffer, 0, 0, 0, 0, 0, NULL, NULL, &outActualStartTime);
 	mac->lastAudioBufferIndex = mac->audioBufferIndex;
 	mac->audioBufferIndex++;
 	mac->audioBufferIndex %= MAC_AUDIO_QUEUE_NUM_BUFFERS;
@@ -338,9 +333,9 @@ static UINT rdpsnd_mac_play(rdpsndDevicePlugin* device, const BYTE* data, size_t
 }
 
 #ifdef BUILTIN_CHANNELS
-#define freerdp_rdpsnd_client_subsystem_entry	mac_freerdp_rdpsnd_client_subsystem_entry
+#define freerdp_rdpsnd_client_subsystem_entry mac_freerdp_rdpsnd_client_subsystem_entry
 #else
-#define freerdp_rdpsnd_client_subsystem_entry	FREERDP_API freerdp_rdpsnd_client_subsystem_entry
+#define freerdp_rdpsnd_client_subsystem_entry FREERDP_API freerdp_rdpsnd_client_subsystem_entry
 #endif
 
 /**

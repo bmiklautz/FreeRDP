@@ -81,8 +81,6 @@ struct win_shadow_subsystem
 extern "C" {
 #endif
 
-
-
 #ifdef __cplusplus
 }
 #endif

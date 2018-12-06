@@ -45,4 +45,3 @@ void rdtk_label_free(rdtkLabel* label);
 #endif
 
 #endif /* RDTK_LABEL_PRIVATE_H */
-

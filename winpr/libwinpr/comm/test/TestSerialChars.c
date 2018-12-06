@@ -37,12 +37,11 @@ static BOOL test_SerCxSys(HANDLE hComm)
 	struct termios currentTermios;
 
 	ZeroMemory(&currentTermios, sizeof(struct termios));
-	if (tcgetattr(((WINPR_COMM*)hComm)->fd, &currentTermios) < 0)
+	if (tcgetattr(((WINPR_COMM*) hComm)->fd, &currentTermios) < 0)
 	{
 		fprintf(stderr, "tcgetattr failure.\n");
 		return FALSE;
 	}
-
 
 	ZeroMemory(&dcb, sizeof(DCB));
 	dcb.DCBlength = sizeof(DCB);
@@ -58,7 +57,6 @@ static BOOL test_SerCxSys(HANDLE hComm)
 		return FALSE;
 	}
 
-
 	/* retrieve Xon/Xoff chars */
 	if ((dcb.XonChar != currentTermios.c_cc[VSTART]) || (dcb.XoffChar != currentTermios.c_cc[VSTOP]))
 	{
@@ -68,9 +66,9 @@ static BOOL test_SerCxSys(HANDLE hComm)
 
 	/* swap XonChar/XoffChar */
 
-	XonChar  = dcb.XonChar;
+	XonChar = dcb.XonChar;
 	XoffChar = dcb.XoffChar;
-	dcb.XonChar  = XoffChar;
+	dcb.XonChar = XoffChar;
 	dcb.XoffChar = XonChar;
 	if (!SetCommState(hComm, &dcb))
 	{
@@ -96,18 +94,21 @@ static BOOL test_SerCxSys(HANDLE hComm)
 	dcb.XonChar = dcb.XoffChar;
 	if (SetCommState(hComm, &dcb))
 	{
-		fprintf(stderr, "test_SerCxSys failure, SetCommState() was supposed to failed because XonChar and XoffChar are the same\n");
+		fprintf(
+		  stderr,
+		  "test_SerCxSys failure, SetCommState() was supposed to failed because XonChar and XoffChar are the same\n");
 		return FALSE;
 	}
 	if (GetLastError() != ERROR_INVALID_PARAMETER)
 	{
-		fprintf(stderr, "test_SerCxSys failure, SetCommState() was supposed to failed with GetLastError()=ERROR_INVALID_PARAMETER\n");
+		fprintf(
+		  stderr,
+		  "test_SerCxSys failure, SetCommState() was supposed to failed with GetLastError()=ERROR_INVALID_PARAMETER\n");
 		return FALSE;
 	}
 
 	return TRUE;
 }
-
 
 static BOOL test_SerCx2Sys(HANDLE hComm)
 {
@@ -121,7 +122,8 @@ static BOOL test_SerCx2Sys(HANDLE hComm)
 		return FALSE;
 	}
 
-	if ((dcb.ErrorChar != '\0') || (dcb.EofChar != '\0') || (dcb.EvtChar != '\0') || (dcb.XonChar != '\0') || (dcb.XoffChar != '\0'))
+	if ((dcb.ErrorChar != '\0') || (dcb.EofChar != '\0') || (dcb.EvtChar != '\0') || (dcb.XonChar != '\0') ||
+	    (dcb.XoffChar != '\0'))
 	{
 		fprintf(stderr, "test_SerCx2Sys failure, expected all characters to be: '\\0'\n");
 		return FALSE;
@@ -149,9 +151,7 @@ int TestSerialChars(int argc, char* argv[])
 		return EXIT_FAILURE;
 	}
 
-	hComm = CreateFile("COM1",
-			GENERIC_READ | GENERIC_WRITE,
-			0, NULL, OPEN_EXISTING, 0, NULL);
+	hComm = CreateFile("COM1", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
 	if (hComm == INVALID_HANDLE_VALUE)
 	{
 		fprintf(stderr, "CreateFileA failure: 0x%x\n", GetLastError());
@@ -171,7 +171,6 @@ int TestSerialChars(int argc, char* argv[])
 		fprintf(stderr, "test_SerCxSys failure\n");
 		return EXIT_FAILURE;
 	}
-
 
 	if (!CloseHandle(hComm))
 	{

@@ -91,7 +91,7 @@ BOOL wf_peer_mouse_event(rdpInput* input, UINT16 flags, UINT16 x, UINT16 y)
 		if (!wfi)
 			return FALSE;
 
-		//width and height of primary screen (even in multimon setups
+		// width and height of primary screen (even in multimon setups
 		width = (float) GetSystemMetrics(SM_CXSCREEN);
 		height = (float) GetSystemMetrics(SM_CYSCREEN);
 		x += wfi->servscreen_xoffset;
@@ -157,7 +157,7 @@ BOOL wf_peer_extended_mouse_event(rdpInput* input, UINT16 flags, UINT16 x, UINT1
 			if (!wfi)
 				return FALSE;
 
-			//width and height of primary screen (even in multimon setups
+			// width and height of primary screen (even in multimon setups
 			width = (float) GetSystemMetrics(SM_CXSCREEN);
 			height = (float) GetSystemMetrics(SM_CYSCREEN);
 			x += wfi->servscreen_xoffset;

@@ -83,8 +83,7 @@
 /* clock_gettime is not implemented on OSX prior to 10.12 */
 int _mach_clock_gettime(int clk_id, struct timespec* t);
 
-int
-_mach_clock_gettime(int clk_id, struct timespec* t)
+int _mach_clock_gettime(int clk_id, struct timespec* t)
 {
 	UINT64 time;
 	double seconds;
@@ -105,8 +104,7 @@ _mach_clock_gettime(int clk_id, struct timespec* t)
  * * but it may be NULL at runtime. So we need to check before using it. */
 int _mach_safe_clock_gettime(int clk_id, struct timespec* t);
 
-int
-_mach_safe_clock_gettime(int clk_id, struct timespec* t)
+int _mach_safe_clock_gettime(int clk_id, struct timespec* t)
 {
 	if (clock_gettime)
 	{
@@ -123,9 +121,7 @@ _mach_safe_clock_gettime(int clk_id, struct timespec* t)
 
 #endif
 
-
-static long long ts_difftime(const struct timespec* o,
-                             const struct timespec* n)
+static long long ts_difftime(const struct timespec* o, const struct timespec* n)
 {
 	long long oldValue = o->tv_sec * 1000000000LL + o->tv_nsec;
 	long long newValue = n->tv_sec * 1000000000LL + n->tv_nsec;
@@ -200,8 +196,7 @@ static int waitOnFd(int fd, ULONG mode, DWORD dwMilliseconds)
 	do
 	{
 		status = poll(&pollfds, 1, dwMilliseconds);
-	}
-	while ((status < 0) && (errno == EINTR));
+	} while ((status < 0) && (errno == EINTR));
 
 #else
 	struct timeval timeout;
@@ -230,8 +225,7 @@ static int waitOnFd(int fd, ULONG mode, DWORD dwMilliseconds)
 	do
 	{
 		status = select(fd + 1, prfds, pwfds, pefds, (dwMilliseconds == INFINITE) ? NULL : &timeout);
-	}
-	while (status < 0 && (errno == EINTR));
+	} while (status < 0 && (errno == EINTR));
 
 #endif
 	return status;
@@ -325,8 +319,7 @@ DWORD WaitForSingleObjectEx(HANDLE hHandle, DWORD dwMilliseconds, BOOL bAlertabl
 	return WAIT_FAILED;
 }
 
-DWORD WaitForMultipleObjects(DWORD nCount, const HANDLE* lpHandles, BOOL bWaitAll,
-                             DWORD dwMilliseconds)
+DWORD WaitForMultipleObjects(DWORD nCount, const HANDLE* lpHandles, BOOL bWaitAll, DWORD dwMilliseconds)
 {
 	struct timespec starttime;
 	struct timespec timenow;
@@ -352,7 +345,7 @@ DWORD WaitForMultipleObjects(DWORD nCount, const HANDLE* lpHandles, BOOL bWaitAl
 
 	if (!nCount || (nCount > MAXIMUM_WAIT_OBJECTS))
 	{
-		WLog_ERR(TAG, "invalid handles count(%"PRIu32")", nCount);
+		WLog_ERR(TAG, "invalid handles count(%" PRIu32 ")", nCount);
 		return WAIT_FAILED;
 	}
 
@@ -437,8 +430,7 @@ DWORD WaitForMultipleObjects(DWORD nCount, const HANDLE* lpHandles, BOOL bWaitAl
 		do
 		{
 			status = poll(pollfds, polled, dwMilliseconds);
-		}
-		while (status < 0 && errno == EINTR);
+		} while (status < 0 && errno == EINTR);
 
 #else
 
@@ -450,21 +442,17 @@ DWORD WaitForMultipleObjects(DWORD nCount, const HANDLE* lpHandles, BOOL bWaitAl
 
 		do
 		{
-			status = select(maxfd + 1, prfds, pwfds, 0,
-			                (dwMilliseconds == INFINITE) ? NULL : &timeout);
-		}
-		while (status < 0 && errno == EINTR);
+			status = select(maxfd + 1, prfds, pwfds, 0, (dwMilliseconds == INFINITE) ? NULL : &timeout);
+		} while (status < 0 && errno == EINTR);
 
 #endif
 
 		if (status < 0)
 		{
 #ifdef HAVE_POLL_H
-			WLog_ERR(TAG, "poll() handle %d (%"PRIu32") failure [%d] %s", index, nCount, errno,
-			         strerror(errno));
+			WLog_ERR(TAG, "poll() handle %d (%" PRIu32 ") failure [%d] %s", index, nCount, errno, strerror(errno));
 #else
-			WLog_ERR(TAG, "select() handle %d (%"PRIu32") failure [%d] %s", index, nCount, errno,
-			         strerror(errno));
+			WLog_ERR(TAG, "select() handle %d (%" PRIu32 ") failure [%d] %s", index, nCount, errno, strerror(errno));
 #endif
 			winpr_log_backtrace(TAG, WLOG_ERROR, 20);
 			SetLastError(ERROR_INTERNAL_ERROR);
@@ -553,22 +541,20 @@ DWORD WaitForMultipleObjects(DWORD nCount, const HANDLE* lpHandles, BOOL bWaitAl
 				signal_handled = TRUE;
 			}
 		}
-	}
-	while (bWaitAll || !signal_handled);
+	} while (bWaitAll || !signal_handled);
 
 	WLog_ERR(TAG, "failed (unknown error)");
 	SetLastError(ERROR_INTERNAL_ERROR);
 	return WAIT_FAILED;
 }
 
-DWORD WaitForMultipleObjectsEx(DWORD nCount, const HANDLE* lpHandles, BOOL bWaitAll,
-                               DWORD dwMilliseconds, BOOL bAlertable)
+DWORD WaitForMultipleObjectsEx(DWORD nCount, const HANDLE* lpHandles, BOOL bWaitAll, DWORD dwMilliseconds,
+                               BOOL bAlertable)
 {
 	return WaitForMultipleObjects(nCount, lpHandles, bWaitAll, dwMilliseconds);
 }
 
-DWORD SignalObjectAndWait(HANDLE hObjectToSignal, HANDLE hObjectToWaitOn, DWORD dwMilliseconds,
-                          BOOL bAlertable)
+DWORD SignalObjectAndWait(HANDLE hObjectToSignal, HANDLE hObjectToWaitOn, DWORD dwMilliseconds, BOOL bAlertable)
 {
 	WLog_ERR(TAG, "%s: Not implemented.", __FUNCTION__);
 	SetLastError(ERROR_NOT_SUPPORTED);
@@ -576,4 +562,3 @@ DWORD SignalObjectAndWait(HANDLE hObjectToSignal, HANDLE hObjectToWaitOn, DWORD 
 }
 
 #endif
-

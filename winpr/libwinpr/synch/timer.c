@@ -60,7 +60,7 @@ static BOOL TimerIsHandled(HANDLE handle)
 
 static int TimerGetFd(HANDLE handle)
 {
-	WINPR_TIMER* timer = (WINPR_TIMER*)handle;
+	WINPR_TIMER* timer = (WINPR_TIMER*) handle;
 
 	if (!TimerIsHandled(handle))
 		return -1;
@@ -68,11 +68,11 @@ static int TimerGetFd(HANDLE handle)
 	return timer->fd;
 }
 
-static DWORD  TimerCleanupHandle(HANDLE handle)
+static DWORD TimerCleanupHandle(HANDLE handle)
 {
 	int length;
 	UINT64 expirations;
-	WINPR_TIMER* timer = (WINPR_TIMER*)handle;
+	WINPR_TIMER* timer = (WINPR_TIMER*) handle;
 
 	if (!TimerIsHandled(handle))
 		return WAIT_FAILED;
@@ -154,7 +154,7 @@ static BOOL g_WaitableTimerSignalHandlerInstalled = FALSE;
 
 static void WaitableTimerHandler(void* arg)
 {
-	WINPR_TIMER* timer = (WINPR_TIMER*)arg;
+	WINPR_TIMER* timer = (WINPR_TIMER*) arg;
 
 	if (!timer)
 		return;
@@ -207,7 +207,7 @@ static int InstallWaitableTimerSignalHandler(void)
 static void WaitableTimerHandler(void* arg)
 {
 	UINT64 data = 1;
-	WINPR_TIMER* timer = (WINPR_TIMER*)arg;
+	WINPR_TIMER* timer = (WINPR_TIMER*) arg;
 
 	if (!timer)
 		return;
@@ -276,37 +276,22 @@ static int InitializeWaitableTimer(WINPR_TIMER* timer)
 	return result;
 }
 
-
-static HANDLE_OPS ops =
-{
-	TimerIsHandled,
-	TimerCloseHandle,
-	TimerGetFd,
-	TimerCleanupHandle,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
+static HANDLE_OPS ops = { TimerIsHandled, TimerCloseHandle,
+	                      TimerGetFd,     TimerCleanupHandle,
+	                      NULL,           NULL,
+	                      NULL,           NULL,
+	                      NULL,           NULL,
+	                      NULL,           NULL,
+	                      NULL,           NULL,
+	                      NULL,           NULL,
+	                      NULL,           NULL,
+	                      NULL,           NULL };
 
 /**
  * Waitable Timer
  */
 
-HANDLE CreateWaitableTimerA(LPSECURITY_ATTRIBUTES lpTimerAttributes, BOOL bManualReset,
-                            LPCSTR lpTimerName)
+HANDLE CreateWaitableTimerA(LPSECURITY_ATTRIBUTES lpTimerAttributes, BOOL bManualReset, LPCSTR lpTimerName)
 {
 	HANDLE handle = NULL;
 	WINPR_TIMER* timer;
@@ -356,8 +341,7 @@ fail:
 #endif
 }
 
-HANDLE CreateWaitableTimerW(LPSECURITY_ATTRIBUTES lpTimerAttributes, BOOL bManualReset,
-                            LPCWSTR lpTimerName)
+HANDLE CreateWaitableTimerW(LPSECURITY_ATTRIBUTES lpTimerAttributes, BOOL bManualReset, LPCWSTR lpTimerName)
 {
 	int rc;
 	HANDLE handle;
@@ -372,16 +356,16 @@ HANDLE CreateWaitableTimerW(LPSECURITY_ATTRIBUTES lpTimerAttributes, BOOL bManua
 	return handle;
 }
 
-HANDLE CreateWaitableTimerExA(LPSECURITY_ATTRIBUTES lpTimerAttributes, LPCSTR lpTimerName,
-                              DWORD dwFlags, DWORD dwDesiredAccess)
+HANDLE CreateWaitableTimerExA(LPSECURITY_ATTRIBUTES lpTimerAttributes, LPCSTR lpTimerName, DWORD dwFlags,
+                              DWORD dwDesiredAccess)
 {
 	BOOL bManualReset;
 	bManualReset = (dwFlags & CREATE_WAITABLE_TIMER_MANUAL_RESET) ? TRUE : FALSE;
 	return CreateWaitableTimerA(lpTimerAttributes, bManualReset, lpTimerName);
 }
 
-HANDLE CreateWaitableTimerExW(LPSECURITY_ATTRIBUTES lpTimerAttributes, LPCWSTR lpTimerName,
-                              DWORD dwFlags, DWORD dwDesiredAccess)
+HANDLE CreateWaitableTimerExW(LPSECURITY_ATTRIBUTES lpTimerAttributes, LPCWSTR lpTimerName, DWORD dwFlags,
+                              DWORD dwDesiredAccess)
 {
 	int rc;
 	HANDLE handle;
@@ -515,7 +499,8 @@ BOOL SetWaitableTimer(HANDLE hTimer, const LARGE_INTEGER* lpDueTime, LONG lPerio
 		/* Clean out old data from FD */
 		BYTE buffer[32];
 
-		while (read(timer->fd, buffer, sizeof(buffer)) > 0);
+		while (read(timer->fd, buffer, sizeof(buffer)) > 0)
+			;
 	}
 
 	{
@@ -538,22 +523,15 @@ BOOL SetWaitableTimer(HANDLE hTimer, const LARGE_INTEGER* lpDueTime, LONG lPerio
 }
 
 BOOL SetWaitableTimerEx(HANDLE hTimer, const LARGE_INTEGER* lpDueTime, LONG lPeriod,
-                        PTIMERAPCROUTINE pfnCompletionRoutine, LPVOID lpArgToCompletionRoutine, PREASON_CONTEXT WakeContext,
-                        ULONG TolerableDelay)
+                        PTIMERAPCROUTINE pfnCompletionRoutine, LPVOID lpArgToCompletionRoutine,
+                        PREASON_CONTEXT WakeContext, ULONG TolerableDelay)
 {
-	return SetWaitableTimer(hTimer, lpDueTime, lPeriod, pfnCompletionRoutine, lpArgToCompletionRoutine,
-	                        FALSE);
+	return SetWaitableTimer(hTimer, lpDueTime, lPeriod, pfnCompletionRoutine, lpArgToCompletionRoutine, FALSE);
 }
 
-HANDLE OpenWaitableTimerA(DWORD dwDesiredAccess, BOOL bInheritHandle, LPCSTR lpTimerName)
-{
-	return NULL;
-}
+HANDLE OpenWaitableTimerA(DWORD dwDesiredAccess, BOOL bInheritHandle, LPCSTR lpTimerName) { return NULL; }
 
-HANDLE OpenWaitableTimerW(DWORD dwDesiredAccess, BOOL bInheritHandle, LPCWSTR lpTimerName)
-{
-	return NULL;
-}
+HANDLE OpenWaitableTimerW(DWORD dwDesiredAccess, BOOL bInheritHandle, LPCWSTR lpTimerName) { return NULL; }
 
 BOOL CancelWaitableTimer(HANDLE hTimer)
 {
@@ -567,7 +545,7 @@ BOOL CancelWaitableTimer(HANDLE hTimer)
 	if (Type != HANDLE_TYPE_TIMER)
 		return FALSE;
 
-	timer = (WINPR_TIMER*)Object;
+	timer = (WINPR_TIMER*) Object;
 #if defined(__APPLE__)
 
 	if (timer->running)
@@ -872,13 +850,10 @@ BOOL DeleteTimerQueueEx(HANDLE TimerQueue, HANDLE CompletionEvent)
 	return TRUE;
 }
 
-BOOL DeleteTimerQueue(HANDLE TimerQueue)
-{
-	return DeleteTimerQueueEx(TimerQueue, NULL);
-}
+BOOL DeleteTimerQueue(HANDLE TimerQueue) { return DeleteTimerQueueEx(TimerQueue, NULL); }
 
-BOOL CreateTimerQueueTimer(PHANDLE phNewTimer, HANDLE TimerQueue,
-                           WAITORTIMERCALLBACK Callback, PVOID Parameter, DWORD DueTime, DWORD Period, ULONG Flags)
+BOOL CreateTimerQueueTimer(PHANDLE phNewTimer, HANDLE TimerQueue, WAITORTIMERCALLBACK Callback, PVOID Parameter,
+                           DWORD DueTime, DWORD Period, ULONG Flags)
 {
 	struct timespec CurrentTime;
 	WINPR_TIMER_QUEUE* timerQueue;

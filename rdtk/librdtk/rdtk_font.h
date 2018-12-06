@@ -69,4 +69,3 @@ void rdtk_font_free(rdtkFont* font);
 #endif
 
 #endif /* RDTK_FONT_PRIVATE_H */
-

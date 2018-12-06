@@ -43,28 +43,26 @@
 
 #define TAG CLIENT_TAG("windows.gdi")
 
-static const BYTE wf_rop2_table[] =
-{
-	R2_BLACK,       /* 0 */
+static const BYTE wf_rop2_table[] = {
+	R2_BLACK, /* 0 */
 	R2_NOTMERGEPEN, /* DPon */
-	R2_MASKNOTPEN,  /* DPna */
-	R2_NOTCOPYPEN,  /* Pn */
-	R2_MASKPENNOT,  /* PDna */
-	R2_NOT,         /* Dn */
-	R2_XORPEN,      /* DPx */
-	R2_NOTMASKPEN,  /* DPan */
-	R2_MASKPEN,     /* DPa */
-	R2_NOTXORPEN,   /* DPxn */
-	R2_NOP,         /* D */
+	R2_MASKNOTPEN, /* DPna */
+	R2_NOTCOPYPEN, /* Pn */
+	R2_MASKPENNOT, /* PDna */
+	R2_NOT, /* Dn */
+	R2_XORPEN, /* DPx */
+	R2_NOTMASKPEN, /* DPan */
+	R2_MASKPEN, /* DPa */
+	R2_NOTXORPEN, /* DPxn */
+	R2_NOP, /* D */
 	R2_MERGENOTPEN, /* DPno */
-	R2_COPYPEN,     /* P */
+	R2_COPYPEN, /* P */
 	R2_MERGEPENNOT, /* PDno */
-	R2_MERGEPEN,    /* PDo */
-	R2_WHITE,       /* 1 */
+	R2_MERGEPEN, /* PDo */
+	R2_WHITE, /* 1 */
 };
 
-static BOOL wf_decode_color(wfContext* wfc, const UINT32 srcColor,
-                            COLORREF* color, UINT32* format)
+static BOOL wf_decode_color(wfContext* wfc, const UINT32 srcColor, COLORREF* color, UINT32* format)
 {
 	rdpGdi* gdi;
 	rdpSettings* settings;
@@ -102,8 +100,7 @@ static BOOL wf_decode_color(wfContext* wfc, const UINT32 srcColor,
 			return FALSE;
 	}
 
-	*color = FreeRDPConvertColor(srcColor, SrcFormat,
-	                      DstFormat, &gdi->palette);
+	*color = FreeRDPConvertColor(srcColor, SrcFormat, DstFormat, &gdi->palette);
 	return TRUE;
 }
 
@@ -111,7 +108,7 @@ static BOOL wf_set_rop2(HDC hdc, int rop2)
 {
 	if ((rop2 < 0x01) || (rop2 > 0x10))
 	{
-		WLog_ERR(TAG,  "Unsupported ROP2: %d", rop2);
+		WLog_ERR(TAG, "Unsupported ROP2: %d", rop2);
 		return FALSE;
 	}
 
@@ -122,15 +119,11 @@ static BOOL wf_set_rop2(HDC hdc, int rop2)
 static wfBitmap* wf_glyph_new(wfContext* wfc, GLYPH_DATA* glyph)
 {
 	wfBitmap* glyph_bmp;
-	glyph_bmp = wf_image_new(wfc, glyph->cx, glyph->cy, PIXEL_FORMAT_MONO,
-	                         glyph->aj);
+	glyph_bmp = wf_image_new(wfc, glyph->cx, glyph->cy, PIXEL_FORMAT_MONO, glyph->aj);
 	return glyph_bmp;
 }
 
-static void wf_glyph_free(wfBitmap* glyph)
-{
-	wf_image_free(glyph);
-}
+static void wf_glyph_free(wfBitmap* glyph) { wf_image_free(glyph); }
 
 static BYTE* wf_glyph_convert(wfContext* wfc, int width, int height, BYTE* data)
 {
@@ -162,8 +155,7 @@ static BYTE* wf_glyph_convert(wfContext* wfc, int width, int height, BYTE* data)
 	return cdata;
 }
 
-static HBRUSH wf_create_brush(wfContext* wfc, rdpBrush* brush, UINT32 color,
-                              UINT32 bpp)
+static HBRUSH wf_create_brush(wfContext* wfc, rdpBrush* brush, UINT32 color, UINT32 bpp)
 {
 	UINT32 i;
 	HBRUSH br;
@@ -173,8 +165,7 @@ static HBRUSH wf_create_brush(wfContext* wfc, rdpBrush* brush, UINT32 color,
 	HBITMAP pattern = NULL;
 	lbr.lbStyle = brush->style;
 
-	if (lbr.lbStyle == BS_DIBPATTERN || lbr.lbStyle == BS_DIBPATTERN8X8
-	    || lbr.lbStyle == BS_DIBPATTERNPT)
+	if (lbr.lbStyle == BS_DIBPATTERN || lbr.lbStyle == BS_DIBPATTERN8X8 || lbr.lbStyle == BS_DIBPATTERNPT)
 		lbr.lbColor = DIB_RGB_COLORS;
 	else
 		lbr.lbColor = color;
@@ -262,8 +253,7 @@ static BOOL wf_scale_rect(wfContext* wfc, RECT* source)
 	return TRUE;
 }
 
-void wf_invalidate_region(wfContext* wfc, UINT32 x, UINT32 y, UINT32 width,
-                          UINT32 height)
+void wf_invalidate_region(wfContext* wfc, UINT32 x, UINT32 y, UINT32 width, UINT32 height)
 {
 	RECT rect;
 	rdpGdi* gdi = wfc->context.gdi;
@@ -278,8 +268,7 @@ void wf_invalidate_region(wfContext* wfc, UINT32 x, UINT32 y, UINT32 width,
 	rect.top = y;
 	rect.bottom = height;
 	wf_scale_rect(wfc, &rect);
-	gdi_InvalidateRegion(gdi->primary->hdc, rect.left, rect.top, rect.right,
-	                     rect.bottom);
+	gdi_InvalidateRegion(gdi->primary->hdc, rect.left, rect.top, rect.right, rect.bottom);
 }
 
 void wf_update_offset(wfContext* wfc)
@@ -344,8 +333,8 @@ void wf_resize_window(wfContext* wfc)
 		else
 		{
 			SetWindowLongPtr(wfc->hwnd, GWL_STYLE, WS_POPUP);
-			SetWindowPos(wfc->hwnd, HWND_TOP, 0, 0, GetSystemMetrics(SM_CXSCREEN),
-			             GetSystemMetrics(SM_CYSCREEN), SWP_FRAMECHANGED);
+			SetWindowPos(wfc->hwnd, HWND_TOP, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN),
+			             SWP_FRAMECHANGED);
 		}
 	}
 	else if (!wfc->context.settings->Decorations)
@@ -358,18 +347,16 @@ void wf_resize_window(wfContext* wfc)
 		else
 		{
 			/* Now resize to get full canvas size and room for caption and borders */
-			SetWindowPos(wfc->hwnd, HWND_TOP, 0, 0, settings->DesktopWidth,
-				settings->DesktopHeight, SWP_FRAMECHANGED);
+			SetWindowPos(wfc->hwnd, HWND_TOP, 0, 0, settings->DesktopWidth, settings->DesktopHeight, SWP_FRAMECHANGED);
 			wf_update_canvas_diff(wfc);
 			SetWindowPos(wfc->hwnd, HWND_TOP, -1, -1, settings->DesktopWidth + wfc->diff.x,
-				settings->DesktopHeight + wfc->diff.y, SWP_NOMOVE | SWP_FRAMECHANGED);
+			             settings->DesktopHeight + wfc->diff.y, SWP_NOMOVE | SWP_FRAMECHANGED);
 		}
 	}
 	else
 	{
 		SetWindowLongPtr(wfc->hwnd, GWL_STYLE,
-		                 WS_CAPTION | WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX | WS_SIZEBOX |
-		                 WS_MAXIMIZEBOX);
+		                 WS_CAPTION | WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX | WS_SIZEBOX | WS_MAXIMIZEBOX);
 
 		if (!wfc->client_height)
 			wfc->client_height = settings->DesktopHeight;
@@ -385,10 +372,9 @@ void wf_resize_window(wfContext* wfc)
 
 		wf_update_canvas_diff(wfc);
 		/* Now resize to get full canvas size and room for caption and borders */
-		SetWindowPos(wfc->hwnd, HWND_TOP, wfc->client_x, wfc->client_y,
-		             wfc->client_width + wfc->diff.x, wfc->client_height + wfc->diff.y,
-		             0 /*SWP_FRAMECHANGED*/);
-		//wf_size_scrollbars(wfc,  wfc->client_width, wfc->client_height);
+		SetWindowPos(wfc->hwnd, HWND_TOP, wfc->client_x, wfc->client_y, wfc->client_width + wfc->diff.x,
+		             wfc->client_height + wfc->diff.y, 0 /*SWP_FRAMECHANGED*/);
+		// wf_size_scrollbars(wfc,  wfc->client_width, wfc->client_height);
 	}
 
 	wf_update_offset(wfc);
@@ -421,16 +407,9 @@ void wf_toggle_fullscreen(wfContext* wfc)
 	}
 }
 
-static BOOL wf_gdi_palette_update(rdpContext* context,
-                                  const PALETTE_UPDATE* palette)
-{
-	return TRUE;
-}
+static BOOL wf_gdi_palette_update(rdpContext* context, const PALETTE_UPDATE* palette) { return TRUE; }
 
-void wf_set_null_clip_rgn(wfContext* wfc)
-{
-	SelectClipRgn(wfc->drawing->hdc, NULL);
-}
+void wf_set_null_clip_rgn(wfContext* wfc) { SelectClipRgn(wfc->drawing->hdc, NULL); }
 
 void wf_set_clip_rgn(wfContext* wfc, int x, int y, int width, int height)
 {
@@ -443,15 +422,14 @@ void wf_set_clip_rgn(wfContext* wfc, int x, int y, int width, int height)
 static BOOL wf_gdi_set_bounds(rdpContext* context, const rdpBounds* bounds)
 {
 	HRGN hrgn;
-	wfContext* wfc = (wfContext*)context;
+	wfContext* wfc = (wfContext*) context;
 
 	if (!context || !bounds)
 		return FALSE;
 
 	if (bounds != NULL)
 	{
-		hrgn = CreateRectRgn(bounds->left, bounds->top, bounds->right + 1,
-		                     bounds->bottom + 1);
+		hrgn = CreateRectRgn(bounds->left, bounds->top, bounds->right + 1, bounds->bottom + 1);
 		SelectClipRgn(wfc->drawing->hdc, hrgn);
 		DeleteObject(hrgn);
 	}
@@ -463,17 +441,16 @@ static BOOL wf_gdi_set_bounds(rdpContext* context, const rdpBounds* bounds)
 
 static BOOL wf_gdi_dstblt(rdpContext* context, const DSTBLT_ORDER* dstblt)
 {
-	wfContext* wfc = (wfContext*)context;
+	wfContext* wfc = (wfContext*) context;
 
 	if (!context || !dstblt)
 		return FALSE;
 
-	if (!BitBlt(wfc->drawing->hdc, dstblt->nLeftRect, dstblt->nTopRect,
-	            dstblt->nWidth, dstblt->nHeight, NULL, 0, 0, gdi_rop3_code(dstblt->bRop)))
+	if (!BitBlt(wfc->drawing->hdc, dstblt->nLeftRect, dstblt->nTopRect, dstblt->nWidth, dstblt->nHeight, NULL, 0, 0,
+	            gdi_rop3_code(dstblt->bRop)))
 		return FALSE;
 
-	wf_invalidate_region(wfc, dstblt->nLeftRect, dstblt->nTopRect,
-	                     dstblt->nWidth, dstblt->nHeight);
+	wf_invalidate_region(wfc, dstblt->nLeftRect, dstblt->nTopRect, dstblt->nWidth, dstblt->nHeight);
 	return TRUE;
 }
 
@@ -487,7 +464,7 @@ static BOOL wf_gdi_patblt(rdpContext* context, PATBLT_ORDER* patblt)
 	COLORREF org_bkcolor;
 	COLORREF org_textcolor;
 	BOOL rc;
-	wfContext* wfc = (wfContext*)context;
+	wfContext* wfc = (wfContext*) context;
 
 	if (!context || !patblt)
 		return FALSE;
@@ -498,14 +475,13 @@ static BOOL wf_gdi_patblt(rdpContext* context, PATBLT_ORDER* patblt)
 	if (!wf_decode_color(wfc, patblt->backColor, &bgcolor, NULL))
 		return FALSE;
 
-	brush = wf_create_brush(wfc, &patblt->brush, fgcolor,
-	                        context->settings->ColorDepth);
+	brush = wf_create_brush(wfc, &patblt->brush, fgcolor, context->settings->ColorDepth);
 	org_bkmode = SetBkMode(wfc->drawing->hdc, OPAQUE);
 	org_bkcolor = SetBkColor(wfc->drawing->hdc, bgcolor);
 	org_textcolor = SetTextColor(wfc->drawing->hdc, fgcolor);
-	org_brush = (HBRUSH)SelectObject(wfc->drawing->hdc, brush);
-	rc = PatBlt(wfc->drawing->hdc, patblt->nLeftRect, patblt->nTopRect,
-	            patblt->nWidth, patblt->nHeight, gdi_rop3_code(patblt->bRop));
+	org_brush = (HBRUSH) SelectObject(wfc->drawing->hdc, brush);
+	rc = PatBlt(wfc->drawing->hdc, patblt->nLeftRect, patblt->nTopRect, patblt->nWidth, patblt->nHeight,
+	            gdi_rop3_code(patblt->bRop));
 	SelectObject(wfc->drawing->hdc, org_brush);
 	DeleteObject(brush);
 	SetBkMode(wfc->drawing->hdc, org_bkmode);
@@ -513,36 +489,32 @@ static BOOL wf_gdi_patblt(rdpContext* context, PATBLT_ORDER* patblt)
 	SetTextColor(wfc->drawing->hdc, org_textcolor);
 
 	if (wfc->drawing == wfc->primary)
-		wf_invalidate_region(wfc, patblt->nLeftRect, patblt->nTopRect, patblt->nWidth,
-		                     patblt->nHeight);
+		wf_invalidate_region(wfc, patblt->nLeftRect, patblt->nTopRect, patblt->nWidth, patblt->nHeight);
 
 	return rc;
 }
 
 static BOOL wf_gdi_scrblt(rdpContext* context, const SCRBLT_ORDER* scrblt)
 {
-	wfContext* wfc = (wfContext*)context;
+	wfContext* wfc = (wfContext*) context;
 
 	if (!context || !scrblt || !wfc->drawing)
 		return FALSE;
 
-	if (!BitBlt(wfc->drawing->hdc, scrblt->nLeftRect, scrblt->nTopRect,
-	            scrblt->nWidth, scrblt->nHeight, wfc->primary->hdc,
-	            scrblt->nXSrc, scrblt->nYSrc, gdi_rop3_code(scrblt->bRop)))
+	if (!BitBlt(wfc->drawing->hdc, scrblt->nLeftRect, scrblt->nTopRect, scrblt->nWidth, scrblt->nHeight,
+	            wfc->primary->hdc, scrblt->nXSrc, scrblt->nYSrc, gdi_rop3_code(scrblt->bRop)))
 		return FALSE;
 
-	wf_invalidate_region(wfc, scrblt->nLeftRect, scrblt->nTopRect,
-	                     scrblt->nWidth, scrblt->nHeight);
+	wf_invalidate_region(wfc, scrblt->nLeftRect, scrblt->nTopRect, scrblt->nWidth, scrblt->nHeight);
 	return TRUE;
 }
 
-static BOOL wf_gdi_opaque_rect(rdpContext* context,
-                               const OPAQUE_RECT_ORDER* opaque_rect)
+static BOOL wf_gdi_opaque_rect(rdpContext* context, const OPAQUE_RECT_ORDER* opaque_rect)
 {
 	RECT rect;
 	HBRUSH brush;
 	UINT32 brush_color;
-	wfContext* wfc = (wfContext*)context;
+	wfContext* wfc = (wfContext*) context;
 
 	if (!context || !opaque_rect)
 		return FALSE;
@@ -559,26 +531,23 @@ static BOOL wf_gdi_opaque_rect(rdpContext* context,
 	DeleteObject(brush);
 
 	if (wfc->drawing == wfc->primary)
-		wf_invalidate_region(wfc, rect.left, rect.top, rect.right - rect.left + 1,
-		                     rect.bottom - rect.top + 1);
+		wf_invalidate_region(wfc, rect.left, rect.top, rect.right - rect.left + 1, rect.bottom - rect.top + 1);
 
 	return TRUE;
 }
 
-static BOOL wf_gdi_multi_opaque_rect(rdpContext* context,
-                                     const MULTI_OPAQUE_RECT_ORDER* multi_opaque_rect)
+static BOOL wf_gdi_multi_opaque_rect(rdpContext* context, const MULTI_OPAQUE_RECT_ORDER* multi_opaque_rect)
 {
 	UINT32 i;
 	RECT rect;
 	HBRUSH brush;
 	UINT32 brush_color;
-	wfContext* wfc = (wfContext*)context;
+	wfContext* wfc = (wfContext*) context;
 
 	if (!context || !multi_opaque_rect)
 		return FALSE;
 
-	if (!wf_decode_color(wfc, multi_opaque_rect->color, &brush_color,
-	                     NULL))
+	if (!wf_decode_color(wfc, multi_opaque_rect->color, &brush_color, NULL))
 		return FALSE;
 
 	for (i = 0; i < multi_opaque_rect->numRectangles; i++)
@@ -592,8 +561,7 @@ static BOOL wf_gdi_multi_opaque_rect(rdpContext* context,
 		FillRect(wfc->drawing->hdc, &rect, brush);
 
 		if (wfc->drawing == wfc->primary)
-			wf_invalidate_region(wfc, rect.left, rect.top, rect.right - rect.left + 1,
-			                     rect.bottom - rect.top + 1);
+			wf_invalidate_region(wfc, rect.left, rect.top, rect.right - rect.left + 1, rect.bottom - rect.top + 1);
 
 		DeleteObject(brush);
 	}
@@ -607,7 +575,7 @@ static BOOL wf_gdi_line_to(rdpContext* context, const LINE_TO_ORDER* line_to)
 	HPEN org_pen;
 	int x, y, w, h;
 	UINT32 pen_color;
-	wfContext* wfc = (wfContext*)context;
+	wfContext* wfc = (wfContext*) context;
 
 	if (!context || !line_to)
 		return FALSE;
@@ -622,10 +590,8 @@ static BOOL wf_gdi_line_to(rdpContext* context, const LINE_TO_ORDER* line_to)
 	LineTo(wfc->drawing->hdc, line_to->nXEnd, line_to->nYEnd);
 	x = (line_to->nXStart < line_to->nXEnd) ? line_to->nXStart : line_to->nXEnd;
 	y = (line_to->nYStart < line_to->nYEnd) ? line_to->nYStart : line_to->nYEnd;
-	w = (line_to->nXStart < line_to->nXEnd) ? (line_to->nXEnd - line_to->nXStart)
-	    : (line_to->nXStart - line_to->nXEnd);
-	h = (line_to->nYStart < line_to->nYEnd) ? (line_to->nYEnd - line_to->nYStart)
-	    : (line_to->nYStart - line_to->nYEnd);
+	w = (line_to->nXStart < line_to->nXEnd) ? (line_to->nXEnd - line_to->nXStart) : (line_to->nXStart - line_to->nXEnd);
+	h = (line_to->nYStart < line_to->nYEnd) ? (line_to->nYEnd - line_to->nYStart) : (line_to->nYStart - line_to->nYEnd);
 
 	if (wfc->drawing == wfc->primary)
 		wf_invalidate_region(wfc, x, y, w, h);
@@ -641,7 +607,7 @@ static BOOL wf_gdi_polyline(rdpContext* context, const POLYLINE_ORDER* polyline)
 	HPEN hpen;
 	HPEN org_hpen;
 	UINT32 pen_color;
-	wfContext* wfc = (wfContext*)context;
+	wfContext* wfc = (wfContext*) context;
 
 	if (!context || !polyline)
 		return FALSE;
@@ -655,10 +621,10 @@ static BOOL wf_gdi_polyline(rdpContext* context, const POLYLINE_ORDER* polyline)
 
 	if (polyline->numDeltaEntries > 0)
 	{
-		POINT*  pts;
-		POINT  temp;
-		int    numPoints;
-		int    i;
+		POINT* pts;
+		POINT temp;
+		int numPoints;
+		int i;
 		numPoints = polyline->numDeltaEntries + 1;
 		pts = (POINT*) malloc(sizeof(POINT) * numPoints);
 		pts[0].x = temp.x = polyline->xStart;
@@ -673,8 +639,7 @@ static BOOL wf_gdi_polyline(rdpContext* context, const POLYLINE_ORDER* polyline)
 		}
 
 		if (wfc->drawing == wfc->primary)
-			wf_invalidate_region(wfc, wfc->client_x, wfc->client_y, wfc->client_width,
-			                     wfc->client_height);
+			wf_invalidate_region(wfc, wfc->client_x, wfc->client_y, wfc->client_width, wfc->client_height);
 
 		Polyline(wfc->drawing->hdc, pts, numPoints);
 		free(pts);
@@ -689,7 +654,7 @@ static BOOL wf_gdi_polyline(rdpContext* context, const POLYLINE_ORDER* polyline)
 static BOOL wf_gdi_memblt(rdpContext* context, MEMBLT_ORDER* memblt)
 {
 	wfBitmap* bitmap;
-	wfContext* wfc = (wfContext*)context;
+	wfContext* wfc = (wfContext*) context;
 
 	if (!context || !memblt)
 		return FALSE;
@@ -699,14 +664,12 @@ static BOOL wf_gdi_memblt(rdpContext* context, MEMBLT_ORDER* memblt)
 	if (!bitmap || !wfc->drawing || !wfc->drawing->hdc)
 		return FALSE;
 
-	if (!BitBlt(wfc->drawing->hdc, memblt->nLeftRect, memblt->nTopRect,
-	            memblt->nWidth, memblt->nHeight, bitmap->hdc,
+	if (!BitBlt(wfc->drawing->hdc, memblt->nLeftRect, memblt->nTopRect, memblt->nWidth, memblt->nHeight, bitmap->hdc,
 	            memblt->nXSrc, memblt->nYSrc, gdi_rop3_code(memblt->bRop)))
 		return FALSE;
 
 	if (wfc->drawing == wfc->primary)
-		wf_invalidate_region(wfc, memblt->nLeftRect, memblt->nTopRect, memblt->nWidth,
-		                     memblt->nHeight);
+		wf_invalidate_region(wfc, memblt->nLeftRect, memblt->nTopRect, memblt->nWidth, memblt->nHeight);
 
 	return TRUE;
 }
@@ -716,7 +679,7 @@ static BOOL wf_gdi_mem3blt(rdpContext* context, MEM3BLT_ORDER* mem3blt)
 	BOOL rc = FALSE;
 	HDC hdc;
 	wfBitmap* bitmap;
-	wfContext* wfc = (wfContext*)context;
+	wfContext* wfc = (wfContext*) context;
 	COLORREF fgcolor, bgcolor, orgColor;
 	HBRUSH orgBrush = NULL, brush = NULL;
 
@@ -746,11 +709,11 @@ static BOOL wf_gdi_mem3blt(rdpContext* context, MEM3BLT_ORDER* mem3blt)
 
 		case GDI_BS_HATCHED:
 		case GDI_BS_PATTERN:
-			{
-				HBITMAP bmp = CreateBitmap(8, 8, 1, mem3blt->brush.bpp, mem3blt->brush.data);
-				brush = CreatePatternBrush(bmp);
-			}
-			break;
+		{
+			HBITMAP bmp = CreateBitmap(8, 8, 1, mem3blt->brush.bpp, mem3blt->brush.data);
+			brush = CreatePatternBrush(bmp);
+		}
+		break;
 
 		default:
 			goto fail;
@@ -758,15 +721,12 @@ static BOOL wf_gdi_mem3blt(rdpContext* context, MEM3BLT_ORDER* mem3blt)
 
 	orgBrush = SelectObject(hdc, brush);
 
-	if (!BitBlt(hdc, mem3blt->nLeftRect, mem3blt->nTopRect,
-	            mem3blt->nWidth, mem3blt->nHeight, bitmap->hdc,
+	if (!BitBlt(hdc, mem3blt->nLeftRect, mem3blt->nTopRect, mem3blt->nWidth, mem3blt->nHeight, bitmap->hdc,
 	            mem3blt->nXSrc, mem3blt->nYSrc, gdi_rop3_code(mem3blt->bRop)))
 		goto fail;
 
 	if (wfc->drawing == wfc->primary)
-		wf_invalidate_region(wfc, mem3blt->nLeftRect, mem3blt->nTopRect,
-		                     mem3blt->nWidth,
-		                     mem3blt->nHeight);
+		wf_invalidate_region(wfc, mem3blt->nLeftRect, mem3blt->nTopRect, mem3blt->nWidth, mem3blt->nHeight);
 
 	rc = TRUE;
 fail:
@@ -778,8 +738,7 @@ fail:
 	return rc;
 }
 
-static BOOL wf_gdi_surface_frame_marker(rdpContext* context,
-                                        const SURFACE_FRAME_MARKER* surface_frame_marker)
+static BOOL wf_gdi_surface_frame_marker(rdpContext* context, const SURFACE_FRAME_MARKER* surface_frame_marker)
 {
 	rdpSettings* settings;
 
@@ -791,11 +750,9 @@ static BOOL wf_gdi_surface_frame_marker(rdpContext* context,
 	if (!settings)
 		return FALSE;
 
-	if (surface_frame_marker->frameAction == SURFACECMD_FRAMEACTION_END
-	    && settings->FrameAcknowledge > 0)
+	if (surface_frame_marker->frameAction == SURFACECMD_FRAMEACTION_END && settings->FrameAcknowledge > 0)
 	{
-		IFCALL(context->instance->update->SurfaceFrameAcknowledge, context,
-		       surface_frame_marker->frameId);
+		IFCALL(context->instance->update->SurfaceFrameAcknowledge, context, surface_frame_marker->frameId);
 	}
 
 	return TRUE;

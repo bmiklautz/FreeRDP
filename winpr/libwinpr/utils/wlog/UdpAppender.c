@@ -22,20 +22,18 @@
 #include "config.h"
 #endif
 
-
 #include <winpr/crt.h>
 #include <winpr/environment.h>
 #include <winpr/winsock.h>
 
 #include "wlog.h"
 
-
 struct _wLogUdpAppender
 {
 	WLOG_APPENDER_COMMON();
 	char* host;
 	struct sockaddr targetAddr;
-	int	targetAddrLen;
+	int targetAddrLen;
 	SOCKET sock;
 };
 typedef struct _wLogUdpAppender wLogUdpAppender;
@@ -52,7 +50,7 @@ static BOOL WLog_UdpAppender_Open(wLog* log, wLogAppender* appender)
 	if (!appender)
 		return FALSE;
 
-	udpAppender = (wLogUdpAppender*)appender;
+	udpAppender = (wLogUdpAppender*) appender;
 
 	if (udpAppender->targetAddrLen) /* already opened */
 		return TRUE;
@@ -62,7 +60,7 @@ static BOOL WLog_UdpAppender_Open(wLog* log, wLogAppender* appender)
 	if (!colonPos)
 		return FALSE;
 
-	addrLen = (int)(colonPos - udpAppender->host);
+	addrLen = (int) (colonPos - udpAppender->host);
 	memcpy(addressString, udpAppender->host, addrLen);
 	addressString[addrLen] = '\0';
 	ZeroMemory(&hints, sizeof(hints));
@@ -101,19 +99,18 @@ static BOOL WLog_UdpAppender_WriteMessage(wLog* log, wLogAppender* appender, wLo
 	if (!log || !appender || !message)
 		return FALSE;
 
-	udpAppender = (wLogUdpAppender*)appender;
+	udpAppender = (wLogUdpAppender*) appender;
 	message->PrefixString = prefix;
 	WLog_Layout_GetMessagePrefix(log, appender->Layout, message);
-	_sendto(udpAppender->sock, message->PrefixString, strlen(message->PrefixString),
-	        0, &udpAppender->targetAddr, udpAppender->targetAddrLen);
-	_sendto(udpAppender->sock, message->TextString, strlen(message->TextString),
-	        0, &udpAppender->targetAddr, udpAppender->targetAddrLen);
+	_sendto(udpAppender->sock, message->PrefixString, strlen(message->PrefixString), 0, &udpAppender->targetAddr,
+	        udpAppender->targetAddrLen);
+	_sendto(udpAppender->sock, message->TextString, strlen(message->TextString), 0, &udpAppender->targetAddr,
+	        udpAppender->targetAddrLen);
 	_sendto(udpAppender->sock, "\n", 1, 0, &udpAppender->targetAddr, udpAppender->targetAddrLen);
 	return TRUE;
 }
 
-static BOOL WLog_UdpAppender_WriteDataMessage(wLog* log, wLogAppender* appender,
-        wLogMessage* message)
+static BOOL WLog_UdpAppender_WriteDataMessage(wLog* log, wLogAppender* appender, wLogMessage* message)
 {
 	if (!log || !appender || !message)
 		return FALSE;
@@ -121,8 +118,7 @@ static BOOL WLog_UdpAppender_WriteDataMessage(wLog* log, wLogAppender* appender,
 	return TRUE;
 }
 
-static BOOL WLog_UdpAppender_WriteImageMessage(wLog* log, wLogAppender* appender,
-        wLogMessage* message)
+static BOOL WLog_UdpAppender_WriteImageMessage(wLog* log, wLogAppender* appender, wLogMessage* message)
 {
 	if (!log || !appender || !message)
 		return FALSE;
@@ -132,7 +128,7 @@ static BOOL WLog_UdpAppender_WriteImageMessage(wLog* log, wLogAppender* appender
 
 static BOOL WLog_UdpAppender_Set(wLogAppender* appender, const char* setting, void* value)
 {
-	wLogUdpAppender* udpAppender = (wLogUdpAppender*)appender;
+	wLogUdpAppender* udpAppender = (wLogUdpAppender*) appender;
 
 	if (!value || !strlen(value))
 		return FALSE;
@@ -145,7 +141,7 @@ static BOOL WLog_UdpAppender_Set(wLogAppender* appender, const char* setting, vo
 	if (udpAppender->host)
 		free(udpAppender->host);
 
-	udpAppender->host = _strdup((const char*)value);
+	udpAppender->host = _strdup((const char*) value);
 	return (udpAppender->host != NULL) && WLog_UdpAppender_Open(NULL, appender);
 }
 
@@ -155,7 +151,7 @@ static void WLog_UdpAppender_Free(wLogAppender* appender)
 
 	if (appender)
 	{
-		udpAppender = (wLogUdpAppender*)appender;
+		udpAppender = (wLogUdpAppender*) appender;
 
 		if (udpAppender->sock != INVALID_SOCKET)
 		{
@@ -204,7 +200,7 @@ wLogAppender* WLog_UdpAppender_New(wLog* log)
 		if (GetEnvironmentVariableA(name, appender->host, nSize) != nSize - 1)
 			goto error_open;
 
-		if (!WLog_UdpAppender_Open(log, (wLogAppender*)appender))
+		if (!WLog_UdpAppender_Open(log, (wLogAppender*) appender))
 			goto error_open;
 	}
 	else
@@ -215,7 +211,7 @@ wLogAppender* WLog_UdpAppender_New(wLog* log)
 			goto error_open;
 	}
 
-	return (wLogAppender*)appender;
+	return (wLogAppender*) appender;
 error_open:
 	free(appender->host);
 	closesocket(appender->sock);

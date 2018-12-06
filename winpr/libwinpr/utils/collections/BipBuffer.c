@@ -31,11 +31,10 @@
  * http://www.codeproject.com/Articles/3479/The-Bip-Buffer-The-Circular-Buffer-with-a-Twist
  */
 
-#define BipBlock_Clear(_bbl) \
-	_bbl.index = _bbl.size = 0
+#define BipBlock_Clear(_bbl) _bbl.index = _bbl.size = 0
 
-#define BipBlock_Copy(_dst, _src) \
-	_dst.index = _src.index; \
+#define BipBlock_Copy(_dst, _src)                                                                                      \
+	_dst.index = _src.index;                                                                                           \
 	_dst.size = _src.size
 
 void BipBuffer_Clear(wBipBuffer* bb)
@@ -121,15 +120,9 @@ void BipBuffer_FreeBuffer(wBipBuffer* bb)
 	BipBuffer_Clear(bb);
 }
 
-size_t BipBuffer_UsedSize(wBipBuffer* bb)
-{
-	return bb->blockA.size + bb->blockB.size;
-}
+size_t BipBuffer_UsedSize(wBipBuffer* bb) { return bb->blockA.size + bb->blockB.size; }
 
-size_t BipBuffer_BufferSize(wBipBuffer* bb)
-{
-	return bb->size;
-}
+size_t BipBuffer_BufferSize(wBipBuffer* bb) { return bb->size; }
 
 BYTE* BipBuffer_WriteTryReserve(wBipBuffer* bb, size_t size, size_t* reserved)
 {

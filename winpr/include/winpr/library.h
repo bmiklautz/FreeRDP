@@ -27,10 +27,10 @@
 
 typedef HANDLE DLL_DIRECTORY_COOKIE;
 
-#define LOAD_LIBRARY_SEARCH_APPLICATION_DIR			0x00000200
-#define LOAD_LIBRARY_SEARCH_DEFAULT_DIRS			0x00001000
-#define LOAD_LIBRARY_SEARCH_SYSTEM32				0x00000800
-#define LOAD_LIBRARY_SEARCH_USER_DIRS				0x00000400
+#define LOAD_LIBRARY_SEARCH_APPLICATION_DIR 0x00000200
+#define LOAD_LIBRARY_SEARCH_DEFAULT_DIRS 0x00001000
+#define LOAD_LIBRARY_SEARCH_SYSTEM32 0x00000800
+#define LOAD_LIBRARY_SEARCH_USER_DIRS 0x00000400
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,11 +51,11 @@ WINPR_API HMODULE LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFl
 #endif
 
 #ifdef UNICODE
-#define LoadLibrary		LoadLibraryW
-#define LoadLibraryEx		LoadLibraryExW
+#define LoadLibrary LoadLibraryW
+#define LoadLibraryEx LoadLibraryExW
 #else
-#define LoadLibrary		LoadLibraryA
-#define LoadLibraryEx		LoadLibraryExA
+#define LoadLibrary LoadLibraryA
+#define LoadLibraryEx LoadLibraryExA
 #endif
 
 #endif
@@ -81,14 +81,13 @@ WINPR_API BOOL FreeLibrary(HMODULE hLibModule);
 #endif
 
 #ifdef UNICODE
-#define GetModuleHandle		GetModuleHandleW
-#define GetModuleFileName	GetModuleFileNameW
+#define GetModuleHandle GetModuleHandleW
+#define GetModuleFileName GetModuleFileNameW
 #else
-#define GetModuleHandle		GetModuleHandleA
-#define GetModuleFileName	GetModuleFileNameA
+#define GetModuleHandle GetModuleHandleA
+#define GetModuleFileName GetModuleFileNameA
 #endif
 
 #endif
 
 #endif /* WINPR_LIBRARY_H */
-

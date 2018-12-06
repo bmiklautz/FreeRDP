@@ -40,4 +40,3 @@ WINPR_API char* winpr_strerror(DWORD dw, char* dmsg, size_t size);
 #endif
 
 #endif /* WINPR_WLOG_H */
-

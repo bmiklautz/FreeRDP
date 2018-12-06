@@ -35,20 +35,20 @@ static int getSyslogLevel(DWORD level)
 {
 	switch (level)
 	{
-	case WLOG_TRACE:
-	case WLOG_DEBUG:
-		return LOG_DEBUG;
-	case WLOG_INFO:
-		return LOG_INFO;
-	case WLOG_WARN:
-		return LOG_WARNING;
-	case WLOG_ERROR:
-		return LOG_ERR;
-	case WLOG_FATAL:
-		return LOG_CRIT;
-	case WLOG_OFF:
-	default:
-		return -1;
+		case WLOG_TRACE:
+		case WLOG_DEBUG:
+			return LOG_DEBUG;
+		case WLOG_INFO:
+			return LOG_INFO;
+		case WLOG_WARN:
+			return LOG_WARNING;
+		case WLOG_ERROR:
+			return LOG_ERR;
+		case WLOG_FATAL:
+			return LOG_CRIT;
+		case WLOG_OFF:
+		default:
+			return -1;
 	}
 }
 
@@ -78,7 +78,7 @@ static BOOL WLog_SyslogAppender_WriteMessage(wLog* log, wLogAppender* appender, 
 	syslogLevel = getSyslogLevel(message->Level);
 	if (syslogLevel >= 0)
 		syslog(syslogLevel, "%s", message->TextString);
-	
+
 	return TRUE;
 }
 
@@ -110,10 +110,7 @@ static BOOL WLog_SyslogAppender_WriteImageMessage(wLog* log, wLogAppender* appen
 	return TRUE;
 }
 
-void WLog_SyslogAppender_Free(wLogAppender* appender)
-{
-		free(appender);
-}
+void WLog_SyslogAppender_Free(wLogAppender* appender) { free(appender); }
 
 wLogAppender* WLog_SyslogAppender_New(wLog* log)
 {
@@ -132,5 +129,5 @@ wLogAppender* WLog_SyslogAppender_New(wLog* log)
 	appender->WriteImageMessage = WLog_SyslogAppender_WriteImageMessage;
 	appender->Free = WLog_SyslogAppender_Free;
 
-	return (wLogAppender*)appender;
+	return (wLogAppender*) appender;
 }

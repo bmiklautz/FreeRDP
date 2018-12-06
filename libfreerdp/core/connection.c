@@ -122,8 +122,9 @@
  *
  * 6.	Optional Connect-Time Auto-Detection: During the optional connect-time auto-detect phase the goal is to
  * 	determine characteristics of the network, such as the round-trip latency time and the bandwidth of the link
- * 	between the server and client. This is accomplished by exchanging a collection of PDUs (specified in section 2.2.1.4)
- * 	over a predetermined period of time with enough data to ensure that the results are statistically relevant.
+ * 	between the server and client. This is accomplished by exchanging a collection of PDUs (specified in
+ *section 2.2.1.4) over a predetermined period of time with enough data to ensure that the results are statistically
+ *relevant.
  *
  * 7.	Licensing: The goal of the licensing exchange is to transfer a license from the server to the client.
  * 	The client stores this license and on subsequent connections sends the license to the server for validation.
@@ -139,37 +140,43 @@
  * 	multitransport protocols ([MS-RDPEMT] section 1.3.1).
  *
  * 9.	Capabilities Exchange: The server sends the set of capabilities it supports to the client in a Demand Active PDU
- * 	(section 2.2.1.13.1). The client responds with its capabilities by sending a Confirm Active PDU (section 2.2.1.13.2).
+ * 	(section 2.2.1.13.1). The client responds with its capabilities by sending a Confirm Active PDU
+ *(section 2.2.1.13.2).
  *
- * 10.	Connection Finalization: The client and server exchange PDUs to finalize the connection details. The client-to-server
- * 	PDUs sent during this phase have no dependencies on any of the server-to-client PDUs; they may be sent as a single batch,
- * 	provided that sequencing is maintained.
+ * 10.	Connection Finalization: The client and server exchange PDUs to finalize the connection details. The
+ *client-to-server PDUs sent during this phase have no dependencies on any of the server-to-client PDUs; they may be
+ *sent as a single batch, provided that sequencing is maintained.
  *
  * 	- The Client Synchronize PDU (section 2.2.1.14) is sent after transmitting the Confirm Active PDU.
  * 	- The Client Control (Cooperate) PDU (section 2.2.1.15) is sent after transmitting the Client Synchronize PDU.
- * 	- The Client Control (Request Control) PDU (section 2.2.1.16) is sent after transmitting the Client Control (Cooperate) PDU.
- * 	- The optional Persistent Key List PDUs (section 2.2.1.17) are sent after transmitting the Client Control (Request Control) PDU.
- * 	- The Font List PDU (section 2.2.1.18) is sent after transmitting the Persistent Key List PDUs or, if the Persistent Key List
- * 	  PDUs were not sent, it is sent after transmitting the Client Control (Request Control) PDU (section 2.2.1.16).
+ * 	- The Client Control (Request Control) PDU (section 2.2.1.16) is sent after transmitting the Client Control
+ *(Cooperate) PDU.
+ * 	- The optional Persistent Key List PDUs (section 2.2.1.17) are sent after transmitting the Client Control (Request
+ *Control) PDU.
+ * 	- The Font List PDU (section 2.2.1.18) is sent after transmitting the Persistent Key List PDUs or, if the Persistent
+ *Key List PDUs were not sent, it is sent after transmitting the Client Control (Request Control) PDU
+ *(section 2.2.1.16).
  *
- *	The server-to-client PDUs sent during the Connection Finalization Phase have dependencies on the client-to-server PDUs.
+ *	The server-to-client PDUs sent during the Connection Finalization Phase have dependencies on the client-to-server
+ *PDUs.
  *
- *	- The optional Monitor Layout PDU (section 2.2.12.1) has no dependency on any client-to-server PDUs and is sent after the Demand Active PDU.
+ *	- The optional Monitor Layout PDU (section 2.2.12.1) has no dependency on any client-to-server PDUs and is sent
+ *after the Demand Active PDU.
  *	- The Server Synchronize PDU (section 2.2.1.19) is sent in response to the Confirm Active PDU.
  *	- The Server Control (Cooperate) PDU (section 2.2.1.20) is sent after transmitting the Server Synchronize PDU.
- *	- The Server Control (Granted Control) PDU (section 2.2.1.21) is sent in response to the Client Control (Request Control) PDU.
+ *	- The Server Control (Granted Control) PDU (section 2.2.1.21) is sent in response to the Client Control (Request
+ *Control) PDU.
  *	- The Font Map PDU (section 2.2.1.22) is sent in response to the Font List PDU.
  *
- *	Once the client has sent the Confirm Active PDU, it can start sending mouse and keyboard input to the server, and upon receipt
- *	of the Font List PDU the server can start sending graphics output to the client.
+ *	Once the client has sent the Confirm Active PDU, it can start sending mouse and keyboard input to the server, and
+ *upon receipt of the Font List PDU the server can start sending graphics output to the client.
  *
- *	Besides input and graphics data, other data that can be exchanged between client and server after the connection has been
- *	finalized includes connection management information and virtual channel messages (exchanged between client-side plug-ins
- *	and server-side applications).
+ *	Besides input and graphics data, other data that can be exchanged between client and server after the connection has
+ *been finalized includes connection management information and virtual channel messages (exchanged between client-side
+ *plug-ins and server-side applications).
  */
 
 static int rdp_client_connect_finalize(rdpRdp* rdp);
-
 
 static BOOL rdp_client_reset_codecs(rdpContext* context)
 {
@@ -184,8 +191,8 @@ static BOOL rdp_client_reset_codecs(rdpContext* context)
 	if (!context->codecs)
 		return FALSE;
 
-	return freerdp_client_codecs_prepare(context->codecs, FREERDP_CODEC_ALL,
-	                                     settings->DesktopWidth, settings->DesktopHeight);
+	return freerdp_client_codecs_prepare(context->codecs, FREERDP_CODEC_ALL, settings->DesktopWidth,
+	                                     settings->DesktopHeight);
 }
 
 /**
@@ -200,7 +207,8 @@ BOOL rdp_client_connect(rdpRdp* rdp)
 	UINT32 SelectedProtocol;
 	BOOL status;
 	rdpSettings* settings = rdp->settings;
-	/* make sure SSL is initialize for earlier enough for crypto, by taking advantage of winpr SSL FIPS flag for openssl initialization */
+	/* make sure SSL is initialize for earlier enough for crypto, by taking advantage of winpr SSL FIPS flag for openssl
+	 * initialization */
 	DWORD flags = WINPR_SSL_INIT_DEFAULT;
 
 	if (!rdp_client_reset_codecs(rdp->context))
@@ -311,8 +319,9 @@ BOOL rdp_client_connect(rdpRdp* rdp)
 
 	if ((SelectedProtocol & PROTOCOL_SSL) || (SelectedProtocol == PROTOCOL_RDP))
 	{
-		if ((settings->Username != NULL) && ((settings->Password != NULL) ||
-		                                     (settings->RedirectionPassword != NULL && settings->RedirectionPasswordLength > 0)))
+		if ((settings->Username != NULL) &&
+		    ((settings->Password != NULL) ||
+		     (settings->RedirectionPassword != NULL && settings->RedirectionPasswordLength > 0)))
 			settings->AutoLogonEnabled = TRUE;
 	}
 
@@ -524,8 +533,7 @@ BOOL rdp_client_redirect(rdpRdp* rdp)
 				haveRedirectAddress = rdp_client_redirect_try_netbios(settings);
 
 			redirectionMask >>= 3;
-		}
-		while (!haveRedirectAddress && (redirectionMask != 0));
+		} while (!haveRedirectAddress && (redirectionMask != 0));
 	}
 
 	if (settings->RedirectionFlags & LB_USERNAME)
@@ -656,10 +664,8 @@ static BOOL rdp_client_establish_keys(rdpRdp* rdp)
 
 	if (settings->EncryptionMethods == ENCRYPTION_METHOD_FIPS)
 	{
-		rdp->fips_encrypt = winpr_Cipher_New(WINPR_CIPHER_DES_EDE3_CBC,
-		                                     WINPR_ENCRYPT,
-		                                     rdp->fips_encrypt_key,
-		                                     fips_ivec);
+		rdp->fips_encrypt =
+		  winpr_Cipher_New(WINPR_CIPHER_DES_EDE3_CBC, WINPR_ENCRYPT, rdp->fips_encrypt_key, fips_ivec);
 
 		if (!rdp->fips_encrypt)
 		{
@@ -667,10 +673,8 @@ static BOOL rdp_client_establish_keys(rdpRdp* rdp)
 			goto end;
 		}
 
-		rdp->fips_decrypt = winpr_Cipher_New(WINPR_CIPHER_DES_EDE3_CBC,
-		                                     WINPR_DECRYPT,
-		                                     rdp->fips_decrypt_key,
-		                                     fips_ivec);
+		rdp->fips_decrypt =
+		  winpr_Cipher_New(WINPR_CIPHER_DES_EDE3_CBC, WINPR_DECRYPT, rdp->fips_decrypt_key, fips_ivec);
 
 		if (!rdp->fips_decrypt)
 		{
@@ -777,8 +781,7 @@ BOOL rdp_server_establish_keys(rdpRdp* rdp, wStream* s)
 	mod = rdp->settings->RdpServerRsaKey->Modulus;
 	priv_exp = rdp->settings->RdpServerRsaKey->PrivateExponent;
 
-	if (crypto_rsa_private_decrypt(crypt_client_random, rand_len - 8, key_len, mod, priv_exp,
-	                               client_random) <= 0)
+	if (crypto_rsa_private_decrypt(crypt_client_random, rand_len - 8, key_len, mod, priv_exp, client_random) <= 0)
 	{
 		free(client_random);
 		goto end;
@@ -795,10 +798,8 @@ BOOL rdp_server_establish_keys(rdpRdp* rdp, wStream* s)
 
 	if (rdp->settings->EncryptionMethods == ENCRYPTION_METHOD_FIPS)
 	{
-		rdp->fips_encrypt = winpr_Cipher_New(WINPR_CIPHER_DES_EDE3_CBC,
-		                                     WINPR_ENCRYPT,
-		                                     rdp->fips_encrypt_key,
-		                                     fips_ivec);
+		rdp->fips_encrypt =
+		  winpr_Cipher_New(WINPR_CIPHER_DES_EDE3_CBC, WINPR_ENCRYPT, rdp->fips_encrypt_key, fips_ivec);
 
 		if (!rdp->fips_encrypt)
 		{
@@ -806,10 +807,8 @@ BOOL rdp_server_establish_keys(rdpRdp* rdp, wStream* s)
 			goto end;
 		}
 
-		rdp->fips_decrypt = winpr_Cipher_New(WINPR_CIPHER_DES_EDE3_CBC,
-		                                     WINPR_DECRYPT,
-		                                     rdp->fips_decrypt_key,
-		                                     fips_ivec);
+		rdp->fips_decrypt =
+		  winpr_Cipher_New(WINPR_CIPHER_DES_EDE3_CBC, WINPR_DECRYPT, rdp->fips_decrypt_key, fips_ivec);
 
 		if (!rdp->fips_decrypt)
 		{
@@ -1183,13 +1182,10 @@ BOOL rdp_server_accept_nego(rdpRdp* rdp, wStream* s)
 		return FALSE;
 
 	RequestedProtocols = nego_get_requested_protocols(nego);
-	WLog_INFO(TAG, "Client Security: NLA:%d TLS:%d RDP:%d",
-	          (RequestedProtocols & PROTOCOL_HYBRID) ? 1 : 0,
-	          (RequestedProtocols & PROTOCOL_SSL) ? 1 : 0,
-	          (RequestedProtocols == PROTOCOL_RDP) ? 1 : 0
-	         );
-	WLog_INFO(TAG, "Server Security: NLA:%"PRId32" TLS:%"PRId32" RDP:%"PRId32"",
-	          settings->NlaSecurity, settings->TlsSecurity, settings->RdpSecurity);
+	WLog_INFO(TAG, "Client Security: NLA:%d TLS:%d RDP:%d", (RequestedProtocols & PROTOCOL_HYBRID) ? 1 : 0,
+	          (RequestedProtocols & PROTOCOL_SSL) ? 1 : 0, (RequestedProtocols == PROTOCOL_RDP) ? 1 : 0);
+	WLog_INFO(TAG, "Server Security: NLA:%" PRId32 " TLS:%" PRId32 " RDP:%" PRId32 "", settings->NlaSecurity,
+	          settings->TlsSecurity, settings->RdpSecurity);
 
 	if ((settings->NlaSecurity) && (RequestedProtocols & PROTOCOL_HYBRID))
 	{
@@ -1235,11 +1231,8 @@ BOOL rdp_server_accept_nego(rdpRdp* rdp, wStream* s)
 
 	if (!(SelectedProtocol & PROTOCOL_FAILED_NEGO))
 	{
-		WLog_INFO(TAG, "Negotiated Security: NLA:%d TLS:%d RDP:%d",
-		          (SelectedProtocol & PROTOCOL_HYBRID) ? 1 : 0,
-		          (SelectedProtocol & PROTOCOL_SSL) ? 1 : 0,
-		          (SelectedProtocol == PROTOCOL_RDP) ? 1 : 0
-		         );
+		WLog_INFO(TAG, "Negotiated Security: NLA:%d TLS:%d RDP:%d", (SelectedProtocol & PROTOCOL_HYBRID) ? 1 : 0,
+		          (SelectedProtocol & PROTOCOL_SSL) ? 1 : 0, (SelectedProtocol == PROTOCOL_RDP) ? 1 : 0);
 	}
 
 	if (!nego_set_selected_protocol(nego, SelectedProtocol))
@@ -1339,8 +1332,8 @@ BOOL rdp_server_accept_mcs_channel_join_request(rdpRdp* rdp, wStream* s)
 			allJoined = FALSE;
 	}
 
-	if ((mcs->userChannelJoined) && (mcs->globalChannelJoined) && (mcs->messageChannelId == 0 ||
-	        mcs->messageChannelJoined) && allJoined)
+	if ((mcs->userChannelJoined) && (mcs->globalChannelJoined) &&
+	    (mcs->messageChannelId == 0 || mcs->messageChannelJoined) && allJoined)
 	{
 		rdp_server_transition_to_state(rdp, CONNECTION_STATE_RDP_SECURITY_COMMENCEMENT);
 	}

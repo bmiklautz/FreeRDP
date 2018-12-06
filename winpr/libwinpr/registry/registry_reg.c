@@ -34,7 +34,7 @@
 #include "../log.h"
 #define TAG WINPR_TAG("registry")
 
-#define WINPR_HKLM_HIVE		"/etc/winpr/HKLM.reg"
+#define WINPR_HKLM_HIVE "/etc/winpr/HKLM.reg"
 
 static void reg_print_key(Reg* reg, RegKey* key);
 static void reg_print_value(Reg* reg, RegVal* value);
@@ -46,35 +46,29 @@ struct reg_data_type
 	DWORD type;
 };
 
-static struct reg_data_type REG_DATA_TYPE_TABLE[] =
-{
-	{ "\"",		1,	REG_SZ		},
-	{ "dword:",	6,	REG_DWORD	},
-	{ "str:\"",	5,	REG_SZ		},
-	{ "str(2):\"",	8,	REG_EXPAND_SZ	},
-	{ "str(7):\"",	8,	REG_MULTI_SZ	},
-	{ "hex:",	4,	REG_BINARY	},
-	{ "hex(2):\"",	8,	REG_EXPAND_SZ	},
-	{ "hex(7):\"",	8,	REG_MULTI_SZ	},
-	{ "hex(b):\"",	8,	REG_QWORD	},
-	{ NULL,		0,	0		}
-};
+static struct reg_data_type REG_DATA_TYPE_TABLE[] = { { "\"", 1, REG_SZ },
+	                                                  { "dword:", 6, REG_DWORD },
+	                                                  { "str:\"", 5, REG_SZ },
+	                                                  { "str(2):\"", 8, REG_EXPAND_SZ },
+	                                                  { "str(7):\"", 8, REG_MULTI_SZ },
+	                                                  { "hex:", 4, REG_BINARY },
+	                                                  { "hex(2):\"", 8, REG_EXPAND_SZ },
+	                                                  { "hex(7):\"", 8, REG_MULTI_SZ },
+	                                                  { "hex(b):\"", 8, REG_QWORD },
+	                                                  { NULL, 0, 0 } };
 
-static char* REG_DATA_TYPE_STRINGS[] =
-{
-	"REG_NONE",
-	"REG_SZ",
-	"REG_EXPAND_SZ",
-	"REG_BINARY",
-	"REG_DWORD",
-	"REG_DWORD_BIG_ENDIAN",
-	"REG_LINK",
-	"REG_MULTI_SZ",
-	"REG_RESOURCE_LIST",
-	"REG_FULL_RESOURCE_DESCRIPTOR",
-	"REG_RESOURCE_REQUIREMENTS_LIST",
-	"REG_QWORD"
-};
+static char* REG_DATA_TYPE_STRINGS[] = { "REG_NONE",
+	                                     "REG_SZ",
+	                                     "REG_EXPAND_SZ",
+	                                     "REG_BINARY",
+	                                     "REG_DWORD",
+	                                     "REG_DWORD_BIG_ENDIAN",
+	                                     "REG_LINK",
+	                                     "REG_MULTI_SZ",
+	                                     "REG_RESOURCE_LIST",
+	                                     "REG_FULL_RESOURCE_DESCRIPTOR",
+	                                     "REG_RESOURCE_REQUIREMENTS_LIST",
+	                                     "REG_QWORD" };
 
 static void reg_load_start(Reg* reg)
 {
@@ -92,7 +86,7 @@ static void reg_load_start(Reg* reg)
 	reg->buffer = (char*) malloc(file_size + 2);
 
 	if (!reg->buffer)
-		return ;
+		return;
 
 	if (fread(reg->buffer, file_size, 1, reg->fp) != 1)
 	{
@@ -239,10 +233,7 @@ static char* reg_load_get_next_line(Reg* reg)
 	return reg->line;
 }
 
-static char* reg_load_peek_next_line(Reg* reg)
-{
-	return reg->next_line;
-}
+static char* reg_load_peek_next_line(Reg* reg) { return reg->next_line; }
 
 static void reg_insert_key(Reg* reg, RegKey* key, RegKey* subkey)
 {
@@ -471,7 +462,7 @@ void reg_print_value(Reg* reg, RegVal* value)
 
 	if (value->type == REG_DWORD)
 	{
-		WLog_INFO(TAG, "dword:%08"PRIX32"", value->data.dword);
+		WLog_INFO(TAG, "dword:%08" PRIX32 "", value->data.dword);
 	}
 	else if (value->type == REG_SZ)
 	{

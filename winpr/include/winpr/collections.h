@@ -77,7 +77,7 @@ WINPR_API void Queue_Unlock(wQueue* queue);
 
 WINPR_API HANDLE Queue_Event(wQueue* queue);
 
-#define Queue_Object(_queue)	(&_queue->object)
+#define Queue_Object(_queue) (&_queue->object)
 
 WINPR_API void Queue_Clear(wQueue* queue);
 
@@ -107,7 +107,7 @@ typedef struct _wStack wStack;
 WINPR_API int Stack_Count(wStack* stack);
 WINPR_API BOOL Stack_IsSynchronized(wStack* stack);
 
-#define Stack_Object(_stack)	(&_stack->object)
+#define Stack_Object(_stack) (&_stack->object)
 
 WINPR_API void Stack_Clear(wStack* stack);
 WINPR_API BOOL Stack_Contains(wStack* stack, void* obj);
@@ -149,7 +149,7 @@ WINPR_API void ArrayList_Unlock(wArrayList* arrayList);
 WINPR_API void* ArrayList_GetItem(wArrayList* arrayList, int index);
 WINPR_API void ArrayList_SetItem(wArrayList* arrayList, int index, void* obj);
 
-#define ArrayList_Object(_arrayList)	(&_arrayList->object)
+#define ArrayList_Object(_arrayList) (&_arrayList->object)
 
 WINPR_API void ArrayList_Clear(wArrayList* arrayList);
 WINPR_API BOOL ArrayList_Contains(wArrayList* arrayList, void* obj);
@@ -198,8 +198,8 @@ struct _wListDictionary
 };
 typedef struct _wListDictionary wListDictionary;
 
-#define ListDictionary_KeyObject(_dictionary)	(&_dictionary->objectKey)
-#define ListDictionary_ValueObject(_dictionary)	(&_dictionary->objectValue)
+#define ListDictionary_KeyObject(_dictionary) (&_dictionary->objectKey)
+#define ListDictionary_ValueObject(_dictionary) (&_dictionary->objectValue)
 
 WINPR_API int ListDictionary_Count(wListDictionary* listDictionary);
 
@@ -215,8 +215,7 @@ WINPR_API BOOL ListDictionary_Contains(wListDictionary* listDictionary, const vo
 WINPR_API int ListDictionary_GetKeys(wListDictionary* listDictionary, ULONG_PTR** ppKeys);
 
 WINPR_API void* ListDictionary_GetItemValue(wListDictionary* listDictionary, const void* key);
-WINPR_API BOOL ListDictionary_SetItemValue(wListDictionary* listDictionary, const void* key,
-        void* value);
+WINPR_API BOOL ListDictionary_SetItemValue(wListDictionary* listDictionary, const void* key, void* value);
 
 WINPR_API wListDictionary* ListDictionary_New(BOOL synchronized);
 WINPR_API void ListDictionary_Free(wListDictionary* listDictionary);
@@ -285,8 +284,7 @@ typedef struct _wReferenceTable wReferenceTable;
 WINPR_API UINT32 ReferenceTable_Add(wReferenceTable* referenceTable, void* ptr);
 WINPR_API UINT32 ReferenceTable_Release(wReferenceTable* referenceTable, void* ptr);
 
-WINPR_API wReferenceTable* ReferenceTable_New(BOOL synchronized, void* context,
-        REFERENCE_FREE ReferenceFree);
+WINPR_API wReferenceTable* ReferenceTable_New(BOOL synchronized, void* context, REFERENCE_FREE ReferenceFree);
 WINPR_API void ReferenceTable_Free(wReferenceTable* referenceTable);
 
 /* Countdown Event */
@@ -314,7 +312,7 @@ WINPR_API void CountdownEvent_Free(wCountdownEvent* countdown);
 
 /* Hash Table */
 
-typedef UINT32(*HASH_TABLE_HASH_FN)(void* key);
+typedef UINT32 (*HASH_TABLE_HASH_FN)(void* key);
 typedef BOOL (*HASH_TABLE_KEY_COMPARE_FN)(void* key1, void* key2);
 typedef BOOL (*HASH_TABLE_VALUE_COMPARE_FN)(void* value1, void* value2);
 typedef void* (*HASH_TABLE_KEY_CLONE_FN)(void* key);
@@ -423,7 +421,7 @@ WINPR_API void* ObjectPool_Take(wObjectPool* pool);
 WINPR_API void ObjectPool_Return(wObjectPool* pool, void* obj);
 WINPR_API void ObjectPool_Clear(wObjectPool* pool);
 
-#define ObjectPool_Object(_pool)	(&_pool->object)
+#define ObjectPool_Object(_pool) (&_pool->object)
 
 WINPR_API wObjectPool* ObjectPool_New(BOOL synchronized);
 WINPR_API void ObjectPool_Free(wObjectPool* pool);
@@ -458,15 +456,14 @@ struct _wMessageQueue
 };
 typedef struct _wMessageQueue wMessageQueue;
 
-#define WMQ_QUIT	0xFFFFFFFF
+#define WMQ_QUIT 0xFFFFFFFF
 
 WINPR_API HANDLE MessageQueue_Event(wMessageQueue* queue);
 WINPR_API BOOL MessageQueue_Wait(wMessageQueue* queue);
 WINPR_API int MessageQueue_Size(wMessageQueue* queue);
 
 WINPR_API BOOL MessageQueue_Dispatch(wMessageQueue* queue, wMessage* message);
-WINPR_API BOOL MessageQueue_Post(wMessageQueue* queue, void* context, UINT32 type, void* wParam,
-                                 void* lParam);
+WINPR_API BOOL MessageQueue_Post(wMessageQueue* queue, void* context, UINT32 type, void* wParam, void* lParam);
 WINPR_API BOOL MessageQueue_PostQuit(wMessageQueue* queue, int nExitCode);
 
 WINPR_API int MessageQueue_Get(wMessageQueue* queue, wMessage* message);
@@ -536,7 +533,7 @@ typedef struct _wEventArgs wEventArgs;
 
 typedef void (*pEventHandler)(void* context, wEventArgs* e);
 
-#define MAX_EVENT_HANDLERS	32
+#define MAX_EVENT_HANDLERS 32
 
 struct _wEventType
 {
@@ -547,107 +544,112 @@ struct _wEventType
 };
 typedef struct _wEventType wEventType;
 
-#define EventArgsInit(_event_args, _sender) \
-	memset(_event_args, 0, sizeof(*_event_args)); \
-	((wEventArgs*) _event_args)->Size = sizeof(*_event_args); \
+#define EventArgsInit(_event_args, _sender)                                                                            \
+	memset(_event_args, 0, sizeof(*_event_args));                                                                      \
+	((wEventArgs*) _event_args)->Size = sizeof(*_event_args);                                                          \
 	((wEventArgs*) _event_args)->Sender = _sender
 
-#define DEFINE_EVENT_HANDLER(_name) \
-	typedef void (*p ## _name ## EventHandler)(void* context, _name ## EventArgs* e)
+#define DEFINE_EVENT_HANDLER(_name) typedef void (*p##_name##EventHandler)(void* context, _name##EventArgs* e)
 
-#define DEFINE_EVENT_RAISE(_name) \
-	static INLINE int PubSub_On ## _name (wPubSub* pubSub, void* context, _name ## EventArgs* e) { \
-		return PubSub_OnEvent(pubSub, #_name, context, (wEventArgs*) e); }
+#define DEFINE_EVENT_RAISE(_name)                                                                                      \
+	static INLINE int PubSub_On##_name(wPubSub* pubSub, void* context, _name##EventArgs* e)                            \
+	{                                                                                                                  \
+		return PubSub_OnEvent(pubSub, #_name, context, (wEventArgs*) e);                                               \
+	}
 
-#define DEFINE_EVENT_SUBSCRIBE(_name) \
-	static INLINE int PubSub_Subscribe ## _name (wPubSub* pubSub, p ## _name ## EventHandler EventHandler) { \
-		return PubSub_Subscribe(pubSub, #_name, (pEventHandler) EventHandler); }
+#define DEFINE_EVENT_SUBSCRIBE(_name)                                                                                  \
+	static INLINE int PubSub_Subscribe##_name(wPubSub* pubSub, p##_name##EventHandler EventHandler)                    \
+	{                                                                                                                  \
+		return PubSub_Subscribe(pubSub, #_name, (pEventHandler) EventHandler);                                         \
+	}
 
-#define DEFINE_EVENT_UNSUBSCRIBE(_name) \
-	static INLINE int PubSub_Unsubscribe ## _name (wPubSub* pubSub, p ## _name ## EventHandler EventHandler) { \
-		return PubSub_Unsubscribe(pubSub, #_name, (pEventHandler) EventHandler); }
+#define DEFINE_EVENT_UNSUBSCRIBE(_name)                                                                                \
+	static INLINE int PubSub_Unsubscribe##_name(wPubSub* pubSub, p##_name##EventHandler EventHandler)                  \
+	{                                                                                                                  \
+		return PubSub_Unsubscribe(pubSub, #_name, (pEventHandler) EventHandler);                                       \
+	}
 
-#define DEFINE_EVENT_BEGIN(_name) \
-	typedef struct _ ## _name ## EventArgs { \
+#define DEFINE_EVENT_BEGIN(_name)                                                                                      \
+	typedef struct _##_name##EventArgs                                                                                 \
+	{                                                                                                                  \
 		wEventArgs e;
 
-#define DEFINE_EVENT_END(_name) \
-	} _name ## EventArgs; \
-	DEFINE_EVENT_HANDLER(_name); \
-	DEFINE_EVENT_RAISE(_name) \
-	DEFINE_EVENT_SUBSCRIBE(_name) \
+#define DEFINE_EVENT_END(_name)                                                                                        \
+	}                                                                                                                  \
+	_name##EventArgs;                                                                                                  \
+	DEFINE_EVENT_HANDLER(_name);                                                                                       \
+	DEFINE_EVENT_RAISE(_name)                                                                                          \
+	DEFINE_EVENT_SUBSCRIBE(_name)                                                                                      \
 	DEFINE_EVENT_UNSUBSCRIBE(_name)
 
-#define DEFINE_EVENT_ENTRY(_name) \
-    { #_name, { sizeof( _name ## EventArgs), NULL }, 0, { NULL } },
+#define DEFINE_EVENT_ENTRY(_name) { #_name, { sizeof(_name##EventArgs), NULL }, 0, { NULL } },
 
-	struct _wPubSub
-	{
-		CRITICAL_SECTION lock;
-		BOOL synchronized;
+struct _wPubSub
+{
+	CRITICAL_SECTION lock;
+	BOOL synchronized;
 
-		int size;
-		int count;
-		wEventType* events;
-	};
-	typedef struct _wPubSub wPubSub;
+	int size;
+	int count;
+	wEventType* events;
+};
+typedef struct _wPubSub wPubSub;
 
-	WINPR_API void PubSub_Lock(wPubSub* pubSub);
-	WINPR_API void PubSub_Unlock(wPubSub* pubSub);
+WINPR_API void PubSub_Lock(wPubSub* pubSub);
+WINPR_API void PubSub_Unlock(wPubSub* pubSub);
 
-	WINPR_API wEventType* PubSub_GetEventTypes(wPubSub* pubSub, int* count);
-	WINPR_API void PubSub_AddEventTypes(wPubSub* pubSub, wEventType* events, int count);
-	WINPR_API wEventType* PubSub_FindEventType(wPubSub* pubSub, const char* EventName);
+WINPR_API wEventType* PubSub_GetEventTypes(wPubSub* pubSub, int* count);
+WINPR_API void PubSub_AddEventTypes(wPubSub* pubSub, wEventType* events, int count);
+WINPR_API wEventType* PubSub_FindEventType(wPubSub* pubSub, const char* EventName);
 
-	WINPR_API int PubSub_Subscribe(wPubSub* pubSub, const char* EventName, pEventHandler EventHandler);
-	WINPR_API int PubSub_Unsubscribe(wPubSub* pubSub, const char* EventName,
-	                                 pEventHandler EventHandler);
+WINPR_API int PubSub_Subscribe(wPubSub* pubSub, const char* EventName, pEventHandler EventHandler);
+WINPR_API int PubSub_Unsubscribe(wPubSub* pubSub, const char* EventName, pEventHandler EventHandler);
 
-	WINPR_API int PubSub_OnEvent(wPubSub* pubSub, const char* EventName, void* context, wEventArgs* e);
+WINPR_API int PubSub_OnEvent(wPubSub* pubSub, const char* EventName, void* context, wEventArgs* e);
 
-	WINPR_API wPubSub* PubSub_New(BOOL synchronized);
-	WINPR_API void PubSub_Free(wPubSub* pubSub);
+WINPR_API wPubSub* PubSub_New(BOOL synchronized);
+WINPR_API void PubSub_Free(wPubSub* pubSub);
 
-	/* BipBuffer */
+/* BipBuffer */
 
-	struct _wBipBlock
-	{
-		size_t index;
-		size_t size;
-	};
-	typedef struct _wBipBlock wBipBlock;
+struct _wBipBlock
+{
+	size_t index;
+	size_t size;
+};
+typedef struct _wBipBlock wBipBlock;
 
-	struct _wBipBuffer
-	{
-		size_t size;
-		BYTE* buffer;
-		size_t pageSize;
-		wBipBlock blockA;
-		wBipBlock blockB;
-		wBipBlock readR;
-		wBipBlock writeR;
-	};
-	typedef struct _wBipBuffer wBipBuffer;
+struct _wBipBuffer
+{
+	size_t size;
+	BYTE* buffer;
+	size_t pageSize;
+	wBipBlock blockA;
+	wBipBlock blockB;
+	wBipBlock readR;
+	wBipBlock writeR;
+};
+typedef struct _wBipBuffer wBipBuffer;
 
-	WINPR_API BOOL BipBuffer_Grow(wBipBuffer* bb, size_t size);
-	WINPR_API void BipBuffer_Clear(wBipBuffer* bb);
+WINPR_API BOOL BipBuffer_Grow(wBipBuffer* bb, size_t size);
+WINPR_API void BipBuffer_Clear(wBipBuffer* bb);
 
-	WINPR_API size_t BipBuffer_UsedSize(wBipBuffer* bb);
-	WINPR_API size_t BipBuffer_BufferSize(wBipBuffer* bb);
+WINPR_API size_t BipBuffer_UsedSize(wBipBuffer* bb);
+WINPR_API size_t BipBuffer_BufferSize(wBipBuffer* bb);
 
-	WINPR_API BYTE* BipBuffer_WriteReserve(wBipBuffer* bb, size_t size);
-	WINPR_API BYTE* BipBuffer_WriteTryReserve(wBipBuffer* bb, size_t size, size_t* reserved);
-	WINPR_API void BipBuffer_WriteCommit(wBipBuffer* bb, size_t size);
+WINPR_API BYTE* BipBuffer_WriteReserve(wBipBuffer* bb, size_t size);
+WINPR_API BYTE* BipBuffer_WriteTryReserve(wBipBuffer* bb, size_t size, size_t* reserved);
+WINPR_API void BipBuffer_WriteCommit(wBipBuffer* bb, size_t size);
 
-	WINPR_API BYTE* BipBuffer_ReadReserve(wBipBuffer* bb, size_t size);
-	WINPR_API BYTE* BipBuffer_ReadTryReserve(wBipBuffer* bb, size_t size, size_t* reserved);
-	WINPR_API void BipBuffer_ReadCommit(wBipBuffer* bb, size_t size);
+WINPR_API BYTE* BipBuffer_ReadReserve(wBipBuffer* bb, size_t size);
+WINPR_API BYTE* BipBuffer_ReadTryReserve(wBipBuffer* bb, size_t size, size_t* reserved);
+WINPR_API void BipBuffer_ReadCommit(wBipBuffer* bb, size_t size);
 
-	WINPR_API int BipBuffer_Read(wBipBuffer* bb, BYTE* data, size_t size);
-	WINPR_API int BipBuffer_Write(wBipBuffer* bb, BYTE* data, size_t size);
+WINPR_API int BipBuffer_Read(wBipBuffer* bb, BYTE* data, size_t size);
+WINPR_API int BipBuffer_Write(wBipBuffer* bb, BYTE* data, size_t size);
 
-	WINPR_API wBipBuffer* BipBuffer_New(size_t size);
-	WINPR_API void BipBuffer_Free(wBipBuffer* bb);
+WINPR_API wBipBuffer* BipBuffer_New(size_t size);
+WINPR_API void BipBuffer_Free(wBipBuffer* bb);
 
 #ifdef __cplusplus
 }

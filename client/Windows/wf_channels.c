@@ -30,8 +30,7 @@
 #include <freerdp/log.h>
 #define TAG CLIENT_TAG("windows")
 
-void wf_OnChannelConnectedEventHandler(void* context,
-                                       ChannelConnectedEventArgs* e)
+void wf_OnChannelConnectedEventHandler(void* context, ChannelConnectedEventArgs* e)
 {
 	wfContext* wfc = (wfContext*) context;
 	rdpSettings* settings = wfc->context.settings;
@@ -43,7 +42,7 @@ void wf_OnChannelConnectedEventHandler(void* context,
 	{
 		if (!settings->SoftwareGdi)
 			WLog_WARN(TAG,
-			          "Channel "RDPGFX_DVC_CHANNEL_NAME" does not support hardware acceleration, using fallback.");
+			          "Channel " RDPGFX_DVC_CHANNEL_NAME " does not support hardware acceleration, using fallback.");
 
 		gdi_graphics_pipeline_init(wfc->context.gdi, (RdpgfxClientContext*) e->pInterface);
 	}
@@ -60,8 +59,7 @@ void wf_OnChannelConnectedEventHandler(void* context,
 	}
 }
 
-void wf_OnChannelDisconnectedEventHandler(void* context,
-        ChannelDisconnectedEventArgs* e)
+void wf_OnChannelDisconnectedEventHandler(void* context, ChannelDisconnectedEventArgs* e)
 {
 	wfContext* wfc = (wfContext*) context;
 	rdpSettings* settings = wfc->context.settings;
@@ -71,8 +69,7 @@ void wf_OnChannelDisconnectedEventHandler(void* context,
 	}
 	else if (strcmp(e->name, RDPGFX_DVC_CHANNEL_NAME) == 0)
 	{
-		gdi_graphics_pipeline_uninit(wfc->context.gdi,
-		                             (RdpgfxClientContext*) e->pInterface);
+		gdi_graphics_pipeline_uninit(wfc->context.gdi, (RdpgfxClientContext*) e->pInterface);
 	}
 	else if (strcmp(e->name, RAIL_SVC_CHANNEL_NAME) == 0)
 	{

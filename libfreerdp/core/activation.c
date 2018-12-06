@@ -26,11 +26,11 @@
 /*
 static const char* const CTRLACTION_STRINGS[] =
 {
-		"",
-		"CTRLACTION_REQUEST_CONTROL",
-		"CTRLACTION_GRANTED_CONTROL",
-		"CTRLACTION_DETACH",
-		"CTRLACTION_COOPERATE"
+        "",
+        "CTRLACTION_REQUEST_CONTROL",
+        "CTRLACTION_GRANTED_CONTROL",
+        "CTRLACTION_DETACH",
+        "CTRLACTION_COOPERATE"
 };
 */
 
@@ -277,8 +277,7 @@ BOOL rdp_recv_deactivate_all(rdpRdp* rdp, wStream* s)
 				break;
 
 			Stream_Seek(s, lengthSourceDescriptor); /* sourceDescriptor (should be 0x00) */
-		}
-		while (0);
+		} while (0);
 	}
 
 	rdp_client_transition_to_state(rdp, CONNECTION_STATE_CAPABILITIES_EXCHANGE);
@@ -365,4 +364,3 @@ BOOL rdp_server_accept_client_font_list_pdu(rdpRdp* rdp, wStream* s)
 
 	return TRUE;
 }
-

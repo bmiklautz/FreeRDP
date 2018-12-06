@@ -55,13 +55,13 @@
 
 #if defined(__FreeBSD__) || defined(__OpenBSD__)
 #ifndef SOL_TCP
-#define SOL_TCP	IPPROTO_TCP
+#define SOL_TCP IPPROTO_TCP
 #endif
 #endif
 
 #ifdef __APPLE__
 #ifndef SOL_TCP
-#define SOL_TCP	IPPROTO_TCP
+#define SOL_TCP IPPROTO_TCP
 #endif
 #ifndef TCP_KEEPIDLE
 #define TCP_KEEPIDLE TCP_KEEPALIVE
@@ -100,11 +100,7 @@ typedef struct _WINPR_BIO_SIMPLE_SOCKET WINPR_BIO_SIMPLE_SOCKET;
 static int transport_bio_simple_init(BIO* bio, SOCKET socket, int shutdown);
 static int transport_bio_simple_uninit(BIO* bio);
 
-long transport_bio_simple_callback(BIO* bio, int mode, const char* argp, int argi, long argl,
-                                   long ret)
-{
-	return 1;
-}
+long transport_bio_simple_callback(BIO* bio, int mode, const char* argp, int argi, long argl, long ret) { return 1; }
 
 static int transport_bio_simple_write(BIO* bio, const char* buf, int size)
 {
@@ -122,8 +118,7 @@ static int transport_bio_simple_write(BIO* bio, const char* buf, int size)
 	{
 		error = WSAGetLastError();
 
-		if ((error == WSAEWOULDBLOCK) || (error == WSAEINTR) ||
-		    (error == WSAEINPROGRESS) || (error == WSAEALREADY))
+		if ((error == WSAEWOULDBLOCK) || (error == WSAEINTR) || (error == WSAEINPROGRESS) || (error == WSAEALREADY))
 		{
 			BIO_set_flags(bio, (BIO_FLAGS_WRITE | BIO_FLAGS_SHOULD_RETRY));
 		}
@@ -162,8 +157,7 @@ static int transport_bio_simple_read(BIO* bio, char* buf, int size)
 
 	error = WSAGetLastError();
 
-	if ((error == WSAEWOULDBLOCK) || (error == WSAEINTR) ||
-	    (error == WSAEINPROGRESS) || (error == WSAEALREADY))
+	if ((error == WSAEWOULDBLOCK) || (error == WSAEINTR) || (error == WSAEINPROGRESS) || (error == WSAEALREADY))
 	{
 		BIO_set_flags(bio, (BIO_FLAGS_READ | BIO_FLAGS_SHOULD_RETRY));
 	}
@@ -175,15 +169,9 @@ static int transport_bio_simple_read(BIO* bio, char* buf, int size)
 	return -1;
 }
 
-static int transport_bio_simple_puts(BIO* bio, const char* str)
-{
-	return 1;
-}
+static int transport_bio_simple_puts(BIO* bio, const char* str) { return 1; }
 
-static int transport_bio_simple_gets(BIO* bio, char* str, int size)
-{
-	return 1;
-}
+static int transport_bio_simple_gets(BIO* bio, char* str, int size) { return 1; }
 
 static long transport_bio_simple_ctrl(BIO* bio, int cmd, long arg1, void* arg2)
 {
@@ -244,8 +232,7 @@ static long transport_bio_simple_ctrl(BIO* bio, int cmd, long arg1, void* arg2)
 		do
 		{
 			status = poll(&pollset, 1, timeout);
-		}
-		while ((status < 0) && (errno == EINTR));
+		} while ((status < 0) && (errno == EINTR));
 
 #else
 		fd_set rset;
@@ -262,8 +249,7 @@ static long transport_bio_simple_ctrl(BIO* bio, int cmd, long arg1, void* arg2)
 		do
 		{
 			status = select(sockfd + 1, &rset, NULL, NULL, timeout ? &tv : NULL);
-		}
-		while ((status < 0) && (errno == EINTR));
+		} while ((status < 0) && (errno == EINTR));
 
 #endif
 	}
@@ -280,8 +266,7 @@ static long transport_bio_simple_ctrl(BIO* bio, int cmd, long arg1, void* arg2)
 		do
 		{
 			status = poll(&pollset, 1, timeout);
-		}
-		while ((status < 0) && (errno == EINTR));
+		} while ((status < 0) && (errno == EINTR));
 
 #else
 		fd_set rset;
@@ -298,8 +283,7 @@ static long transport_bio_simple_ctrl(BIO* bio, int cmd, long arg1, void* arg2)
 		do
 		{
 			status = select(sockfd + 1, NULL, &rset, NULL, timeout ? &tv : NULL);
-		}
-		while ((status < 0) && (errno == EINTR));
+		} while ((status < 0) && (errno == EINTR));
 
 #endif
 	}
@@ -463,11 +447,7 @@ struct _WINPR_BIO_BUFFERED_SOCKET
 };
 typedef struct _WINPR_BIO_BUFFERED_SOCKET WINPR_BIO_BUFFERED_SOCKET;
 
-long transport_bio_buffered_callback(BIO* bio, int mode, const char* argp, int argi, long argl,
-                                     long ret)
-{
-	return 1;
-}
+long transport_bio_buffered_callback(BIO* bio, int mode, const char* argp, int argi, long argl, long ret) { return 1; }
 
 static int transport_bio_buffered_write(BIO* bio, const char* buf, int num)
 {
@@ -560,15 +540,9 @@ out:
 	return status;
 }
 
-static int transport_bio_buffered_puts(BIO* bio, const char* str)
-{
-	return 1;
-}
+static int transport_bio_buffered_puts(BIO* bio, const char* str) { return 1; }
 
-static int transport_bio_buffered_gets(BIO* bio, char* str, int size)
-{
-	return 1;
-}
+static int transport_bio_buffered_gets(BIO* bio, char* str, int size) { return 1; }
 
 static long transport_bio_buffered_ctrl(BIO* bio, int cmd, long arg1, void* arg2)
 {
@@ -666,8 +640,8 @@ BIO_METHOD* BIO_s_buffered_socket(void)
 char* freerdp_tcp_address_to_string(const struct sockaddr_storage* addr, BOOL* pIPv6)
 {
 	char ipAddress[INET6_ADDRSTRLEN + 1] = { 0 };
-	struct sockaddr_in6* sockaddr_ipv6 = (struct sockaddr_in6*)addr;
-	struct sockaddr_in* sockaddr_ipv4 = (struct sockaddr_in*)addr;
+	struct sockaddr_in6* sockaddr_ipv6 = (struct sockaddr_in6*) addr;
+	struct sockaddr_in* sockaddr_ipv4 = (struct sockaddr_in*) addr;
 
 	if (addr == NULL)
 	{
@@ -709,7 +683,7 @@ static char* freerdp_tcp_get_ip_address(int sockfd, BOOL* pIPv6)
 	struct sockaddr_storage saddr = { 0 };
 	socklen_t length = sizeof(struct sockaddr_storage);
 
-	if (getsockname(sockfd, (struct sockaddr*)&saddr, &length) != 0)
+	if (getsockname(sockfd, (struct sockaddr*) &saddr, &length) != 0)
 	{
 		return NULL;
 	}
@@ -722,7 +696,7 @@ char* freerdp_tcp_get_peer_address(SOCKET sockfd)
 	struct sockaddr_storage saddr = { 0 };
 	socklen_t length = sizeof(struct sockaddr_storage);
 
-	if (getpeername(sockfd, (struct sockaddr*)&saddr, &length) != 0)
+	if (getpeername(sockfd, (struct sockaddr*) &saddr, &length) != 0)
 	{
 		return NULL;
 	}
@@ -805,9 +779,8 @@ static BOOL freerdp_tcp_is_hostname_resolvable(rdpContext* context, const char* 
 	return TRUE;
 }
 
-static BOOL freerdp_tcp_connect_timeout(rdpContext* context, int sockfd,
-                                        struct sockaddr* addr,
-                                        socklen_t addrlen, int timeout)
+static BOOL freerdp_tcp_connect_timeout(rdpContext* context, int sockfd, struct sockaddr* addr, socklen_t addrlen,
+                                        int timeout)
 {
 	BOOL rc = FALSE;
 	HANDLE handles[2];
@@ -898,8 +871,7 @@ static void peer_free(t_peer* peer)
 	peer->s = INVALID_SOCKET;
 }
 
-static int freerdp_tcp_connect_multi(rdpContext* context, char** hostnames,
-                                     UINT32* ports, UINT32 count, int port,
+static int freerdp_tcp_connect_multi(rdpContext* context, char** hostnames, UINT32* ports, UINT32 count, int port,
                                      int timeout)
 {
 	UINT32 index;
@@ -911,7 +883,7 @@ static int freerdp_tcp_connect_multi(rdpContext* context, char** hostnames,
 	struct addrinfo* result;
 	t_peer* peers;
 	events = (HANDLE*) calloc(count + 1, sizeof(HANDLE));
-	peers = (t_peer*)calloc(count, sizeof(t_peer));
+	peers = (t_peer*) calloc(count, sizeof(t_peer));
 
 	if (!peers || !events || (count < 1))
 	{
@@ -1064,8 +1036,7 @@ BOOL freerdp_tcp_set_keep_alive_mode(int sockfd)
 	return TRUE;
 }
 
-int freerdp_tcp_connect(rdpContext* context, rdpSettings* settings,
-                        const char* hostname, int port, int timeout)
+int freerdp_tcp_connect(rdpContext* context, rdpSettings* settings, const char* hostname, int port, int timeout)
 {
 	int sockfd;
 	UINT32 optval;
@@ -1111,12 +1082,8 @@ int freerdp_tcp_connect(rdpContext* context, rdpSettings* settings,
 			{
 				if (settings->TargetNetAddressCount > 0)
 				{
-					sockfd = freerdp_tcp_connect_multi(
-					             context,
-					             settings->TargetNetAddresses,
-					             settings->TargetNetPorts,
-					             settings->TargetNetAddressCount,
-					             port, timeout);
+					sockfd = freerdp_tcp_connect_multi(context, settings->TargetNetAddresses, settings->TargetNetPorts,
+					                                   settings->TargetNetAddressCount, port, timeout);
 				}
 			}
 		}
@@ -1161,15 +1128,14 @@ int freerdp_tcp_connect(rdpContext* context, rdpSettings* settings,
 				return -1;
 			}
 
-			if ((peerAddress = freerdp_tcp_address_to_string((const struct sockaddr_storage*)addr->ai_addr,
-			                   NULL)) != NULL)
+			if ((peerAddress = freerdp_tcp_address_to_string((const struct sockaddr_storage*) addr->ai_addr, NULL)) !=
+			    NULL)
 			{
 				WLog_DBG(TAG, "connecting to peer %s", peerAddress);
 				free(peerAddress);
 			}
 
-			if (!freerdp_tcp_connect_timeout(context, sockfd, addr->ai_addr,
-			                                 addr->ai_addrlen, timeout))
+			if (!freerdp_tcp_connect_timeout(context, sockfd, addr->ai_addr, addr->ai_addrlen, timeout))
 			{
 				freeaddrinfo(result);
 				close(sockfd);

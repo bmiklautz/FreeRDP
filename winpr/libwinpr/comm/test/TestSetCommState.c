@@ -25,7 +25,7 @@
 
 #include "../comm.h"
 
-static void init_empty_dcb(DCB *pDcb)
+static void init_empty_dcb(DCB* pDcb)
 {
 	ZeroMemory(pDcb, sizeof(DCB));
 	pDcb->DCBlength = sizeof(DCB);
@@ -42,7 +42,7 @@ static BOOL test_fParity(HANDLE hComm)
 	result = GetCommState(hComm, &dcb);
 	if (!result)
 	{
-		fprintf(stderr, "GetCommState failure: 0x%08"PRIx32"\n", GetLastError());
+		fprintf(stderr, "GetCommState failure: 0x%08" PRIx32 "\n", GetLastError());
 		return FALSE;
 	}
 
@@ -51,7 +51,7 @@ static BOOL test_fParity(HANDLE hComm)
 	result = SetCommState(hComm, &dcb);
 	if (!result)
 	{
-		fprintf(stderr, "SetCommState failure: 0x%08"PRIx32"\n", GetLastError());
+		fprintf(stderr, "SetCommState failure: 0x%08" PRIx32 "\n", GetLastError());
 		return FALSE;
 	}
 
@@ -59,13 +59,13 @@ static BOOL test_fParity(HANDLE hComm)
 	result = GetCommState(hComm, &dcb);
 	if (!result)
 	{
-		fprintf(stderr, "GetCommState failure: 0x%08"PRIx32"\n", GetLastError());
+		fprintf(stderr, "GetCommState failure: 0x%08" PRIx32 "\n", GetLastError());
 		return FALSE;
 	}
 
 	if (!dcb.fParity)
 	{
-		fprintf(stderr, "unexpected fParity: %"PRIu32" instead of TRUE\n", dcb.fParity);
+		fprintf(stderr, "unexpected fParity: %" PRIu32 " instead of TRUE\n", dcb.fParity);
 		return FALSE;
 	}
 
@@ -74,7 +74,7 @@ static BOOL test_fParity(HANDLE hComm)
 	result = SetCommState(hComm, &dcb);
 	if (!result)
 	{
-		fprintf(stderr, "SetCommState failure: 0x%08"PRIx32"\n", GetLastError());
+		fprintf(stderr, "SetCommState failure: 0x%08" PRIx32 "\n", GetLastError());
 		return FALSE;
 	}
 
@@ -82,13 +82,13 @@ static BOOL test_fParity(HANDLE hComm)
 	result = GetCommState(hComm, &dcb);
 	if (!result)
 	{
-		fprintf(stderr, "GetCommState failure: 0x%08"PRIx32"\n", GetLastError());
+		fprintf(stderr, "GetCommState failure: 0x%08" PRIx32 "\n", GetLastError());
 		return FALSE;
 	}
 
 	if (dcb.fParity)
 	{
-		fprintf(stderr, "unexpected fParity: %"PRIu32" instead of FALSE\n", dcb.fParity);
+		fprintf(stderr, "unexpected fParity: %" PRIu32 " instead of FALSE\n", dcb.fParity);
 		return FALSE;
 	}
 
@@ -97,7 +97,7 @@ static BOOL test_fParity(HANDLE hComm)
 	result = SetCommState(hComm, &dcb);
 	if (!result)
 	{
-		fprintf(stderr, "SetCommState failure: 0x%08"PRIx32"\n", GetLastError());
+		fprintf(stderr, "SetCommState failure: 0x%08" PRIx32 "\n", GetLastError());
 		return FALSE;
 	}
 
@@ -105,19 +105,18 @@ static BOOL test_fParity(HANDLE hComm)
 	result = GetCommState(hComm, &dcb);
 	if (!result)
 	{
-		fprintf(stderr, "GetCommState failure: 0x%08"PRIx32"\n", GetLastError());
+		fprintf(stderr, "GetCommState failure: 0x%08" PRIx32 "\n", GetLastError());
 		return FALSE;
 	}
 
 	if (!dcb.fParity)
 	{
-		fprintf(stderr, "unexpected fParity: %"PRIu32" instead of TRUE\n", dcb.fParity);
+		fprintf(stderr, "unexpected fParity: %" PRIu32 " instead of TRUE\n", dcb.fParity);
 		return FALSE;
 	}
 
 	return TRUE;
 }
-
 
 static BOOL test_SerialSys(HANDLE hComm)
 {
@@ -250,7 +249,6 @@ static BOOL test_generic(HANDLE hComm)
 	return TRUE;
 }
 
-
 int TestSetCommState(int argc, char* argv[])
 {
 	struct stat statbuf;
@@ -270,9 +268,7 @@ int TestSetCommState(int argc, char* argv[])
 		return EXIT_FAILURE;
 	}
 
-	hComm = CreateFile("COM1",
-			GENERIC_READ | GENERIC_WRITE,
-			0, NULL, OPEN_EXISTING, 0, NULL);
+	hComm = CreateFile("COM1", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
 	if (hComm == INVALID_HANDLE_VALUE)
 	{
 		fprintf(stderr, "CreateFileA failure: 0x%x\n", GetLastError());
@@ -296,7 +292,6 @@ int TestSetCommState(int argc, char* argv[])
 		fprintf(stderr, "test_SerialSys failure\n");
 		return EXIT_FAILURE;
 	}
-
 
 	_comm_setServerSerialDriver(hComm, SerialDriverSerCxSys);
 	if (!test_generic(hComm))

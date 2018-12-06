@@ -46,7 +46,6 @@
 
 #include "listener.h"
 
-
 #define TAG FREERDP_TAG("core.listener")
 
 static BOOL freerdp_listener_open(freerdp_listener* instance, const char* bind_address, UINT16 port)
@@ -223,8 +222,7 @@ static BOOL freerdp_listener_open_from_socket(freerdp_listener* instance, int fd
 		return FALSE;
 
 	listener->sockfds[listener->num_sockfds] = fd;
-	listener->events[listener->num_sockfds] =
-	    CreateFileDescriptorEvent(NULL, FALSE, FALSE, fd, WINPR_FD_READ);
+	listener->events[listener->num_sockfds] = CreateFileDescriptorEvent(NULL, FALSE, FALSE, fd, WINPR_FD_READ);
 
 	if (!listener->events[listener->num_sockfds])
 		return FALSE;
@@ -261,7 +259,7 @@ static BOOL freerdp_listener_get_fds(freerdp_listener* instance, void** rfds, in
 
 	for (index = 0; index < listener->num_sockfds; index++)
 	{
-		rfds[*rcount] = (void*)(long)(listener->sockfds[index]);
+		rfds[*rcount] = (void*) (long) (listener->sockfds[index]);
 		(*rcount)++;
 	}
 
@@ -413,4 +411,3 @@ void freerdp_listener_free(freerdp_listener* instance)
 		free(instance);
 	}
 }
-

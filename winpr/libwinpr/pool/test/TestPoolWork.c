@@ -11,8 +11,8 @@ static void CALLBACK test_WorkCallback(PTP_CALLBACK_INSTANCE instance, void* con
 	BYTE a[1024];
 	BYTE b[1024];
 	BYTE c[1024];
-	printf("Hello %s: %03"PRId32" (thread: 0x%08"PRIX32")\n", (char*) context,
-	       InterlockedIncrement(&count), GetCurrentThreadId());
+	printf("Hello %s: %03" PRId32 " (thread: 0x%08" PRIX32 ")\n", (char*) context, InterlockedIncrement(&count),
+	       GetCurrentThreadId());
 
 	for (index = 0; index < 100; index++)
 	{

@@ -23,7 +23,7 @@
 
 #ifdef _WIN32
 #define SEC_ENTRY __stdcall
-#define SSPI_EXPORT	__declspec(dllexport)
+#define SSPI_EXPORT __declspec(dllexport)
 #else
 #include <winpr/winpr.h>
 #define SEC_ENTRY
@@ -58,17 +58,11 @@ SSPI_EXPORT SECURITY_STATUS SEC_ENTRY EnumerateSecurityPackagesA(void* pcPackage
 
 extern void* SEC_ENTRY sspi_InitSecurityInterfaceW(void);
 
-SSPI_EXPORT void* SEC_ENTRY InitSecurityInterfaceW(void)
-{
-	return sspi_InitSecurityInterfaceW();
-}
+SSPI_EXPORT void* SEC_ENTRY InitSecurityInterfaceW(void) { return sspi_InitSecurityInterfaceW(); }
 
 extern void* SEC_ENTRY sspi_InitSecurityInterfaceA(void);
 
-SSPI_EXPORT void* SEC_ENTRY InitSecurityInterfaceA(void)
-{
-	return sspi_InitSecurityInterfaceA();
-}
+SSPI_EXPORT void* SEC_ENTRY InitSecurityInterfaceA(void) { return sspi_InitSecurityInterfaceA(); }
 
 extern SECURITY_STATUS SEC_ENTRY sspi_QuerySecurityPackageInfoW(void*, void*);
 
@@ -86,29 +80,34 @@ SSPI_EXPORT SECURITY_STATUS SEC_ENTRY QuerySecurityPackageInfoA(void* pszPackage
 
 /* Credential Management */
 
-extern SECURITY_STATUS SEC_ENTRY sspi_AcquireCredentialsHandleW(void*, void*, ULONG, void*, void*, void*, void*, void*, void*);
+extern SECURITY_STATUS SEC_ENTRY sspi_AcquireCredentialsHandleW(void*, void*, ULONG, void*, void*, void*, void*, void*,
+                                                                void*);
 
 SSPI_EXPORT SECURITY_STATUS SEC_ENTRY AcquireCredentialsHandleW(void* pszPrincipal, void* pszPackage,
-		ULONG fCredentialUse, void* pvLogonID, void* pAuthData, void* pGetKeyFn,
-		void* pvGetKeyArgument, void* phCredential, void* ptsExpiry)
+                                                                ULONG fCredentialUse, void* pvLogonID, void* pAuthData,
+                                                                void* pGetKeyFn, void* pvGetKeyArgument,
+                                                                void* phCredential, void* ptsExpiry)
 {
-	return sspi_AcquireCredentialsHandleW(pszPrincipal, pszPackage, fCredentialUse,
-		pvLogonID, pAuthData, pGetKeyFn, pvGetKeyArgument, phCredential, ptsExpiry);
+	return sspi_AcquireCredentialsHandleW(pszPrincipal, pszPackage, fCredentialUse, pvLogonID, pAuthData, pGetKeyFn,
+	                                      pvGetKeyArgument, phCredential, ptsExpiry);
 }
 
-extern SECURITY_STATUS SEC_ENTRY sspi_AcquireCredentialsHandleA(void*, void*, ULONG, void*, void*, void*, void*, void*, void*);
+extern SECURITY_STATUS SEC_ENTRY sspi_AcquireCredentialsHandleA(void*, void*, ULONG, void*, void*, void*, void*, void*,
+                                                                void*);
 
 SSPI_EXPORT SECURITY_STATUS SEC_ENTRY AcquireCredentialsHandleA(void* pszPrincipal, void* pszPackage,
-		ULONG fCredentialUse, void* pvLogonID, void* pAuthData, void* pGetKeyFn,
-		void* pvGetKeyArgument, void* phCredential, void* ptsExpiry)
+                                                                ULONG fCredentialUse, void* pvLogonID, void* pAuthData,
+                                                                void* pGetKeyFn, void* pvGetKeyArgument,
+                                                                void* phCredential, void* ptsExpiry)
 {
-	return sspi_AcquireCredentialsHandleA(pszPrincipal, pszPackage, fCredentialUse,
-		pvLogonID, pAuthData, pGetKeyFn, pvGetKeyArgument, phCredential, ptsExpiry);
+	return sspi_AcquireCredentialsHandleA(pszPrincipal, pszPackage, fCredentialUse, pvLogonID, pAuthData, pGetKeyFn,
+	                                      pvGetKeyArgument, phCredential, ptsExpiry);
 }
 
 extern SECURITY_STATUS SEC_ENTRY sspi_ExportSecurityContext(void*, ULONG, void*, void**);
 
-SSPI_EXPORT SECURITY_STATUS SEC_ENTRY ExportSecurityContext(void* phContext, ULONG fFlags, void* pPackedContext, void** pToken)
+SSPI_EXPORT SECURITY_STATUS SEC_ENTRY ExportSecurityContext(void* phContext, ULONG fFlags, void* pPackedContext,
+                                                            void** pToken)
 {
 	return sspi_ExportSecurityContext(phContext, fFlags, pPackedContext, pToken);
 }
@@ -122,14 +121,16 @@ SSPI_EXPORT SECURITY_STATUS SEC_ENTRY FreeCredentialsHandle(void* phCredential)
 
 extern SECURITY_STATUS SEC_ENTRY sspi_ImportSecurityContextW(void*, void*, void*, void*);
 
-SSPI_EXPORT SECURITY_STATUS SEC_ENTRY ImportSecurityContextW(void* pszPackage, void* pPackedContext, void* pToken, void* phContext)
+SSPI_EXPORT SECURITY_STATUS SEC_ENTRY ImportSecurityContextW(void* pszPackage, void* pPackedContext, void* pToken,
+                                                             void* phContext)
 {
 	return sspi_ImportSecurityContextW(pszPackage, pPackedContext, pToken, phContext);
 }
 
 extern SECURITY_STATUS SEC_ENTRY sspi_ImportSecurityContextA(void*, void*, void*, void*);
 
-SSPI_EXPORT SECURITY_STATUS SEC_ENTRY ImportSecurityContextA(void* pszPackage, void* pPackedContext, void* pToken, void* phContext)
+SSPI_EXPORT SECURITY_STATUS SEC_ENTRY ImportSecurityContextA(void* pszPackage, void* pPackedContext, void* pToken,
+                                                             void* phContext)
 {
 	return sspi_ImportSecurityContextA(pszPackage, pPackedContext, pToken, phContext);
 }
@@ -150,14 +151,15 @@ SSPI_EXPORT SECURITY_STATUS SEC_ENTRY QueryCredentialsAttributesA(void* phCreden
 
 /* Context Management */
 
-extern SECURITY_STATUS SEC_ENTRY sspi_AcceptSecurityContext(void*, void*, void*, ULONG, ULONG, void*, void*, void*, void*);
+extern SECURITY_STATUS SEC_ENTRY sspi_AcceptSecurityContext(void*, void*, void*, ULONG, ULONG, void*, void*, void*,
+                                                            void*);
 
-SSPI_EXPORT SECURITY_STATUS SEC_ENTRY AcceptSecurityContext(void* phCredential, void* phContext,
-		void* pInput, ULONG fContextReq, ULONG TargetDataRep, void* phNewContext,
-		void* pOutput, void* pfContextAttr, void* ptsTimeStamp)
+SSPI_EXPORT SECURITY_STATUS SEC_ENTRY AcceptSecurityContext(void* phCredential, void* phContext, void* pInput,
+                                                            ULONG fContextReq, ULONG TargetDataRep, void* phNewContext,
+                                                            void* pOutput, void* pfContextAttr, void* ptsTimeStamp)
 {
-	return sspi_AcceptSecurityContext(phCredential, phContext, pInput, fContextReq,
-		TargetDataRep, phNewContext, pOutput, pfContextAttr, ptsTimeStamp);
+	return sspi_AcceptSecurityContext(phCredential, phContext, pInput, fContextReq, TargetDataRep, phNewContext,
+	                                  pOutput, pfContextAttr, ptsTimeStamp);
 }
 
 extern SECURITY_STATUS SEC_ENTRY sspi_ApplyControlToken(void*, void*);
@@ -195,28 +197,32 @@ SSPI_EXPORT SECURITY_STATUS SEC_ENTRY ImpersonateSecurityContext(void* phContext
 	return sspi_ImpersonateSecurityContext(phContext);
 }
 
-extern SECURITY_STATUS SEC_ENTRY sspi_InitializeSecurityContextW(void*, void*, void*, ULONG, ULONG, ULONG,
-								     void*, ULONG, void*, void*, void*, void*);
+extern SECURITY_STATUS SEC_ENTRY sspi_InitializeSecurityContextW(void*, void*, void*, ULONG, ULONG, ULONG, void*, ULONG,
+                                                                 void*, void*, void*, void*);
 
 SSPI_EXPORT SECURITY_STATUS SEC_ENTRY InitializeSecurityContextW(void* phCredential, void* phContext,
-		void* pszTargetName, ULONG fContextReq, ULONG Reserved1, ULONG TargetDataRep,
-		void* pInput, ULONG Reserved2, void* phNewContext,
-		void* pOutput, void* pfContextAttr, void* ptsExpiry)
+                                                                 void* pszTargetName, ULONG fContextReq,
+                                                                 ULONG Reserved1, ULONG TargetDataRep, void* pInput,
+                                                                 ULONG Reserved2, void* phNewContext, void* pOutput,
+                                                                 void* pfContextAttr, void* ptsExpiry)
 {
 	return sspi_InitializeSecurityContextW(phCredential, phContext, pszTargetName, fContextReq, Reserved1,
-		TargetDataRep, pInput, Reserved2, phNewContext, pOutput, pfContextAttr, ptsExpiry);
+	                                       TargetDataRep, pInput, Reserved2, phNewContext, pOutput, pfContextAttr,
+	                                       ptsExpiry);
 }
 
-extern SECURITY_STATUS SEC_ENTRY sspi_InitializeSecurityContextA(void*, void*, void*, ULONG, ULONG, ULONG,
-								     void*, ULONG, void*, void*, void*, void*);
+extern SECURITY_STATUS SEC_ENTRY sspi_InitializeSecurityContextA(void*, void*, void*, ULONG, ULONG, ULONG, void*, ULONG,
+                                                                 void*, void*, void*, void*);
 
 SSPI_EXPORT SECURITY_STATUS SEC_ENTRY InitializeSecurityContextA(void* phCredential, void* phContext,
-		void* pszTargetName, ULONG fContextReq, ULONG Reserved1, ULONG TargetDataRep,
-		void* pInput, ULONG Reserved2, void* phNewContext,
-		void* pOutput, void* pfContextAttr, void* ptsExpiry)
+                                                                 void* pszTargetName, ULONG fContextReq,
+                                                                 ULONG Reserved1, ULONG TargetDataRep, void* pInput,
+                                                                 ULONG Reserved2, void* phNewContext, void* pOutput,
+                                                                 void* pfContextAttr, void* ptsExpiry)
 {
 	return sspi_InitializeSecurityContextA(phCredential, phContext, pszTargetName, fContextReq, Reserved1,
-		TargetDataRep, pInput, Reserved2, phNewContext, pOutput, pfContextAttr, ptsExpiry);
+	                                       TargetDataRep, pInput, Reserved2, phNewContext, pOutput, pfContextAttr,
+	                                       ptsExpiry);
 }
 
 extern SECURITY_STATUS SEC_ENTRY sspi_QueryContextAttributesW(void*, ULONG, void*);
@@ -242,14 +248,16 @@ SSPI_EXPORT SECURITY_STATUS SEC_ENTRY QuerySecurityContextToken(void* phContext,
 
 extern SECURITY_STATUS SEC_ENTRY sspi_SetContextAttributesW(void*, ULONG, void*, ULONG);
 
-SSPI_EXPORT SECURITY_STATUS SEC_ENTRY SetContextAttributesW(void* phContext, ULONG ulAttribute, void* pBuffer, ULONG cbBuffer)
+SSPI_EXPORT SECURITY_STATUS SEC_ENTRY SetContextAttributesW(void* phContext, ULONG ulAttribute, void* pBuffer,
+                                                            ULONG cbBuffer)
 {
 	return sspi_SetContextAttributesW(phContext, ulAttribute, pBuffer, cbBuffer);
 }
 
 extern SECURITY_STATUS SEC_ENTRY sspi_SetContextAttributesA(void*, ULONG, void*, ULONG);
 
-SSPI_EXPORT SECURITY_STATUS SEC_ENTRY SetContextAttributesA(void* phContext, ULONG ulAttribute, void* pBuffer, ULONG cbBuffer)
+SSPI_EXPORT SECURITY_STATUS SEC_ENTRY SetContextAttributesA(void* phContext, ULONG ulAttribute, void* pBuffer,
+                                                            ULONG cbBuffer)
 {
 	return sspi_SetContextAttributesA(phContext, ulAttribute, pBuffer, cbBuffer);
 }

@@ -66,14 +66,14 @@ static UINT echo_server_open_channel(echo_server* echo)
 	DWORD BytesReturned = 0;
 	PULONG pSessionId = NULL;
 
-	if (WTSQuerySessionInformationA(echo->context.vcm, WTS_CURRENT_SESSION,
-	                                WTSSessionId, (LPSTR*) &pSessionId, &BytesReturned) == FALSE)
+	if (WTSQuerySessionInformationA(echo->context.vcm, WTS_CURRENT_SESSION, WTSSessionId, (LPSTR*) &pSessionId,
+	                                &BytesReturned) == FALSE)
 	{
 		WLog_ERR(TAG, "WTSQuerySessionInformationA failed!");
 		return ERROR_INTERNAL_ERROR;
 	}
 
-	echo->SessionId = (DWORD) * pSessionId;
+	echo->SessionId = (DWORD) *pSessionId;
 	WTSFreeMemory(pSessionId);
 	hEvent = WTSVirtualChannelManagerGetEventHandle(echo->context.vcm);
 	StartTick = GetTickCount();
@@ -83,12 +83,11 @@ static UINT echo_server_open_channel(echo_server* echo)
 		if (WaitForSingleObject(hEvent, 1000) == WAIT_FAILED)
 		{
 			Error = GetLastError();
-			WLog_ERR(TAG, "WaitForSingleObject failed with error %"PRIu32"!", Error);
+			WLog_ERR(TAG, "WaitForSingleObject failed with error %" PRIu32 "!", Error);
 			return Error;
 		}
 
-		echo->echo_channel = WTSVirtualChannelOpenEx(echo->SessionId,
-		                     "ECHO", WTS_CHANNEL_OPTION_DYNAMIC);
+		echo->echo_channel = WTSVirtualChannelOpenEx(echo->SessionId, "ECHO", WTS_CHANNEL_OPTION_DYNAMIC);
 
 		if (echo->echo_channel)
 			break;
@@ -121,13 +120,11 @@ static DWORD WINAPI echo_server_thread_func(LPVOID arg)
 	if ((error = echo_server_open_channel(echo)))
 	{
 		UINT error2 = 0;
-		WLog_ERR(TAG, "echo_server_open_channel failed with error %"PRIu32"!", error);
-		IFCALLRET(echo->context.OpenResult, error2, &echo->context,
-		          ECHO_SERVER_OPEN_RESULT_NOTSUPPORTED);
+		WLog_ERR(TAG, "echo_server_open_channel failed with error %" PRIu32 "!", error);
+		IFCALLRET(echo->context.OpenResult, error2, &echo->context, ECHO_SERVER_OPEN_RESULT_NOTSUPPORTED);
 
 		if (error2)
-			WLog_ERR(TAG, "echo server's OpenResult callback failed with error %"PRIu32"",
-			         error2);
+			WLog_ERR(TAG, "echo server's OpenResult callback failed with error %" PRIu32 "", error2);
 
 		goto out;
 	}
@@ -136,8 +133,7 @@ static DWORD WINAPI echo_server_thread_func(LPVOID arg)
 	BytesReturned = 0;
 	ChannelEvent = NULL;
 
-	if (WTSVirtualChannelQuery(echo->echo_channel, WTSVirtualEventHandle, &buffer,
-	                           &BytesReturned) == TRUE)
+	if (WTSVirtualChannelQuery(echo->echo_channel, WTSVirtualEventHandle, &buffer, &BytesReturned) == TRUE)
 	{
 		if (BytesReturned == sizeof(HANDLE))
 			CopyMemory(&ChannelEvent, buffer, sizeof(HANDLE));
@@ -158,29 +154,26 @@ static DWORD WINAPI echo_server_thread_func(LPVOID arg)
 		if (status == WAIT_FAILED)
 		{
 			error = GetLastError();
-			WLog_ERR(TAG, "WaitForMultipleObjects failed with error %"PRIu32"", error);
+			WLog_ERR(TAG, "WaitForMultipleObjects failed with error %" PRIu32 "", error);
 			break;
 		}
 
 		if (status == WAIT_OBJECT_0)
 		{
-			IFCALLRET(echo->context.OpenResult, error, &echo->context,
-			          ECHO_SERVER_OPEN_RESULT_CLOSED);
+			IFCALLRET(echo->context.OpenResult, error, &echo->context, ECHO_SERVER_OPEN_RESULT_CLOSED);
 
 			if (error)
-				WLog_ERR(TAG, "OpenResult failed with error %"PRIu32"!", error);
+				WLog_ERR(TAG, "OpenResult failed with error %" PRIu32 "!", error);
 
 			break;
 		}
 
-		if (WTSVirtualChannelQuery(echo->echo_channel, WTSVirtualChannelReady, &buffer,
-		                           &BytesReturned) == FALSE)
+		if (WTSVirtualChannelQuery(echo->echo_channel, WTSVirtualChannelReady, &buffer, &BytesReturned) == FALSE)
 		{
-			IFCALLRET(echo->context.OpenResult, error, &echo->context,
-			          ECHO_SERVER_OPEN_RESULT_ERROR);
+			IFCALLRET(echo->context.OpenResult, error, &echo->context, ECHO_SERVER_OPEN_RESULT_ERROR);
 
 			if (error)
-				WLog_ERR(TAG, "OpenResult failed with error %"PRIu32"!", error);
+				WLog_ERR(TAG, "OpenResult failed with error %" PRIu32 "!", error);
 
 			break;
 		}
@@ -190,11 +183,10 @@ static DWORD WINAPI echo_server_thread_func(LPVOID arg)
 
 		if (ready)
 		{
-			IFCALLRET(echo->context.OpenResult, error, &echo->context,
-			          ECHO_SERVER_OPEN_RESULT_OK);
+			IFCALLRET(echo->context.OpenResult, error, &echo->context, ECHO_SERVER_OPEN_RESULT_OK);
 
 			if (error)
-				WLog_ERR(TAG, "OpenResult failed with error %"PRIu32"!", error);
+				WLog_ERR(TAG, "OpenResult failed with error %" PRIu32 "!", error);
 
 			break;
 		}
@@ -217,7 +209,7 @@ static DWORD WINAPI echo_server_thread_func(LPVOID arg)
 		if (status == WAIT_FAILED)
 		{
 			error = GetLastError();
-			WLog_ERR(TAG, "WaitForMultipleObjects failed with error %"PRIu32"", error);
+			WLog_ERR(TAG, "WaitForMultipleObjects failed with error %" PRIu32 "", error);
 			break;
 		}
 
@@ -237,20 +229,19 @@ static DWORD WINAPI echo_server_thread_func(LPVOID arg)
 			break;
 		}
 
-		if (WTSVirtualChannelRead(echo->echo_channel, 0, (PCHAR) Stream_Buffer(s),
-		                          (ULONG) Stream_Capacity(s), &BytesReturned) == FALSE)
+		if (WTSVirtualChannelRead(echo->echo_channel, 0, (PCHAR) Stream_Buffer(s), (ULONG) Stream_Capacity(s),
+		                          &BytesReturned) == FALSE)
 		{
 			WLog_ERR(TAG, "WTSVirtualChannelRead failed!");
 			error = ERROR_INTERNAL_ERROR;
 			break;
 		}
 
-		IFCALLRET(echo->context.Response, error, &echo->context,
-		          (BYTE*) Stream_Buffer(s), BytesReturned);
+		IFCALLRET(echo->context.Response, error, &echo->context, (BYTE*) Stream_Buffer(s), BytesReturned);
 
 		if (error)
 		{
-			WLog_ERR(TAG, "Response failed with error %"PRIu32"!", error);
+			WLog_ERR(TAG, "Response failed with error %" PRIu32 "!", error);
 			break;
 		}
 	}
@@ -261,8 +252,7 @@ static DWORD WINAPI echo_server_thread_func(LPVOID arg)
 out:
 
 	if (error && echo->context.rdpcontext)
-		setChannelError(echo->context.rdpcontext, error,
-		                "echo_server_thread_func reported an error");
+		setChannelError(echo->context.rdpcontext, error, "echo_server_thread_func reported an error");
 
 	ExitThread(error);
 	return error;
@@ -314,7 +304,7 @@ static UINT echo_server_close(echo_server_context* context)
 		if (WaitForSingleObject(echo->thread, INFINITE) == WAIT_FAILED)
 		{
 			error = GetLastError();
-			WLog_ERR(TAG, "WaitForSingleObject failed with error %"PRIu32"", error);
+			WLog_ERR(TAG, "WaitForSingleObject failed with error %" PRIu32 "", error);
 			return error;
 		}
 
@@ -327,8 +317,7 @@ static UINT echo_server_close(echo_server_context* context)
 	return error;
 }
 
-static BOOL echo_server_request(echo_server_context* context,
-                                const BYTE* buffer, UINT32 length)
+static BOOL echo_server_request(echo_server_context* context, const BYTE* buffer, UINT32 length)
 {
 	echo_server* echo = (echo_server*) context;
 	return WTSVirtualChannelWrite(echo->echo_channel, (PCHAR) buffer, length, NULL);

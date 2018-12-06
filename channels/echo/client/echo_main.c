@@ -66,7 +66,7 @@ struct _ECHO_PLUGIN
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT echo_on_data_received(IWTSVirtualChannelCallback* pChannelCallback, wStream *data)
+static UINT echo_on_data_received(IWTSVirtualChannelCallback* pChannelCallback, wStream* data)
 {
 	ECHO_CHANNEL_CALLBACK* callback = (ECHO_CHANNEL_CALLBACK*) pChannelCallback;
 	BYTE* pBuffer = Stream_Pointer(data);
@@ -95,9 +95,8 @@ static UINT echo_on_close(IWTSVirtualChannelCallback* pChannelCallback)
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT echo_on_new_channel_connection(IWTSListenerCallback* pListenerCallback,
-	IWTSVirtualChannel* pChannel, BYTE* Data, BOOL* pbAccept,
-	IWTSVirtualChannelCallback** ppCallback)
+static UINT echo_on_new_channel_connection(IWTSListenerCallback* pListenerCallback, IWTSVirtualChannel* pChannel,
+                                           BYTE* Data, BOOL* pbAccept, IWTSVirtualChannelCallback** ppCallback)
 {
 	ECHO_CHANNEL_CALLBACK* callback;
 	ECHO_LISTENER_CALLBACK* listener_callback = (ECHO_LISTENER_CALLBACK*) pListenerCallback;
@@ -142,8 +141,7 @@ static UINT echo_plugin_initialize(IWTSPlugin* pPlugin, IWTSVirtualChannelManage
 	echo->listener_callback->plugin = pPlugin;
 	echo->listener_callback->channel_mgr = pChannelMgr;
 
-	return pChannelMgr->CreateListener(pChannelMgr, "ECHO", 0,
-		(IWTSListenerCallback*) echo->listener_callback, NULL);
+	return pChannelMgr->CreateListener(pChannelMgr, "ECHO", 0, (IWTSListenerCallback*) echo->listener_callback, NULL);
 }
 
 /**
@@ -161,9 +159,9 @@ static UINT echo_plugin_terminated(IWTSPlugin* pPlugin)
 }
 
 #ifdef BUILTIN_CHANNELS
-#define DVCPluginEntry		echo_DVCPluginEntry
+#define DVCPluginEntry echo_DVCPluginEntry
 #else
-#define DVCPluginEntry		FREERDP_API DVCPluginEntry
+#define DVCPluginEntry FREERDP_API DVCPluginEntry
 #endif
 
 /**

@@ -9,10 +9,10 @@ struct _WINDOWS_TZID_ENTRY
 };
 typedef struct _WINDOWS_TZID_ENTRY WINDOWS_TZID_ENTRY;
 
-const WINDOWS_TZID_ENTRY WindowsTimeZoneIdTable[] =
-{
+const WINDOWS_TZID_ENTRY WindowsTimeZoneIdTable[] = {
 	{ "Afghanistan Standard Time", "Asia/Kabul" },
-	{ "Alaskan Standard Time", "America/Anchorage America/Juneau America/Metlakatla America/Nome America/Sitka America/Yakutat" },
+	{ "Alaskan Standard Time",
+	  "America/Anchorage America/Juneau America/Metlakatla America/Nome America/Sitka America/Yakutat" },
 	{ "Alaskan Standard Time", "America/Anchorage" },
 	{ "Aleutian Standard Time", "America/Adak" },
 	{ "Altai Standard Time", "Asia/Barnaul" },
@@ -25,7 +25,10 @@ const WINDOWS_TZID_ENTRY WindowsTimeZoneIdTable[] =
 	{ "Arabian Standard Time", "Asia/Muscat" },
 	{ "Arabian Standard Time", "Etc/GMT-4" },
 	{ "Arabic Standard Time", "Asia/Baghdad" },
-	{ "Argentina Standard Time", "America/Buenos_Aires America/Argentina/La_Rioja America/Argentina/Rio_Gallegos America/Argentina/Salta America/Argentina/San_Juan America/Argentina/San_Luis America/Argentina/Tucuman America/Argentina/Ushuaia America/Catamarca America/Cordoba America/Jujuy America/Mendoza" },
+	{ "Argentina Standard Time",
+	  "America/Buenos_Aires America/Argentina/La_Rioja America/Argentina/Rio_Gallegos America/Argentina/Salta "
+	  "America/Argentina/San_Juan America/Argentina/San_Luis America/Argentina/Tucuman America/Argentina/Ushuaia "
+	  "America/Catamarca America/Cordoba America/Jujuy America/Mendoza" },
 	{ "Argentina Standard Time", "America/Buenos_Aires" },
 	{ "Astrakhan Standard Time", "Europe/Astrakhan Europe/Ulyanovsk" },
 	{ "Astrakhan Standard Time", "Europe/Astrakhan" },
@@ -88,7 +91,9 @@ const WINDOWS_TZID_ENTRY WindowsTimeZoneIdTable[] =
 	{ "Central Pacific Standard Time", "Pacific/Ponape Pacific/Kosrae" },
 	{ "Central Standard Time (Mexico)", "America/Mexico_City America/Bahia_Banderas America/Merida America/Monterrey" },
 	{ "Central Standard Time (Mexico)", "America/Mexico_City" },
-	{ "Central Standard Time", "America/Chicago America/Indiana/Knox America/Indiana/Tell_City America/Menominee America/North_Dakota/Beulah America/North_Dakota/Center America/North_Dakota/New_Salem" },
+	{ "Central Standard Time",
+	  "America/Chicago America/Indiana/Knox America/Indiana/Tell_City America/Menominee America/North_Dakota/Beulah "
+	  "America/North_Dakota/Center America/North_Dakota/New_Salem" },
 	{ "Central Standard Time", "America/Chicago" },
 	{ "Central Standard Time", "America/Matamoros" },
 	{ "Central Standard Time", "America/Winnipeg America/Rainy_River America/Rankin_Inlet America/Resolute" },
@@ -119,9 +124,12 @@ const WINDOWS_TZID_ENTRY WindowsTimeZoneIdTable[] =
 	{ "Easter Island Standard Time", "Pacific/Easter" },
 	{ "Eastern Standard Time (Mexico)", "America/Cancun" },
 	{ "Eastern Standard Time", "America/Nassau" },
-	{ "Eastern Standard Time", "America/New_York America/Detroit America/Indiana/Petersburg America/Indiana/Vincennes America/Indiana/Winamac America/Kentucky/Monticello America/Louisville" },
+	{ "Eastern Standard Time",
+	  "America/New_York America/Detroit America/Indiana/Petersburg America/Indiana/Vincennes America/Indiana/Winamac "
+	  "America/Kentucky/Monticello America/Louisville" },
 	{ "Eastern Standard Time", "America/New_York" },
-	{ "Eastern Standard Time", "America/Toronto America/Iqaluit America/Montreal America/Nipigon America/Pangnirtung America/Thunder_Bay" },
+	{ "Eastern Standard Time",
+	  "America/Toronto America/Iqaluit America/Montreal America/Nipigon America/Pangnirtung America/Thunder_Bay" },
 	{ "Eastern Standard Time", "EST5EDT" },
 	{ "Egypt Standard Time", "Africa/Cairo" },
 	{ "Ekaterinburg Standard Time", "Asia/Yekaterinburg" },

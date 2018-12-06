@@ -93,8 +93,7 @@ void cache_free(rdpCache* cache)
 	}
 }
 
-CACHE_COLOR_TABLE_ORDER* copy_cache_color_table_order(rdpContext* context,
-        const CACHE_COLOR_TABLE_ORDER* order)
+CACHE_COLOR_TABLE_ORDER* copy_cache_color_table_order(rdpContext* context, const CACHE_COLOR_TABLE_ORDER* order)
 {
 	CACHE_COLOR_TABLE_ORDER* dst = calloc(1, sizeof(CACHE_COLOR_TABLE_ORDER));
 
@@ -108,10 +107,7 @@ fail:
 	return NULL;
 }
 
-void free_cache_color_table_order(rdpContext* context, CACHE_COLOR_TABLE_ORDER* order)
-{
-	free(order);
-}
+void free_cache_color_table_order(rdpContext* context, CACHE_COLOR_TABLE_ORDER* order) { free(order); }
 
 SURFACE_BITS_COMMAND* copy_surface_bits_command(rdpContext* context, const SURFACE_BITS_COMMAND* order)
 {
@@ -126,8 +122,7 @@ SURFACE_BITS_COMMAND* copy_surface_bits_command(rdpContext* context, const SURFA
 	if (!dst->bmp.bitmapData)
 		goto fail;
 
-	CopyMemory(dst->bmp.bitmapData, order->bmp.bitmapData,
-			   order->bmp.bitmapDataLength);
+	CopyMemory(dst->bmp.bitmapData, order->bmp.bitmapData, order->bmp.bitmapDataLength);
 
 	return dst;
 

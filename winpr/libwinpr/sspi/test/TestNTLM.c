@@ -10,51 +10,48 @@ static BYTE TEST_NTLM_CLIENT_CHALLENGE[8] = { 0x20, 0xc0, 0x2b, 0x3d, 0xc0, 0x61
 
 static BYTE TEST_NTLM_SERVER_CHALLENGE[8] = { 0xa4, 0xf1, 0xba, 0xa6, 0x7c, 0xdc, 0x1a, 0x12 };
 
-static BYTE TEST_NTLM_NEGOTIATE[] =
-    "\x4e\x54\x4c\x4d\x53\x53\x50\x00\x01\x00\x00\x00\x07\x82\x08\xa2"
-    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
-    "\x06\x03\x80\x25\x00\x00\x00\x0f";
+static BYTE TEST_NTLM_NEGOTIATE[] = "\x4e\x54\x4c\x4d\x53\x53\x50\x00\x01\x00\x00\x00\x07\x82\x08\xa2"
+                                    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+                                    "\x06\x03\x80\x25\x00\x00\x00\x0f";
 
-static BYTE TEST_NTLM_CHALLENGE[] =
-    "\x4e\x54\x4c\x4d\x53\x53\x50\x00\x02\x00\x00\x00\x00\x00\x00\x00"
-    "\x38\x00\x00\x00\x07\x82\x88\xa2\xa4\xf1\xba\xa6\x7c\xdc\x1a\x12"
-    "\x00\x00\x00\x00\x00\x00\x00\x00\x66\x00\x66\x00\x38\x00\x00\x00"
-    "\x06\x03\x80\x25\x00\x00\x00\x0f\x02\x00\x0e\x00\x4e\x00\x45\x00"
-    "\x57\x00\x59\x00\x45\x00\x41\x00\x52\x00\x01\x00\x0e\x00\x4e\x00"
-    "\x45\x00\x57\x00\x59\x00\x45\x00\x41\x00\x52\x00\x04\x00\x1c\x00"
-    "\x6c\x00\x61\x00\x62\x00\x2e\x00\x77\x00\x61\x00\x79\x00\x6b\x00"
-    "\x2e\x00\x6c\x00\x6f\x00\x63\x00\x61\x00\x6c\x00\x03\x00\x0e\x00"
-    "\x6e\x00\x65\x00\x77\x00\x79\x00\x65\x00\x61\x00\x72\x00\x07\x00"
-    "\x08\x00\x33\x57\xbd\xb1\x07\x8b\xcf\x01\x00\x00\x00\x00";
+static BYTE TEST_NTLM_CHALLENGE[] = "\x4e\x54\x4c\x4d\x53\x53\x50\x00\x02\x00\x00\x00\x00\x00\x00\x00"
+                                    "\x38\x00\x00\x00\x07\x82\x88\xa2\xa4\xf1\xba\xa6\x7c\xdc\x1a\x12"
+                                    "\x00\x00\x00\x00\x00\x00\x00\x00\x66\x00\x66\x00\x38\x00\x00\x00"
+                                    "\x06\x03\x80\x25\x00\x00\x00\x0f\x02\x00\x0e\x00\x4e\x00\x45\x00"
+                                    "\x57\x00\x59\x00\x45\x00\x41\x00\x52\x00\x01\x00\x0e\x00\x4e\x00"
+                                    "\x45\x00\x57\x00\x59\x00\x45\x00\x41\x00\x52\x00\x04\x00\x1c\x00"
+                                    "\x6c\x00\x61\x00\x62\x00\x2e\x00\x77\x00\x61\x00\x79\x00\x6b\x00"
+                                    "\x2e\x00\x6c\x00\x6f\x00\x63\x00\x61\x00\x6c\x00\x03\x00\x0e\x00"
+                                    "\x6e\x00\x65\x00\x77\x00\x79\x00\x65\x00\x61\x00\x72\x00\x07\x00"
+                                    "\x08\x00\x33\x57\xbd\xb1\x07\x8b\xcf\x01\x00\x00\x00\x00";
 
-static BYTE TEST_NTLM_AUTHENTICATE[] =
-    "\x4e\x54\x4c\x4d\x53\x53\x50\x00\x03\x00\x00\x00\x18\x00\x18\x00"
-    "\x82\x00\x00\x00\x08\x01\x08\x01\x9a\x00\x00\x00\x0c\x00\x0c\x00"
-    "\x58\x00\x00\x00\x10\x00\x10\x00\x64\x00\x00\x00\x0e\x00\x0e\x00"
-    "\x74\x00\x00\x00\x00\x00\x00\x00\xa2\x01\x00\x00\x05\x82\x88\xa2"
-    "\x06\x03\x80\x25\x00\x00\x00\x0f\x12\xe5\x5a\xf5\x80\xee\x3f\x29"
-    "\xe1\xde\x90\x4d\x73\x77\x06\x25\x44\x00\x6f\x00\x6d\x00\x61\x00"
-    "\x69\x00\x6e\x00\x55\x00\x73\x00\x65\x00\x72\x00\x6e\x00\x61\x00"
-    "\x6d\x00\x65\x00\x4e\x00\x45\x00\x57\x00\x59\x00\x45\x00\x41\x00"
-    "\x52\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
-    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x62\x14\x68\xc8\x98\x12"
-    "\xe7\x39\xd8\x76\x1b\xe9\xf7\x54\xb5\xe3\x01\x01\x00\x00\x00\x00"
-    "\x00\x00\x33\x57\xbd\xb1\x07\x8b\xcf\x01\x20\xc0\x2b\x3d\xc0\x61"
-    "\xa7\x73\x00\x00\x00\x00\x02\x00\x0e\x00\x4e\x00\x45\x00\x57\x00"
-    "\x59\x00\x45\x00\x41\x00\x52\x00\x01\x00\x0e\x00\x4e\x00\x45\x00"
-    "\x57\x00\x59\x00\x45\x00\x41\x00\x52\x00\x04\x00\x1c\x00\x6c\x00"
-    "\x61\x00\x62\x00\x2e\x00\x77\x00\x61\x00\x79\x00\x6b\x00\x2e\x00"
-    "\x6c\x00\x6f\x00\x63\x00\x61\x00\x6c\x00\x03\x00\x0e\x00\x6e\x00"
-    "\x65\x00\x77\x00\x79\x00\x65\x00\x61\x00\x72\x00\x07\x00\x08\x00"
-    "\x33\x57\xbd\xb1\x07\x8b\xcf\x01\x06\x00\x04\x00\x02\x00\x00\x00"
-    "\x08\x00\x30\x00\x30\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00"
-    "\x00\x20\x00\x00\x1e\x10\xf5\x2c\x54\x2f\x2e\x77\x1c\x13\xbf\xc3"
-    "\x3f\xe1\x7b\x28\x7e\x0b\x93\x5a\x39\xd2\xce\x12\xd7\xbd\x8c\x4e"
-    "\x2b\xb5\x0b\xf5\x0a\x00\x10\x00\x00\x00\x00\x00\x00\x00\x00\x00"
-    "\x00\x00\x00\x00\x00\x00\x00\x00\x09\x00\x1a\x00\x48\x00\x54\x00"
-    "\x54\x00\x50\x00\x2f\x00\x72\x00\x77\x00\x2e\x00\x6c\x00\x6f\x00"
-    "\x63\x00\x61\x00\x6c\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
-    "\x00\x00";
+static BYTE TEST_NTLM_AUTHENTICATE[] = "\x4e\x54\x4c\x4d\x53\x53\x50\x00\x03\x00\x00\x00\x18\x00\x18\x00"
+                                       "\x82\x00\x00\x00\x08\x01\x08\x01\x9a\x00\x00\x00\x0c\x00\x0c\x00"
+                                       "\x58\x00\x00\x00\x10\x00\x10\x00\x64\x00\x00\x00\x0e\x00\x0e\x00"
+                                       "\x74\x00\x00\x00\x00\x00\x00\x00\xa2\x01\x00\x00\x05\x82\x88\xa2"
+                                       "\x06\x03\x80\x25\x00\x00\x00\x0f\x12\xe5\x5a\xf5\x80\xee\x3f\x29"
+                                       "\xe1\xde\x90\x4d\x73\x77\x06\x25\x44\x00\x6f\x00\x6d\x00\x61\x00"
+                                       "\x69\x00\x6e\x00\x55\x00\x73\x00\x65\x00\x72\x00\x6e\x00\x61\x00"
+                                       "\x6d\x00\x65\x00\x4e\x00\x45\x00\x57\x00\x59\x00\x45\x00\x41\x00"
+                                       "\x52\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+                                       "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x62\x14\x68\xc8\x98\x12"
+                                       "\xe7\x39\xd8\x76\x1b\xe9\xf7\x54\xb5\xe3\x01\x01\x00\x00\x00\x00"
+                                       "\x00\x00\x33\x57\xbd\xb1\x07\x8b\xcf\x01\x20\xc0\x2b\x3d\xc0\x61"
+                                       "\xa7\x73\x00\x00\x00\x00\x02\x00\x0e\x00\x4e\x00\x45\x00\x57\x00"
+                                       "\x59\x00\x45\x00\x41\x00\x52\x00\x01\x00\x0e\x00\x4e\x00\x45\x00"
+                                       "\x57\x00\x59\x00\x45\x00\x41\x00\x52\x00\x04\x00\x1c\x00\x6c\x00"
+                                       "\x61\x00\x62\x00\x2e\x00\x77\x00\x61\x00\x79\x00\x6b\x00\x2e\x00"
+                                       "\x6c\x00\x6f\x00\x63\x00\x61\x00\x6c\x00\x03\x00\x0e\x00\x6e\x00"
+                                       "\x65\x00\x77\x00\x79\x00\x65\x00\x61\x00\x72\x00\x07\x00\x08\x00"
+                                       "\x33\x57\xbd\xb1\x07\x8b\xcf\x01\x06\x00\x04\x00\x02\x00\x00\x00"
+                                       "\x08\x00\x30\x00\x30\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00"
+                                       "\x00\x20\x00\x00\x1e\x10\xf5\x2c\x54\x2f\x2e\x77\x1c\x13\xbf\xc3"
+                                       "\x3f\xe1\x7b\x28\x7e\x0b\x93\x5a\x39\xd2\xce\x12\xd7\xbd\x8c\x4e"
+                                       "\x2b\xb5\x0b\xf5\x0a\x00\x10\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+                                       "\x00\x00\x00\x00\x00\x00\x00\x00\x09\x00\x1a\x00\x48\x00\x54\x00"
+                                       "\x54\x00\x50\x00\x2f\x00\x72\x00\x77\x00\x2e\x00\x6c\x00\x6f\x00"
+                                       "\x63\x00\x61\x00\x6c\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+                                       "\x00\x00";
 
 #define TEST_SSPI_INTERFACE SSPI_INTERFACE_WINPR
 
@@ -62,17 +59,17 @@ static const char* TEST_NTLM_USER = "Username";
 static const char* TEST_NTLM_DOMAIN = "Domain";
 static const char* TEST_NTLM_PASSWORD = "P4ss123!";
 
-//static const char* TEST_NTLM_HASH_STRING = "d5922a65c4d5c082ca444af1be0001db";
+// static const char* TEST_NTLM_HASH_STRING = "d5922a65c4d5c082ca444af1be0001db";
 
-static const BYTE TEST_NTLM_HASH[16] =
-{ 0xd5, 0x92, 0x2a, 0x65, 0xc4, 0xd5, 0xc0, 0x82, 0xca, 0x44, 0x4a, 0xf1, 0xbe, 0x00, 0x01, 0xdb };
+static const BYTE TEST_NTLM_HASH[16] = { 0xd5, 0x92, 0x2a, 0x65, 0xc4, 0xd5, 0xc0, 0x82,
+	                                     0xca, 0x44, 0x4a, 0xf1, 0xbe, 0x00, 0x01, 0xdb };
 
-//static const char* TEST_NTLM_HASH_V2_STRING = "4c7f706f7dde05a9d1a0f4e7ffe3bfb8";
+// static const char* TEST_NTLM_HASH_V2_STRING = "4c7f706f7dde05a9d1a0f4e7ffe3bfb8";
 
-static const BYTE TEST_NTLM_V2_HASH[16] =
-{ 0x4c, 0x7f, 0x70, 0x6f, 0x7d, 0xde, 0x05, 0xa9, 0xd1, 0xa0, 0xf4, 0xe7, 0xff, 0xe3, 0xbf, 0xb8 };
+static const BYTE TEST_NTLM_V2_HASH[16] = { 0x4c, 0x7f, 0x70, 0x6f, 0x7d, 0xde, 0x05, 0xa9,
+	                                        0xd1, 0xa0, 0xf4, 0xe7, 0xff, 0xe3, 0xbf, 0xb8 };
 
-#define NTLM_PACKAGE_NAME	NTLM_SSP_NAME
+#define NTLM_PACKAGE_NAME NTLM_SSP_NAME
 
 struct _TEST_NTLM_CLIENT
 {
@@ -97,8 +94,7 @@ struct _TEST_NTLM_CLIENT
 };
 typedef struct _TEST_NTLM_CLIENT TEST_NTLM_CLIENT;
 
-int test_ntlm_client_init(TEST_NTLM_CLIENT* ntlm, const char* user, const char* domain,
-                          const char* password)
+int test_ntlm_client_init(TEST_NTLM_CLIENT* ntlm, const char* user, const char* domain, const char* password)
 {
 	SECURITY_STATUS status;
 	SecInvalidateHandle(&(ntlm->context));
@@ -108,19 +104,19 @@ int test_ntlm_client_init(TEST_NTLM_CLIENT* ntlm, const char* user, const char* 
 
 	if (status != SEC_E_OK)
 	{
-		fprintf(stderr, "QuerySecurityPackageInfo status: %s (0x%08"PRIX32")\n",
-		        GetSecurityStatusString(status), status);
+		fprintf(stderr, "QuerySecurityPackageInfo status: %s (0x%08" PRIX32 ")\n", GetSecurityStatusString(status),
+		        status);
 		return -1;
 	}
 
 	ntlm->cbMaxToken = ntlm->pPackageInfo->cbMaxToken;
-	status = ntlm->table->AcquireCredentialsHandle(NULL, NTLM_PACKAGE_NAME,
-	         SECPKG_CRED_OUTBOUND, NULL, &ntlm->identity, NULL, NULL, &ntlm->credentials, &ntlm->expiration);
+	status = ntlm->table->AcquireCredentialsHandle(NULL, NTLM_PACKAGE_NAME, SECPKG_CRED_OUTBOUND, NULL, &ntlm->identity,
+	                                               NULL, NULL, &ntlm->credentials, &ntlm->expiration);
 
 	if (status != SEC_E_OK)
 	{
-		fprintf(stderr, "AcquireCredentialsHandle status: %s (0x%08"PRIX32")\n",
-		        GetSecurityStatusString(status), status);
+		fprintf(stderr, "AcquireCredentialsHandle status: %s (0x%08" PRIX32 ")\n", GetSecurityStatusString(status),
+		        status);
 		return -1;
 	}
 
@@ -236,13 +232,11 @@ int test_ntlm_client_authenticate(TEST_NTLM_CLIENT* ntlm)
 		return -1;
 	}
 
-	status = ntlm->table->InitializeSecurityContext(&ntlm->credentials,
-	         (ntlm->haveContext) ? &ntlm->context : NULL,
-	         (ntlm->ServicePrincipalName) ? ntlm->ServicePrincipalName : NULL,
-	         ntlm->fContextReq, 0, SECURITY_NATIVE_DREP,
-	         (ntlm->haveInputBuffer) ? &ntlm->inputBufferDesc : NULL,
-	         0, &ntlm->context, &ntlm->outputBufferDesc,
-	         &ntlm->pfContextAttr, &ntlm->expiration);
+	status = ntlm->table->InitializeSecurityContext(
+	  &ntlm->credentials, (ntlm->haveContext) ? &ntlm->context : NULL,
+	  (ntlm->ServicePrincipalName) ? ntlm->ServicePrincipalName : NULL, ntlm->fContextReq, 0, SECURITY_NATIVE_DREP,
+	  (ntlm->haveInputBuffer) ? &ntlm->inputBufferDesc : NULL, 0, &ntlm->context, &ntlm->outputBufferDesc,
+	  &ntlm->pfContextAttr, &ntlm->expiration);
 
 	if ((status == SEC_I_COMPLETE_AND_CONTINUE) || (status == SEC_I_COMPLETE_NEEDED))
 	{
@@ -319,20 +313,19 @@ int test_ntlm_server_init(TEST_NTLM_SERVER* ntlm)
 
 	if (status != SEC_E_OK)
 	{
-		fprintf(stderr, "QuerySecurityPackageInfo status: %s (0x%08"PRIX32")\n",
-		        GetSecurityStatusString(status), status);
+		fprintf(stderr, "QuerySecurityPackageInfo status: %s (0x%08" PRIX32 ")\n", GetSecurityStatusString(status),
+		        status);
 		return -1;
 	}
 
 	ntlm->cbMaxToken = ntlm->pPackageInfo->cbMaxToken;
-	status = ntlm->table->AcquireCredentialsHandle(NULL, NTLM_PACKAGE_NAME,
-	         SECPKG_CRED_INBOUND, NULL, NULL, NULL, NULL,
-	         &ntlm->credentials, &ntlm->expiration);
+	status = ntlm->table->AcquireCredentialsHandle(NULL, NTLM_PACKAGE_NAME, SECPKG_CRED_INBOUND, NULL, NULL, NULL, NULL,
+	                                               &ntlm->credentials, &ntlm->expiration);
 
 	if (status != SEC_E_OK)
 	{
-		fprintf(stderr, "AcquireCredentialsHandle status: %s (0x%08"PRIX32")\n",
-		        GetSecurityStatusString(status), status);
+		fprintf(stderr, "AcquireCredentialsHandle status: %s (0x%08" PRIX32 ")\n", GetSecurityStatusString(status),
+		        status);
 		return -1;
 	}
 
@@ -393,10 +386,9 @@ int test_ntlm_server_authenticate(TEST_NTLM_SERVER* ntlm)
 	if (!ntlm->outputBuffer[0].pvBuffer)
 		return -1;
 
-	status = ntlm->table->AcceptSecurityContext(&ntlm->credentials,
-	         ntlm->haveContext ? &ntlm->context : NULL,
-	         &ntlm->inputBufferDesc, ntlm->fContextReq, SECURITY_NATIVE_DREP, &ntlm->context,
-	         &ntlm->outputBufferDesc, &ntlm->pfContextAttr, &ntlm->expiration);
+	status = ntlm->table->AcceptSecurityContext(
+	  &ntlm->credentials, ntlm->haveContext ? &ntlm->context : NULL, &ntlm->inputBufferDesc, ntlm->fContextReq,
+	  SECURITY_NATIVE_DREP, &ntlm->context, &ntlm->outputBufferDesc, &ntlm->pfContextAttr, &ntlm->expiration);
 
 	if ((status == SEC_I_COMPLETE_AND_CONTINUE) || (status == SEC_I_COMPLETE_NEEDED))
 	{
@@ -404,8 +396,7 @@ int test_ntlm_server_authenticate(TEST_NTLM_SERVER* ntlm)
 		SecPkgContext_AuthNtlmHash AuthNtlmHash;
 		ZeroMemory(&AuthIdentity, sizeof(SecPkgContext_AuthIdentity));
 		ZeroMemory(&AuthNtlmHash, sizeof(SecPkgContext_AuthNtlmHash));
-		status = ntlm->table->QueryContextAttributes(&ntlm->context, SECPKG_ATTR_AUTH_IDENTITY,
-		         &AuthIdentity);
+		status = ntlm->table->QueryContextAttributes(&ntlm->context, SECPKG_ATTR_AUTH_IDENTITY, &AuthIdentity);
 
 		if (status == SEC_E_OK)
 		{
@@ -422,8 +413,8 @@ int test_ntlm_server_authenticate(TEST_NTLM_SERVER* ntlm)
 					CopyMemory(AuthNtlmHash.NtlmHash, TEST_NTLM_HASH, 16);
 				}
 
-				status = ntlm->table->SetContextAttributes(&ntlm->context,
-				         SECPKG_ATTR_AUTH_NTLM_HASH, &AuthNtlmHash, sizeof(SecPkgContext_AuthNtlmHash));
+				status = ntlm->table->SetContextAttributes(&ntlm->context, SECPKG_ATTR_AUTH_NTLM_HASH, &AuthNtlmHash,
+				                                           sizeof(SecPkgContext_AuthNtlmHash));
 			}
 		}
 
@@ -438,8 +429,8 @@ int test_ntlm_server_authenticate(TEST_NTLM_SERVER* ntlm)
 
 	if ((status != SEC_E_OK) && (status != SEC_I_CONTINUE_NEEDED))
 	{
-		fprintf(stderr, "AcceptSecurityContext status: %s (0x%08"PRIX32")\n",
-		        GetSecurityStatusString(status), status);
+		fprintf(stderr, "AcceptSecurityContext status: %s (0x%08" PRIX32 ")\n", GetSecurityStatusString(status),
+		        status);
 		return -1; /* Access Denied */
 	}
 
@@ -530,11 +521,11 @@ int TestNTLM(int argc, char* argv[])
 		SecPkgContext_AuthNtlmServerChallenge AuthNtlmServerChallenge;
 		CopyMemory(AuthNtlmTimestamp.Timestamp, TEST_NTLM_TIMESTAMP, 8);
 		AuthNtlmTimestamp.ChallengeOrResponse = TRUE;
-		client->table->SetContextAttributes(&client->context, SECPKG_ATTR_AUTH_NTLM_TIMESTAMP,
-		                                    &AuthNtlmTimestamp, sizeof(SecPkgContext_AuthNtlmTimestamp));
+		client->table->SetContextAttributes(&client->context, SECPKG_ATTR_AUTH_NTLM_TIMESTAMP, &AuthNtlmTimestamp,
+		                                    sizeof(SecPkgContext_AuthNtlmTimestamp));
 		AuthNtlmTimestamp.ChallengeOrResponse = FALSE;
-		client->table->SetContextAttributes(&client->context, SECPKG_ATTR_AUTH_NTLM_TIMESTAMP,
-		                                    &AuthNtlmTimestamp, sizeof(SecPkgContext_AuthNtlmTimestamp));
+		client->table->SetContextAttributes(&client->context, SECPKG_ATTR_AUTH_NTLM_TIMESTAMP, &AuthNtlmTimestamp,
+		                                    sizeof(SecPkgContext_AuthNtlmTimestamp));
 		CopyMemory(AuthNtlmClientChallenge.ClientChallenge, TEST_NTLM_CLIENT_CHALLENGE, 8);
 		CopyMemory(AuthNtlmServerChallenge.ServerChallenge, TEST_NTLM_SERVER_CHALLENGE, 8);
 		client->table->SetContextAttributes(&client->context, SECPKG_ATTR_AUTH_NTLM_CLIENT_CHALLENGE,
@@ -559,7 +550,7 @@ int TestNTLM(int argc, char* argv[])
 		CopyMemory(pSecBuffer->pvBuffer, TEST_NTLM_NEGOTIATE, pSecBuffer->cbBuffer);
 	}
 
-	fprintf(stderr, "NTLM_NEGOTIATE (length = %"PRIu32"):\n", pSecBuffer->cbBuffer);
+	fprintf(stderr, "NTLM_NEGOTIATE (length = %" PRIu32 "):\n", pSecBuffer->cbBuffer);
 	winpr_HexDump("sspi.test", WLOG_DEBUG, (BYTE*) pSecBuffer->pvBuffer, pSecBuffer->cbBuffer);
 	/**
 	 * Server <- Negotiate Message
@@ -584,11 +575,11 @@ int TestNTLM(int argc, char* argv[])
 		SecPkgContext_AuthNtlmServerChallenge AuthNtlmServerChallenge;
 		CopyMemory(AuthNtlmTimestamp.Timestamp, TEST_NTLM_TIMESTAMP, 8);
 		AuthNtlmTimestamp.ChallengeOrResponse = TRUE;
-		client->table->SetContextAttributes(&server->context, SECPKG_ATTR_AUTH_NTLM_TIMESTAMP,
-		                                    &AuthNtlmTimestamp, sizeof(SecPkgContext_AuthNtlmTimestamp));
+		client->table->SetContextAttributes(&server->context, SECPKG_ATTR_AUTH_NTLM_TIMESTAMP, &AuthNtlmTimestamp,
+		                                    sizeof(SecPkgContext_AuthNtlmTimestamp));
 		AuthNtlmTimestamp.ChallengeOrResponse = FALSE;
-		client->table->SetContextAttributes(&server->context, SECPKG_ATTR_AUTH_NTLM_TIMESTAMP,
-		                                    &AuthNtlmTimestamp, sizeof(SecPkgContext_AuthNtlmTimestamp));
+		client->table->SetContextAttributes(&server->context, SECPKG_ATTR_AUTH_NTLM_TIMESTAMP, &AuthNtlmTimestamp,
+		                                    sizeof(SecPkgContext_AuthNtlmTimestamp));
 		CopyMemory(AuthNtlmClientChallenge.ClientChallenge, TEST_NTLM_CLIENT_CHALLENGE, 8);
 		CopyMemory(AuthNtlmServerChallenge.ServerChallenge, TEST_NTLM_SERVER_CHALLENGE, 8);
 		server->table->SetContextAttributes(&server->context, SECPKG_ATTR_AUTH_NTLM_CLIENT_CHALLENGE,
@@ -615,11 +606,11 @@ int TestNTLM(int argc, char* argv[])
 		AuthNtlmMessage.type = 2;
 		AuthNtlmMessage.length = pSecBuffer->cbBuffer;
 		AuthNtlmMessage.buffer = (BYTE*) pSecBuffer->pvBuffer;
-		server->table->SetContextAttributes(&server->context, SECPKG_ATTR_AUTH_NTLM_MESSAGE,
-		                                    &AuthNtlmMessage, sizeof(SecPkgContext_AuthNtlmMessage));
+		server->table->SetContextAttributes(&server->context, SECPKG_ATTR_AUTH_NTLM_MESSAGE, &AuthNtlmMessage,
+		                                    sizeof(SecPkgContext_AuthNtlmMessage));
 	}
 
-	fprintf(stderr, "NTLM_CHALLENGE (length = %"PRIu32"):\n", pSecBuffer->cbBuffer);
+	fprintf(stderr, "NTLM_CHALLENGE (length = %" PRIu32 "):\n", pSecBuffer->cbBuffer);
 	winpr_HexDump("sspi.test", WLOG_DEBUG, (BYTE*) pSecBuffer->pvBuffer, pSecBuffer->cbBuffer);
 	/**
 	 * Client <- Challenge Message
@@ -653,7 +644,7 @@ int TestNTLM(int argc, char* argv[])
 		CopyMemory(pSecBuffer->pvBuffer, TEST_NTLM_AUTHENTICATE, pSecBuffer->cbBuffer);
 	}
 
-	fprintf(stderr, "NTLM_AUTHENTICATE (length = %"PRIu32"):\n", pSecBuffer->cbBuffer);
+	fprintf(stderr, "NTLM_AUTHENTICATE (length = %" PRIu32 "):\n", pSecBuffer->cbBuffer);
 	winpr_HexDump("sspi.test", WLOG_DEBUG, (BYTE*) pSecBuffer->pvBuffer, pSecBuffer->cbBuffer);
 	/**
 	 * Server <- Authenticate Message

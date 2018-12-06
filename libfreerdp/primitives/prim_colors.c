@@ -28,18 +28,15 @@
 #include "prim_internal.h"
 
 #ifndef MINMAX
-#define MINMAX(_v_, _l_, _h_) \
-	((_v_) < (_l_) ? (_l_) : ((_v_) > (_h_) ? (_h_) : (_v_)))
+#define MINMAX(_v_, _l_, _h_) ((_v_) < (_l_) ? (_l_) : ((_v_) > (_h_) ? (_h_) : (_v_)))
 #endif /* !MINMAX */
 /* ------------------------------------------------------------------------- */
-static pstatus_t general_yCbCrToRGB_16s8u_P3AC4R_BGRX(
-    const INT16* pSrc[3], UINT32 srcStep,
-    BYTE* pDst, UINT32 dstStep, UINT32 DstFormat,
-    const prim_size_t* roi)
+static pstatus_t general_yCbCrToRGB_16s8u_P3AC4R_BGRX(const INT16* pSrc[3], UINT32 srcStep, BYTE* pDst, UINT32 dstStep,
+                                                      UINT32 DstFormat, const prim_size_t* roi)
 {
 	UINT32 x, y;
 	BYTE* pRGB = pDst;
-	const INT16* pY  = pSrc[0];
+	const INT16* pY = pSrc[0];
 	const INT16* pCb = pSrc[1];
 	const INT16* pCr = pSrc[2];
 	const size_t srcPad = (srcStep - (roi->width * 2)) / 2;
@@ -62,8 +59,7 @@ static pstatus_t general_yCbCrToRGB_16s8u_P3AC4R_BGRX(
 			R = ((INT16)((CrR + Y) >> divisor) >> 5);
 			G = ((INT16)((Y - CbG - CrG) >> divisor) >> 5);
 			B = ((INT16)((CbB + Y) >> divisor) >> 5);
-			pRGB = writePixelBGRX(pRGB, formatSize, DstFormat, CLIP(R), CLIP(G),
-			                      CLIP(B), 0xFF);
+			pRGB = writePixelBGRX(pRGB, formatSize, DstFormat, CLIP(R), CLIP(G), CLIP(B), 0xFF);
 		}
 
 		pY += srcPad;
@@ -75,14 +71,12 @@ static pstatus_t general_yCbCrToRGB_16s8u_P3AC4R_BGRX(
 	return PRIMITIVES_SUCCESS;
 }
 
-static pstatus_t general_yCbCrToRGB_16s8u_P3AC4R_general(
-    const INT16* pSrc[3], UINT32 srcStep,
-    BYTE* pDst, UINT32 dstStep, UINT32 DstFormat,
-    const prim_size_t* roi)
+static pstatus_t general_yCbCrToRGB_16s8u_P3AC4R_general(const INT16* pSrc[3], UINT32 srcStep, BYTE* pDst,
+                                                         UINT32 dstStep, UINT32 DstFormat, const prim_size_t* roi)
 {
 	UINT32 x, y;
 	BYTE* pRGB = pDst;
-	const INT16* pY  = pSrc[0];
+	const INT16* pY = pSrc[0];
 	const INT16* pCb = pSrc[1];
 	const INT16* pCr = pSrc[2];
 	const size_t srcPad = (srcStep - (roi->width * 2)) / 2;
@@ -106,8 +100,7 @@ static pstatus_t general_yCbCrToRGB_16s8u_P3AC4R_general(
 			R = ((INT16)((CrR + Y) >> divisor) >> 5);
 			G = ((INT16)((Y - CbG - CrG) >> divisor) >> 5);
 			B = ((INT16)((CbB + Y) >> divisor) >> 5);
-			pRGB = (*writePixel)(pRGB, formatSize, DstFormat, CLIP(R), CLIP(G),
-			                     CLIP(B), 0xFF);
+			pRGB = (*writePixel)(pRGB, formatSize, DstFormat, CLIP(R), CLIP(G), CLIP(B), 0xFF);
 		}
 
 		pY += srcPad;
@@ -119,10 +112,8 @@ static pstatus_t general_yCbCrToRGB_16s8u_P3AC4R_general(
 	return PRIMITIVES_SUCCESS;
 }
 
-static pstatus_t general_yCbCrToRGB_16s8u_P3AC4R(
-    const INT16* pSrc[3], UINT32 srcStep,
-    BYTE* pDst, UINT32 dstStep, UINT32 DstFormat,
-    const prim_size_t* roi)
+static pstatus_t general_yCbCrToRGB_16s8u_P3AC4R(const INT16* pSrc[3], UINT32 srcStep, BYTE* pDst, UINT32 dstStep,
+                                                 UINT32 DstFormat, const prim_size_t* roi)
 {
 	switch (DstFormat)
 	{
@@ -137,10 +128,8 @@ static pstatus_t general_yCbCrToRGB_16s8u_P3AC4R(
 
 /* ------------------------------------------------------------------------- */
 
-static pstatus_t general_yCbCrToRGB_16s16s_P3P3(
-    const INT16* pSrc[3],  INT32 srcStep,
-    INT16* pDst[3],  INT32 dstStep,
-    const prim_size_t* roi)	/* region of interest */
+static pstatus_t general_yCbCrToRGB_16s16s_P3P3(const INT16* pSrc[3], INT32 srcStep, INT16* pDst[3], INT32 dstStep,
+                                                const prim_size_t* roi) /* region of interest */
 {
 	/**
 	 * The decoded YCbCr coeffectients are represented as 11.5 fixed-point
@@ -153,7 +142,7 @@ static pstatus_t general_yCbCrToRGB_16s16s_P3P3(
 	 * by << 5 when interpreted as INT16.
 	 * It was scaled in the quantization phase, so we must scale it back here.
 	 */
-	const INT16* yptr  = pSrc[0];
+	const INT16* yptr = pSrc[0];
 	const INT16* cbptr = pSrc[1];
 	const INT16* crptr = pSrc[2];
 	INT16* rptr = pDst[0];
@@ -172,7 +161,7 @@ static pstatus_t general_yCbCrToRGB_16s16s_P3P3(
 			/* INT32 is used intentionally because we calculate
 			 * with shifted factors!
 			 */
-			INT32 y  = (INT32)(*yptr++);
+			INT32 y = (INT32)(*yptr++);
 			INT32 cb = (INT32)(*cbptr++);
 			INT32 cr = (INT32)(*crptr++);
 			INT32 r, g, b;
@@ -205,7 +194,7 @@ static pstatus_t general_yCbCrToRGB_16s16s_P3P3(
 			*bptr++ = CLIP(b >> 21);
 		}
 
-		yptr  += srcbump;
+		yptr += srcbump;
 		cbptr += srcbump;
 		crptr += srcbump;
 		rptr += dstbump;
@@ -217,10 +206,8 @@ static pstatus_t general_yCbCrToRGB_16s16s_P3P3(
 }
 
 /* ------------------------------------------------------------------------- */
-static pstatus_t general_RGBToYCbCr_16s16s_P3P3(
-    const INT16* pSrc[3],  INT32 srcStep,
-    INT16* pDst[3],  INT32 dstStep,
-    const prim_size_t* roi)	/* region of interest */
+static pstatus_t general_RGBToYCbCr_16s16s_P3P3(const INT16* pSrc[3], INT32 srcStep, INT16* pDst[3], INT32 dstStep,
+                                                const prim_size_t* roi) /* region of interest */
 {
 	/* The encoded YCbCr coefficients are represented as 11.5 fixed-point
 	 * numbers:
@@ -235,7 +222,7 @@ static pstatus_t general_RGBToYCbCr_16s16s_P3P3(
 	const INT16* rptr = pSrc[0];
 	const INT16* gptr = pSrc[1];
 	const INT16* bptr = pSrc[2];
-	INT16* yptr  = pDst[0];
+	INT16* yptr = pDst[0];
 	INT16* cbptr = pDst[1];
 	INT16* crptr = pDst[2];
 	UINT32 srcbump = (srcStep - (roi->width * sizeof(UINT16))) / sizeof(UINT16);
@@ -266,15 +253,15 @@ static pstatus_t general_RGBToYCbCr_16s16s_P3P3(
 			 * Cr: 0.499813 << 15 = 16377, 0.418531 << 15 = 13714,
 			 *     0.081282 << 15 = 2663
 			 */
-			INT32 y  = (r *  9798 + g *  19235 + b *  3735) >> 10;
+			INT32 y = (r * 9798 + g * 19235 + b * 3735) >> 10;
 			INT32 cb = (r * -5535 + g * -10868 + b * 16403) >> 10;
 			INT32 cr = (r * 16377 + g * -13714 + b * -2663) >> 10;
-			*yptr++  = (INT16) MINMAX(y - 4096, -4096, 4095);
+			*yptr++ = (INT16) MINMAX(y - 4096, -4096, 4095);
 			*cbptr++ = (INT16) MINMAX(cb, -4096, 4095);
 			*crptr++ = (INT16) MINMAX(cr, -4096, 4095);
 		}
 
-		yptr  += srcbump;
+		yptr += srcbump;
 		cbptr += srcbump;
 		crptr += srcbump;
 		rptr += dstbump;
@@ -285,8 +272,8 @@ static pstatus_t general_RGBToYCbCr_16s16s_P3P3(
 	return PRIMITIVES_SUCCESS;
 }
 
-static INLINE void writeScanlineGeneric(BYTE* dst, DWORD formatSize, UINT32 DstFormat,
-                                        const INT16* r, const INT16* g, const INT16* b, DWORD width)
+static INLINE void writeScanlineGeneric(BYTE* dst, DWORD formatSize, UINT32 DstFormat, const INT16* r, const INT16* g,
+                                        const INT16* b, DWORD width)
 {
 	DWORD x;
 	fkt_writePixel writePixel = getPixelWriteFunction(DstFormat);
@@ -295,8 +282,8 @@ static INLINE void writeScanlineGeneric(BYTE* dst, DWORD formatSize, UINT32 DstF
 		dst = (*writePixel)(dst, formatSize, DstFormat, *r++, *g++, *b++, 0xFF);
 }
 
-static INLINE void writeScanlineRGB(BYTE* dst, DWORD formatSize, UINT32 DstFormat,
-                                    const INT16* r, const INT16* g, const INT16* b, DWORD width)
+static INLINE void writeScanlineRGB(BYTE* dst, DWORD formatSize, UINT32 DstFormat, const INT16* r, const INT16* g,
+                                    const INT16* b, DWORD width)
 {
 	DWORD x;
 
@@ -311,8 +298,8 @@ static INLINE void writeScanlineRGB(BYTE* dst, DWORD formatSize, UINT32 DstForma
 	}
 }
 
-static INLINE void writeScanlineBGR(BYTE* dst, DWORD formatSize, UINT32 DstFormat,
-                                    const INT16* r, const INT16* g, const INT16* b, DWORD width)
+static INLINE void writeScanlineBGR(BYTE* dst, DWORD formatSize, UINT32 DstFormat, const INT16* r, const INT16* g,
+                                    const INT16* b, DWORD width)
 {
 	DWORD x;
 
@@ -327,8 +314,8 @@ static INLINE void writeScanlineBGR(BYTE* dst, DWORD formatSize, UINT32 DstForma
 	}
 }
 
-static INLINE void writeScanlineBGRX(BYTE* dst, DWORD formatSize, UINT32 DstFormat,
-                                     const INT16* r, const INT16* g, const INT16* b, DWORD width)
+static INLINE void writeScanlineBGRX(BYTE* dst, DWORD formatSize, UINT32 DstFormat, const INT16* r, const INT16* g,
+                                     const INT16* b, DWORD width)
 {
 	DWORD x;
 
@@ -344,8 +331,8 @@ static INLINE void writeScanlineBGRX(BYTE* dst, DWORD formatSize, UINT32 DstForm
 	}
 }
 
-static INLINE void writeScanlineRGBX(BYTE* dst, DWORD formatSize, UINT32 DstFormat,
-                                     const INT16* r, const INT16* g, const INT16* b, DWORD width)
+static INLINE void writeScanlineRGBX(BYTE* dst, DWORD formatSize, UINT32 DstFormat, const INT16* r, const INT16* g,
+                                     const INT16* b, DWORD width)
 {
 	DWORD x;
 
@@ -361,8 +348,8 @@ static INLINE void writeScanlineRGBX(BYTE* dst, DWORD formatSize, UINT32 DstForm
 	}
 }
 
-static INLINE void writeScanlineXBGR(BYTE* dst, DWORD formatSize, UINT32 DstFormat,
-                                     const INT16* r, const INT16* g, const INT16* b, DWORD width)
+static INLINE void writeScanlineXBGR(BYTE* dst, DWORD formatSize, UINT32 DstFormat, const INT16* r, const INT16* g,
+                                     const INT16* b, DWORD width)
 {
 	DWORD x;
 
@@ -378,8 +365,8 @@ static INLINE void writeScanlineXBGR(BYTE* dst, DWORD formatSize, UINT32 DstForm
 	}
 }
 
-static INLINE void writeScanlineXRGB(BYTE* dst, DWORD formatSize, UINT32 DstFormat,
-                                     const INT16* r, const INT16* g, const INT16* b, DWORD width)
+static INLINE void writeScanlineXRGB(BYTE* dst, DWORD formatSize, UINT32 DstFormat, const INT16* r, const INT16* g,
+                                     const INT16* b, DWORD width)
 {
 	DWORD x;
 
@@ -395,8 +382,7 @@ static INLINE void writeScanlineXRGB(BYTE* dst, DWORD formatSize, UINT32 DstForm
 	}
 }
 
-typedef void (*fkt_writeScanline)(BYTE*, DWORD, UINT32, const INT16*,
-                                  const INT16*, const INT16*, DWORD);
+typedef void (*fkt_writeScanline)(BYTE*, DWORD, UINT32, const INT16*, const INT16*, const INT16*, DWORD);
 
 static INLINE fkt_writeScanline getScanlineWriteFunction(DWORD format)
 {
@@ -430,17 +416,16 @@ static INLINE fkt_writeScanline getScanlineWriteFunction(DWORD format)
 }
 
 /* ------------------------------------------------------------------------- */
-static pstatus_t general_RGBToRGB_16s8u_P3AC4R_general(
-    const INT16* const pSrc[3],	/* 16-bit R,G, and B arrays */
-    UINT32 srcStep,			/* bytes between rows in source data */
-    BYTE* pDst,			/* 32-bit interleaved ARGB (ABGR?) data */
-    UINT32 dstStep,			/* bytes between rows in dest data */
-    UINT32 DstFormat,
-    const prim_size_t* roi)	/* region of interest */
+static pstatus_t general_RGBToRGB_16s8u_P3AC4R_general(const INT16* const pSrc[3], /* 16-bit R,G, and B arrays */
+                                                       UINT32 srcStep, /* bytes between rows in source data */
+                                                       BYTE* pDst, /* 32-bit interleaved ARGB (ABGR?) data */
+                                                       UINT32 dstStep, /* bytes between rows in dest data */
+                                                       UINT32 DstFormat,
+                                                       const prim_size_t* roi) /* region of interest */
 {
-	const INT16* r  = pSrc[0];
-	const INT16* g  = pSrc[1];
-	const INT16* b  = pSrc[2];
+	const INT16* r = pSrc[0];
+	const INT16* g = pSrc[1];
+	const INT16* b = pSrc[2];
 	UINT32 y;
 	const DWORD srcAdd = srcStep / sizeof(INT16);
 	fkt_writeScanline writeScanline = getScanlineWriteFunction(DstFormat);
@@ -458,17 +443,15 @@ static pstatus_t general_RGBToRGB_16s8u_P3AC4R_general(
 	return PRIMITIVES_SUCCESS;
 }
 
-static pstatus_t general_RGBToRGB_16s8u_P3AC4R_BGRX(
-    const INT16* const pSrc[3],	/* 16-bit R,G, and B arrays */
-    UINT32 srcStep,			/* bytes between rows in source data */
-    BYTE* pDst,			/* 32-bit interleaved ARGB (ABGR?) data */
-    UINT32 dstStep,			/* bytes between rows in dest data */
-    UINT32 DstFormat,
-    const prim_size_t* roi)	/* region of interest */
+static pstatus_t general_RGBToRGB_16s8u_P3AC4R_BGRX(const INT16* const pSrc[3], /* 16-bit R,G, and B arrays */
+                                                    UINT32 srcStep, /* bytes between rows in source data */
+                                                    BYTE* pDst, /* 32-bit interleaved ARGB (ABGR?) data */
+                                                    UINT32 dstStep, /* bytes between rows in dest data */
+                                                    UINT32 DstFormat, const prim_size_t* roi) /* region of interest */
 {
-	const INT16* r  = pSrc[0];
-	const INT16* g  = pSrc[1];
-	const INT16* b  = pSrc[2];
+	const INT16* r = pSrc[0];
+	const INT16* g = pSrc[1];
+	const INT16* b = pSrc[2];
 	UINT32 y;
 	const DWORD srcAdd = srcStep / sizeof(INT16);
 	const DWORD formatSize = GetBytesPerPixel(DstFormat);
@@ -485,13 +468,11 @@ static pstatus_t general_RGBToRGB_16s8u_P3AC4R_BGRX(
 	return PRIMITIVES_SUCCESS;
 }
 
-static pstatus_t general_RGBToRGB_16s8u_P3AC4R(
-    const INT16* const pSrc[3],	/* 16-bit R,G, and B arrays */
-    UINT32 srcStep,			/* bytes between rows in source data */
-    BYTE* pDst,			/* 32-bit interleaved ARGB (ABGR?) data */
-    UINT32 dstStep,			/* bytes between rows in dest data */
-    UINT32 DstFormat,
-    const prim_size_t* roi)	/* region of interest */
+static pstatus_t general_RGBToRGB_16s8u_P3AC4R(const INT16* const pSrc[3], /* 16-bit R,G, and B arrays */
+                                               UINT32 srcStep, /* bytes between rows in source data */
+                                               BYTE* pDst, /* 32-bit interleaved ARGB (ABGR?) data */
+                                               UINT32 dstStep, /* bytes between rows in dest data */
+                                               UINT32 DstFormat, const prim_size_t* roi) /* region of interest */
 {
 	switch (DstFormat)
 	{
@@ -509,5 +490,5 @@ void primitives_init_colors(primitives_t* prims)
 	prims->yCbCrToRGB_16s8u_P3AC4R = general_yCbCrToRGB_16s8u_P3AC4R;
 	prims->yCbCrToRGB_16s16s_P3P3 = general_yCbCrToRGB_16s16s_P3P3;
 	prims->RGBToYCbCr_16s16s_P3P3 = general_RGBToYCbCr_16s16s_P3P3;
-	prims->RGBToRGB_16s8u_P3AC4R  = general_RGBToRGB_16s8u_P3AC4R;
+	prims->RGBToRGB_16s8u_P3AC4R = general_RGBToRGB_16s8u_P3AC4R;
 }

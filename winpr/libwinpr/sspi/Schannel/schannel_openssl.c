@@ -336,8 +336,8 @@ out_rsa_key:
 	return -1;
 }
 
-SECURITY_STATUS schannel_openssl_client_process_tokens(SCHANNEL_OPENSSL* context,
-        PSecBufferDesc pInput, PSecBufferDesc pOutput)
+SECURITY_STATUS schannel_openssl_client_process_tokens(SCHANNEL_OPENSSL* context, PSecBufferDesc pInput,
+                                                       PSecBufferDesc pOutput)
 {
 	int status;
 	int ssl_error;
@@ -398,8 +398,8 @@ SECURITY_STATUS schannel_openssl_client_process_tokens(SCHANNEL_OPENSSL* context
 	return SEC_E_OK;
 }
 
-SECURITY_STATUS schannel_openssl_server_process_tokens(SCHANNEL_OPENSSL* context,
-        PSecBufferDesc pInput, PSecBufferDesc pOutput)
+SECURITY_STATUS schannel_openssl_server_process_tokens(SCHANNEL_OPENSSL* context, PSecBufferDesc pInput,
+                                                       PSecBufferDesc pOutput)
 {
 	int status;
 	int ssl_error;
@@ -485,18 +485,15 @@ SECURITY_STATUS schannel_openssl_encrypt_message(SCHANNEL_OPENSSL* context, PSec
 	if (status > 0)
 	{
 		offset = 0;
-		length = (pStreamHeaderBuffer->cbBuffer > (unsigned long) status) ? status :
-		         pStreamHeaderBuffer->cbBuffer;
+		length = (pStreamHeaderBuffer->cbBuffer > (unsigned long) status) ? status : pStreamHeaderBuffer->cbBuffer;
 		CopyMemory(pStreamHeaderBuffer->pvBuffer, &context->ReadBuffer[offset], length);
 		status -= length;
 		offset += length;
-		length = (pStreamBodyBuffer->cbBuffer > (unsigned long) status) ? status :
-		         pStreamBodyBuffer->cbBuffer;
+		length = (pStreamBodyBuffer->cbBuffer > (unsigned long) status) ? status : pStreamBodyBuffer->cbBuffer;
 		CopyMemory(pStreamBodyBuffer->pvBuffer, &context->ReadBuffer[offset], length);
 		status -= length;
 		offset += length;
-		length = (pStreamTrailerBuffer->cbBuffer > (unsigned long) status) ? status :
-		         pStreamTrailerBuffer->cbBuffer;
+		length = (pStreamTrailerBuffer->cbBuffer > (unsigned long) status) ? status : pStreamTrailerBuffer->cbBuffer;
 		CopyMemory(pStreamTrailerBuffer->pvBuffer, &context->ReadBuffer[offset], length);
 	}
 
@@ -564,24 +561,18 @@ void schannel_openssl_free(SCHANNEL_OPENSSL* context)
 
 #else
 
-int schannel_openssl_client_init(SCHANNEL_OPENSSL* context)
-{
-	return 0;
-}
+int schannel_openssl_client_init(SCHANNEL_OPENSSL* context) { return 0; }
 
-int schannel_openssl_server_init(SCHANNEL_OPENSSL* context)
-{
-	return 0;
-}
+int schannel_openssl_server_init(SCHANNEL_OPENSSL* context) { return 0; }
 
-SECURITY_STATUS schannel_openssl_client_process_tokens(SCHANNEL_OPENSSL* context,
-        PSecBufferDesc pInput, PSecBufferDesc pOutput)
+SECURITY_STATUS schannel_openssl_client_process_tokens(SCHANNEL_OPENSSL* context, PSecBufferDesc pInput,
+                                                       PSecBufferDesc pOutput)
 {
 	return SEC_E_OK;
 }
 
-SECURITY_STATUS schannel_openssl_server_process_tokens(SCHANNEL_OPENSSL* context,
-        PSecBufferDesc pInput, PSecBufferDesc pOutput)
+SECURITY_STATUS schannel_openssl_server_process_tokens(SCHANNEL_OPENSSL* context, PSecBufferDesc pInput,
+                                                       PSecBufferDesc pOutput)
 {
 	return SEC_E_OK;
 }
@@ -596,13 +587,8 @@ SECURITY_STATUS schannel_openssl_decrypt_message(SCHANNEL_OPENSSL* context, PSec
 	return SEC_E_OK;
 }
 
-SCHANNEL_OPENSSL* schannel_openssl_new(void)
-{
-	return NULL;
-}
+SCHANNEL_OPENSSL* schannel_openssl_new(void) { return NULL; }
 
-void schannel_openssl_free(SCHANNEL_OPENSSL* context)
-{
-}
+void schannel_openssl_free(SCHANNEL_OPENSSL* context) {}
 
 #endif

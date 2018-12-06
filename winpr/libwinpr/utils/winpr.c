@@ -46,10 +46,7 @@ void winpr_get_version(int* major, int* minor, int* revision)
 		*revision = WINPR_VERSION_REVISION;
 }
 
-const char* winpr_get_version_string(void)
-{
-	return WINPR_VERSION_FULL;
-}
+const char* winpr_get_version_string(void) { return WINPR_VERSION_FULL; }
 
 const char* winpr_get_build_date(void)
 {
@@ -58,20 +55,15 @@ const char* winpr_get_build_date(void)
 	return build_date;
 }
 
-const char* winpr_get_build_revision(void)
-{
-	return GIT_REVISION;
-}
+const char* winpr_get_build_revision(void) { return GIT_REVISION; }
 
 const char* winpr_get_build_config(void)
 {
-	static const char build_config[] =
-		"Build configuration: " BUILD_CONFIG "\n"
-		"Build type:          " BUILD_TYPE "\n"
-		"CFLAGS:              " CFLAGS "\n"
-		"Compiler:            " COMPILER_ID ", " COMPILER_VERSION "\n"
-		"Target architecture: " TARGET_ARCH "\n";
+	static const char build_config[] = "Build configuration: " BUILD_CONFIG "\n"
+	                                   "Build type:          " BUILD_TYPE "\n"
+	                                   "CFLAGS:              " CFLAGS "\n"
+	                                   "Compiler:            " COMPILER_ID ", " COMPILER_VERSION "\n"
+	                                   "Target architecture: " TARGET_ARCH "\n";
 
 	return build_config;
 }
-

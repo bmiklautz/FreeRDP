@@ -86,13 +86,13 @@ static BOOL LogonUserIsHandled(HANDLE handle)
 
 static int LogonUserGetFd(HANDLE handle)
 {
-	WINPR_ACCESS_TOKEN* pLogonUser = (WINPR_ACCESS_TOKEN*)handle;
+	WINPR_ACCESS_TOKEN* pLogonUser = (WINPR_ACCESS_TOKEN*) handle;
 
 	if (!LogonUserIsHandled(handle))
 		return -1;
 
 	/* TODO: File fd not supported */
-	(void)pLogonUser;
+	(void) pLogonUser;
 	return -1;
 }
 
@@ -109,32 +109,29 @@ BOOL LogonUserCloseHandle(HANDLE handle)
 	return TRUE;
 }
 
-static HANDLE_OPS ops =
-{
-	LogonUserIsHandled,
-	LogonUserCloseHandle,
-	LogonUserGetFd,
-	NULL, /* CleanupHandle */
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
+static HANDLE_OPS ops = { LogonUserIsHandled,
+	                      LogonUserCloseHandle,
+	                      LogonUserGetFd,
+	                      NULL, /* CleanupHandle */
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL };
 
-BOOL LogonUserA(LPCSTR lpszUsername, LPCSTR lpszDomain, LPCSTR lpszPassword,
-                DWORD dwLogonType, DWORD dwLogonProvider, PHANDLE phToken)
+BOOL LogonUserA(LPCSTR lpszUsername, LPCSTR lpszDomain, LPCSTR lpszPassword, DWORD dwLogonType, DWORD dwLogonProvider,
+                PHANDLE phToken)
 {
 	struct passwd* pw;
 	WINPR_ACCESS_TOKEN* token;
@@ -181,22 +178,22 @@ BOOL LogonUserA(LPCSTR lpszUsername, LPCSTR lpszDomain, LPCSTR lpszPassword,
 	return TRUE;
 }
 
-BOOL LogonUserW(LPCWSTR lpszUsername, LPCWSTR lpszDomain, LPCWSTR lpszPassword,
-                DWORD dwLogonType, DWORD dwLogonProvider, PHANDLE phToken)
+BOOL LogonUserW(LPCWSTR lpszUsername, LPCWSTR lpszDomain, LPCWSTR lpszPassword, DWORD dwLogonType,
+                DWORD dwLogonProvider, PHANDLE phToken)
 {
 	return TRUE;
 }
 
-BOOL LogonUserExA(LPCSTR lpszUsername, LPCSTR lpszDomain, LPCSTR lpszPassword,
-                  DWORD dwLogonType, DWORD dwLogonProvider, PHANDLE phToken, PSID* ppLogonSid,
-                  PVOID* ppProfileBuffer, LPDWORD pdwProfileLength, PQUOTA_LIMITS pQuotaLimits)
+BOOL LogonUserExA(LPCSTR lpszUsername, LPCSTR lpszDomain, LPCSTR lpszPassword, DWORD dwLogonType, DWORD dwLogonProvider,
+                  PHANDLE phToken, PSID* ppLogonSid, PVOID* ppProfileBuffer, LPDWORD pdwProfileLength,
+                  PQUOTA_LIMITS pQuotaLimits)
 {
 	return TRUE;
 }
 
-BOOL LogonUserExW(LPCWSTR lpszUsername, LPCWSTR lpszDomain, LPCWSTR lpszPassword,
-                  DWORD dwLogonType, DWORD dwLogonProvider, PHANDLE phToken, PSID* ppLogonSid,
-                  PVOID* ppProfileBuffer, LPDWORD pdwProfileLength, PQUOTA_LIMITS pQuotaLimits)
+BOOL LogonUserExW(LPCWSTR lpszUsername, LPCWSTR lpszDomain, LPCWSTR lpszPassword, DWORD dwLogonType,
+                  DWORD dwLogonProvider, PHANDLE phToken, PSID* ppLogonSid, PVOID* ppProfileBuffer,
+                  LPDWORD pdwProfileLength, PQUOTA_LIMITS pQuotaLimits)
 {
 	return TRUE;
 }
@@ -241,10 +238,6 @@ BOOL GetUserNameExA(EXTENDED_NAME_FORMAT NameFormat, LPSTR lpNameBuffer, PULONG 
 	return 0;
 }
 
-BOOL GetUserNameExW(EXTENDED_NAME_FORMAT NameFormat, LPWSTR lpNameBuffer, PULONG nSize)
-{
-	return 0;
-}
+BOOL GetUserNameExW(EXTENDED_NAME_FORMAT NameFormat, LPWSTR lpNameBuffer, PULONG nSize) { return 0; }
 
 #endif
-

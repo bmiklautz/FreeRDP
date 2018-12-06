@@ -149,8 +149,8 @@
  *
  */
 
-int MultiByteToWideChar(UINT CodePage, DWORD dwFlags, LPCSTR lpMultiByteStr,
-                        int cbMultiByte, LPWSTR lpWideCharStr, int cchWideChar)
+int MultiByteToWideChar(UINT CodePage, DWORD dwFlags, LPCSTR lpMultiByteStr, int cbMultiByte, LPWSTR lpWideCharStr,
+                        int cchWideChar)
 {
 	LPWSTR targetStart;
 #if !defined(WITH_ICU)
@@ -169,10 +169,10 @@ int MultiByteToWideChar(UINT CodePage, DWORD dwFlags, LPCSTR lpMultiByteStr,
 	if (cbMultiByte == -1)
 		cbMultiByte = strlen((char*) lpMultiByteStr) + 1;
 
-	/*
-	 * if cchWideChar is 0, the function returns the required buffer size
-	 * in characters for lpWideCharStr and makes no use of the output parameter itself.
-	 */
+		/*
+		 * if cchWideChar is 0, the function returns the required buffer size
+		 * in characters for lpWideCharStr and makes no use of the output parameter itself.
+		 */
 #if defined(WITH_ICU)
 	{
 		UErrorCode error;
@@ -199,14 +199,12 @@ int MultiByteToWideChar(UINT CodePage, DWORD dwFlags, LPCSTR lpMultiByteStr,
 
 		if (cchWideChar == 0)
 		{
-			u_strFromUTF8(NULL, 0, &targetLength,
-			              lpMultiByteStr, cbMultiByte, &error);
+			u_strFromUTF8(NULL, 0, &targetLength, lpMultiByteStr, cbMultiByte, &error);
 			cchWideChar = targetLength;
 		}
 		else
 		{
-			u_strFromUTF8(targetStart, targetCapacity, &targetLength,
-			              lpMultiByteStr, cbMultiByte, &error);
+			u_strFromUTF8(targetStart, targetCapacity, &targetLength, lpMultiByteStr, cbMultiByte, &error);
 			cchWideChar = U_SUCCESS(error) ? targetLength : 0;
 		}
 	}
@@ -216,16 +214,15 @@ int MultiByteToWideChar(UINT CodePage, DWORD dwFlags, LPCSTR lpMultiByteStr,
 	{
 		sourceStart = (const BYTE*) lpMultiByteStr;
 		targetStart = (WCHAR*) NULL;
-		result = ConvertUTF8toUTF16(&sourceStart, &sourceStart[cbMultiByte],
-		                            &targetStart, NULL, strictConversion);
+		result = ConvertUTF8toUTF16(&sourceStart, &sourceStart[cbMultiByte], &targetStart, NULL, strictConversion);
 		length = targetStart - ((WCHAR*) NULL);
 	}
 	else
 	{
 		sourceStart = (const BYTE*) lpMultiByteStr;
 		targetStart = lpWideCharStr;
-		result = ConvertUTF8toUTF16(&sourceStart, &sourceStart[cbMultiByte],
-		                            &targetStart, &targetStart[cchWideChar], strictConversion);
+		result = ConvertUTF8toUTF16(&sourceStart, &sourceStart[cbMultiByte], &targetStart, &targetStart[cchWideChar],
+		                            strictConversion);
 		length = targetStart - ((WCHAR*) lpWideCharStr);
 	}
 
@@ -269,8 +266,8 @@ int MultiByteToWideChar(UINT CodePage, DWORD dwFlags, LPCSTR lpMultiByteStr,
  *
  */
 
-int WideCharToMultiByte(UINT CodePage, DWORD dwFlags, LPCWSTR lpWideCharStr, int cchWideChar,
-                        LPSTR lpMultiByteStr, int cbMultiByte, LPCSTR lpDefaultChar, LPBOOL lpUsedDefaultChar)
+int WideCharToMultiByte(UINT CodePage, DWORD dwFlags, LPCWSTR lpWideCharStr, int cchWideChar, LPSTR lpMultiByteStr,
+                        int cbMultiByte, LPCSTR lpDefaultChar, LPBOOL lpUsedDefaultChar)
 {
 #if !defined(WITH_ICU)
 	int length;
@@ -291,10 +288,10 @@ int WideCharToMultiByte(UINT CodePage, DWORD dwFlags, LPCWSTR lpWideCharStr, int
 	if (cchWideChar == -1)
 		cchWideChar = _wcslen(lpWideCharStr) + 1;
 
-	/*
-	 * if cbMultiByte is 0, the function returns the required buffer size
-	 * in bytes for lpMultiByteStr and makes no use of the output parameter itself.
-	 */
+		/*
+		 * if cbMultiByte is 0, the function returns the required buffer size
+		 * in bytes for lpMultiByteStr and makes no use of the output parameter itself.
+		 */
 #if defined(WITH_ICU)
 	{
 		UErrorCode error;
@@ -321,14 +318,12 @@ int WideCharToMultiByte(UINT CodePage, DWORD dwFlags, LPCWSTR lpWideCharStr, int
 
 		if (cbMultiByte == 0)
 		{
-			u_strToUTF8(NULL, 0, &targetLength,
-			            lpWideCharStr, cchWideChar, &error);
+			u_strToUTF8(NULL, 0, &targetLength, lpWideCharStr, cchWideChar, &error);
 			cbMultiByte = targetLength;
 		}
 		else
 		{
-			u_strToUTF8(targetStart, targetCapacity, &targetLength,
-			            lpWideCharStr, cchWideChar, &error);
+			u_strToUTF8(targetStart, targetCapacity, &targetLength, lpWideCharStr, cchWideChar, &error);
 			cbMultiByte = U_SUCCESS(error) ? targetLength : 0;
 		}
 	}
@@ -338,16 +333,15 @@ int WideCharToMultiByte(UINT CodePage, DWORD dwFlags, LPCWSTR lpWideCharStr, int
 	{
 		sourceStart = (WCHAR*) lpWideCharStr;
 		targetStart = (BYTE*) NULL;
-		result = ConvertUTF16toUTF8(&sourceStart, &sourceStart[cchWideChar],
-		                            &targetStart, NULL, strictConversion);
+		result = ConvertUTF16toUTF8(&sourceStart, &sourceStart[cchWideChar], &targetStart, NULL, strictConversion);
 		length = targetStart - ((BYTE*) NULL);
 	}
 	else
 	{
 		sourceStart = (WCHAR*) lpWideCharStr;
 		targetStart = (BYTE*) lpMultiByteStr;
-		result = ConvertUTF16toUTF8(&sourceStart, &sourceStart[cchWideChar],
-		                            &targetStart, &targetStart[cbMultiByte], strictConversion);
+		result = ConvertUTF16toUTF8(&sourceStart, &sourceStart[cchWideChar], &targetStart, &targetStart[cbMultiByte],
+		                            strictConversion);
 		length = targetStart - ((BYTE*) lpMultiByteStr);
 	}
 
@@ -371,8 +365,8 @@ int WideCharToMultiByte(UINT CodePage, DWORD dwFlags, LPCWSTR lpWideCharStr, int
  * calculated accordingly.
  */
 
-int ConvertToUnicode(UINT CodePage, DWORD dwFlags, LPCSTR lpMultiByteStr,
-                     int cbMultiByte, LPWSTR* lpWideCharStr, int cchWideChar)
+int ConvertToUnicode(UINT CodePage, DWORD dwFlags, LPCSTR lpMultiByteStr, int cbMultiByte, LPWSTR* lpWideCharStr,
+                     int cchWideChar)
 {
 	int status;
 	BOOL allocate = FALSE;
@@ -384,7 +378,7 @@ int ConvertToUnicode(UINT CodePage, DWORD dwFlags, LPCSTR lpMultiByteStr,
 		return 0;
 
 	if (cbMultiByte == -1)
-		cbMultiByte = (int)(strlen(lpMultiByteStr) + 1);
+		cbMultiByte = (int) (strlen(lpMultiByteStr) + 1);
 
 	if (cchWideChar == 0)
 	{
@@ -404,13 +398,12 @@ int ConvertToUnicode(UINT CodePage, DWORD dwFlags, LPCSTR lpMultiByteStr,
 
 		if (!(*lpWideCharStr))
 		{
-			//SetLastError(ERROR_INSUFFICIENT_BUFFER);
+			// SetLastError(ERROR_INSUFFICIENT_BUFFER);
 			return 0;
 		}
 	}
 
-	status = MultiByteToWideChar(CodePage, dwFlags, lpMultiByteStr, cbMultiByte, *lpWideCharStr,
-	                             cchWideChar);
+	status = MultiByteToWideChar(CodePage, dwFlags, lpMultiByteStr, cbMultiByte, *lpWideCharStr, cchWideChar);
 
 	if (status != cchWideChar)
 	{
@@ -439,8 +432,8 @@ int ConvertToUnicode(UINT CodePage, DWORD dwFlags, LPCSTR lpMultiByteStr,
  * calculated accordingly.
  */
 
-int ConvertFromUnicode(UINT CodePage, DWORD dwFlags, LPCWSTR lpWideCharStr, int cchWideChar,
-                       LPSTR* lpMultiByteStr, int cbMultiByte, LPCSTR lpDefaultChar, LPBOOL lpUsedDefaultChar)
+int ConvertFromUnicode(UINT CodePage, DWORD dwFlags, LPCWSTR lpWideCharStr, int cchWideChar, LPSTR* lpMultiByteStr,
+                       int cbMultiByte, LPCSTR lpDefaultChar, LPBOOL lpUsedDefaultChar)
 {
 	int status;
 	BOOL allocate = FALSE;
@@ -452,12 +445,11 @@ int ConvertFromUnicode(UINT CodePage, DWORD dwFlags, LPCWSTR lpWideCharStr, int 
 		return 0;
 
 	if (cchWideChar == -1)
-		cchWideChar = (int)(_wcslen(lpWideCharStr) + 1);
+		cchWideChar = (int) (_wcslen(lpWideCharStr) + 1);
 
 	if (cbMultiByte == 0)
 	{
-		cbMultiByte = WideCharToMultiByte(CodePage, dwFlags, lpWideCharStr, cchWideChar, NULL, 0, NULL,
-		                                  NULL);
+		cbMultiByte = WideCharToMultiByte(CodePage, dwFlags, lpWideCharStr, cchWideChar, NULL, 0, NULL, NULL);
 		allocate = TRUE;
 	}
 
@@ -473,13 +465,13 @@ int ConvertFromUnicode(UINT CodePage, DWORD dwFlags, LPCWSTR lpWideCharStr, int 
 
 		if (!(*lpMultiByteStr))
 		{
-			//SetLastError(ERROR_INSUFFICIENT_BUFFER);
+			// SetLastError(ERROR_INSUFFICIENT_BUFFER);
 			return 0;
 		}
 	}
 
-	status = WideCharToMultiByte(CodePage, dwFlags, lpWideCharStr, cchWideChar,
-	                             *lpMultiByteStr, cbMultiByte, lpDefaultChar, lpUsedDefaultChar);
+	status = WideCharToMultiByte(CodePage, dwFlags, lpWideCharStr, cchWideChar, *lpMultiByteStr, cbMultiByte,
+	                             lpDefaultChar, lpUsedDefaultChar);
 
 	if ((status != cbMultiByte) && allocate)
 	{

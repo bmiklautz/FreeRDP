@@ -75,7 +75,7 @@ void ObjectPool_Return(wObjectPool* pool, void* obj)
 	if ((pool->size + 1) >= pool->capacity)
 	{
 		int new_cap;
-		void **new_arr;
+		void** new_arr;
 
 		new_cap = pool->capacity * 2;
 		new_arr = (void**) realloc(pool->array, sizeof(void*) * new_cap);
@@ -139,7 +139,6 @@ wObjectPool* ObjectPool_New(BOOL synchronized)
 
 		if (pool->synchronized)
 			InitializeCriticalSectionAndSpinCount(&pool->lock, 4000);
-
 	}
 
 	return pool;

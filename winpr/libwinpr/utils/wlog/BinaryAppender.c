@@ -29,7 +29,6 @@
 #include <winpr/path.h>
 #include <winpr/stream.h>
 
-
 struct _wLogBinaryAppender
 {
 	WLOG_APPENDER_COMMON();
@@ -47,13 +46,13 @@ static BOOL WLog_BinaryAppender_Open(wLog* log, wLogAppender* appender)
 	if (!log || !appender)
 		return FALSE;
 
-	binaryAppender = (wLogBinaryAppender *)appender;
+	binaryAppender = (wLogBinaryAppender*) appender;
 	if (!binaryAppender->FileName)
 	{
 		binaryAppender->FileName = (char*) malloc(MAX_PATH);
 		if (!binaryAppender->FileName)
 			return FALSE;
-		sprintf_s(binaryAppender->FileName, MAX_PATH, "%"PRIu32".wlog", GetCurrentProcessId());
+		sprintf_s(binaryAppender->FileName, MAX_PATH, "%" PRIu32 ".wlog", GetCurrentProcessId());
 	}
 
 	if (!binaryAppender->FilePath)
@@ -92,7 +91,7 @@ static BOOL WLog_BinaryAppender_Close(wLog* log, wLogAppender* appender)
 	if (!appender)
 		return FALSE;
 
-	binaryAppender = (wLogBinaryAppender *)appender;
+	binaryAppender = (wLogBinaryAppender*) appender;
 	if (!binaryAppender->FileDescriptor)
 		return TRUE;
 
@@ -117,7 +116,7 @@ static BOOL WLog_BinaryAppender_WriteMessage(wLog* log, wLogAppender* appender, 
 	if (!log || !appender || !message)
 		return FALSE;
 
-	binaryAppender = (wLogBinaryAppender *)appender;
+	binaryAppender = (wLogBinaryAppender*) appender;
 
 	fp = binaryAppender->FileDescriptor;
 
@@ -128,10 +127,7 @@ static BOOL WLog_BinaryAppender_WriteMessage(wLog* log, wLogAppender* appender, 
 	FunctionNameLength = (int) strlen(message->FunctionName);
 	TextStringLength = (int) strlen(message->TextString);
 
-	MessageLength = 16 +
-			(4 + FileNameLength + 1) +
-			(4 + FunctionNameLength + 1) +
-			(4 + TextStringLength + 1);
+	MessageLength = 16 + (4 + FileNameLength + 1) + (4 + FunctionNameLength + 1) + (4 + TextStringLength + 1);
 
 	s = Stream_New(NULL, MessageLength);
 	if (!s)
@@ -173,22 +169,22 @@ static BOOL WLog_BinaryAppender_WriteImageMessage(wLog* log, wLogAppender* appen
 	return TRUE;
 }
 
-static BOOL WLog_BinaryAppender_Set(wLogAppender* appender, const char *setting, void *value)
+static BOOL WLog_BinaryAppender_Set(wLogAppender* appender, const char* setting, void* value)
 {
-	wLogBinaryAppender *binaryAppender = (wLogBinaryAppender *) appender;
+	wLogBinaryAppender* binaryAppender = (wLogBinaryAppender*) appender;
 
 	if (!value || !strlen(value))
 		return FALSE;
 
 	if (!strcmp("outputfilename", setting))
 	{
-		binaryAppender->FileName = _strdup((const char *)value);
+		binaryAppender->FileName = _strdup((const char*) value);
 		if (!binaryAppender->FileName)
 			return FALSE;
 	}
 	else if (!strcmp("outputfilepath", setting))
 	{
-		binaryAppender->FilePath = _strdup((const char *)value);
+		binaryAppender->FilePath = _strdup((const char*) value);
 		if (!binaryAppender->FilePath)
 			return FALSE;
 	}
@@ -200,10 +196,10 @@ static BOOL WLog_BinaryAppender_Set(wLogAppender* appender, const char *setting,
 
 static void WLog_BinaryAppender_Free(wLogAppender* appender)
 {
-	wLogBinaryAppender *binaryAppender;
+	wLogBinaryAppender* binaryAppender;
 	if (appender)
 	{
-		binaryAppender = (wLogBinaryAppender *)appender;
+		binaryAppender = (wLogBinaryAppender*) appender;
 		free(binaryAppender->FileName);
 		free(binaryAppender->FilePath);
 		free(binaryAppender->FullFileName);
@@ -228,5 +224,5 @@ wLogAppender* WLog_BinaryAppender_New(wLog* log)
 	BinaryAppender->Free = WLog_BinaryAppender_Free;
 	BinaryAppender->Set = WLog_BinaryAppender_Set;
 
-	return (wLogAppender *)BinaryAppender;
+	return (wLogAppender*) BinaryAppender;
 }

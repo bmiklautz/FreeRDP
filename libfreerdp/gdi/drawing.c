@@ -42,10 +42,7 @@
  * @return draw mode
  */
 
-INT32 gdi_GetROP2(HGDI_DC hdc)
-{
-	return hdc->drawMode;
-}
+INT32 gdi_GetROP2(HGDI_DC hdc) { return hdc->drawMode; }
 
 /**
  * Set current foreground draw mode.\n
@@ -72,10 +69,7 @@ INT32 gdi_SetROP2(HGDI_DC hdc, INT32 fnDrawMode)
  * @return background color
  */
 
-UINT32 gdi_GetBkColor(HGDI_DC hdc)
-{
-	return hdc->bkColor;
-}
+UINT32 gdi_GetBkColor(HGDI_DC hdc) { return hdc->bkColor; }
 
 /**
  * Set the current background color.\n
@@ -99,10 +93,7 @@ UINT32 gdi_SetBkColor(HGDI_DC hdc, UINT32 crColor)
  * @return background mode
  */
 
-UINT32 gdi_GetBkMode(HGDI_DC hdc)
-{
-	return hdc->bkMode;
-}
+UINT32 gdi_GetBkMode(HGDI_DC hdc) { return hdc->bkMode; }
 
 /**
  * Set the current background mode.\n
@@ -111,7 +102,6 @@ UINT32 gdi_GetBkMode(HGDI_DC hdc)
  * @param iBkMode background mode
  * @return previous background mode on success, 0 on failure
  */
-
 
 INT32 gdi_SetBkMode(HGDI_DC hdc, INT32 iBkMode)
 {

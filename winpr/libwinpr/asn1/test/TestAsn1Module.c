@@ -4,8 +4,4 @@
 #include <winpr/asn1.h>
 #include <winpr/winpr.h>
 
-int TestAsn1Module(int argc, char* argv[])
-{
-	return 0;
-}
-
+int TestAsn1Module(int argc, char* argv[]) { return 0; }

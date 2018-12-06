@@ -32,7 +32,6 @@
 
 #define TAG CHANNELS_TAG("drdynvc.server")
 
-
 static DWORD WINAPI drdynvc_server_thread(LPVOID arg)
 {
 #if 0
@@ -121,8 +120,7 @@ static DWORD WINAPI drdynvc_server_thread(LPVOID arg)
  */
 static UINT drdynvc_server_start(DrdynvcServerContext* context)
 {
-	context->priv->ChannelHandle = WTSVirtualChannelOpen(context->vcm,
-	                               WTS_CURRENT_SESSION, "drdynvc");
+	context->priv->ChannelHandle = WTSVirtualChannelOpen(context->vcm, WTS_CURRENT_SESSION, "drdynvc");
 
 	if (!context->priv->ChannelHandle)
 	{
@@ -160,7 +158,7 @@ static UINT drdynvc_server_stop(DrdynvcServerContext* context)
 	if (WaitForSingleObject(context->priv->Thread, INFINITE) == WAIT_FAILED)
 	{
 		error = GetLastError();
-		WLog_ERR(TAG, "WaitForSingleObject failed with error %"PRIu32"!", error);
+		WLog_ERR(TAG, "WaitForSingleObject failed with error %" PRIu32 "!", error);
 		return error;
 	}
 

@@ -31,29 +31,28 @@
 
 #ifdef _WIN32
 static INIT_ONCE init_once_module = INIT_ONCE_STATIC_INIT;
-static PTP_POOL (WINAPI * pCreateThreadpool)(PVOID reserved);
-static VOID (WINAPI * pCloseThreadpool)(PTP_POOL ptpp);
-static BOOL (WINAPI * pSetThreadpoolThreadMinimum)(PTP_POOL ptpp, DWORD cthrdMic);
-static VOID (WINAPI * pSetThreadpoolThreadMaximum)(PTP_POOL ptpp, DWORD cthrdMost);
+static PTP_POOL(WINAPI* pCreateThreadpool)(PVOID reserved);
+static VOID(WINAPI* pCloseThreadpool)(PTP_POOL ptpp);
+static BOOL(WINAPI* pSetThreadpoolThreadMinimum)(PTP_POOL ptpp, DWORD cthrdMic);
+static VOID(WINAPI* pSetThreadpoolThreadMaximum)(PTP_POOL ptpp, DWORD cthrdMost);
 
-static BOOL CALLBACK init_module(PINIT_ONCE once, PVOID param, PVOID *context)
+static BOOL CALLBACK init_module(PINIT_ONCE once, PVOID param, PVOID* context)
 {
 	HMODULE kernel32 = LoadLibraryA("kernel32.dll");
 	if (kernel32)
 	{
-		pCreateThreadpool = (void*)GetProcAddress(kernel32, "CreateThreadpool");
-		pCloseThreadpool = (void*)GetProcAddress(kernel32, "CloseThreadpool");
-		pSetThreadpoolThreadMinimum = (void*)GetProcAddress(kernel32, "SetThreadpoolThreadMinimum");
-		pSetThreadpoolThreadMaximum = (void*)GetProcAddress(kernel32, "SetThreadpoolThreadMaximum");
+		pCreateThreadpool = (void*) GetProcAddress(kernel32, "CreateThreadpool");
+		pCloseThreadpool = (void*) GetProcAddress(kernel32, "CloseThreadpool");
+		pSetThreadpoolThreadMinimum = (void*) GetProcAddress(kernel32, "SetThreadpoolThreadMinimum");
+		pSetThreadpoolThreadMaximum = (void*) GetProcAddress(kernel32, "SetThreadpoolThreadMaximum");
 	}
 	return TRUE;
 }
 #endif
 
-static TP_POOL DEFAULT_POOL =
-{
-	0,    /* DWORD Minimum */
-	500,  /* DWORD Maximum */
+static TP_POOL DEFAULT_POOL = {
+	0, /* DWORD Minimum */
+	500, /* DWORD Maximum */
 	NULL, /* wArrayList* Threads */
 	NULL, /* wQueue* PendingQueue */
 	NULL, /* HANDLE TerminateEvent */
@@ -98,7 +97,7 @@ static DWORD WINAPI thread_pool_work_func(LPVOID arg)
 	return 0;
 }
 
-static void threads_close(void *thread)
+static void threads_close(void* thread)
 {
 	WaitForSingleObject(thread, INFINITE);
 	CloseHandle(thread);
@@ -131,9 +130,7 @@ static BOOL InitializeThreadpool(PTP_POOL pool)
 
 	for (index = 0; index < 4; index++)
 	{
-		if (!(thread = CreateThread(NULL, 0,
-					thread_pool_work_func,
-					(void*) pool, 0, NULL)))
+		if (!(thread = CreateThread(NULL, 0, thread_pool_work_func, (void*) pool, 0, NULL)))
 		{
 			goto fail_create_threads;
 		}
@@ -236,9 +233,7 @@ BOOL winpr_SetThreadpoolThreadMinimum(PTP_POOL ptpp, DWORD cthrdMic)
 
 	while (ArrayList_Count(ptpp->Threads) < ptpp->Minimum)
 	{
-		if (!(thread = CreateThread(NULL, 0,
-				thread_pool_work_func,
-				(void*) ptpp, 0, NULL)))
+		if (!(thread = CreateThread(NULL, 0, thread_pool_work_func, (void*) ptpp, 0, NULL)))
 		{
 			return FALSE;
 		}

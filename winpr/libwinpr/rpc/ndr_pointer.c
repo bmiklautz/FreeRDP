@@ -160,7 +160,8 @@ void NdrpPointerBufferSize(unsigned char* pMemory, PFORMAT_STRING pFormat, PMIDL
 		pfnSizeRoutine(pStubMsg, pMemory, pNextFormat);
 }
 
-PFORMAT_STRING NdrpEmbeddedRepeatPointerBufferSize(PMIDL_STUB_MESSAGE pStubMsg, unsigned char* pMemory, PFORMAT_STRING pFormat, unsigned char** ppMemory)
+PFORMAT_STRING NdrpEmbeddedRepeatPointerBufferSize(PMIDL_STUB_MESSAGE pStubMsg, unsigned char* pMemory,
+                                                   PFORMAT_STRING pFormat, unsigned char** ppMemory)
 {
 	ULONG_PTR MaxCount;
 	unsigned char* Memory;
@@ -222,14 +223,12 @@ PFORMAT_STRING NdrpEmbeddedRepeatPointerBufferSize(PMIDL_STUB_MESSAGE pStubMsg, 
 					MemoryPointer = &pMemory[*(unsigned short*) pFormatNext];
 					NdrpPointerBufferSize(MemoryPointer, pFormatNext + 4, pStubMsg);
 					pFormatNext += 8;
-				}
-				while (pointer_count);
+				} while (pointer_count);
 			}
 
 			pMemory += increment;
 			pStubMsg->Memory += increment;
-		}
-		while (MaxCount);
+		} while (MaxCount);
 
 		Memory = MemoryCopy;
 	}
@@ -239,7 +238,8 @@ PFORMAT_STRING NdrpEmbeddedRepeatPointerBufferSize(PMIDL_STUB_MESSAGE pStubMsg, 
 	return pFormat;
 }
 
-PFORMAT_STRING NdrpEmbeddedPointerBufferSize(PMIDL_STUB_MESSAGE pStubMsg, unsigned char* pMemory, PFORMAT_STRING pFormat)
+PFORMAT_STRING NdrpEmbeddedPointerBufferSize(PMIDL_STUB_MESSAGE pStubMsg, unsigned char* pMemory,
+                                             PFORMAT_STRING pFormat)
 {
 	ULONG_PTR MaxCount;
 	unsigned long Offset;

@@ -28,4 +28,3 @@ int TestEnvironmentMergeEnvironmentStrings(int argc, char* argv[])
 #endif
 	return 0;
 }
-

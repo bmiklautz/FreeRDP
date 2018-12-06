@@ -125,39 +125,33 @@
 
 #include "security.h"
 
-BOOL InitializeSecurityDescriptor(PSECURITY_DESCRIPTOR pSecurityDescriptor, DWORD dwRevision)
-{
-	return TRUE;
-}
+BOOL InitializeSecurityDescriptor(PSECURITY_DESCRIPTOR pSecurityDescriptor, DWORD dwRevision) { return TRUE; }
 
-DWORD GetSecurityDescriptorLength(PSECURITY_DESCRIPTOR pSecurityDescriptor)
-{
-	return 0;
-}
+DWORD GetSecurityDescriptorLength(PSECURITY_DESCRIPTOR pSecurityDescriptor) { return 0; }
 
-BOOL IsValidSecurityDescriptor(PSECURITY_DESCRIPTOR pSecurityDescriptor)
-{
-	return TRUE;
-}
+BOOL IsValidSecurityDescriptor(PSECURITY_DESCRIPTOR pSecurityDescriptor) { return TRUE; }
 
-BOOL GetSecurityDescriptorControl(PSECURITY_DESCRIPTOR pSecurityDescriptor,
-		PSECURITY_DESCRIPTOR_CONTROL pControl, LPDWORD lpdwRevision)
+BOOL GetSecurityDescriptorControl(PSECURITY_DESCRIPTOR pSecurityDescriptor, PSECURITY_DESCRIPTOR_CONTROL pControl,
+                                  LPDWORD lpdwRevision)
 {
 	return TRUE;
 }
 
 BOOL SetSecurityDescriptorControl(PSECURITY_DESCRIPTOR pSecurityDescriptor,
-		SECURITY_DESCRIPTOR_CONTROL ControlBitsOfInterest, SECURITY_DESCRIPTOR_CONTROL ControlBitsToSet)
+                                  SECURITY_DESCRIPTOR_CONTROL ControlBitsOfInterest,
+                                  SECURITY_DESCRIPTOR_CONTROL ControlBitsToSet)
 {
 	return TRUE;
 }
 
-BOOL GetSecurityDescriptorDacl(PSECURITY_DESCRIPTOR pSecurityDescriptor, LPBOOL lpbDaclPresent, PACL* pDacl, LPBOOL lpbDaclDefaulted)
+BOOL GetSecurityDescriptorDacl(PSECURITY_DESCRIPTOR pSecurityDescriptor, LPBOOL lpbDaclPresent, PACL* pDacl,
+                               LPBOOL lpbDaclDefaulted)
 {
 	return TRUE;
 }
 
-BOOL SetSecurityDescriptorDacl(PSECURITY_DESCRIPTOR pSecurityDescriptor, BOOL bDaclPresent, PACL pDacl, BOOL bDaclDefaulted)
+BOOL SetSecurityDescriptorDacl(PSECURITY_DESCRIPTOR pSecurityDescriptor, BOOL bDaclPresent, PACL pDacl,
+                               BOOL bDaclDefaulted)
 {
 	return TRUE;
 }
@@ -182,25 +176,20 @@ BOOL SetSecurityDescriptorOwner(PSECURITY_DESCRIPTOR pSecurityDescriptor, PSID p
 	return TRUE;
 }
 
-DWORD GetSecurityDescriptorRMControl(PSECURITY_DESCRIPTOR SecurityDescriptor, PUCHAR RMControl)
-{
-	return 0;
-}
+DWORD GetSecurityDescriptorRMControl(PSECURITY_DESCRIPTOR SecurityDescriptor, PUCHAR RMControl) { return 0; }
 
-DWORD SetSecurityDescriptorRMControl(PSECURITY_DESCRIPTOR SecurityDescriptor, PUCHAR RMControl)
-{
-	return 0;
-}
+DWORD SetSecurityDescriptorRMControl(PSECURITY_DESCRIPTOR SecurityDescriptor, PUCHAR RMControl) { return 0; }
 
-BOOL GetSecurityDescriptorSacl(PSECURITY_DESCRIPTOR pSecurityDescriptor, LPBOOL lpbSaclPresent, PACL* pSacl, LPBOOL lpbSaclDefaulted)
+BOOL GetSecurityDescriptorSacl(PSECURITY_DESCRIPTOR pSecurityDescriptor, LPBOOL lpbSaclPresent, PACL* pSacl,
+                               LPBOOL lpbSaclDefaulted)
 {
 	return TRUE;
 }
 
-BOOL SetSecurityDescriptorSacl(PSECURITY_DESCRIPTOR pSecurityDescriptor, BOOL bSaclPresent, PACL pSacl, BOOL bSaclDefaulted)
+BOOL SetSecurityDescriptorSacl(PSECURITY_DESCRIPTOR pSecurityDescriptor, BOOL bSaclPresent, PACL pSacl,
+                               BOOL bSaclDefaulted)
 {
 	return TRUE;
 }
 
 #endif
-

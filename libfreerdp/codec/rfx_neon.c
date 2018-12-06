@@ -38,17 +38,16 @@ static __inline void __attribute__((__gnu_inline__, __always_inline__, __artific
 rfx_quantization_decode_block_NEON(INT16* buffer, const int buffer_size, const UINT32 factor)
 {
 	int16x8_t quantFactors = vdupq_n_s16(factor);
-	int16x8_t* buf = (int16x8_t*)buffer;
-	int16x8_t* buf_end = (int16x8_t*)(buffer + buffer_size);
+	int16x8_t* buf = (int16x8_t*) buffer;
+	int16x8_t* buf_end = (int16x8_t*) (buffer + buffer_size);
 
 	do
 	{
-		int16x8_t val = vld1q_s16((INT16*)buf);
+		int16x8_t val = vld1q_s16((INT16*) buf);
 		val = vshlq_s16(val, quantFactors);
-		vst1q_s16((INT16*)buf, val);
+		vst1q_s16((INT16*) buf, val);
 		buf++;
-	}
-	while (buf < buf_end);
+	} while (buf < buf_end);
 }
 
 void rfx_quantization_decode_NEON(INT16* buffer, const UINT32* quantVals)
@@ -64,8 +63,6 @@ void rfx_quantization_decode_NEON(INT16* buffer, const UINT32* quantVals)
 	rfx_quantization_decode_block_NEON(&buffer[3968], 64, quantVals[3] - 1); /* HH3 */
 	rfx_quantization_decode_block_NEON(&buffer[4032], 64, quantVals[0] - 1); /* LL3 */
 }
-
-
 
 static __inline void __attribute__((__gnu_inline__, __always_inline__, __artificial__))
 rfx_dwt_2d_decode_block_horiz_NEON(INT16* l, INT16* h, INT16* dst, int subband_width)
@@ -147,7 +144,8 @@ rfx_dwt_2d_decode_block_vert_NEON(INT16* l, INT16* h, INT16* dst, int subband_wi
 			// dst[2n] = l[n] - ((h[n-1] + h[n] + 1) >> 1);
 			int16x8_t l_n = vld1q_s16(l_ptr);
 			int16x8_t h_n = vld1q_s16(h_ptr);
-			int16x8_t tmp_n = vaddq_s16(h_n, vdupq_n_s16(1));;
+			int16x8_t tmp_n = vaddq_s16(h_n, vdupq_n_s16(1));
+			;
 
 			if (n == 0)
 				tmp_n = vaddq_s16(tmp_n, h_n);
@@ -204,8 +202,8 @@ rfx_dwt_2d_decode_block_vert_NEON(INT16* l, INT16* h, INT16* dst, int subband_wi
 static __inline void __attribute__((__gnu_inline__, __always_inline__, __artificial__))
 rfx_dwt_2d_decode_block_NEON(INT16* buffer, INT16* idwt, int subband_width)
 {
-	INT16* hl, * lh, * hh, * ll;
-	INT16* l_dst, * h_dst;
+	INT16 *hl, *lh, *hh, *ll;
+	INT16 *l_dst, *h_dst;
 	/* Inverse DWT in horizontal direction, results in 2 sub-bands in L, H order in tmp buffer idwt. */
 	/* The 4 sub-bands are stored in HL(0), LH(1), HH(2), LL(3) order. */
 	/* The lower part L uses LL(3) and HL(0). */
@@ -243,4 +241,3 @@ void rfx_init_neon(RFX_CONTEXT* context)
 }
 
 #endif // __ARM_NEON__
-

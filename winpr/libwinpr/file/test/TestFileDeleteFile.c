@@ -4,7 +4,4 @@
 #include <winpr/file.h>
 #include <winpr/windows.h>
 
-int TestFileDeleteFile(int argc, char* argv[])
-{
-	return 0;
-}
+int TestFileDeleteFile(int argc, char* argv[]) { return 0; }

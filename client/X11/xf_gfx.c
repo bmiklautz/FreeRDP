@@ -49,8 +49,7 @@ static UINT xf_OutputUpdate(xfContext* xfc, xfGfxSurface* surface)
 	XSetClipMask(xfc->display, xfc->gc, None);
 	XSetFunction(xfc->display, xfc->gc, GXcopy);
 	XSetFillStyle(xfc->display, xfc->gc, FillSolid);
-	region16_intersect_rect(&(surface->gdi.invalidRegion),
-	                        &(surface->gdi.invalidRegion), &surfaceRect);
+	region16_intersect_rect(&(surface->gdi.invalidRegion), &(surface->gdi.invalidRegion), &surfaceRect);
 
 	if (!(rects = region16_rects(&surface->gdi.invalidRegion, &nbRects)))
 		return CHANNEL_RC_OK;
@@ -66,40 +65,31 @@ static UINT xf_OutputUpdate(xfContext* xfc, xfGfxSurface* surface)
 
 		if (surface->stage)
 		{
-			if (!freerdp_image_copy(surface->stage, gdi->dstFormat,
-			                        surface->stageScanline, nXSrc, nYSrc,
-			                        width, height,
-			                        surface->gdi.data, surface->gdi.format,
-			                        surface->gdi.scanline, nXSrc, nYSrc,
-			                        NULL, FREERDP_FLIP_NONE))
+			if (!freerdp_image_copy(surface->stage, gdi->dstFormat, surface->stageScanline, nXSrc, nYSrc, width, height,
+			                        surface->gdi.data, surface->gdi.format, surface->gdi.scanline, nXSrc, nYSrc, NULL,
+			                        FREERDP_FLIP_NONE))
 				goto fail;
 		}
 
 		if (xfc->remote_app)
 		{
-			XPutImage(xfc->display, xfc->primary, xfc->gc,
-			          surface->image, nXSrc, nYSrc,
-			          nXDst, nYDst, width, height);
+			XPutImage(xfc->display, xfc->primary, xfc->gc, surface->image, nXSrc, nYSrc, nXDst, nYDst, width, height);
 			xf_lock_x11(xfc, FALSE);
 			xf_rail_paint(xfc, nXDst, nYDst, nXDst + width, nYDst + height);
 			xf_unlock_x11(xfc, FALSE);
 		}
 		else
 #ifdef WITH_XRENDER
-			if (xfc->context.settings->SmartSizing
-			    || xfc->context.settings->MultiTouchGestures)
-			{
-				XPutImage(xfc->display, xfc->primary, xfc->gc, surface->image,
-				          nXSrc, nYSrc, nXDst, nYDst, width, height);
-				xf_draw_screen(xfc, nXDst, nYDst, width, height);
-			}
-			else
+		  if (xfc->context.settings->SmartSizing || xfc->context.settings->MultiTouchGestures)
+		{
+			XPutImage(xfc->display, xfc->primary, xfc->gc, surface->image, nXSrc, nYSrc, nXDst, nYDst, width, height);
+			xf_draw_screen(xfc, nXDst, nYDst, width, height);
+		}
+		else
 #endif
-			{
-				XPutImage(xfc->display, xfc->drawable, xfc->gc,
-				          surface->image, nXSrc, nYSrc,
-				          nXDst, nYDst, width, height);
-			}
+		{
+			XPutImage(xfc->display, xfc->drawable, xfc->gc, surface->image, nXSrc, nYSrc, nXDst, nYDst, width, height);
+		}
 	}
 
 	rc = CHANNEL_RC_OK;
@@ -117,7 +107,7 @@ static UINT xf_UpdateSurfaces(RdpgfxClientContext* context)
 	UINT status = CHANNEL_RC_OK;
 	xfGfxSurface* surface;
 	UINT16* pSurfaceIds = NULL;
-	rdpGdi* gdi = (rdpGdi*)context->custom;
+	rdpGdi* gdi = (rdpGdi*) context->custom;
 	xfContext* xfc = (xfContext*) gdi->context;
 
 	if (!gdi)
@@ -150,8 +140,7 @@ static UINT xf_UpdateSurfaces(RdpgfxClientContext* context)
 	return status;
 }
 
-UINT xf_OutputExpose(xfContext* xfc, UINT32 x, UINT32 y,
-                     UINT32 width, UINT32 height)
+UINT xf_OutputExpose(xfContext* xfc, UINT32 x, UINT32 y, UINT32 width, UINT32 height)
 {
 	UINT16 count;
 	UINT32 index;
@@ -191,9 +180,7 @@ UINT xf_OutputExpose(xfContext* xfc, UINT32 x, UINT32 y,
 			intersection.top -= surfaceRect.top;
 			intersection.right -= surfaceRect.left;
 			intersection.bottom -= surfaceRect.top;
-			region16_union_rect(&surface->gdi.invalidRegion,
-			                    &surface->gdi.invalidRegion,
-			                    &intersection);
+			region16_union_rect(&surface->gdi.invalidRegion, &surface->gdi.invalidRegion, &intersection);
 		}
 	}
 
@@ -227,19 +214,17 @@ UINT32 x11_pad_scanline(UINT32 scanline, UINT32 inPad)
 	return scanline;
 }
 
-
 /**
  * Function description
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT xf_CreateSurface(RdpgfxClientContext* context,
-                             const RDPGFX_CREATE_SURFACE_PDU* createSurface)
+static UINT xf_CreateSurface(RdpgfxClientContext* context, const RDPGFX_CREATE_SURFACE_PDU* createSurface)
 {
 	UINT ret = CHANNEL_RC_NO_MEMORY;
 	size_t size;
 	xfGfxSurface* surface;
-	rdpGdi* gdi = (rdpGdi*)context->custom;
+	rdpGdi* gdi = (rdpGdi*) context->custom;
 	xfContext* xfc = (xfContext*) gdi->context;
 	surface = (xfGfxSurface*) calloc(1, sizeof(xfGfxSurface));
 
@@ -269,7 +254,7 @@ static UINT xf_CreateSurface(RdpgfxClientContext* context,
 			break;
 
 		default:
-			WLog_ERR(TAG, "%s: unknown pixelFormat 0x%"PRIx32"", __FUNCTION__, createSurface->pixelFormat);
+			WLog_ERR(TAG, "%s: unknown pixelFormat 0x%" PRIx32 "", __FUNCTION__, createSurface->pixelFormat);
 			ret = ERROR_INTERNAL_ERROR;
 			goto out_free;
 	}
@@ -277,7 +262,7 @@ static UINT xf_CreateSurface(RdpgfxClientContext* context,
 	surface->gdi.scanline = surface->gdi.width * GetBytesPerPixel(surface->gdi.format);
 	surface->gdi.scanline = x11_pad_scanline(surface->gdi.scanline, xfc->scanline_pad);
 	size = surface->gdi.scanline * surface->gdi.height;
-	surface->gdi.data = (BYTE*)_aligned_malloc(size, 16);
+	surface->gdi.data = (BYTE*) _aligned_malloc(size, 16);
 
 	if (!surface->gdi.data)
 	{
@@ -289,9 +274,9 @@ static UINT xf_CreateSurface(RdpgfxClientContext* context,
 
 	if (AreColorFormatsEqualNoAlpha(gdi->dstFormat, surface->gdi.format))
 	{
-		surface->image = XCreateImage(xfc->display, xfc->visual, xfc->depth, ZPixmap, 0,
-		                              (char*) surface->gdi.data, surface->gdi.width, surface->gdi.height,
-		                              xfc->scanline_pad, surface->gdi.scanline);
+		surface->image = XCreateImage(xfc->display, xfc->visual, xfc->depth, ZPixmap, 0, (char*) surface->gdi.data,
+		                              surface->gdi.width, surface->gdi.height, xfc->scanline_pad,
+		                              surface->gdi.scanline);
 	}
 	else
 	{
@@ -309,10 +294,9 @@ static UINT xf_CreateSurface(RdpgfxClientContext* context,
 		}
 
 		ZeroMemory(surface->stage, size);
-		surface->image = XCreateImage(xfc->display, xfc->visual, xfc->depth,
-		                              ZPixmap, 0, (char*) surface->stage,
-		                              surface->gdi.width, surface->gdi.height,
-		                              xfc->scanline_pad, surface->stageScanline);
+		surface->image = XCreateImage(xfc->display, xfc->visual, xfc->depth, ZPixmap, 0, (char*) surface->stage,
+		                              surface->gdi.width, surface->gdi.height, xfc->scanline_pad,
+		                              surface->stageScanline);
 	}
 
 	if (!surface->image)
@@ -350,15 +334,13 @@ out_free:
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT xf_DeleteSurface(RdpgfxClientContext* context,
-                             const RDPGFX_DELETE_SURFACE_PDU* deleteSurface)
+static UINT xf_DeleteSurface(RdpgfxClientContext* context, const RDPGFX_DELETE_SURFACE_PDU* deleteSurface)
 {
 	rdpCodecs* codecs = NULL;
 	xfGfxSurface* surface = NULL;
 	UINT status;
 	EnterCriticalSection(&context->mux);
-	surface = (xfGfxSurface*) context->GetSurfaceData(context,
-	          deleteSurface->surfaceId);
+	surface = (xfGfxSurface*) context->GetSurfaceData(context, deleteSurface->surfaceId);
 
 	if (surface)
 	{
@@ -377,8 +359,7 @@ static UINT xf_DeleteSurface(RdpgfxClientContext* context,
 	status = context->SetSurfaceData(context, deleteSurface->surfaceId, NULL);
 
 	if (codecs && codecs->progressive)
-		progressive_delete_surface_context(codecs->progressive,
-		                                   deleteSurface->surfaceId);
+		progressive_delete_surface_context(codecs->progressive, deleteSurface->surfaceId);
 
 	LeaveCriticalSection(&context->mux);
 	return status;

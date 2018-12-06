@@ -1,21 +1,21 @@
 /**
-* FreeRDP: A Remote Desktop Protocol Client
-* FreeRDP Windows Server
-*
-* Copyright 2012 Corey Clayton <can.of.tuna@gmail.com>
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * FreeRDP: A Remote Desktop Protocol Client
+ * FreeRDP Windows Server
+ *
+ * Copyright 2012 Corey Clayton <can.of.tuna@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -36,8 +36,7 @@
 #include <freerdp/log.h>
 #define TAG SERVER_TAG("windows")
 
-#define SERVER_KEY "Software\\"FREERDP_VENDOR_STRING"\\" \
-	FREERDP_PRODUCT_STRING"\\Server"
+#define SERVER_KEY "Software\\" FREERDP_VENDOR_STRING "\\" FREERDP_PRODUCT_STRING "\\Server"
 
 static wfInfo* wfInfoInstance = NULL;
 static int _IDcount = 0;
@@ -151,28 +150,24 @@ wfInfo* wf_info_init()
 			return NULL;
 		}
 
-		//Set FPS
+		// Set FPS
 		wfi->framesPerSecond = FREERDP_SERVER_WIN_INFO_DEFAULT_FPS;
-		status = RegOpenKeyExA(HKEY_LOCAL_MACHINE, SERVER_KEY, 0,
-		                       KEY_READ | KEY_WOW64_64KEY, &hKey);
+		status = RegOpenKeyExA(HKEY_LOCAL_MACHINE, SERVER_KEY, 0, KEY_READ | KEY_WOW64_64KEY, &hKey);
 
 		if (status == ERROR_SUCCESS)
 		{
-			if (RegQueryValueEx(hKey, _T("FramesPerSecond"), NULL, &dwType, (BYTE*) &dwValue,
-			                    &dwSize) == ERROR_SUCCESS)
+			if (RegQueryValueEx(hKey, _T("FramesPerSecond"), NULL, &dwType, (BYTE*) &dwValue, &dwSize) == ERROR_SUCCESS)
 				wfi->framesPerSecond = dwValue;
 		}
 
 		RegCloseKey(hKey);
-		//Set input toggle
+		// Set input toggle
 		wfi->input_disabled = FALSE;
-		status = RegOpenKeyExA(HKEY_LOCAL_MACHINE, SERVER_KEY,
-		                       0, KEY_READ | KEY_WOW64_64KEY, &hKey);
+		status = RegOpenKeyExA(HKEY_LOCAL_MACHINE, SERVER_KEY, 0, KEY_READ | KEY_WOW64_64KEY, &hKey);
 
 		if (status == ERROR_SUCCESS)
 		{
-			if (RegQueryValueEx(hKey, _T("DisableInput"), NULL, &dwType, (BYTE*) &dwValue,
-			                    &dwSize) == ERROR_SUCCESS)
+			if (RegQueryValueEx(hKey, _T("DisableInput"), NULL, &dwType, (BYTE*) &dwValue, &dwSize) == ERROR_SUCCESS)
 			{
 				if (dwValue != 0)
 					wfi->input_disabled = TRUE;
@@ -212,7 +207,7 @@ BOOL wf_info_peer_register(wfInfo* wfi, wfPeerContext* context)
 	if (!(context->updateEvent = CreateEvent(NULL, TRUE, FALSE, NULL)))
 		goto fail_update_event;
 
-	//get the offset of the top left corner of selected screen
+	// get the offset of the top left corner of selected screen
 	EnumDisplayMonitors(NULL, NULL, wf_info_monEnumCB, 0);
 	_IDcount = 0;
 #ifdef WITH_DXGI_1_2
@@ -228,10 +223,10 @@ BOOL wf_info_peer_register(wfInfo* wfi, wfPeerContext* context)
 
 #endif
 
-	//look through the array of peers until an empty slot
+	// look through the array of peers until an empty slot
 	for (i = 0; i < FREERDP_SERVER_WIN_INFO_MAXPEERS; ++i)
 	{
-		//empty index will be our peer id
+		// empty index will be our peer id
 		if (wfi->peers[i] == NULL)
 		{
 			peerId = i;
@@ -317,7 +312,7 @@ void wf_info_find_invalid_region(wfInfo* wfi)
 	{
 		LPRECT lpR = &buf->buffer->pointrect[i].rect;
 
-		//need to make sure we only get updates from the selected screen
+		// need to make sure we only get updates from the selected screen
 		if ((lpR->left >= wfi->servscreen_xoffset) &&
 		    (lpR->right <= (wfi->servscreen_xoffset + wfi->servscreen_width)) &&
 		    (lpR->top >= wfi->servscreen_yoffset) &&
@@ -345,7 +340,8 @@ void wf_info_find_invalid_region(wfInfo* wfi)
 	if (wfi->invalid.bottom >= wfi->servscreen_height)
 		wfi->invalid.bottom = wfi->servscreen_height - 1;
 
-	//WLog_DBG(TAG, "invalid region: (%"PRId32", %"PRId32"), (%"PRId32", %"PRId32")", wfi->invalid.left, wfi->invalid.top, wfi->invalid.right, wfi->invalid.bottom);
+	// WLog_DBG(TAG, "invalid region: (%"PRId32", %"PRId32"), (%"PRId32", %"PRId32")", wfi->invalid.left,
+	// wfi->invalid.top, wfi->invalid.right, wfi->invalid.bottom);
 }
 
 void wf_info_clear_invalid_region(wfInfo* wfi)
@@ -359,10 +355,7 @@ void wf_info_invalidate_full_screen(wfInfo* wfi)
 	SetRect(&wfi->invalid, 0, 0, wfi->servscreen_width, wfi->servscreen_height);
 }
 
-BOOL wf_info_have_invalid_region(wfInfo* wfi)
-{
-	return IsRectEmpty(&wfi->invalid);
-}
+BOOL wf_info_have_invalid_region(wfInfo* wfi) { return IsRectEmpty(&wfi->invalid); }
 
 void wf_info_getScreenData(wfInfo* wfi, long* width, long* height, BYTE** pBits, int* pitch)
 {
@@ -378,14 +371,13 @@ void wf_info_getScreenData(wfInfo* wfi, long* width, long* height, BYTE** pBits,
 		*width += 1;
 		*height += 1;
 		offset = (4 * wfi->invalid.left) + (wfi->invalid.top * wfi->virtscreen_width * 4);
-		*pBits = ((BYTE*)(changes->Userbuffer)) + offset;
+		*pBits = ((BYTE*) (changes->Userbuffer)) + offset;
 		*pitch = wfi->virtscreen_width * 4;
 	}
 #endif
 }
 
-BOOL CALLBACK wf_info_monEnumCB(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor,
-                                LPARAM dwData)
+BOOL CALLBACK wf_info_monEnumCB(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData)
 {
 	wfInfo* wfi;
 	wfi = wf_info_get_instance();

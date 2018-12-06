@@ -119,14 +119,13 @@ static ssize_t recvmsg_cloexec_fallback(int sockfd, struct msghdr* msg, int flag
 
 	for (; cmsg != NULL; cmsg = CMSG_NXTHDR(msg, cmsg))
 	{
-		if (cmsg->cmsg_level != SOL_SOCKET ||
-		    cmsg->cmsg_type != SCM_RIGHTS)
+		if (cmsg->cmsg_level != SOL_SOCKET || cmsg->cmsg_type != SCM_RIGHTS)
 			continue;
 
 		data = CMSG_DATA(cmsg);
-		end = (int*)(data + cmsg->cmsg_len - CMSG_LEN(0));
+		end = (int*) (data + cmsg->cmsg_len - CMSG_LEN(0));
 
-		for (fd = (int*)data; fd < end; ++fd)
+		for (fd = (int*) data; fd < end; ++fd)
 			*fd = set_cloexec_or_close(*fd);
 	}
 

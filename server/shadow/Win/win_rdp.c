@@ -28,15 +28,13 @@
 
 #define TAG SERVER_TAG("shadow.win")
 
-static void shw_OnChannelConnectedEventHandler(void* context,
-        ChannelConnectedEventArgs* e)
+static void shw_OnChannelConnectedEventHandler(void* context, ChannelConnectedEventArgs* e)
 {
 	shwContext* shw = (shwContext*) context;
 	WLog_INFO(TAG, "OnChannelConnected: %s", e->name);
 }
 
-static void shw_OnChannelDisconnectedEventHandler(void* context,
-        ChannelDisconnectedEventArgs* e)
+static void shw_OnChannelDisconnectedEventHandler(void* context, ChannelDisconnectedEventArgs* e)
 {
 	shwContext* shw = (shwContext*) context;
 	WLog_INFO(TAG, "OnChannelDisconnected: %s", e->name);
@@ -71,8 +69,7 @@ static BOOL shw_end_paint(rdpContext* context)
 		invalidRect.top = cinvalid[index].y;
 		invalidRect.right = cinvalid[index].x + cinvalid[index].w;
 		invalidRect.bottom = cinvalid[index].y + cinvalid[index].h;
-		region16_union_rect(&(surface->invalidRegion), &(surface->invalidRegion),
-		                    &invalidRect);
+		region16_union_rect(&(surface->invalidRegion), &(surface->invalidRegion), &invalidRect);
 	}
 
 	SetEvent(subsystem->RdpUpdateEnterEvent);
@@ -81,39 +78,29 @@ static BOOL shw_end_paint(rdpContext* context)
 	return TRUE;
 }
 
-BOOL shw_desktop_resize(rdpContext* context)
-{
-	return TRUE;
-}
+BOOL shw_desktop_resize(rdpContext* context) { return TRUE; }
 
-static BOOL shw_surface_frame_marker(rdpContext* context,
-                                     const SURFACE_FRAME_MARKER* surfaceFrameMarker)
+static BOOL shw_surface_frame_marker(rdpContext* context, const SURFACE_FRAME_MARKER* surfaceFrameMarker)
 {
 	shwContext* shw = (shwContext*) context;
 	return TRUE;
 }
 
-static BOOL shw_authenticate(freerdp* instance, char** username, char** password,
-                             char** domain)
-{
-	return TRUE;
-}
+static BOOL shw_authenticate(freerdp* instance, char** username, char** password, char** domain) { return TRUE; }
 
-static DWORD shw_verify_certificate(freerdp* instance, const char* common_name,
-                                    const char* subject, const char* issuer,
+static DWORD shw_verify_certificate(freerdp* instance, const char* common_name, const char* subject, const char* issuer,
                                     const char* fingerprint, BOOL host_mismatch)
 {
 	return 1;
 }
 
-static int shw_verify_x509_certificate(freerdp* instance, BYTE* data, int length,
-                                       const char* hostname, int port, DWORD flags)
+static int shw_verify_x509_certificate(freerdp* instance, BYTE* data, int length, const char* hostname, int port,
+                                       DWORD flags)
 {
 	return 1;
 }
 
-static void shw_OnConnectionResultEventHandler(void* context,
-        ConnectionResultEventArgs* e)
+static void shw_OnConnectionResultEventHandler(void* context, ConnectionResultEventArgs* e)
 {
 	shwContext* shw = (shwContext*) context;
 	WLog_INFO(TAG, "OnConnectionResult: %d", e->result);
@@ -124,12 +111,9 @@ static BOOL shw_pre_connect(freerdp* instance)
 	shwContext* shw;
 	rdpContext* context = instance->context;
 	shw = (shwContext*) context;
-	PubSub_SubscribeConnectionResult(context->pubSub,
-	                                 shw_OnConnectionResultEventHandler);
-	PubSub_SubscribeChannelConnected(context->pubSub,
-	                                 shw_OnChannelConnectedEventHandler);
-	PubSub_SubscribeChannelDisconnected(context->pubSub,
-	                                    shw_OnChannelDisconnectedEventHandler);
+	PubSub_SubscribeConnectionResult(context->pubSub, shw_OnConnectionResultEventHandler);
+	PubSub_SubscribeChannelConnected(context->pubSub, shw_OnChannelConnectedEventHandler);
+	PubSub_SubscribeChannelDisconnected(context->pubSub, shw_OnChannelDisconnectedEventHandler);
 
 	if (!freerdp_client_load_addins(context->channels, instance->settings))
 		return FALSE;
@@ -210,8 +194,7 @@ static DWORD WINAPI shw_client_thread(LPVOID arg)
 		for (index = 0; index < wcount; index++)
 			fds[fds_count++] = wfds[index];
 
-		if (MsgWaitForMultipleObjects(fds_count, fds, FALSE, 1000,
-		                              QS_ALLINPUT) == WAIT_FAILED)
+		if (MsgWaitForMultipleObjects(fds_count, fds, FALSE, 1000, QS_ALLINPUT) == WAIT_FAILED)
 		{
 			WLog_ERR(TAG, "MsgWaitForMultipleObjects failure: 0x%08lX", GetLastError());
 			break;
@@ -244,14 +227,9 @@ static DWORD WINAPI shw_client_thread(LPVOID arg)
  * Client Interface
  */
 
-static BOOL shw_freerdp_client_global_init(void)
-{
-	return TRUE;
-}
+static BOOL shw_freerdp_client_global_init(void) { return TRUE; }
 
-static void shw_freerdp_client_global_uninit(void)
-{
-}
+static void shw_freerdp_client_global_uninit(void) {}
 
 static int shw_freerdp_client_start(rdpContext* context)
 {
@@ -259,8 +237,7 @@ static int shw_freerdp_client_start(rdpContext* context)
 	freerdp* instance = context->instance;
 	shw = (shwContext*) context;
 
-	if (!(shw->thread = CreateThread(NULL, 0, shw_client_thread,
-	                                 instance, 0, NULL)))
+	if (!(shw->thread = CreateThread(NULL, 0, shw_client_thread, instance, 0, NULL)))
 	{
 		WLog_ERR(TAG, "Failed to create thread");
 		return -1;

@@ -26,20 +26,20 @@ int TestAlignment(int argc, char* argv[])
 
 	if (((size_t) ptr % alignment) != 0)
 	{
-		printf("This pointer, %p, is not aligned on %"PRIuz"\n", ptr, alignment);
+		printf("This pointer, %p, is not aligned on %" PRIuz "\n", ptr, alignment);
 		return -1;
 	}
 
 	/* _aligned_realloc */
-	
+
 	ptr = _aligned_realloc(ptr, 200, alignment);
-	
+
 	if (((size_t) ptr % alignment) != 0)
 	{
-		printf("This pointer, %p, is not aligned on %"PRIuz"\n", ptr, alignment);
+		printf("This pointer, %p, is not aligned on %" PRIuz "\n", ptr, alignment);
 		return -1;
 	}
-	
+
 	_aligned_free(ptr);
 
 	/* _aligned_offset_malloc */
@@ -54,14 +54,15 @@ int TestAlignment(int argc, char* argv[])
 
 	if (((((size_t) ptr) + offset) % alignment) != 0)
 	{
-		printf("This pointer, %p, does not satisfy offset %"PRIuz" and alignment %"PRIuz"\n", ptr, offset, alignment);
+		printf("This pointer, %p, does not satisfy offset %" PRIuz " and alignment %" PRIuz "\n", ptr, offset,
+		       alignment);
 		return -1;
 	}
 
 	/* _aligned_offset_realloc */
 
 	ptr = _aligned_offset_realloc(ptr, 200, alignment, offset);
-	
+
 	if (ptr == NULL)
 	{
 		printf("Error reallocating aligned offset memory.");
@@ -70,7 +71,8 @@ int TestAlignment(int argc, char* argv[])
 
 	if (((((size_t) ptr) + offset) % alignment) != 0)
 	{
-		printf("This pointer, %p, does not satisfy offset %"PRIuz" and alignment %"PRIuz"\n", ptr, offset, alignment);
+		printf("This pointer, %p, does not satisfy offset %" PRIuz " and alignment %" PRIuz "\n", ptr, offset,
+		       alignment);
 		return -1;
 	}
 
@@ -79,4 +81,3 @@ int TestAlignment(int argc, char* argv[])
 
 	return 0;
 }
-

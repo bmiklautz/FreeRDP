@@ -47,4 +47,3 @@ void rdtk_text_field_free(rdtkTextField* textField);
 #endif
 
 #endif /* RDTK_TEXT_FIELD_PRIVATE_H */
-

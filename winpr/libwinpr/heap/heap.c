@@ -30,10 +30,7 @@
 
 #ifndef _WIN32
 
-HANDLE GetProcessHeap(void)
-{
-	return NULL;
-}
+HANDLE GetProcessHeap(void) { return NULL; }
 
 LPVOID HeapAlloc(HANDLE hHeap, DWORD dwFlags, SIZE_T dwBytes)
 {

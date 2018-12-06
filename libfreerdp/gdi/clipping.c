@@ -34,8 +34,7 @@
 
 #include "clipping.h"
 
-BOOL gdi_SetClipRgn(HGDI_DC hdc, INT32 nXLeft, INT32 nYLeft, INT32 nWidth,
-                    INT32 nHeight)
+BOOL gdi_SetClipRgn(HGDI_DC hdc, INT32 nXLeft, INT32 nYLeft, INT32 nWidth, INT32 nHeight)
 {
 	return gdi_SetRgn(hdc->clip, nXLeft, nYLeft, nWidth, nHeight);
 }
@@ -47,10 +46,7 @@ BOOL gdi_SetClipRgn(HGDI_DC hdc, INT32 nXLeft, INT32 nYLeft, INT32 nWidth,
  * @return clipping region
  */
 
-HGDI_RGN gdi_GetClipRgn(HGDI_DC hdc)
-{
-	return hdc->clip;
-}
+HGDI_RGN gdi_GetClipRgn(HGDI_DC hdc) { return hdc->clip; }
 
 /**
  * Set the current clipping region to null.
@@ -77,8 +73,7 @@ BOOL gdi_SetNullClipRgn(HGDI_DC hdc)
  * @return nonzero if there is something to draw, 0 otherwise
  */
 
-BOOL gdi_ClipCoords(HGDI_DC hdc, INT32* x, INT32* y, INT32* w, INT32* h,
-                    INT32* srcx, INT32* srcy)
+BOOL gdi_ClipCoords(HGDI_DC hdc, INT32* x, INT32* y, INT32* w, INT32* h, INT32* srcx, INT32* srcy)
 {
 	GDI_RECT bmp;
 	GDI_RECT clip;
@@ -124,8 +119,8 @@ BOOL gdi_ClipCoords(HGDI_DC hdc, INT32* x, INT32* y, INT32* w, INT32* h,
 
 	gdi_CRgnToRect(*x, *y, *w, *h, &coords);
 
-	if (coords.right >= clip.left && coords.left <= clip.right &&
-	    coords.bottom >= clip.top && coords.top <= clip.bottom)
+	if (coords.right >= clip.left && coords.left <= clip.right && coords.bottom >= clip.top &&
+	    coords.top <= clip.bottom)
 	{
 		/* coordinates overlap with clipping region */
 		if (coords.left < clip.left)

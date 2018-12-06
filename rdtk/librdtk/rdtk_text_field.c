@@ -24,8 +24,8 @@
 
 #include "rdtk_text_field.h"
 
-int rdtk_text_field_draw(rdtkSurface* surface, int nXDst, int nYDst, int nWidth, int nHeight,
-		rdtkTextField* textField, const char* text)
+int rdtk_text_field_draw(rdtkSurface* surface, int nXDst, int nYDst, int nWidth, int nHeight, rdtkTextField* textField,
+                         const char* text)
 {
 	int offsetX;
 	int offsetY;
@@ -85,10 +85,7 @@ rdtkTextField* rdtk_text_field_new(rdtkEngine* engine, rdtkNinePatch* ninePatch)
 	return textField;
 }
 
-void rdtk_text_field_free(rdtkTextField* textField)
-{
-	free(textField);
-}
+void rdtk_text_field_free(rdtkTextField* textField) { free(textField); }
 
 int rdtk_text_field_engine_init(rdtkEngine* engine)
 {

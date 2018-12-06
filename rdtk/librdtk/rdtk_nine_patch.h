@@ -71,4 +71,3 @@ void rdtk_nine_patch_free(rdtkNinePatch* ninePatch);
 #endif
 
 #endif /* RDTK_NINE_PATCH_PRIVATE_H */
-

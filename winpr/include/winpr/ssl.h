@@ -31,7 +31,7 @@
 #define WINPR_SSL_CLEANUP_GLOBAL 0x01
 #define WINPR_SSL_CLEANUP_THREAD 0x02
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -40,9 +40,8 @@ WINPR_API BOOL winpr_CleanupSSL(DWORD flags);
 
 WINPR_API BOOL winpr_FIPSMode(void);
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 }
 #endif
 
-#endif	/* WINPR_SSL_H */
-
+#endif /* WINPR_SSL_H */

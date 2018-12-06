@@ -81,20 +81,11 @@
 
 #endif
 
-DLL_DIRECTORY_COOKIE AddDllDirectory(PCWSTR NewDirectory)
-{
-	return NULL;
-}
+DLL_DIRECTORY_COOKIE AddDllDirectory(PCWSTR NewDirectory) { return NULL; }
 
-BOOL RemoveDllDirectory(DLL_DIRECTORY_COOKIE Cookie)
-{
-	return TRUE;
-}
+BOOL RemoveDllDirectory(DLL_DIRECTORY_COOKIE Cookie) { return TRUE; }
 
-BOOL SetDefaultDllDirectories(DWORD DirectoryFlags)
-{
-	return TRUE;
-}
+BOOL SetDefaultDllDirectories(DWORD DirectoryFlags) { return TRUE; }
 
 HMODULE LoadLibraryA(LPCSTR lpLibFileName)
 {
@@ -151,14 +142,11 @@ HMODULE LoadLibraryExA(LPCSTR lpLibFileName, HANDLE hFile, DWORD dwFlags)
 
 	return library;
 #else
-	return (HMODULE)NULL;
+	return (HMODULE) NULL;
 #endif
 }
 
-HMODULE LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags)
-{
-	return (HMODULE) NULL;
-}
+HMODULE LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) { return (HMODULE) NULL; }
 
 #endif
 
@@ -189,15 +177,9 @@ BOOL FreeLibrary(HMODULE hLibModule)
 	return TRUE;
 }
 
-HMODULE GetModuleHandleA(LPCSTR lpModuleName)
-{
-	return NULL;
-}
+HMODULE GetModuleHandleA(LPCSTR lpModuleName) { return NULL; }
 
-HMODULE GetModuleHandleW(LPCWSTR lpModuleName)
-{
-	return NULL;
-}
+HMODULE GetModuleHandleW(LPCWSTR lpModuleName) { return NULL; }
 
 /**
  * GetModuleFileName:
@@ -294,4 +276,3 @@ DWORD GetModuleFileNameA(HMODULE hModule, LPSTR lpFilename, DWORD nSize)
 }
 
 #endif
-

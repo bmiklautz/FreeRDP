@@ -55,10 +55,7 @@ int Stack_Count(wStack* stack)
  * Gets a value indicating whether access to the Stack is synchronized (thread safe).
  */
 
-BOOL Stack_IsSynchronized(wStack* stack)
-{
-	return stack->synchronized;
-}
+BOOL Stack_IsSynchronized(wStack* stack) { return stack->synchronized; }
 
 /**
  * Methods
@@ -185,11 +182,7 @@ void* Stack_Peek(wStack* stack)
 	return obj;
 }
 
-
-static BOOL default_stack_equals(const void* obj1, const void* obj2)
-{
-	return (obj1 == obj2);
-}
+static BOOL default_stack_equals(const void* obj1, const void* obj2) { return (obj1 == obj2); }
 
 /**
  * Construction, Destruction
@@ -198,7 +191,7 @@ static BOOL default_stack_equals(const void* obj1, const void* obj2)
 wStack* Stack_New(BOOL synchronized)
 {
 	wStack* stack = NULL;
-	stack = (wStack*)calloc(1, sizeof(wStack));
+	stack = (wStack*) calloc(1, sizeof(wStack));
 
 	if (!stack)
 		return NULL;

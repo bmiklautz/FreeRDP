@@ -30,7 +30,7 @@ static BOOL test_overlaps(void)
 	int nchunks, i, j, k, counter = 0;
 
 	for (i = 0; i < sizeof(bytes); i++)
-		bytes[i] = (BYTE)i;
+		bytes[i] = (BYTE) i;
 
 	ringbuffer_init(&rb, 5);
 	if (!ringbuffer_write(&rb, bytes, 4)) /* [0123.] */
@@ -50,7 +50,7 @@ static BOOL test_overlaps(void)
 	{
 		for (k = 0; k < (int) chunks[i].size; k++, j++)
 		{
-			if (chunks[i].data[k] != (BYTE)j)
+			if (chunks[i].data[k] != (BYTE) j)
 				goto error;
 		}
 	}
@@ -77,14 +77,13 @@ error:
 	return FALSE;
 }
 
-
 int TestRingBuffer(int argc, char* argv[])
 {
 	RingBuffer ringBuffer;
 	int testNo = 0;
-	BYTE *tmpBuf;
-	BYTE *rb_ptr;
-	int i/*, chunkNb, counter*/;
+	BYTE* tmpBuf;
+	BYTE* rb_ptr;
+	int i /*, chunkNb, counter*/;
 	DataChunk chunks[2];
 
 	if (!ringbuffer_init(&ringBuffer, 10))
@@ -93,16 +92,16 @@ int TestRingBuffer(int argc, char* argv[])
 		return -1;
 	}
 
-	tmpBuf = (BYTE *)malloc(50);
+	tmpBuf = (BYTE*) malloc(50);
 	if (!tmpBuf)
 		return -1;
 
 	for (i = 0; i < 50; i++)
-		tmpBuf[i] = (char)i;
+		tmpBuf[i] = (char) i;
 
 	fprintf(stderr, "%d: basic tests...", ++testNo);
 	if (!ringbuffer_write(&ringBuffer, tmpBuf, 5) || !ringbuffer_write(&ringBuffer, tmpBuf, 5) ||
-			!ringbuffer_write(&ringBuffer, tmpBuf, 5))
+	    !ringbuffer_write(&ringBuffer, tmpBuf, 5))
 	{
 		fprintf(stderr, "error when writing bytes\n");
 		return -1;
@@ -110,7 +109,7 @@ int TestRingBuffer(int argc, char* argv[])
 
 	if (ringbuffer_used(&ringBuffer) != 15)
 	{
-		fprintf(stderr, "invalid used size got %"PRIuz" when I would expect 15\n", ringbuffer_used(&ringBuffer));
+		fprintf(stderr, "invalid used size got %" PRIuz " when I would expect 15\n", ringbuffer_used(&ringBuffer));
 		return -1;
 	}
 
@@ -126,22 +125,21 @@ int TestRingBuffer(int argc, char* argv[])
 	{
 		if (chunks[0].data[i] != i % 5)
 		{
-			fprintf(stderr, "invalid byte at %d, got %"PRIu8" instead of %d\n", i, chunks[0].data[i], i % 5);
+			fprintf(stderr, "invalid byte at %d, got %" PRIu8 " instead of %d\n", i, chunks[0].data[i], i % 5);
 			return -1;
 		}
 	}
 
 	if (ringbuffer_used(&ringBuffer) != 5)
 	{
-		fprintf(stderr, "invalid used size after read got %"PRIuz" when I would expect 5\n", ringbuffer_used(&ringBuffer));
+		fprintf(stderr, "invalid used size after read got %" PRIuz " when I would expect 5\n",
+		        ringbuffer_used(&ringBuffer));
 		return -1;
 	}
 
 	/* write some more bytes to have writePtr < readPtr and data splitted in 2 chunks */
-	if (!ringbuffer_write(&ringBuffer, tmpBuf, 6) ||
-			ringbuffer_peek(&ringBuffer, chunks, 11) != 2 ||
-			chunks[0].size != 10 ||
-			chunks[1].size != 1)
+	if (!ringbuffer_write(&ringBuffer, tmpBuf, 6) || ringbuffer_peek(&ringBuffer, chunks, 11) != 2 ||
+	    chunks[0].size != 10 || chunks[1].size != 1)
 	{
 		fprintf(stderr, "invalid read of splitted data\n");
 		return -1;
@@ -176,7 +174,7 @@ int TestRingBuffer(int argc, char* argv[])
 			return -1;
 		}
 
-		//ringbuffer_commit_read_bytes(&ringBuffer, 25);
+		// ringbuffer_commit_read_bytes(&ringBuffer, 25);
 	}
 
 	for (i = 0; i < 1000; i++)
@@ -184,15 +182,14 @@ int TestRingBuffer(int argc, char* argv[])
 
 	for (i = 0; i < 1000; i++)
 		ringbuffer_commit_read_bytes(&ringBuffer, 25);
-
 
 	if (ringbuffer_capacity(&ringBuffer) != 10)
 	{
-		fprintf(stderr, "not the expected capacity, have %"PRIuz" and expects 10\n", ringbuffer_capacity(&ringBuffer));
+		fprintf(stderr, "not the expected capacity, have %" PRIuz " and expects 10\n",
+		        ringbuffer_capacity(&ringBuffer));
 		return -1;
 	}
 	fprintf(stderr, "ok\n");
-
 
 	fprintf(stderr, "%d: free size is correctly computed...", ++testNo);
 	for (i = 0; i < 1000; i++)
@@ -221,4 +218,3 @@ int TestRingBuffer(int argc, char* argv[])
 	free(tmpBuf);
 	return 0;
 }
-

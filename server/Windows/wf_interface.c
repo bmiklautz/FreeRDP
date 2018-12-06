@@ -41,8 +41,7 @@
 
 #define TAG SERVER_TAG("windows")
 
-#define SERVER_KEY "Software\\"FREERDP_VENDOR_STRING"\\" \
-		FREERDP_PRODUCT_STRING"\\Server"
+#define SERVER_KEY "Software\\" FREERDP_VENDOR_STRING "\\" FREERDP_PRODUCT_STRING "\\Server"
 
 cbCallback cbEvent;
 
@@ -64,9 +63,8 @@ int get_screen_info(int id, _TCHAR* name, int* width, int* height, int* bpp)
 		*width = GetDeviceCaps(dc, HORZRES);
 		*height = GetDeviceCaps(dc, VERTRES);
 		*bpp = GetDeviceCaps(dc, BITSPIXEL);
-		//ReleaseDC(NULL, dc);
+		// ReleaseDC(NULL, dc);
 		DeleteDC(dc);
-
 	}
 	else
 	{
@@ -110,7 +108,7 @@ static DWORD WINAPI wf_server_main_loop(LPVOID lpParam)
 	ZeroMemory(rfds, sizeof(rfds));
 	instance = (freerdp_listener*) lpParam;
 
-	while(wfi->force_all_disconnect == FALSE)
+	while (wfi->force_all_disconnect == FALSE)
 	{
 		rcount = 0;
 
@@ -125,7 +123,7 @@ static DWORD WINAPI wf_server_main_loop(LPVOID lpParam)
 
 		for (i = 0; i < rcount; i++)
 		{
-			fds = (int)(long)(rfds[i]);
+			fds = (int) (long) (rfds[i]);
 
 			if (fds > max_fds)
 				max_fds = fds;
@@ -135,7 +133,6 @@ static DWORD WINAPI wf_server_main_loop(LPVOID lpParam)
 
 		if (max_fds == 0)
 			break;
-
 
 		select(max_fds + 1, &rfds_set, NULL, NULL, NULL);
 
@@ -160,8 +157,7 @@ BOOL wfreerdp_server_start(wfServer* server)
 	server->instance->PeerAccepted = wf_peer_accepted;
 	instance = server->instance;
 
-	wf_settings_read_dword(HKEY_LOCAL_MACHINE, SERVER_KEY,
-				_T("DefaultPort"), &server->port);
+	wf_settings_read_dword(HKEY_LOCAL_MACHINE, SERVER_KEY, _T("DefaultPort"), &server->port);
 
 	if (!instance->Open(instance, NULL, (UINT16) server->port))
 		return FALSE;
@@ -241,7 +237,7 @@ UINT32 wfreerdp_server_num_peers()
 	return wfi->peerCount;
 }
 
-UINT32 wfreerdp_server_get_peer_hostname(int pId, wchar_t * dstStr)
+UINT32 wfreerdp_server_get_peer_hostname(int pId, wchar_t* dstStr)
 {
 	wfInfo* wfi;
 	freerdp_peer* peer;
@@ -296,7 +292,6 @@ BOOL wfreerdp_server_peer_is_connected(int pId)
 		return FALSE;
 	peer = wfi->peers[pId];
 
-
 	if (peer)
 	{
 		return peer->connected;
@@ -347,14 +342,10 @@ BOOL wfreerdp_server_peer_is_authenticated(int pId)
 	}
 }
 
-void wfreerdp_server_register_callback_event(cbCallback cb)
-{
-	cbEvent = cb;
-}
+void wfreerdp_server_register_callback_event(cbCallback cb) { cbEvent = cb; }
 
 void wfreerdp_server_peer_callback_event(int pId, UINT32 eType)
 {
 	if (cbEvent)
 		cbEvent(pId, eType);
 }
-

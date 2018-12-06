@@ -57,10 +57,7 @@ struct _wLinkedList
  * Gets the number of nodes actually contained in the LinkedList.
  */
 
-int LinkedList_Count(wLinkedList* list)
-{
-	return list->count;
-}
+int LinkedList_Count(wLinkedList* list) { return list->count; }
 
 /**
  * Gets the first node of the LinkedList.
@@ -320,10 +317,7 @@ BOOL LinkedList_Enumerator_MoveNext(wLinkedList* list)
 	return TRUE;
 }
 
-static BOOL default_equal_function(const void* objA, const void* objB)
-{
-	return objA == objB;
-}
+static BOOL default_equal_function(const void* objA, const void* objB) { return objA == objB; }
 
 /**
  * Construction, Destruction

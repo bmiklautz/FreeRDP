@@ -41,7 +41,8 @@
  *
  */
 
-PFORMAT_STRING NdrpComputeCount(PMIDL_STUB_MESSAGE pStubMsg, unsigned char* pMemory, PFORMAT_STRING pFormat, ULONG_PTR* pCount)
+PFORMAT_STRING NdrpComputeCount(PMIDL_STUB_MESSAGE pStubMsg, unsigned char* pMemory, PFORMAT_STRING pFormat,
+                                ULONG_PTR* pCount)
 {
 	LPVOID ptr = NULL;
 	ULONG_PTR data = 0;
@@ -54,7 +55,7 @@ PFORMAT_STRING NdrpComputeCount(PMIDL_STUB_MESSAGE pStubMsg, unsigned char* pMem
 	type = correlation_type & 0x0F;
 	conformance = correlation_type & 0xF0;
 	correlation_operator = pFormat[1];
-	offset = *(unsigned short*) & pFormat[2];
+	offset = *(unsigned short*) &pFormat[2];
 
 	if (conformance == FC_NORMAL_CONFORMANCE)
 	{
@@ -84,7 +85,7 @@ PFORMAT_STRING NdrpComputeCount(PMIDL_STUB_MESSAGE pStubMsg, unsigned char* pMem
 	switch (correlation_operator)
 	{
 		case FC_DEREFERENCE:
-			ptr = *(LPVOID*)((char*) ptr + offset);
+			ptr = *(LPVOID*) ((char*) ptr + offset);
 			break;
 
 		case FC_DIV_2:
@@ -104,10 +105,10 @@ PFORMAT_STRING NdrpComputeCount(PMIDL_STUB_MESSAGE pStubMsg, unsigned char* pMem
 			break;
 
 		case FC_CALLBACK:
-			{
-				WLog_ERR(TAG, "warning: NdrpComputeConformance FC_CALLBACK unimplemented");
-			}
-			break;
+		{
+			WLog_ERR(TAG, "warning: NdrpComputeConformance FC_CALLBACK unimplemented");
+		}
+		break;
 	}
 
 	if (!ptr)
@@ -142,7 +143,7 @@ PFORMAT_STRING NdrpComputeCount(PMIDL_STUB_MESSAGE pStubMsg, unsigned char* pMem
 			break;
 
 		case FC_HYPER:
-			data = (ULONG_PTR) *(ULONGLONG*) ptr;
+			data = (ULONG_PTR) * (ULONGLONG*) ptr;
 			break;
 	}
 

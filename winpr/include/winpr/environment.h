@@ -37,8 +37,10 @@ WINPR_API DWORD GetCurrentDirectoryW(DWORD nBufferLength, LPWSTR lpBuffer);
 WINPR_API BOOL SetCurrentDirectoryA(LPCSTR lpPathName);
 WINPR_API BOOL SetCurrentDirectoryW(LPCWSTR lpPathName);
 
-WINPR_API DWORD SearchPathA(LPCSTR lpPath, LPCSTR lpFileName, LPCSTR lpExtension, DWORD nBufferLength, LPSTR lpBuffer, LPSTR* lpFilePart);
-WINPR_API DWORD SearchPathW(LPCWSTR lpPath, LPCWSTR lpFileName, LPCWSTR lpExtension, DWORD nBufferLength, LPWSTR lpBuffer, LPWSTR* lpFilePart);
+WINPR_API DWORD SearchPathA(LPCSTR lpPath, LPCSTR lpFileName, LPCSTR lpExtension, DWORD nBufferLength, LPSTR lpBuffer,
+                            LPSTR* lpFilePart);
+WINPR_API DWORD SearchPathW(LPCWSTR lpPath, LPCWSTR lpFileName, LPCWSTR lpExtension, DWORD nBufferLength,
+                            LPWSTR lpBuffer, LPWSTR* lpFilePart);
 
 WINPR_API LPSTR GetCommandLineA(VOID);
 WINPR_API LPWSTR GetCommandLineW(VOID);
@@ -51,17 +53,17 @@ WINPR_API BOOL NeedCurrentDirectoryForExePathW(LPCWSTR ExeName);
 #endif
 
 #ifdef UNICODE
-#define GetCurrentDirectory		GetCurrentDirectoryW
-#define SetCurrentDirectory		SetCurrentDirectoryW
-#define SearchPath			SearchPathW
-#define GetCommandLine			GetCommandLineW
-#define NeedCurrentDirectoryForExePath	NeedCurrentDirectoryForExePathW
+#define GetCurrentDirectory GetCurrentDirectoryW
+#define SetCurrentDirectory SetCurrentDirectoryW
+#define SearchPath SearchPathW
+#define GetCommandLine GetCommandLineW
+#define NeedCurrentDirectoryForExePath NeedCurrentDirectoryForExePathW
 #else
-#define GetCurrentDirectory		GetCurrentDirectoryA
-#define SetCurrentDirectory		SetCurrentDirectoryA
-#define SearchPath			SearchPathA
-#define GetCommandLine			GetCommandLineA
-#define NeedCurrentDirectoryForExePath	NeedCurrentDirectoryForExePathA
+#define GetCurrentDirectory GetCurrentDirectoryA
+#define SetCurrentDirectory SetCurrentDirectoryA
+#define SearchPath SearchPathA
+#define GetCommandLine GetCommandLineA
+#define NeedCurrentDirectoryForExePath NeedCurrentDirectoryForExePathA
 #endif
 
 #endif
@@ -100,19 +102,19 @@ WINPR_API BOOL FreeEnvironmentStringsW(LPWCH lpszEnvironmentBlock);
 #endif
 
 #ifdef UNICODE
-#define GetEnvironmentVariable		GetEnvironmentVariableW
-#define SetEnvironmentVariable		SetEnvironmentVariableW
-#define GetEnvironmentStrings		GetEnvironmentStringsW
-#define SetEnvironmentStrings		SetEnvironmentStringsW
-#define ExpandEnvironmentStrings	ExpandEnvironmentStringsW
-#define FreeEnvironmentStrings		FreeEnvironmentStringsW
+#define GetEnvironmentVariable GetEnvironmentVariableW
+#define SetEnvironmentVariable SetEnvironmentVariableW
+#define GetEnvironmentStrings GetEnvironmentStringsW
+#define SetEnvironmentStrings SetEnvironmentStringsW
+#define ExpandEnvironmentStrings ExpandEnvironmentStringsW
+#define FreeEnvironmentStrings FreeEnvironmentStringsW
 #else
-#define GetEnvironmentVariable		GetEnvironmentVariableA
-#define SetEnvironmentVariable		SetEnvironmentVariableA
-#define GetEnvironmentStringsA		GetEnvironmentStrings
-#define SetEnvironmentStrings		SetEnvironmentStringsA
-#define ExpandEnvironmentStrings	ExpandEnvironmentStringsA
-#define FreeEnvironmentStrings		FreeEnvironmentStringsA
+#define GetEnvironmentVariable GetEnvironmentVariableA
+#define SetEnvironmentVariable SetEnvironmentVariableA
+#define GetEnvironmentStringsA GetEnvironmentStrings
+#define SetEnvironmentStrings SetEnvironmentStringsA
+#define ExpandEnvironmentStrings ExpandEnvironmentStringsA
+#define FreeEnvironmentStrings FreeEnvironmentStringsA
 #endif
 
 #endif
@@ -133,4 +135,3 @@ WINPR_API char** EnvironmentBlockToEnvpA(LPCH lpszEnvironmentBlock);
 #endif
 
 #endif /* WINPR_ENVIRONMENT_H */
-

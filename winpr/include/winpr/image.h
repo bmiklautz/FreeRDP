@@ -63,8 +63,8 @@ typedef struct _WINPR_BITMAP_CORE_HEADER WINPR_BITMAP_CORE_HEADER;
 
 #pragma pack(pop)
 
-#define WINPR_IMAGE_BITMAP		0
-#define WINPR_IMAGE_PNG			1
+#define WINPR_IMAGE_BITMAP 0
+#define WINPR_IMAGE_PNG 1
 
 struct _wImage
 {

@@ -17,7 +17,6 @@
  * limitations under the License.
  */
 
-
 #include <freerdp/client/geometry.h>
 #include <freerdp/client/video.h>
 #include <freerdp/gdi/gdi.h>
@@ -33,7 +32,6 @@ typedef struct
 	BYTE* image;
 } gdiVideoSurface;
 
-
 void gdi_video_geometry_init(rdpGdi* gdi, GeometryClientContext* geom)
 {
 	gdi->geometry = geom;
@@ -45,15 +43,12 @@ void gdi_video_geometry_init(rdpGdi* gdi, GeometryClientContext* geom)
 	}
 }
 
-void gdi_video_geometry_uninit(rdpGdi* gdi, GeometryClientContext* geom)
-{
-}
+void gdi_video_geometry_uninit(rdpGdi* gdi, GeometryClientContext* geom) {}
 
-static VideoSurface* gdiVideoCreateSurface(VideoClientContext* video, BYTE* data, UINT32 x,
-        UINT32 y,
-        UINT32 width, UINT32 height)
+static VideoSurface* gdiVideoCreateSurface(VideoClientContext* video, BYTE* data, UINT32 x, UINT32 y, UINT32 width,
+                                           UINT32 height)
 {
-	rdpGdi* gdi = (rdpGdi*)video->custom;
+	rdpGdi* gdi = (rdpGdi*) video->custom;
 	gdiVideoSurface* ret = calloc(1, sizeof(*ret));
 	UINT32 bpp;
 
@@ -79,11 +74,10 @@ static VideoSurface* gdiVideoCreateSurface(VideoClientContext* video, BYTE* data
 	return &ret->base;
 }
 
-
 static BOOL gdiVideoShowSurface(VideoClientContext* video, VideoSurface* surface)
 {
-	rdpGdi* gdi = (rdpGdi*)video->custom;
-	gdiVideoSurface* gdiSurface = (gdiVideoSurface*)surface;
+	rdpGdi* gdi = (rdpGdi*) video->custom;
+	gdiVideoSurface* gdiSurface = (gdiVideoSurface*) surface;
 	RECTANGLE_16 surfaceRect;
 	rdpUpdate* update = gdi->context->update;
 	surfaceRect.left = surface->x;
@@ -97,14 +91,11 @@ static BOOL gdiVideoShowSurface(VideoClientContext* video, VideoSurface* surface
 		const UINT32 nXDst = nXSrc;
 		const UINT32 nYDst = nYSrc;
 		const UINT32 width = (surface->w + surface->x < gdi->width) ? surface->w : gdi->width - surface->x;
-		const UINT32 height = (surface->h + surface->y < gdi->height) ? surface->h : gdi->height -
-		                      surface->y;
+		const UINT32 height = (surface->h + surface->y < gdi->height) ? surface->h : gdi->height - surface->y;
 
-		if (!freerdp_image_copy(gdi->primary_buffer, gdi->primary->hdc->format,
-		                        gdi->stride,
-		                        nXDst, nYDst, width, height,
-		                        surface->data, gdi->primary->hdc->format,
-		                        gdiSurface->scanline, 0, 0, NULL, FREERDP_FLIP_NONE))
+		if (!freerdp_image_copy(gdi->primary_buffer, gdi->primary->hdc->format, gdi->stride, nXDst, nYDst, width,
+		                        height, surface->data, gdi->primary->hdc->format, gdiSurface->scanline, 0, 0, NULL,
+		                        FREERDP_FLIP_NONE))
 			return CHANNEL_RC_NULL_DATA;
 
 		gdi_InvalidateRegion(gdi->primary->hdc, nXDst, nYDst, width, height);
@@ -115,7 +106,7 @@ static BOOL gdiVideoShowSurface(VideoClientContext* video, VideoSurface* surface
 
 static BOOL gdiVideoDeleteSurface(VideoClientContext* video, VideoSurface* surface)
 {
-	gdiVideoSurface* gdiSurface = (gdiVideoSurface*)surface;
+	gdiVideoSurface* gdiSurface = (gdiVideoSurface*) surface;
 
 	if (gdiSurface)
 		_aligned_free(gdiSurface->image);
@@ -133,15 +124,11 @@ void gdi_video_control_init(rdpGdi* gdi, VideoClientContext* video)
 	video->setGeometry(video, gdi->geometry);
 }
 
-
-void gdi_video_control_uninit(rdpGdi* gdi, VideoClientContext* video)
-{
-	gdi->video = NULL;
-}
+void gdi_video_control_uninit(rdpGdi* gdi, VideoClientContext* video) { gdi->video = NULL; }
 
 static void gdi_video_timer(void* context, TimerEventArgs* timer)
 {
-	rdpContext* ctx = (rdpContext*)context;
+	rdpContext* ctx = (rdpContext*) context;
 	rdpGdi* gdi = ctx->gdi;
 
 	if (gdi && gdi->video)

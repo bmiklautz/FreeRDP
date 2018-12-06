@@ -27,7 +27,7 @@
 int TestFileGetStdHandle(int argc, char* argv[])
 {
 	HANDLE so;
-	char *buf = "happy happy";
+	char* buf = "happy happy";
 	DWORD bytesWritten;
 
 	so = GetStdHandle(STD_OUTPUT_HANDLE);

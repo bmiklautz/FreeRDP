@@ -106,8 +106,6 @@ struct x11_shadow_subsystem
 extern "C" {
 #endif
 
-
-
 #ifdef __cplusplus
 }
 #endif

@@ -77,7 +77,6 @@ BOOL wlf_handle_pointer_buttons(freerdp* instance, UwacPointerButtonEvent* ev)
 	return freerdp_input_send_mouse_event(input, flags, ev->x, ev->y);
 }
 
-
 BOOL wlf_handle_pointer_axis(freerdp* instance, UwacPointerAxisEvent* ev)
 {
 	rdpInput* input;
@@ -128,6 +127,5 @@ BOOL wlf_keyboard_enter(freerdp* instance, UwacKeyboardEnterLeaveEvent* ev)
 		return FALSE;
 
 	input = instance->input;
-	return freerdp_input_send_focus_in_event(input, 0) &&
-		   freerdp_input_send_mouse_event(input, PTR_FLAGS_MOVE, 0, 0);
+	return freerdp_input_send_focus_in_event(input, 0) && freerdp_input_send_mouse_event(input, PTR_FLAGS_MOVE, 0, 0);
 }

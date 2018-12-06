@@ -29,17 +29,14 @@
 
 #include "prim_internal.h"
 
-#define ALPHA(_k_)	(((_k_) & 0xFF000000U) >> 24)
-#define RED(_k_)	(((_k_) & 0x00FF0000U) >> 16)
-#define GRN(_k_)	(((_k_) & 0x0000FF00U) >> 8)
-#define BLU(_k_)	(((_k_) & 0x000000FFU))
+#define ALPHA(_k_) (((_k_) &0xFF000000U) >> 24)
+#define RED(_k_) (((_k_) &0x00FF0000U) >> 16)
+#define GRN(_k_) (((_k_) &0x0000FF00U) >> 8)
+#define BLU(_k_) (((_k_) &0x000000FFU))
 
 /* ------------------------------------------------------------------------- */
-static pstatus_t general_alphaComp_argb(
-    const BYTE* pSrc1,  UINT32 src1Step,
-    const BYTE* pSrc2,  UINT32 src2Step,
-    BYTE* pDst,  UINT32 dstStep,
-    UINT32 width,  UINT32 height)
+static pstatus_t general_alphaComp_argb(const BYTE* pSrc1, UINT32 src1Step, const BYTE* pSrc2, UINT32 src2Step,
+                                        BYTE* pDst, UINT32 dstStep, UINT32 width, UINT32 height)
 {
 	UINT32 y;
 
@@ -83,8 +80,8 @@ static pstatus_t general_alphaComp_argb(
 				UINT32 dag = s1ag - s2ag;
 				drb *= alpha;
 				dag *= alpha;
-				rb  = ((drb >> 8) + s2rb)       & 0x00FF00FFU;
-				ag  = (((dag >> 8) + s2ag) << 8) & 0xFF00FF00U;
+				rb = ((drb >> 8) + s2rb) & 0x00FF00FFU;
+				ag = (((dag >> 8) + s2ag) << 8) & 0xFF00FF00U;
 				*dptr++ = rb | ag;
 			}
 		}
@@ -94,8 +91,4 @@ static pstatus_t general_alphaComp_argb(
 }
 
 /* ------------------------------------------------------------------------- */
-void primitives_init_alphaComp(primitives_t* prims)
-{
-	prims->alphaComp_argb = general_alphaComp_argb;
-}
-
+void primitives_init_alphaComp(primitives_t* prims) { prims->alphaComp_argb = general_alphaComp_argb; }

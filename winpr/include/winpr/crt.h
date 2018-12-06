@@ -41,81 +41,56 @@
 #endif
 
 #ifndef _rotl
-static INLINE UINT32 _rotl(UINT32 value, int shift)
-{
-	return (value << shift) | (value >> (32 - shift));
-}
+static INLINE UINT32 _rotl(UINT32 value, int shift) { return (value << shift) | (value >> (32 - shift)); }
 #endif
 
 #ifndef _rotl64
-static INLINE UINT64 _rotl64(UINT64 value, int shift)
-{
-	return (value << shift) | (value >> (64 - shift));
-}
+static INLINE UINT64 _rotl64(UINT64 value, int shift) { return (value << shift) | (value >> (64 - shift)); }
 #endif
 
 #ifndef _rotr
-static INLINE UINT32 _rotr(UINT32 value, int shift)
-{
-	return (value >> shift) | (value << (32 - shift));
-}
+static INLINE UINT32 _rotr(UINT32 value, int shift) { return (value >> shift) | (value << (32 - shift)); }
 #endif
 
 #ifndef _rotr64
-static INLINE UINT64 _rotr64(UINT64 value, int shift)
-{
-	return (value >> shift) | (value << (64 - shift));
-}
+static INLINE UINT64 _rotr64(UINT64 value, int shift) { return (value >> shift) | (value << (64 - shift)); }
 #endif
 
 #if (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2))
 
-#define _byteswap_ulong(_val)	__builtin_bswap32(_val)
-#define _byteswap_uint64(_val)	__builtin_bswap64(_val)
+#define _byteswap_ulong(_val) __builtin_bswap32(_val)
+#define _byteswap_uint64(_val) __builtin_bswap64(_val)
 
 #else
 
 static INLINE UINT32 _byteswap_ulong(UINT32 _val)
 {
-	return (((_val) >> 24) | \
-	        (((_val) & 0x00FF0000) >> 8) | \
-	        (((_val) & 0x0000FF00) << 8) | \
-	        ((_val) << 24));
+	return (((_val) >> 24) | (((_val) &0x00FF0000) >> 8) | (((_val) &0x0000FF00) << 8) | ((_val) << 24));
 }
 
 static INLINE UINT64 _byteswap_uint64(UINT64 _val)
 {
-	return (((_val) << 56) | \
-	        (((_val) << 40) & 0xFF000000000000) | \
-	        (((_val) << 24) & 0xFF0000000000) | \
-	        (((_val) << 8)  & 0xFF00000000) | \
-	        (((_val) >> 8)  & 0xFF000000) | \
-	        (((_val) >> 24) & 0xFF0000) | \
-	        (((_val) >> 40) & 0xFF00) | \
-	        ((_val)  >> 56));
+	return (((_val) << 56) | (((_val) << 40) & 0xFF000000000000) | (((_val) << 24) & 0xFF0000000000) |
+	        (((_val) << 8) & 0xFF00000000) | (((_val) >> 8) & 0xFF000000) | (((_val) >> 24) & 0xFF0000) |
+	        (((_val) >> 40) & 0xFF00) | ((_val) >> 56));
 }
 
 #endif
 
 #if (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8))
 
-#define _byteswap_ushort(_val)	__builtin_bswap16(_val)
+#define _byteswap_ushort(_val) __builtin_bswap16(_val)
 
 #else
 
-static INLINE UINT16 _byteswap_ushort(UINT16 _val)
-{
-	return (((_val) >> 8) | ((_val) << 8));
-}
+static INLINE UINT16 _byteswap_ushort(UINT16 _val) { return (((_val) >> 8) | ((_val) << 8)); }
 
 #endif
 
-
-
-#define CopyMemory(Destination, Source, Length)		memcpy((Destination), (Source), (Length))
-#define MoveMemory(Destination, Source, Length)		memmove((Destination), (Source), (Length))
-#define	FillMemory(Destination, Length, Fill)		memset((Destination), (Fill), (Length))
-#define ZeroMemory(Destination, Length)			memset((Destination), 0, (Length))
+#define CopyMemory(Destination, Source, Length) memcpy((Destination), (Source), (Length))
+#define MoveMemory(Destination, Source, Length) memmove((Destination), (Source), (Length))
+#define FillMemory(Destination, Length, Fill) memset((Destination), (Fill), (Length))
+#define ZeroMemory(Destination, Length) memset((Destination), 0, (Length))
 
 #ifdef __cplusplus
 extern "C" {
@@ -143,10 +118,8 @@ WINPR_API void* _aligned_realloc(void* memblock, size_t size, size_t alignment);
 WINPR_API void* _aligned_recalloc(void* memblock, size_t num, size_t size, size_t alignment);
 
 WINPR_API void* _aligned_offset_malloc(size_t size, size_t alignment, size_t offset);
-WINPR_API void* _aligned_offset_realloc(void* memblock, size_t size, size_t alignment,
-                                        size_t offset);
-WINPR_API void* _aligned_offset_recalloc(void* memblock, size_t num, size_t size, size_t alignment,
-        size_t offset);
+WINPR_API void* _aligned_offset_realloc(void* memblock, size_t size, size_t alignment, size_t offset);
+WINPR_API void* _aligned_offset_recalloc(void* memblock, size_t num, size_t size, size_t alignment, size_t offset);
 
 WINPR_API size_t _aligned_msize(void* memblock, size_t alignment, size_t offset);
 
@@ -164,7 +137,6 @@ WINPR_API errno_t wmemmove_s(WCHAR* dest, size_t numberOfElements, const WCHAR* 
 #ifdef __cplusplus
 }
 #endif
-
 
 #endif
 

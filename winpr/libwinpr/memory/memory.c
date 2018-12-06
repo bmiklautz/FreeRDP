@@ -78,8 +78,8 @@
 
 #include "memory.h"
 
-HANDLE CreateFileMappingA(HANDLE hFile, LPSECURITY_ATTRIBUTES lpAttributes, DWORD flProtect,
-		DWORD dwMaximumSizeHigh, DWORD dwMaximumSizeLow, LPCSTR lpName)
+HANDLE CreateFileMappingA(HANDLE hFile, LPSECURITY_ATTRIBUTES lpAttributes, DWORD flProtect, DWORD dwMaximumSizeHigh,
+                          DWORD dwMaximumSizeLow, LPCSTR lpName)
 {
 	if (hFile != INVALID_HANDLE_VALUE)
 	{
@@ -89,43 +89,30 @@ HANDLE CreateFileMappingA(HANDLE hFile, LPSECURITY_ATTRIBUTES lpAttributes, DWOR
 	return NULL;
 }
 
-HANDLE CreateFileMappingW(HANDLE hFile, LPSECURITY_ATTRIBUTES lpAttributes, DWORD flProtect,
-		DWORD dwMaximumSizeHigh, DWORD dwMaximumSizeLow, LPCWSTR lpName)
+HANDLE CreateFileMappingW(HANDLE hFile, LPSECURITY_ATTRIBUTES lpAttributes, DWORD flProtect, DWORD dwMaximumSizeHigh,
+                          DWORD dwMaximumSizeLow, LPCWSTR lpName)
 {
 	return NULL;
 }
 
-HANDLE OpenFileMappingA(DWORD dwDesiredAccess, BOOL bInheritHandle, LPCSTR lpName)
+HANDLE OpenFileMappingA(DWORD dwDesiredAccess, BOOL bInheritHandle, LPCSTR lpName) { return NULL; }
+
+HANDLE OpenFileMappingW(DWORD dwDesiredAccess, BOOL bInheritHandle, LPCWSTR lpName) { return NULL; }
+
+LPVOID MapViewOfFile(HANDLE hFileMappingObject, DWORD dwDesiredAccess, DWORD dwFileOffsetHigh, DWORD dwFileOffsetLow,
+                     SIZE_T dwNumberOfBytesToMap)
 {
 	return NULL;
 }
 
-HANDLE OpenFileMappingW(DWORD dwDesiredAccess, BOOL bInheritHandle, LPCWSTR lpName)
+LPVOID MapViewOfFileEx(HANDLE hFileMappingObject, DWORD dwDesiredAccess, DWORD dwFileOffsetHigh, DWORD dwFileOffsetLow,
+                       SIZE_T dwNumberOfBytesToMap, LPVOID lpBaseAddress)
 {
 	return NULL;
 }
 
-LPVOID MapViewOfFile(HANDLE hFileMappingObject, DWORD dwDesiredAccess, DWORD dwFileOffsetHigh,
-		DWORD dwFileOffsetLow, SIZE_T dwNumberOfBytesToMap)
-{
-	return NULL;
-}
+BOOL FlushViewOfFile(LPCVOID lpBaseAddress, SIZE_T dwNumberOfBytesToFlush) { return TRUE; }
 
-LPVOID MapViewOfFileEx(HANDLE hFileMappingObject, DWORD dwDesiredAccess, DWORD dwFileOffsetHigh,
-		DWORD dwFileOffsetLow, SIZE_T dwNumberOfBytesToMap, LPVOID lpBaseAddress)
-{
-	return NULL;
-}
-
-BOOL FlushViewOfFile(LPCVOID lpBaseAddress, SIZE_T dwNumberOfBytesToFlush)
-{
-	return TRUE;
-}
-
-BOOL UnmapViewOfFile(LPCVOID lpBaseAddress)
-{
-	return TRUE;
-}
+BOOL UnmapViewOfFile(LPCVOID lpBaseAddress) { return TRUE; }
 
 #endif
-

@@ -31,17 +31,11 @@
 
 #ifndef _WIN32
 
-VOID WakeByAddressAll(PVOID Address)
-{
+VOID WakeByAddressAll(PVOID Address) {}
 
-}
+VOID WakeByAddressSingle(PVOID Address) {}
 
-VOID WakeByAddressSingle(PVOID Address)
-{
-
-}
-
-BOOL WaitOnAddress(VOID volatile *Address, PVOID CompareAddress, SIZE_T AddressSize, DWORD dwMilliseconds)
+BOOL WaitOnAddress(VOID volatile* Address, PVOID CompareAddress, SIZE_T AddressSize, DWORD dwMilliseconds)
 {
 	return TRUE;
 }

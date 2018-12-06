@@ -38,18 +38,11 @@
 
 #include "ndr_private.h"
 
-void NdrpAlignLength(ULONG* length, unsigned int alignment)
-{
-	*length = (*length + alignment - 1) & ~(alignment - 1);
-}
+void NdrpAlignLength(ULONG* length, unsigned int alignment) { *length = (*length + alignment - 1) & ~(alignment - 1); }
 
-void NdrpIncrementLength(ULONG* length, unsigned int size)
-{
-	*length += size;
-}
+void NdrpIncrementLength(ULONG* length, unsigned int size) { *length += size; }
 
-const char* FC_TYPE_STRINGS[] =
-{
+const char* FC_TYPE_STRINGS[] = {
 	"FC_ZERO",
 	"FC_BYTE",
 	"FC_CHAR",
@@ -143,20 +136,92 @@ const char* FC_TYPE_STRINGS[] =
 	"FC_CONSTANT_IID",
 	"FC_END",
 	"FC_PAD",
-	"", "", "", "", "", "",
-	"", "", "", "", "", "",
-	"", "", "", "", "", "",
-	"", "", "", "", "", "",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
 	"FC_SPLIT_DEREFERENCE",
 	"FC_SPLIT_DIV_2",
 	"FC_SPLIT_MULT_2",
 	"FC_SPLIT_ADD_1",
 	"FC_SPLIT_SUB_1",
 	"FC_SPLIT_CALLBACK",
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
 	"FC_HARD_STRUCT",
 	"FC_TRANSMIT_AS_PTR",
 	"FC_REPRESENT_AS_PTR",
@@ -169,8 +234,7 @@ const char* FC_TYPE_STRINGS[] =
 	"FC_END_OF_UNIVERSE",
 };
 
-const NDR_TYPE_SIZE_ROUTINE pfnSizeRoutines[] =
-{
+const NDR_TYPE_SIZE_ROUTINE pfnSizeRoutines[] = {
 	NULL, /* FC_ZERO */
 	NdrSimpleTypeBufferSize, /* FC_BYTE */
 	NdrSimpleTypeBufferSize, /* FC_CHAR */
@@ -266,8 +330,7 @@ const NDR_TYPE_SIZE_ROUTINE pfnSizeRoutines[] =
 	NULL, /* FC_PAD */
 };
 
-const NDR_TYPE_MARSHALL_ROUTINE pfnMarshallRoutines[] =
-{
+const NDR_TYPE_MARSHALL_ROUTINE pfnMarshallRoutines[] = {
 	NULL, /* FC_ZERO */
 	NdrSimpleTypeMarshall, /* FC_BYTE */
 	NdrSimpleTypeMarshall, /* FC_CHAR */
@@ -363,8 +426,7 @@ const NDR_TYPE_MARSHALL_ROUTINE pfnMarshallRoutines[] =
 	NULL, /* FC_PAD */
 };
 
-const NDR_TYPE_UNMARSHALL_ROUTINE pfnUnmarshallRoutines[] =
-{
+const NDR_TYPE_UNMARSHALL_ROUTINE pfnUnmarshallRoutines[] = {
 	NULL, /* FC_ZERO */
 	NdrSimpleTypeUnmarshall, /* FC_BYTE */
 	NdrSimpleTypeUnmarshall, /* FC_CHAR */
@@ -460,8 +522,7 @@ const NDR_TYPE_UNMARSHALL_ROUTINE pfnUnmarshallRoutines[] =
 	NULL, /* FC_PAD */
 };
 
-const NDR_TYPE_FREE_ROUTINE pfnFreeRoutines[] =
-{
+const NDR_TYPE_FREE_ROUTINE pfnFreeRoutines[] = {
 	NULL, /* FC_ZERO */
 	NdrSimpleTypeFree, /* FC_BYTE */
 	NdrSimpleTypeFree, /* FC_CHAR */

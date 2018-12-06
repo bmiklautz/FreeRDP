@@ -36,7 +36,6 @@
 
 #ifndef _WIN32
 
-
 #ifdef ANDROID
 #include <sys/vfs.h>
 #else
@@ -71,13 +70,13 @@ BOOL NamedPipeClientCloseHandle(HANDLE handle)
 
 	if (pNamedPipe->clientfd != -1)
 	{
-		//WLOG_DBG(TAG, "closing clientfd %d", pNamedPipe->clientfd);
+		// WLOG_DBG(TAG, "closing clientfd %d", pNamedPipe->clientfd);
 		close(pNamedPipe->clientfd);
 	}
 
 	if (pNamedPipe->serverfd != -1)
 	{
-		//WLOG_DBG(TAG, "closing serverfd %d", pNamedPipe->serverfd);
+		// WLOG_DBG(TAG, "closing serverfd %d", pNamedPipe->serverfd);
 		close(pNamedPipe->serverfd);
 	}
 
@@ -93,7 +92,7 @@ BOOL NamedPipeClientCloseHandle(HANDLE handle)
 
 static int NamedPipeClientGetFd(HANDLE handle)
 {
-	WINPR_NAMED_PIPE* file = (WINPR_NAMED_PIPE*)handle;
+	WINPR_NAMED_PIPE* file = (WINPR_NAMED_PIPE*) handle;
 
 	if (!NamedPipeClientIsHandled(handle))
 		return -1;
@@ -104,8 +103,7 @@ static int NamedPipeClientGetFd(HANDLE handle)
 		return file->clientfd;
 }
 
-static HANDLE_OPS ops =
-{
+static HANDLE_OPS ops = {
 	NamedPipeClientIsHandled,
 	NamedPipeClientCloseHandle,
 	NamedPipeClientGetFd,
@@ -125,12 +123,12 @@ static HANDLE_OPS ops =
 	NULL, /* FileLockFileEx */
 	NULL, /* FileUnlockFile */
 	NULL, /* FileUnlockFileEx */
-	NULL  /* SetFileTime */
+	NULL /* SetFileTime */
 };
 
-static HANDLE NamedPipeClientCreateFileA(LPCSTR lpFileName, DWORD dwDesiredAccess,
-        DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes,
-        DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile)
+static HANDLE NamedPipeClientCreateFileA(LPCSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
+                                         LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition,
+                                         DWORD dwFlagsAndAttributes, HANDLE hTemplateFile)
 {
 	char* name;
 	int status;
@@ -187,7 +185,7 @@ static HANDLE NamedPipeClientCreateFileA(LPCSTR lpFileName, DWORD dwDesiredAcces
 
 	if (!pNamedPipe->lpFileName)
 	{
-		free((void*)pNamedPipe->name);
+		free((void*) pNamedPipe->name);
 		free(pNamedPipe);
 		return INVALID_HANDLE_VALUE;
 	}
@@ -196,8 +194,8 @@ static HANDLE NamedPipeClientCreateFileA(LPCSTR lpFileName, DWORD dwDesiredAcces
 
 	if (!pNamedPipe->lpFilePath)
 	{
-		free((void*)pNamedPipe->lpFileName);
-		free((void*)pNamedPipe->name);
+		free((void*) pNamedPipe->lpFileName);
+		free((void*) pNamedPipe->name);
 		free(pNamedPipe);
 		return INVALID_HANDLE_VALUE;
 	}
@@ -246,7 +244,7 @@ HANDLE_CREATOR* GetNamedPipeClientHandleCreator(void)
 
 /* Extended API */
 
-#define NAMED_PIPE_PREFIX_PATH		"\\\\.\\pipe\\"
+#define NAMED_PIPE_PREFIX_PATH "\\\\.\\pipe\\"
 
 BOOL IsNamedPipeFileNameA(LPCSTR lpName)
 {
@@ -313,4 +311,3 @@ int GetNamePipeFileDescriptor(HANDLE hNamedPipe)
 	return -1;
 #endif
 }
-

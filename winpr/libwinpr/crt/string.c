@@ -45,7 +45,7 @@ char* _strdup(const char* strSource)
 	strDestination = strdup(strSource);
 
 	if (strDestination == NULL)
-		WLog_ERR(TAG,"strdup");
+		WLog_ERR(TAG, "strdup");
 
 	return strDestination;
 }
@@ -58,30 +58,24 @@ WCHAR* _wcsdup(const WCHAR* strSource)
 		return NULL;
 
 #if defined(__APPLE__) && defined(__MACH__) || defined(ANDROID) || defined(sun)
-	strDestination = malloc(wcslen((wchar_t*)strSource));
+	strDestination = malloc(wcslen((wchar_t*) strSource));
 
 	if (strDestination != NULL)
-		wcscpy((wchar_t*)strDestination, (const wchar_t*)strSource);
+		wcscpy((wchar_t*) strDestination, (const wchar_t*) strSource);
 
 #else
 	strDestination = (WCHAR*) wcsdup((wchar_t*) strSource);
 #endif
 
 	if (strDestination == NULL)
-		WLog_ERR(TAG,"wcsdup");
+		WLog_ERR(TAG, "wcsdup");
 
 	return strDestination;
 }
 
-int _stricmp(const char* string1, const char* string2)
-{
-	return strcasecmp(string1, string2);
-}
+int _stricmp(const char* string1, const char* string2) { return strcasecmp(string1, string2); }
 
-int _strnicmp(const char* string1, const char* string2, size_t count)
-{
-	return strncasecmp(string1, string2, count);
-}
+int _strnicmp(const char* string1, const char* string2, size_t count) { return strncasecmp(string1, string2, count); }
 
 /* _wcscmp -> wcscmp */
 
@@ -133,15 +127,15 @@ WCHAR* _wcschr(const WCHAR* str, WCHAR c)
 
 WCHAR* _wcsrchr(const WCHAR* str, WCHAR c)
 {
-	WCHAR *p;
+	WCHAR* p;
 	WCHAR ch;
 
 	if (!str)
 		return NULL;
 
-	for (p = (WCHAR *) 0; (ch = *str); str++)
+	for (p = (WCHAR*) 0; (ch = *str); str++)
 		if (ch == c)
-			p = (WCHAR *) str;
+			p = (WCHAR*) str;
 
 	return p;
 }
@@ -351,8 +345,7 @@ BOOL IsCharAlphaW(WCHAR ch)
 
 BOOL IsCharAlphaNumericA(CHAR ch)
 {
-	if (((ch >= 'a') && (ch <= 'z')) || ((ch >= 'A') && (ch <= 'Z')) ||
-			((ch >= '0') && (ch <= '9')))
+	if (((ch >= 'a') && (ch <= 'z')) || ((ch >= 'A') && (ch <= 'Z')) || ((ch >= '0') && (ch <= '9')))
 		return 1;
 	else
 		return 0;
@@ -392,10 +385,7 @@ BOOL IsCharLowerW(WCHAR ch)
 	return 0;
 }
 
-int lstrlenA(LPCSTR lpString)
-{
-	return (int) strlen(lpString);
-}
+int lstrlenA(LPCSTR lpString) { return (int) strlen(lpString); }
 
 int lstrlenW(LPCWSTR lpString)
 {
@@ -412,10 +402,7 @@ int lstrlenW(LPCWSTR lpString)
 	return (int) (p - lpString);
 }
 
-int lstrcmpA(LPCSTR lpString1, LPCSTR lpString2)
-{
-	return strcmp(lpString1, lpString2);
-}
+int lstrcmpA(LPCSTR lpString1, LPCSTR lpString2) { return strcmp(lpString1, lpString2); }
 
 int lstrcmpW(LPCWSTR lpString1, LPCWSTR lpString2)
 {
@@ -533,7 +520,7 @@ INT64 GetLine(char** lineptr, size_t* size, FILE* stream)
 {
 #if defined(_WIN32)
 	char c;
-	char *n;
+	char* n;
 	size_t step = 32;
 	size_t used = 0;
 
@@ -555,11 +542,11 @@ INT64 GetLine(char** lineptr, size_t* size, FILE* stream)
 			}
 			*lineptr = n;
 		}
-        c = fgetc(stream);
-        if (c != EOF)
-            (*lineptr)[used++] = c;
-    } while((c != '\n') && (c != '\r') && (c != EOF));
-    (*lineptr)[used] = '\0';
+		c = fgetc(stream);
+		if (c != EOF)
+			(*lineptr)[used++] = c;
+	} while ((c != '\n') && (c != '\r') && (c != EOF));
+	(*lineptr)[used] = '\0';
 
 	return used;
 #elif !defined(ANDROID) && !defined(IOS)

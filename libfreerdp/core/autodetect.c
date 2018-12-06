@@ -25,21 +25,21 @@
 
 #include "autodetect.h"
 
-#define RDP_RTT_REQUEST_TYPE_CONTINUOUS  0x0001
+#define RDP_RTT_REQUEST_TYPE_CONTINUOUS 0x0001
 #define RDP_RTT_REQUEST_TYPE_CONNECTTIME 0x1001
 
 #define RDP_RTT_RESPONSE_TYPE 0x0000
 
-#define RDP_BW_START_REQUEST_TYPE_CONTINUOUS  0x0014
-#define RDP_BW_START_REQUEST_TYPE_TUNNEL      0x0114
+#define RDP_BW_START_REQUEST_TYPE_CONTINUOUS 0x0014
+#define RDP_BW_START_REQUEST_TYPE_TUNNEL 0x0114
 #define RDP_BW_START_REQUEST_TYPE_CONNECTTIME 0x1014
-#define RDP_BW_PAYLOAD_REQUEST_TYPE           0x0002
-#define RDP_BW_STOP_REQUEST_TYPE_CONNECTTIME  0x002B
-#define RDP_BW_STOP_REQUEST_TYPE_CONTINUOUS   0x0429
-#define RDP_BW_STOP_REQUEST_TYPE_TUNNEL       0x0629
+#define RDP_BW_PAYLOAD_REQUEST_TYPE 0x0002
+#define RDP_BW_STOP_REQUEST_TYPE_CONNECTTIME 0x002B
+#define RDP_BW_STOP_REQUEST_TYPE_CONTINUOUS 0x0429
+#define RDP_BW_STOP_REQUEST_TYPE_TUNNEL 0x0629
 
 #define RDP_BW_RESULTS_RESPONSE_TYPE_CONNECTTIME 0x0003
-#define RDP_BW_RESULTS_RESPONSE_TYPE_CONTINUOUS  0x000B
+#define RDP_BW_RESULTS_RESPONSE_TYPE_CONTINUOUS 0x000B
 
 #define RDP_NETCHAR_SYNC_RESPONSE_TYPE 0x0018
 
@@ -59,8 +59,7 @@ typedef struct
 	UINT16 responseType;
 } AUTODETECT_RSP_PDU;
 
-static BOOL autodetect_send_rtt_measure_request(rdpContext* context, UINT16 sequenceNumber,
-        UINT16 requestType)
+static BOOL autodetect_send_rtt_measure_request(rdpContext* context, UINT16 sequenceNumber, UINT16 requestType)
 {
 	wStream* s;
 	s = rdp_message_channel_pdu_init(context->rdp);
@@ -77,17 +76,14 @@ static BOOL autodetect_send_rtt_measure_request(rdpContext* context, UINT16 sequ
 	return rdp_send_message_channel_pdu(context->rdp, s, SEC_AUTODETECT_REQ);
 }
 
-static BOOL autodetect_send_continuous_rtt_measure_request(rdpContext* context,
-        UINT16 sequenceNumber)
+static BOOL autodetect_send_continuous_rtt_measure_request(rdpContext* context, UINT16 sequenceNumber)
 {
-	return autodetect_send_rtt_measure_request(context, sequenceNumber,
-	        RDP_RTT_REQUEST_TYPE_CONTINUOUS);
+	return autodetect_send_rtt_measure_request(context, sequenceNumber, RDP_RTT_REQUEST_TYPE_CONTINUOUS);
 }
 
 BOOL autodetect_send_connecttime_rtt_measure_request(rdpContext* context, UINT16 sequenceNumber)
 {
-	return autodetect_send_rtt_measure_request(context, sequenceNumber,
-	        RDP_RTT_REQUEST_TYPE_CONNECTTIME);
+	return autodetect_send_rtt_measure_request(context, sequenceNumber, RDP_RTT_REQUEST_TYPE_CONNECTTIME);
 }
 
 static BOOL autodetect_send_rtt_measure_response(rdpRdp* rdp, UINT16 sequenceNumber)
@@ -107,8 +103,7 @@ static BOOL autodetect_send_rtt_measure_response(rdpRdp* rdp, UINT16 sequenceNum
 	return rdp_send_message_channel_pdu(rdp, s, SEC_AUTODETECT_RSP);
 }
 
-static BOOL autodetect_send_bandwidth_measure_start(rdpContext* context, UINT16 sequenceNumber,
-        UINT16 requestType)
+static BOOL autodetect_send_bandwidth_measure_start(rdpContext* context, UINT16 sequenceNumber, UINT16 requestType)
 {
 	wStream* s;
 	s = rdp_message_channel_pdu_init(context->rdp);
@@ -124,21 +119,17 @@ static BOOL autodetect_send_bandwidth_measure_start(rdpContext* context, UINT16 
 	return rdp_send_message_channel_pdu(context->rdp, s, SEC_AUTODETECT_REQ);
 }
 
-static BOOL autodetect_send_continuous_bandwidth_measure_start(rdpContext* context,
-        UINT16 sequenceNumber)
+static BOOL autodetect_send_continuous_bandwidth_measure_start(rdpContext* context, UINT16 sequenceNumber)
 {
-	return autodetect_send_bandwidth_measure_start(context, sequenceNumber,
-	        RDP_BW_START_REQUEST_TYPE_CONTINUOUS);
+	return autodetect_send_bandwidth_measure_start(context, sequenceNumber, RDP_BW_START_REQUEST_TYPE_CONTINUOUS);
 }
 
 BOOL autodetect_send_connecttime_bandwidth_measure_start(rdpContext* context, UINT16 sequenceNumber)
 {
-	return autodetect_send_bandwidth_measure_start(context, sequenceNumber,
-	        RDP_BW_START_REQUEST_TYPE_CONNECTTIME);
+	return autodetect_send_bandwidth_measure_start(context, sequenceNumber, RDP_BW_START_REQUEST_TYPE_CONNECTTIME);
 }
 
-BOOL autodetect_send_bandwidth_measure_payload(rdpContext* context, UINT16 payloadLength,
-        UINT16 sequenceNumber)
+BOOL autodetect_send_bandwidth_measure_payload(rdpContext* context, UINT16 payloadLength, UINT16 sequenceNumber)
 {
 	wStream* s;
 	UCHAR* buffer = NULL;
@@ -148,8 +139,7 @@ BOOL autodetect_send_bandwidth_measure_payload(rdpContext* context, UINT16 paylo
 	if (!s)
 		return FALSE;
 
-	WLog_VRB(AUTODETECT_TAG, "sending Bandwidth Measure Payload PDU -> payloadLength=%"PRIu16"",
-	         payloadLength);
+	WLog_VRB(AUTODETECT_TAG, "sending Bandwidth Measure Payload PDU -> payloadLength=%" PRIu16 "", payloadLength);
 	/* 4-bytes aligned */
 	payloadLength &= ~3;
 
@@ -165,7 +155,7 @@ BOOL autodetect_send_bandwidth_measure_payload(rdpContext* context, UINT16 paylo
 	Stream_Write_UINT16(s, RDP_BW_PAYLOAD_REQUEST_TYPE); /* requestType (2 bytes) */
 	Stream_Write_UINT16(s, payloadLength); /* payloadLength (2 bytes) */
 	/* Random data (better measurement in case the line is compressed) */
-	buffer = (UCHAR*)malloc(payloadLength);
+	buffer = (UCHAR*) malloc(payloadLength);
 
 	if (NULL == buffer)
 	{
@@ -180,8 +170,8 @@ BOOL autodetect_send_bandwidth_measure_payload(rdpContext* context, UINT16 paylo
 	return bResult;
 }
 
-static BOOL autodetect_send_bandwidth_measure_stop(rdpContext* context, UINT16 payloadLength,
-        UINT16 sequenceNumber, UINT16 requestType)
+static BOOL autodetect_send_bandwidth_measure_stop(rdpContext* context, UINT16 payloadLength, UINT16 sequenceNumber,
+                                                   UINT16 requestType)
 {
 	wStream* s;
 	UCHAR* buffer = NULL;
@@ -191,12 +181,11 @@ static BOOL autodetect_send_bandwidth_measure_stop(rdpContext* context, UINT16 p
 	if (!s)
 		return FALSE;
 
-	WLog_VRB(AUTODETECT_TAG, "sending Bandwidth Measure Stop PDU -> payloadLength=%"PRIu16"",
-	         payloadLength);
+	WLog_VRB(AUTODETECT_TAG, "sending Bandwidth Measure Stop PDU -> payloadLength=%" PRIu16 "", payloadLength);
 	/* 4-bytes aligned */
 	payloadLength &= ~3;
-	Stream_Write_UINT8(s, requestType == RDP_BW_STOP_REQUEST_TYPE_CONNECTTIME ? 0x08 :
-	                   0x06); /* headerLength (1 byte) */
+	Stream_Write_UINT8(s,
+	                   requestType == RDP_BW_STOP_REQUEST_TYPE_CONNECTTIME ? 0x08 : 0x06); /* headerLength (1 byte) */
 	Stream_Write_UINT8(s, TYPE_ID_AUTODETECT_REQUEST); /* headerTypeId (1 byte) */
 	Stream_Write_UINT16(s, sequenceNumber); /* sequenceNumber (2 bytes) */
 	Stream_Write_UINT16(s, requestType); /* requestType (2 bytes) */
@@ -232,22 +221,19 @@ static BOOL autodetect_send_bandwidth_measure_stop(rdpContext* context, UINT16 p
 	return bResult;
 }
 
-static BOOL autodetect_send_continuous_bandwidth_measure_stop(rdpContext* context,
-        UINT16 sequenceNumber)
+static BOOL autodetect_send_continuous_bandwidth_measure_stop(rdpContext* context, UINT16 sequenceNumber)
 {
-	return autodetect_send_bandwidth_measure_stop(context, 0, sequenceNumber,
-	        RDP_BW_STOP_REQUEST_TYPE_CONTINUOUS);
+	return autodetect_send_bandwidth_measure_stop(context, 0, sequenceNumber, RDP_BW_STOP_REQUEST_TYPE_CONTINUOUS);
 }
 
 BOOL autodetect_send_connecttime_bandwidth_measure_stop(rdpContext* context, UINT16 payloadLength,
-        UINT16 sequenceNumber)
+                                                        UINT16 sequenceNumber)
 {
 	return autodetect_send_bandwidth_measure_stop(context, payloadLength, sequenceNumber,
-	        RDP_BW_STOP_REQUEST_TYPE_CONNECTTIME);
+	                                              RDP_BW_STOP_REQUEST_TYPE_CONNECTTIME);
 }
 
-static BOOL autodetect_send_bandwidth_measure_results(rdpRdp* rdp, UINT16 responseType,
-        UINT16 sequenceNumber)
+static BOOL autodetect_send_bandwidth_measure_results(rdpRdp* rdp, UINT16 responseType, UINT16 sequenceNumber)
 {
 	BOOL success = TRUE;
 	wStream* s;
@@ -260,17 +246,15 @@ static BOOL autodetect_send_bandwidth_measure_results(rdpRdp* rdp, UINT16 respon
 	if (!s)
 		return FALSE;
 
-	WLog_VRB(AUTODETECT_TAG,
-	         "sending Bandwidth Measure Results PDU -> timeDelta=%"PRIu32", byteCount=%"PRIu32"", timeDelta,
-	         rdp->autodetect->bandwidthMeasureByteCount);
+	WLog_VRB(AUTODETECT_TAG, "sending Bandwidth Measure Results PDU -> timeDelta=%" PRIu32 ", byteCount=%" PRIu32 "",
+	         timeDelta, rdp->autodetect->bandwidthMeasureByteCount);
 	Stream_Write_UINT8(s, 0x0E); /* headerLength (1 byte) */
 	Stream_Write_UINT8(s, TYPE_ID_AUTODETECT_RESPONSE); /* headerTypeId (1 byte) */
 	Stream_Write_UINT16(s, sequenceNumber); /* sequenceNumber (2 bytes) */
 	Stream_Write_UINT16(s, responseType); /* responseType (1 byte) */
 	Stream_Write_UINT32(s, timeDelta); /* timeDelta (4 bytes) */
 	Stream_Write_UINT32(s, rdp->autodetect->bandwidthMeasureByteCount); /* byteCount (4 bytes) */
-	IFCALLRET(rdp->autodetect->ClientBandwidthMeasureResult, success,
-	          rdp->context, rdp->autodetect);
+	IFCALLRET(rdp->autodetect->ClientBandwidthMeasureResult, success, rdp->context, rdp->autodetect);
 
 	if (!success)
 		return FALSE;
@@ -320,8 +304,7 @@ BOOL autodetect_send_netchar_sync(rdpRdp* rdp, UINT16 sequenceNumber)
 	if (!s)
 		return FALSE;
 
-	WLog_VRB(AUTODETECT_TAG,
-	         "sending Network Characteristics Sync PDU -> bandwidth=%"PRIu32", rtt=%"PRIu32"",
+	WLog_VRB(AUTODETECT_TAG, "sending Network Characteristics Sync PDU -> bandwidth=%" PRIu32 ", rtt=%" PRIu32 "",
 	         rdp->autodetect->netCharBandwidth, rdp->autodetect->netCharAverageRTT);
 	Stream_Write_UINT8(s, 0x0E); /* headerLength (1 byte) */
 	Stream_Write_UINT8(s, TYPE_ID_AUTODETECT_RESPONSE); /* headerTypeId (1 byte) */
@@ -332,8 +315,7 @@ BOOL autodetect_send_netchar_sync(rdpRdp* rdp, UINT16 sequenceNumber)
 	return rdp_send_message_channel_pdu(rdp, s, SEC_AUTODETECT_RSP);
 }
 
-static BOOL autodetect_recv_rtt_measure_request(rdpRdp* rdp, wStream* s,
-        AUTODETECT_REQ_PDU* autodetectReqPdu)
+static BOOL autodetect_recv_rtt_measure_request(rdpRdp* rdp, wStream* s, AUTODETECT_REQ_PDU* autodetectReqPdu)
 {
 	if (autodetectReqPdu->headerLength != 0x06)
 		return FALSE;
@@ -343,8 +325,7 @@ static BOOL autodetect_recv_rtt_measure_request(rdpRdp* rdp, wStream* s,
 	return autodetect_send_rtt_measure_response(rdp, autodetectReqPdu->sequenceNumber);
 }
 
-static BOOL autodetect_recv_rtt_measure_response(rdpRdp* rdp, wStream* s,
-        AUTODETECT_RSP_PDU* autodetectRspPdu)
+static BOOL autodetect_recv_rtt_measure_response(rdpRdp* rdp, wStream* s, AUTODETECT_RSP_PDU* autodetectRspPdu)
 {
 	BOOL success = TRUE;
 
@@ -354,23 +335,19 @@ static BOOL autodetect_recv_rtt_measure_response(rdpRdp* rdp, wStream* s,
 	WLog_VRB(AUTODETECT_TAG, "received RTT Measure Response PDU");
 	rdp->autodetect->netCharAverageRTT = GetTickCountPrecise() - rdp->autodetect->rttMeasureStartTime;
 
-	if (rdp->autodetect->netCharBaseRTT == 0 ||
-	    rdp->autodetect->netCharBaseRTT > rdp->autodetect->netCharAverageRTT)
+	if (rdp->autodetect->netCharBaseRTT == 0 || rdp->autodetect->netCharBaseRTT > rdp->autodetect->netCharAverageRTT)
 		rdp->autodetect->netCharBaseRTT = rdp->autodetect->netCharAverageRTT;
 
-	IFCALLRET(rdp->autodetect->RTTMeasureResponse, success, rdp->context,
-	          autodetectRspPdu->sequenceNumber);
+	IFCALLRET(rdp->autodetect->RTTMeasureResponse, success, rdp->context, autodetectRspPdu->sequenceNumber);
 	return success;
 }
 
-static BOOL autodetect_recv_bandwidth_measure_start(rdpRdp* rdp, wStream* s,
-        AUTODETECT_REQ_PDU* autodetectReqPdu)
+static BOOL autodetect_recv_bandwidth_measure_start(rdpRdp* rdp, wStream* s, AUTODETECT_REQ_PDU* autodetectReqPdu)
 {
 	if (autodetectReqPdu->headerLength != 0x06)
 		return FALSE;
 
-	WLog_VRB(AUTODETECT_TAG, "received Bandwidth Measure Start PDU - time=%"PRIu32"",
-	         GetTickCountPrecise());
+	WLog_VRB(AUTODETECT_TAG, "received Bandwidth Measure Start PDU - time=%" PRIu32 "", GetTickCountPrecise());
 	/* Initialize bandwidth measurement parameters */
 	rdp->autodetect->bandwidthMeasureStartTime = GetTickCountPrecise();
 	rdp->autodetect->bandwidthMeasureByteCount = 0;
@@ -384,8 +361,7 @@ static BOOL autodetect_recv_bandwidth_measure_start(rdpRdp* rdp, wStream* s,
 	return TRUE;
 }
 
-static BOOL autodetect_recv_bandwidth_measure_payload(rdpRdp* rdp, wStream* s,
-        AUTODETECT_REQ_PDU* autodetectReqPdu)
+static BOOL autodetect_recv_bandwidth_measure_payload(rdpRdp* rdp, wStream* s, AUTODETECT_REQ_PDU* autodetectReqPdu)
 {
 	UINT16 payloadLength;
 
@@ -396,15 +372,13 @@ static BOOL autodetect_recv_bandwidth_measure_payload(rdpRdp* rdp, wStream* s,
 		return FALSE;
 
 	Stream_Read_UINT16(s, payloadLength); /* payloadLength (2 bytes) */
-	WLog_DBG(AUTODETECT_TAG, "received Bandwidth Measure Payload PDU -> payloadLength=%"PRIu16"",
-	         payloadLength);
+	WLog_DBG(AUTODETECT_TAG, "received Bandwidth Measure Payload PDU -> payloadLength=%" PRIu16 "", payloadLength);
 	/* Add the payload length to the bandwidth measurement parameters */
 	rdp->autodetect->bandwidthMeasureByteCount += payloadLength;
 	return TRUE;
 }
 
-static BOOL autodetect_recv_bandwidth_measure_stop(rdpRdp* rdp, wStream* s,
-        AUTODETECT_REQ_PDU* autodetectReqPdu)
+static BOOL autodetect_recv_bandwidth_measure_stop(rdpRdp* rdp, wStream* s, AUTODETECT_REQ_PDU* autodetectReqPdu)
 {
 	UINT16 payloadLength;
 	UINT16 responseType;
@@ -427,8 +401,7 @@ static BOOL autodetect_recv_bandwidth_measure_stop(rdpRdp* rdp, wStream* s,
 		payloadLength = 0;
 	}
 
-	WLog_VRB(AUTODETECT_TAG, "received Bandwidth Measure Stop PDU -> payloadLength=%"PRIu16"",
-	         payloadLength);
+	WLog_VRB(AUTODETECT_TAG, "received Bandwidth Measure Stop PDU -> payloadLength=%" PRIu16 "", payloadLength);
 	/* Add the payload length to the bandwidth measurement parameters */
 	rdp->autodetect->bandwidthMeasureByteCount += payloadLength;
 
@@ -439,14 +412,13 @@ static BOOL autodetect_recv_bandwidth_measure_stop(rdpRdp* rdp, wStream* s,
 	}
 
 	/* Send a response the server */
-	responseType = autodetectReqPdu->requestType == RDP_BW_STOP_REQUEST_TYPE_CONNECTTIME ?
-	               RDP_BW_RESULTS_RESPONSE_TYPE_CONNECTTIME : RDP_BW_RESULTS_RESPONSE_TYPE_CONTINUOUS;
-	return autodetect_send_bandwidth_measure_results(rdp, responseType,
-	        autodetectReqPdu->sequenceNumber);
+	responseType = autodetectReqPdu->requestType == RDP_BW_STOP_REQUEST_TYPE_CONNECTTIME
+	  ? RDP_BW_RESULTS_RESPONSE_TYPE_CONNECTTIME
+	  : RDP_BW_RESULTS_RESPONSE_TYPE_CONTINUOUS;
+	return autodetect_send_bandwidth_measure_results(rdp, responseType, autodetectReqPdu->sequenceNumber);
 }
 
-static BOOL autodetect_recv_bandwidth_measure_results(rdpRdp* rdp, wStream* s,
-        AUTODETECT_RSP_PDU* autodetectRspPdu)
+static BOOL autodetect_recv_bandwidth_measure_results(rdpRdp* rdp, wStream* s, AUTODETECT_RSP_PDU* autodetectRspPdu)
 {
 	BOOL success = TRUE;
 
@@ -458,18 +430,16 @@ static BOOL autodetect_recv_bandwidth_measure_results(rdpRdp* rdp, wStream* s,
 	Stream_Read_UINT32(s, rdp->autodetect->bandwidthMeasureByteCount); /* byteCount (4 bytes) */
 
 	if (rdp->autodetect->bandwidthMeasureTimeDelta > 0)
-		rdp->autodetect->netCharBandwidth = rdp->autodetect->bandwidthMeasureByteCount * 8 /
-		                                    rdp->autodetect->bandwidthMeasureTimeDelta;
+		rdp->autodetect->netCharBandwidth =
+		  rdp->autodetect->bandwidthMeasureByteCount * 8 / rdp->autodetect->bandwidthMeasureTimeDelta;
 	else
 		rdp->autodetect->netCharBandwidth = 0;
 
-	IFCALLRET(rdp->autodetect->BandwidthMeasureResults, success, rdp->context,
-	          autodetectRspPdu->sequenceNumber);
+	IFCALLRET(rdp->autodetect->BandwidthMeasureResults, success, rdp->context, autodetectRspPdu->sequenceNumber);
 	return success;
 }
 
-static BOOL autodetect_recv_netchar_result(rdpRdp* rdp, wStream* s,
-        AUTODETECT_REQ_PDU* autodetectReqPdu)
+static BOOL autodetect_recv_netchar_result(rdpRdp* rdp, wStream* s, AUTODETECT_REQ_PDU* autodetectReqPdu)
 {
 	BOOL success = TRUE;
 
@@ -508,11 +478,10 @@ static BOOL autodetect_recv_netchar_result(rdpRdp* rdp, wStream* s,
 	}
 
 	WLog_VRB(AUTODETECT_TAG,
-	         "received Network Characteristics Result PDU -> baseRTT=%"PRIu32", bandwidth=%"PRIu32", averageRTT=%"PRIu32"",
-	         rdp->autodetect->netCharBaseRTT, rdp->autodetect->netCharBandwidth,
-	         rdp->autodetect->netCharAverageRTT);
-	IFCALLRET(rdp->autodetect->NetworkCharacteristicsResult, success, rdp->context,
-	          autodetectReqPdu->sequenceNumber);
+	         "received Network Characteristics Result PDU -> baseRTT=%" PRIu32 ", bandwidth=%" PRIu32
+	         ", averageRTT=%" PRIu32 "",
+	         rdp->autodetect->netCharBaseRTT, rdp->autodetect->netCharBandwidth, rdp->autodetect->netCharAverageRTT);
+	IFCALLRET(rdp->autodetect->NetworkCharacteristicsResult, success, rdp->context, autodetectReqPdu->sequenceNumber);
 	return success;
 }
 
@@ -529,9 +498,10 @@ int rdp_recv_autodetect_request_packet(rdpRdp* rdp, wStream* s)
 	Stream_Read_UINT16(s, autodetectReqPdu.sequenceNumber); /* sequenceNumber (2 bytes) */
 	Stream_Read_UINT16(s, autodetectReqPdu.requestType); /* requestType (2 bytes) */
 	WLog_VRB(AUTODETECT_TAG,
-	         "rdp_recv_autodetect_request_packet: headerLength=%"PRIu8", headerTypeId=%"PRIu8", sequenceNumber=%"PRIu16", requestType=%04"PRIx16"",
-	         autodetectReqPdu.headerLength, autodetectReqPdu.headerTypeId,
-	         autodetectReqPdu.sequenceNumber, autodetectReqPdu.requestType);
+	         "rdp_recv_autodetect_request_packet: headerLength=%" PRIu8 ", headerTypeId=%" PRIu8
+	         ", sequenceNumber=%" PRIu16 ", requestType=%04" PRIx16 "",
+	         autodetectReqPdu.headerLength, autodetectReqPdu.headerTypeId, autodetectReqPdu.sequenceNumber,
+	         autodetectReqPdu.requestType);
 
 	if (autodetectReqPdu.headerTypeId != TYPE_ID_AUTODETECT_REQUEST)
 		return -1;
@@ -590,9 +560,10 @@ int rdp_recv_autodetect_response_packet(rdpRdp* rdp, wStream* s)
 	Stream_Read_UINT16(s, autodetectRspPdu.sequenceNumber); /* sequenceNumber (2 bytes) */
 	Stream_Read_UINT16(s, autodetectRspPdu.responseType); /* responseType (2 bytes) */
 	WLog_VRB(AUTODETECT_TAG,
-	         "rdp_recv_autodetect_response_packet: headerLength=%"PRIu8", headerTypeId=%"PRIu8", sequenceNumber=%"PRIu16", requestType=%04"PRIx16"",
-	         autodetectRspPdu.headerLength, autodetectRspPdu.headerTypeId,
-	         autodetectRspPdu.sequenceNumber, autodetectRspPdu.responseType);
+	         "rdp_recv_autodetect_response_packet: headerLength=%" PRIu8 ", headerTypeId=%" PRIu8
+	         ", sequenceNumber=%" PRIu16 ", requestType=%04" PRIx16 "",
+	         autodetectRspPdu.headerLength, autodetectRspPdu.headerTypeId, autodetectRspPdu.sequenceNumber,
+	         autodetectRspPdu.responseType);
 
 	if (autodetectRspPdu.headerTypeId != TYPE_ID_AUTODETECT_RESPONSE)
 		return -1;
@@ -628,10 +599,7 @@ rdpAutoDetect* autodetect_new(void)
 	return autoDetect;
 }
 
-void autodetect_free(rdpAutoDetect* autoDetect)
-{
-	free(autoDetect);
-}
+void autodetect_free(rdpAutoDetect* autoDetect) { free(autoDetect); }
 
 void autodetect_register_server_callbacks(rdpAutoDetect* autodetect)
 {

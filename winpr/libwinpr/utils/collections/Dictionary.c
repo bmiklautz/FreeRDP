@@ -36,37 +36,25 @@
  * Gets the number of key/value pairs contained in the Dictionary.
  */
 
-int Dictionary_Count(wDictionary* dictionary)
-{
-	return 0;
-}
+int Dictionary_Count(wDictionary* dictionary) { return 0; }
 
 /**
  * Gets a value indicating whether the Dictionary has a fixed size.
  */
 
-BOOL Dictionary_IsFixedSized(wDictionary* dictionary)
-{
-	return FALSE;
-}
+BOOL Dictionary_IsFixedSized(wDictionary* dictionary) { return FALSE; }
 
 /**
  * Gets a value indicating whether the Dictionary is read-only.
  */
 
-BOOL Dictionary_IsReadOnly(wDictionary* dictionary)
-{
-	return FALSE;
-}
+BOOL Dictionary_IsReadOnly(wDictionary* dictionary) { return FALSE; }
 
 /**
  * Gets a value indicating whether the Dictionary is synchronized (thread safe).
  */
 
-BOOL Dictionary_IsSynchronized(wDictionary* dictionary)
-{
-	return dictionary->synchronized;
-}
+BOOL Dictionary_IsSynchronized(wDictionary* dictionary) { return dictionary->synchronized; }
 
 /**
  * Methods
@@ -76,37 +64,25 @@ BOOL Dictionary_IsSynchronized(wDictionary* dictionary)
  * Adds an entry with the specified key and value into the Dictionary.
  */
 
-void Dictionary_Add(wDictionary* dictionary, void* key, void* value)
-{
-
-}
+void Dictionary_Add(wDictionary* dictionary, void* key, void* value) {}
 
 /**
  * Removes all entries from the Dictionary.
  */
 
-void Dictionary_Clear(wDictionary* dictionary)
-{
-
-}
+void Dictionary_Clear(wDictionary* dictionary) {}
 
 /**
  * Determines whether the Dictionary contains a specific key.
  */
 
-BOOL Dictionary_Contains(wDictionary* dictionary, void* key)
-{
-	return FALSE;
-}
+BOOL Dictionary_Contains(wDictionary* dictionary, void* key) { return FALSE; }
 
 /**
  * Removes the entry with the specified key from the Dictionary.
  */
 
-void Dictionary_Remove(wDictionary* dictionary, void* key)
-{
-
-}
+void Dictionary_Remove(wDictionary* dictionary, void* key) {}
 
 /**
  * Construction, Destruction
@@ -133,4 +109,3 @@ void Dictionary_Free(wDictionary* dictionary)
 
 	free(dictionary);
 }
-

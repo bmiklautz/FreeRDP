@@ -19,19 +19,19 @@
 #include <winpr/sysinfo.h>
 #include "prim_test.h"
 
-#define FUNC_TEST_SIZE	65536
+#define FUNC_TEST_SIZE 65536
 /* ========================================================================= */
 static BOOL test_add16s_func(void)
 {
 	pstatus_t status;
 
-	INT16 ALIGN(src1[FUNC_TEST_SIZE + 3]), ALIGN(src2[FUNC_TEST_SIZE + 3]),
-			ALIGN(d1[FUNC_TEST_SIZE + 3]), ALIGN(d2[FUNC_TEST_SIZE + 3]);
+	INT16 ALIGN(src1[FUNC_TEST_SIZE + 3]), ALIGN(src2[FUNC_TEST_SIZE + 3]), ALIGN(d1[FUNC_TEST_SIZE + 3]),
+	  ALIGN(d2[FUNC_TEST_SIZE + 3]);
 
 	char testStr[256];
 	testStr[0] = '\0';
-	winpr_RAND((BYTE*)src1, sizeof(src1));
-	winpr_RAND((BYTE*)src2, sizeof(src2));
+	winpr_RAND((BYTE*) src1, sizeof(src1));
+	winpr_RAND((BYTE*) src2, sizeof(src2));
 	memset(d1, 0, sizeof(d1));
 	memset(d2, 0, sizeof(d2));
 	status = generic->add_16s(src1 + 1, src2 + 1, d1 + 1, FUNC_TEST_SIZE);
@@ -49,8 +49,7 @@ static BOOL test_add16s_func(void)
 /* ------------------------------------------------------------------------- */
 static BOOL test_add16s_speed(void)
 {
-	BYTE ALIGN(src1[MAX_TEST_SIZE + 3]), ALIGN(src2[MAX_TEST_SIZE + 3]),
-			ALIGN(dst[MAX_TEST_SIZE + 3]);
+	BYTE ALIGN(src1[MAX_TEST_SIZE + 3]), ALIGN(src2[MAX_TEST_SIZE + 3]), ALIGN(dst[MAX_TEST_SIZE + 3]);
 
 	if (!g_TestPrimitivesPerformance)
 		return TRUE;
@@ -58,10 +57,8 @@ static BOOL test_add16s_speed(void)
 	winpr_RAND(src1, sizeof(src1));
 	winpr_RAND(src2, sizeof(src2));
 
-	if (!speed_test("add16s", "aligned", g_Iterations,
-			(speed_test_fkt)generic->add_16s,
-			(speed_test_fkt)optimized->add_16s,
-			src1, src2, dst, FUNC_TEST_SIZE))
+	if (!speed_test("add16s", "aligned", g_Iterations, (speed_test_fkt) generic->add_16s,
+	                (speed_test_fkt) optimized->add_16s, src1, src2, dst, FUNC_TEST_SIZE))
 		return FALSE;
 
 	return TRUE;

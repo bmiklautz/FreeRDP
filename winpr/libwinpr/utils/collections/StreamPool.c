@@ -36,7 +36,7 @@ void StreamPool_ShiftUsed(wStreamPool* pool, int index, int count)
 		if (pool->uSize + count > pool->uCapacity)
 		{
 			int new_cap;
-			wStream **new_arr;
+			wStream** new_arr;
 
 			new_cap = pool->uCapacity * 2;
 			new_arr = (wStream**) realloc(pool->uArray, sizeof(wStream*) * new_cap);
@@ -54,7 +54,7 @@ void StreamPool_ShiftUsed(wStreamPool* pool, int index, int count)
 		if (pool->uSize - index + count > 0)
 		{
 			MoveMemory(&pool->uArray[index], &pool->uArray[index - count],
-					(pool->uSize - index + count) * sizeof(wStream*));
+			           (pool->uSize - index + count) * sizeof(wStream*));
 		}
 
 		pool->uSize += count;
@@ -70,7 +70,7 @@ void StreamPool_AddUsed(wStreamPool* pool, wStream* s)
 	if ((pool->uSize + 1) >= pool->uCapacity)
 	{
 		int new_cap;
-		wStream **new_arr;
+		wStream** new_arr;
 
 		new_cap = pool->uCapacity * 2;
 		new_arr = (wStream**) realloc(pool->uArray, sizeof(wStream*) * new_cap);
@@ -112,7 +112,7 @@ void StreamPool_ShiftAvailable(wStreamPool* pool, int index, int count)
 		if (pool->aSize + count > pool->aCapacity)
 		{
 			int new_cap;
-			wStream **new_arr;
+			wStream** new_arr;
 
 			new_cap = pool->aCapacity * 2;
 			new_arr = (wStream**) realloc(pool->aArray, sizeof(wStream*) * new_cap);
@@ -130,7 +130,7 @@ void StreamPool_ShiftAvailable(wStreamPool* pool, int index, int count)
 		if (pool->aSize - index + count > 0)
 		{
 			MoveMemory(&pool->aArray[index], &pool->aArray[index - count],
-					(pool->aSize - index + count) * sizeof(wStream*));
+			           (pool->aSize - index + count) * sizeof(wStream*));
 		}
 
 		pool->aSize += count;
@@ -205,7 +205,7 @@ void StreamPool_Return(wStreamPool* pool, wStream* s)
 	if ((pool->aSize + 1) >= pool->aCapacity)
 	{
 		int new_cap;
-		wStream **new_arr;
+		wStream** new_arr;
 
 		new_cap = pool->aCapacity * 2;
 		new_arr = (wStream**) realloc(pool->aArray, sizeof(wStream*) * new_cap);
@@ -217,7 +217,7 @@ void StreamPool_Return(wStreamPool* pool, wStream* s)
 	else if ((pool->aSize + 1) * 3 < pool->aCapacity)
 	{
 		int new_cap;
-		wStream **new_arr;
+		wStream** new_arr;
 
 		new_cap = pool->aCapacity / 2;
 		new_arr = (wStream**) realloc(pool->aArray, sizeof(wStream*) * new_cap);
@@ -239,19 +239,13 @@ out_fail:
  * Lock the stream pool
  */
 
-void StreamPool_Lock(wStreamPool* pool)
-{
-	EnterCriticalSection(&pool->lock);
-}
+void StreamPool_Lock(wStreamPool* pool) { EnterCriticalSection(&pool->lock); }
 
 /**
  * Unlock the stream pool
  */
 
-void StreamPool_Unlock(wStreamPool* pool)
-{
-	LeaveCriticalSection(&pool->lock);
-}
+void StreamPool_Unlock(wStreamPool* pool) { LeaveCriticalSection(&pool->lock); }
 
 /**
  * Increment stream reference count

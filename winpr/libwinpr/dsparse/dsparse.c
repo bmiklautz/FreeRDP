@@ -45,26 +45,26 @@
 
 #if !defined(_WIN32) || defined(_UWP)
 
-DWORD DsCrackSpnW(LPCWSTR pszSpn, DWORD* pcServiceClass, LPWSTR ServiceClass, DWORD* pcServiceName,
-		LPWSTR ServiceName, DWORD* pcInstanceName, LPWSTR InstanceName, USHORT* pInstancePort)
+DWORD DsCrackSpnW(LPCWSTR pszSpn, DWORD* pcServiceClass, LPWSTR ServiceClass, DWORD* pcServiceName, LPWSTR ServiceName,
+                  DWORD* pcInstanceName, LPWSTR InstanceName, USHORT* pInstancePort)
 {
 	return 0;
 }
 
-DWORD DsCrackSpnA(LPCSTR pszSpn, LPDWORD pcServiceClass, LPSTR ServiceClass, LPDWORD pcServiceName,
-		LPSTR ServiceName, LPDWORD pcInstanceName, LPSTR InstanceName, USHORT* pInstancePort)
+DWORD DsCrackSpnA(LPCSTR pszSpn, LPDWORD pcServiceClass, LPSTR ServiceClass, LPDWORD pcServiceName, LPSTR ServiceName,
+                  LPDWORD pcInstanceName, LPSTR InstanceName, USHORT* pInstancePort)
 {
 	return 0;
 }
 
-DWORD DsMakeSpnW(LPCWSTR ServiceClass, LPCWSTR ServiceName, LPCWSTR InstanceName,
-		USHORT InstancePort, LPCWSTR Referrer, DWORD* pcSpnLength, LPWSTR pszSpn)
+DWORD DsMakeSpnW(LPCWSTR ServiceClass, LPCWSTR ServiceName, LPCWSTR InstanceName, USHORT InstancePort, LPCWSTR Referrer,
+                 DWORD* pcSpnLength, LPWSTR pszSpn)
 {
 	return 0;
 }
 
-DWORD DsMakeSpnA(LPCSTR ServiceClass, LPCSTR ServiceName, LPCSTR InstanceName,
-		USHORT InstancePort, LPCSTR Referrer, DWORD* pcSpnLength, LPSTR pszSpn)
+DWORD DsMakeSpnA(LPCSTR ServiceClass, LPCSTR ServiceName, LPCSTR InstanceName, USHORT InstancePort, LPCSTR Referrer,
+                 DWORD* pcSpnLength, LPSTR pszSpn)
 {
 	DWORD SpnLength;
 	DWORD ServiceClassLength;

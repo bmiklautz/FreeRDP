@@ -26,29 +26,14 @@
 
 #ifdef WINPR_THREAD_POOL
 
-PTP_TIMER winpr_CreateThreadpoolTimer(PTP_TIMER_CALLBACK pfnti, PVOID pv, PTP_CALLBACK_ENVIRON pcbe)
-{
-	return NULL;
-}
+PTP_TIMER winpr_CreateThreadpoolTimer(PTP_TIMER_CALLBACK pfnti, PVOID pv, PTP_CALLBACK_ENVIRON pcbe) { return NULL; }
 
-VOID winpr_CloseThreadpoolTimer(PTP_TIMER pti)
-{
+VOID winpr_CloseThreadpoolTimer(PTP_TIMER pti) {}
 
-}
+BOOL winpr_IsThreadpoolTimerSet(PTP_TIMER pti) { return FALSE; }
 
-BOOL winpr_IsThreadpoolTimerSet(PTP_TIMER pti)
-{
-	return FALSE;
-}
+VOID winpr_SetThreadpoolTimer(PTP_TIMER pti, PFILETIME pftDueTime, DWORD msPeriod, DWORD msWindowLength) {}
 
-VOID winpr_SetThreadpoolTimer(PTP_TIMER pti, PFILETIME pftDueTime, DWORD msPeriod, DWORD msWindowLength)
-{
-
-}
-
-VOID winpr_WaitForThreadpoolTimerCallbacks(PTP_TIMER pti, BOOL fCancelPendingCallbacks)
-{
-
-}
+VOID winpr_WaitForThreadpoolTimerCallbacks(PTP_TIMER pti, BOOL fCancelPendingCallbacks) {}
 
 #endif

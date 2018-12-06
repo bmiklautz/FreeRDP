@@ -112,7 +112,6 @@ IRP* irp_new(DEVMAN* devman, wStream* s, UINT* error)
 		return NULL;
 	}
 
-
 	ZeroMemory(irp, sizeof(IRP));
 
 	irp->input = s;

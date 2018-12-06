@@ -102,7 +102,7 @@ static BOOL rdp_redirection_read_unicode_string(wStream* s, char** str, size_t m
 
 	if (Stream_GetRemainingLength(s) < 4)
 	{
-		WLog_ERR(TAG,  "rdp_redirection_read_string failure: cannot read length");
+		WLog_ERR(TAG, "rdp_redirection_read_string failure: cannot read length");
 		return FALSE;
 	}
 
@@ -110,15 +110,13 @@ static BOOL rdp_redirection_read_unicode_string(wStream* s, char** str, size_t m
 
 	if ((length % 2) || length < 2 || length > maxLength)
 	{
-		WLog_ERR(TAG,  "rdp_redirection_read_string failure: invalid unicode string length: %"PRIu32"",
-		         length);
+		WLog_ERR(TAG, "rdp_redirection_read_string failure: invalid unicode string length: %" PRIu32 "", length);
 		return FALSE;
 	}
 
 	if (Stream_GetRemainingLength(s) < length)
 	{
-		WLog_ERR(TAG,
-		         "rdp_redirection_read_string failure: insufficient stream length (%"PRIu32" bytes required)",
+		WLog_ERR(TAG, "rdp_redirection_read_string failure: insufficient stream length (%" PRIu32 " bytes required)",
 		         length);
 		return FALSE;
 	}
@@ -127,13 +125,13 @@ static BOOL rdp_redirection_read_unicode_string(wStream* s, char** str, size_t m
 
 	if (wstr[length / 2 - 1])
 	{
-		WLog_ERR(TAG,  "rdp_redirection_read_string failure: unterminated unicode string");
+		WLog_ERR(TAG, "rdp_redirection_read_string failure: unterminated unicode string");
 		return FALSE;
 	}
 
 	if (ConvertFromUnicode(CP_UTF8, 0, wstr, -1, str, 0, NULL, NULL) < 1)
 	{
-		WLog_ERR(TAG,  "rdp_redirection_read_string failure: string conversion failed");
+		WLog_ERR(TAG, "rdp_redirection_read_string failure: string conversion failed");
 		return FALSE;
 	}
 
@@ -158,8 +156,7 @@ int rdp_redirection_apply_settings(rdpRdp* rdp)
 		if (!settings->LoadBalanceInfo)
 			return -1;
 
-		CopyMemory(settings->LoadBalanceInfo, redirection->LoadBalanceInfo,
-		           settings->LoadBalanceInfoLength);
+		CopyMemory(settings->LoadBalanceInfo, redirection->LoadBalanceInfo, settings->LoadBalanceInfoLength);
 	}
 	else
 	{
@@ -225,14 +222,12 @@ int rdp_redirection_apply_settings(rdpRdp* rdp)
 		/* For security reasons we'll allocate an additional zero WCHAR at the
 		 * end of the buffer that is not included in RedirectionPasswordLength
 		 */
-		settings->RedirectionPassword = (BYTE*) calloc(1,
-		                                settings->RedirectionPasswordLength + sizeof(WCHAR));
+		settings->RedirectionPassword = (BYTE*) calloc(1, settings->RedirectionPasswordLength + sizeof(WCHAR));
 
 		if (!settings->RedirectionPassword)
 			return -1;
 
-		CopyMemory(settings->RedirectionPassword, redirection->Password,
-		           settings->RedirectionPasswordLength);
+		CopyMemory(settings->RedirectionPassword, redirection->Password, settings->RedirectionPasswordLength);
 	}
 
 	if (settings->RedirectionFlags & LB_CLIENT_TSV_URL)
@@ -293,8 +288,7 @@ static BOOL rdp_recv_server_redirection_pdu(rdpRdp* rdp, wStream* s)
 	Stream_Read_UINT16(s, length); /* length (2 bytes) */
 	Stream_Read_UINT32(s, redirection->sessionID); /* sessionID (4 bytes) */
 	Stream_Read_UINT32(s, redirection->flags); /* redirFlags (4 bytes) */
-	WLog_DBG(TAG,
-	         "flags: 0x%04"PRIX16", redirFlags: 0x%08"PRIX32" length: %"PRIu16", sessionID: 0x%08"PRIX32"",
+	WLog_DBG(TAG, "flags: 0x%04" PRIX16 ", redirFlags: 0x%08" PRIX32 " length: %" PRIu16 ", sessionID: 0x%08" PRIX32 "",
 	         flags, redirection->flags, length, redirection->sessionID);
 	rdp_print_redirection_flags(redirection->flags);
 
@@ -322,7 +316,7 @@ static BOOL rdp_recv_server_redirection_pdu(rdpRdp* rdp, wStream* s)
 		 * load balance info example data:
 		 * 0000  43 6f 6f 6b 69 65 3a 20 6d 73 74 73 3d 32 31 33  Cookie: msts=213
 		 * 0010  34 30 32 36 34 33 32 2e 31 35 36 32 39 2e 30 30  4026432.15629.00
-		         * 0020  30 30 0d 0a                                      00..
+		 * 0020  30 30 0d 0a                                      00..
 		 */
 		if (Stream_GetRemainingLength(s) < 4)
 			return -1;
@@ -462,7 +456,7 @@ static BOOL rdp_recv_server_redirection_pdu(rdpRdp* rdp, wStream* s)
 		if (!redirection->TargetNetAddresses)
 			return FALSE;
 
-		WLog_DBG(TAG, "TargetNetAddressesCount: %"PRIu32"", redirection->TargetNetAddressesCount);
+		WLog_DBG(TAG, "TargetNetAddressesCount: %" PRIu32 "", redirection->TargetNetAddressesCount);
 
 		for (i = 0; i < (int) count; i++)
 		{
@@ -546,4 +540,3 @@ void redirection_free(rdpRedirection* redirection)
 		free(redirection);
 	}
 }
-

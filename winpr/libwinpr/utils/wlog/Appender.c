@@ -102,35 +102,35 @@ wLogAppender* WLog_Appender_New(wLog* log, DWORD logAppenderType)
 
 	switch (logAppenderType)
 	{
-	case WLOG_APPENDER_CONSOLE:
-		appender = WLog_ConsoleAppender_New(log);
-		break;
-	case WLOG_APPENDER_FILE:
-		appender = WLog_FileAppender_New(log);
-		break;
-	case WLOG_APPENDER_BINARY:
-		appender = WLog_BinaryAppender_New(log);
-		break;
-	case WLOG_APPENDER_CALLBACK:
-		appender = WLog_CallbackAppender_New(log);
-		break;
+		case WLOG_APPENDER_CONSOLE:
+			appender = WLog_ConsoleAppender_New(log);
+			break;
+		case WLOG_APPENDER_FILE:
+			appender = WLog_FileAppender_New(log);
+			break;
+		case WLOG_APPENDER_BINARY:
+			appender = WLog_BinaryAppender_New(log);
+			break;
+		case WLOG_APPENDER_CALLBACK:
+			appender = WLog_CallbackAppender_New(log);
+			break;
 #ifdef HAVE_SYSLOG_H
-	case WLOG_APPENDER_SYSLOG:
-		appender = WLog_SyslogAppender_New(log);
-		break;
+		case WLOG_APPENDER_SYSLOG:
+			appender = WLog_SyslogAppender_New(log);
+			break;
 #endif
 #ifdef HAVE_JOURNALD_H
-	case WLOG_APPENDER_JOURNALD:
-		appender = WLog_JournaldAppender_New(log);
-		break;
+		case WLOG_APPENDER_JOURNALD:
+			appender = WLog_JournaldAppender_New(log);
+			break;
 #endif
-	case WLOG_APPENDER_UDP:
-		appender = (wLogAppender*) WLog_UdpAppender_New(log);
-		break;
-	default:
-		fprintf(stderr, "%s: unknown handler type %"PRIu32"\n", __FUNCTION__, logAppenderType);
-		appender = NULL;
-		break;
+		case WLOG_APPENDER_UDP:
+			appender = (wLogAppender*) WLog_UdpAppender_New(log);
+			break;
+		default:
+			fprintf(stderr, "%s: unknown handler type %" PRIu32 "\n", __FUNCTION__, logAppenderType);
+			appender = NULL;
+			break;
 	}
 
 	if (!appender)
@@ -165,7 +165,7 @@ BOOL WLog_SetLogAppenderType(wLog* log, DWORD logAppenderType)
 	return log->Appender != NULL;
 }
 
-BOOL WLog_ConfigureAppender(wLogAppender *appender, const char *setting, void *value)
+BOOL WLog_ConfigureAppender(wLogAppender* appender, const char* setting, void* value)
 {
 	if (!appender || !setting || !strlen(setting))
 		return FALSE;
@@ -174,5 +174,4 @@ BOOL WLog_ConfigureAppender(wLogAppender *appender, const char *setting, void *v
 		return appender->Set(appender, setting, value);
 	else
 		return FALSE;
-
 }

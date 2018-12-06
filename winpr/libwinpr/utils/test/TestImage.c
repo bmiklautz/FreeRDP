@@ -40,13 +40,13 @@ static void* read_image(const char* src, size_t* size)
 
 	if (!a)
 	{
-		fprintf(stderr, "Failed malloc %"PRId64" bytes\n", src_size);
+		fprintf(stderr, "Failed malloc %" PRId64 " bytes\n", src_size);
 		goto cleanup;
 	}
 
 	if (fread(a, sizeof(char), src_size, fsrc) != src_size)
 	{
-		fprintf(stderr, "Failed read %"PRId64" bytes\n", src_size);
+		fprintf(stderr, "Failed read %" PRId64 " bytes\n", src_size);
 		goto cleanup;
 	}
 
@@ -102,8 +102,7 @@ static int img_compare(wImage* image, wImage* image2, BOOL ignoreType)
 
 	if (image->bytesPerPixel != image2->bytesPerPixel)
 	{
-		fprintf(stderr, "Image bytesPerPixel mismatch %d:%d\n", image->bytesPerPixel,
-		        image2->bytesPerPixel);
+		fprintf(stderr, "Image bytesPerPixel mismatch %d:%d\n", image->bytesPerPixel, image2->bytesPerPixel);
 		goto cleanup;
 	}
 
@@ -148,7 +147,7 @@ static int create_test(const char* src, const char* dst_png, const char* dst_bmp
 	int status;
 	size_t bsize;
 	void* buffer = NULL;
-	wImage* image = NULL, *image2 = NULL, *image3 = NULL, *image4 = NULL;
+	wImage *image = NULL, *image2 = NULL, *image3 = NULL, *image4 = NULL;
 
 	if (!PathFileExistsA(src))
 	{
@@ -292,4 +291,3 @@ int TestImage(int argc, char* argv[])
 	int rc = test_image_png_to_bmp();
 	return rc;
 }
-

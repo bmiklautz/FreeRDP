@@ -59,12 +59,12 @@ UINT32 audio_format_compute_time_length(const AUDIO_FORMAT* format, size_t size)
 			}
 			else
 			{
-				WLog_ERR(TAG,  "audio_format_compute_time_length: invalid WAVE_FORMAT_GSM610 format");
+				WLog_ERR(TAG, "audio_format_compute_time_length: invalid WAVE_FORMAT_GSM610 format");
 			}
 		}
 		else
 		{
-			WLog_ERR(TAG,  "audio_format_compute_time_length: unknown format %"PRIu16"", format->wFormatTag);
+			WLog_ERR(TAG, "audio_format_compute_time_length: unknown format %" PRIu16 "", format->wFormatTag);
 		}
 	}
 
@@ -115,11 +115,11 @@ char* audio_format_get_tag_string(UINT16 wFormatTag)
 void audio_format_print(wLog* log, DWORD level, const AUDIO_FORMAT* format)
 {
 	WLog_Print(log, level,
-	           "%s:\t wFormatTag: 0x%04"PRIX16" nChannels: %"PRIu16" nSamplesPerSec: %"PRIu32" "
-	           "nAvgBytesPerSec: %"PRIu32" nBlockAlign: %"PRIu16" wBitsPerSample: %"PRIu16" cbSize: %"PRIu16"",
-	           audio_format_get_tag_string(format->wFormatTag), format->wFormatTag,
-	           format->nChannels, format->nSamplesPerSec, format->nAvgBytesPerSec,
-	           format->nBlockAlign, format->wBitsPerSample, format->cbSize);
+	           "%s:\t wFormatTag: 0x%04" PRIX16 " nChannels: %" PRIu16 " nSamplesPerSec: %" PRIu32 " "
+	           "nAvgBytesPerSec: %" PRIu32 " nBlockAlign: %" PRIu16 " wBitsPerSample: %" PRIu16 " cbSize: %" PRIu16 "",
+	           audio_format_get_tag_string(format->wFormatTag), format->wFormatTag, format->nChannels,
+	           format->nSamplesPerSec, format->nAvgBytesPerSec, format->nBlockAlign, format->wBitsPerSample,
+	           format->cbSize);
 }
 
 void audio_formats_print(wLog* log, DWORD level, const AUDIO_FORMAT* formats, UINT16 count)
@@ -129,16 +129,16 @@ void audio_formats_print(wLog* log, DWORD level, const AUDIO_FORMAT* formats, UI
 
 	if (formats)
 	{
-		WLog_Print(log, level,  "AUDIO_FORMATS (%"PRIu16") ={", count);
+		WLog_Print(log, level, "AUDIO_FORMATS (%" PRIu16 ") ={", count);
 
 		for (index = 0; index < count; index++)
 		{
 			format = &formats[index];
-			WLog_Print(log, level,  "\t");
+			WLog_Print(log, level, "\t");
 			audio_format_print(log, level, format);
 		}
 
-		WLog_Print(log, level,  "}");
+		WLog_Print(log, level, "}");
 	}
 }
 
@@ -264,15 +264,9 @@ BOOL audio_format_valid(const AUDIO_FORMAT* format)
 	return TRUE;
 }
 
-AUDIO_FORMAT* audio_format_new(void)
-{
-	return audio_formats_new(1);
-}
+AUDIO_FORMAT* audio_format_new(void) { return audio_formats_new(1); }
 
-AUDIO_FORMAT* audio_formats_new(size_t count)
-{
-	return calloc(count, sizeof(AUDIO_FORMAT));
-}
+AUDIO_FORMAT* audio_formats_new(size_t count) { return calloc(count, sizeof(AUDIO_FORMAT)); }
 
 void audio_format_free(AUDIO_FORMAT* format)
 {

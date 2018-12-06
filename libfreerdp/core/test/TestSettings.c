@@ -2,8 +2,8 @@
 
 int TestSettings(int argc, char* argv[])
 {
-	rdpSettings *settings = NULL;
-	rdpSettings *cloned;
+	rdpSettings* settings = NULL;
+	rdpSettings* cloned;
 
 	settings = freerdp_settings_new(0);
 	if (!settings)
@@ -20,9 +20,8 @@ int TestSettings(int argc, char* argv[])
 		freerdp_settings_free(settings);
 		return -1;
 	}
-	
+
 	freerdp_settings_free(cloned);
 	freerdp_settings_free(settings);
 	return 0;
 }
-

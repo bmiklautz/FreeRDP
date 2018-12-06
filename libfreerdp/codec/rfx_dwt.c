@@ -59,12 +59,12 @@ static void rfx_dwt_2d_decode_block(INT16* buffer, INT16* idwt, int subband_widt
 		for (n = 1; n < subband_width; n++)
 		{
 			x = n << 1;
-			l_dst[x] = ll[n] - ((hl[n-1] + hl[n] + 1) >> 1);
-			h_dst[x] = lh[n] - ((hh[n-1] + hh[n] + 1) >> 1);
+			l_dst[x] = ll[n] - ((hl[n - 1] + hl[n] + 1) >> 1);
+			h_dst[x] = lh[n] - ((hh[n - 1] + hh[n] + 1) >> 1);
 		}
 
 		/* Odd coefficients */
-		for (n = 0; n < subband_width-1; n++)
+		for (n = 0; n < subband_width - 1; n++)
 		{
 			x = n << 1;
 			l_dst[x + 1] = (hl[n] << 1) + ((l_dst[x] + l_dst[x + 2]) >> 1);
@@ -72,7 +72,7 @@ static void rfx_dwt_2d_decode_block(INT16* buffer, INT16* idwt, int subband_widt
 		}
 		x = n << 1;
 		l_dst[x + 1] = (hl[n] << 1) + (l_dst[x]);
-		h_dst[x + 1] = (hh[n] << 1) + (h_dst[x]);		
+		h_dst[x + 1] = (hh[n] << 1) + (h_dst[x]);
 
 		ll += subband_width;
 		hl += subband_width;
@@ -144,7 +144,8 @@ static void rfx_dwt_2d_encode_block(INT16* buffer, INT16* dwt, int subband_width
 		}
 	}
 
-	/* DWT in horizontal direction, results in 4 sub-bands in HL(0), LH(1), HH(2), LL(3) order, stored in original buffer. */
+	/* DWT in horizontal direction, results in 4 sub-bands in HL(0), LH(1), HH(2), LL(3) order, stored in original
+	 * buffer. */
 	/* The lower part L generates LL(3) and HL(0). */
 	/* The higher part H generates LH(1) and HH(2). */
 

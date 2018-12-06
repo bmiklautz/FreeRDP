@@ -60,8 +60,7 @@ BOOL test_peer_context_new(freerdp_peer* client, testPeerContext* context)
 	if (!(context->rfx_context = rfx_context_new(TRUE)))
 		goto fail_rfx_context;
 
-	if (!rfx_context_reset(context->rfx_context, SAMPLE_SERVER_DEFAULT_WIDTH,
-	                       SAMPLE_SERVER_DEFAULT_HEIGHT))
+	if (!rfx_context_reset(context->rfx_context, SAMPLE_SERVER_DEFAULT_WIDTH, SAMPLE_SERVER_DEFAULT_HEIGHT))
 		goto fail_rfx_context;
 
 	context->rfx_context->mode = RLGR3;
@@ -197,8 +196,7 @@ static BOOL test_peer_draw_background(freerdp_peer* client)
 
 	if (client->settings->RemoteFxCodec)
 	{
-		if (!rfx_compose_message(context->rfx_context, s,
-		                         &rect, 1, rgb_data, rect.width, rect.height, rect.width * 3))
+		if (!rfx_compose_message(context->rfx_context, s, &rect, 1, rgb_data, rect.width, rect.height, rect.width * 3))
 		{
 			goto out;
 		}
@@ -207,8 +205,7 @@ static BOOL test_peer_draw_background(freerdp_peer* client)
 	}
 	else
 	{
-		nsc_compose_message(context->nsc_context, s,
-		                    rgb_data, rect.width, rect.height, rect.width * 3);
+		nsc_compose_message(context->nsc_context, s, rgb_data, rect.width, rect.height, rect.width * 3);
 		cmd.bmp.codecID = client->settings->NSCodecId;
 	}
 
@@ -276,7 +273,7 @@ static BOOL test_peer_load_icon(freerdp_peer* client)
 		if (!fgets(line, sizeof(line), fp) || (sscanf(line, "%d", &c) != 1))
 			goto out_fail;
 
-		rgb_data[i] = (BYTE)c;
+		rgb_data[i] = (BYTE) c;
 	}
 
 	/* background with same size, which will be used to erase the icon from old position */
@@ -289,7 +286,7 @@ static BOOL test_peer_load_icon(freerdp_peer* client)
 	return TRUE;
 out_fail:
 	free(rgb_data);
-	context->bg_data =  NULL;
+	context->bg_data = NULL;
 	fclose(fp);
 	return FALSE;
 }
@@ -323,14 +320,13 @@ static void test_peer_draw_icon(freerdp_peer* client, int x, int y)
 
 		if (client->settings->RemoteFxCodec)
 		{
-			rfx_compose_message(context->rfx_context, s,
-			                    &rect, 1, context->bg_data, rect.width, rect.height, rect.width * 3);
+			rfx_compose_message(context->rfx_context, s, &rect, 1, context->bg_data, rect.width, rect.height,
+			                    rect.width * 3);
 			cmd.bmp.codecID = client->settings->RemoteFxCodecId;
 		}
 		else
 		{
-			nsc_compose_message(context->nsc_context, s,
-			                    context->bg_data, rect.width, rect.height, rect.width * 3);
+			nsc_compose_message(context->nsc_context, s, context->bg_data, rect.width, rect.height, rect.width * 3);
 			cmd.bmp.codecID = client->settings->NSCodecId;
 		}
 
@@ -351,14 +347,13 @@ static void test_peer_draw_icon(freerdp_peer* client, int x, int y)
 
 	if (client->settings->RemoteFxCodec)
 	{
-		rfx_compose_message(context->rfx_context, s,
-		                    &rect, 1, context->icon_data, rect.width, rect.height, rect.width * 3);
+		rfx_compose_message(context->rfx_context, s, &rect, 1, context->icon_data, rect.width, rect.height,
+		                    rect.width * 3);
 		cmd.bmp.codecID = client->settings->RemoteFxCodecId;
 	}
 	else
 	{
-		nsc_compose_message(context->nsc_context, s,
-		                    context->icon_data, rect.width, rect.height, rect.width * 3);
+		nsc_compose_message(context->nsc_context, s, context->icon_data, rect.width, rect.height, rect.width * 3);
 		cmd.bmp.codecID = client->settings->NSCodecId;
 	}
 
@@ -377,8 +372,7 @@ static void test_peer_draw_icon(freerdp_peer* client, int x, int y)
 	test_peer_end_frame(client);
 }
 
-static BOOL test_sleep_tsdiff(UINT32* old_sec, UINT32* old_usec, UINT32 new_sec,
-                              UINT32 new_usec)
+static BOOL test_sleep_tsdiff(UINT32* old_sec, UINT32* old_usec, UINT32 new_sec, UINT32 new_usec)
 {
 	INT32 sec, usec;
 
@@ -448,9 +442,8 @@ BOOL tf_peer_dump_rfx(freerdp_peer* client)
 		pcap_get_next_record_content(pcap_rfx, &record);
 		Stream_SetPointer(s, Stream_Buffer(s) + Stream_Capacity(s));
 
-		if (test_dump_rfx_realtime
-		    && test_sleep_tsdiff(&prev_seconds, &prev_useconds, record.header.ts_sec,
-		                         record.header.ts_usec) == FALSE)
+		if (test_dump_rfx_realtime &&
+		    test_sleep_tsdiff(&prev_seconds, &prev_useconds, record.header.ts_sec, record.header.ts_usec) == FALSE)
 			break;
 
 		update->SurfaceCommand(update->context, s);
@@ -473,8 +466,7 @@ static DWORD WINAPI tf_debug_channel_thread_func(LPVOID arg)
 	ULONG written;
 	testPeerContext* context = (testPeerContext*) arg;
 
-	if (WTSVirtualChannelQuery(context->debug_channel, WTSVirtualFileHandle,
-	                           &buffer, &BytesReturned) == TRUE)
+	if (WTSVirtualChannelQuery(context->debug_channel, WTSVirtualFileHandle, &buffer, &BytesReturned) == TRUE)
 	{
 		fd = *((void**) buffer);
 		WTSFreeMemory(buffer);
@@ -495,16 +487,16 @@ static DWORD WINAPI tf_debug_channel_thread_func(LPVOID arg)
 
 		Stream_SetPosition(s, 0);
 
-		if (WTSVirtualChannelRead(context->debug_channel, 0, (PCHAR) Stream_Buffer(s),
-		                          Stream_Capacity(s), &BytesReturned) == FALSE)
+		if (WTSVirtualChannelRead(context->debug_channel, 0, (PCHAR) Stream_Buffer(s), Stream_Capacity(s),
+		                          &BytesReturned) == FALSE)
 		{
 			if (BytesReturned == 0)
 				break;
 
 			Stream_EnsureRemainingCapacity(s, BytesReturned);
 
-			if (WTSVirtualChannelRead(context->debug_channel, 0, (PCHAR) Stream_Buffer(s),
-			                          Stream_Capacity(s), &BytesReturned) == FALSE)
+			if (WTSVirtualChannelRead(context->debug_channel, 0, (PCHAR) Stream_Buffer(s), Stream_Capacity(s),
+			                          &BytesReturned) == FALSE)
 			{
 				/* should not happen */
 				break;
@@ -512,7 +504,7 @@ static DWORD WINAPI tf_debug_channel_thread_func(LPVOID arg)
 		}
 
 		Stream_SetPosition(s, BytesReturned);
-		WLog_DBG(TAG, "got %"PRIu32" bytes", BytesReturned);
+		WLog_DBG(TAG, "got %" PRIu32 " bytes", BytesReturned);
 	}
 
 	Stream_Free(s, TRUE);
@@ -528,33 +520,30 @@ BOOL tf_peer_post_connect(freerdp_peer* client)
 	 * The server may start sending graphics output and receiving keyboard/mouse input after this
 	 * callback returns.
 	 */
-	WLog_DBG(TAG, "Client %s is activated (osMajorType %"PRIu32" osMinorType %"PRIu32")",
-	         client->local ? "(local)" : client->hostname,
-	         client->settings->OsMajorType, client->settings->OsMinorType);
+	WLog_DBG(TAG, "Client %s is activated (osMajorType %" PRIu32 " osMinorType %" PRIu32 ")",
+	         client->local ? "(local)" : client->hostname, client->settings->OsMajorType,
+	         client->settings->OsMinorType);
 
 	if (client->settings->AutoLogonEnabled)
 	{
 		WLog_DBG(TAG, " and wants to login automatically as %s\\%s",
-		         client->settings->Domain ? client->settings->Domain : "",
-		         client->settings->Username);
+		         client->settings->Domain ? client->settings->Domain : "", client->settings->Username);
 		/* A real server may perform OS login here if NLA is not executed previously. */
 	}
 
 	WLog_DBG(TAG, "");
-	WLog_DBG(TAG, "Client requested desktop: %"PRIu32"x%"PRIu32"x%"PRIu32"",
-	         client->settings->DesktopWidth, client->settings->DesktopHeight,
-	         client->settings->ColorDepth);
+	WLog_DBG(TAG, "Client requested desktop: %" PRIu32 "x%" PRIu32 "x%" PRIu32 "", client->settings->DesktopWidth,
+	         client->settings->DesktopHeight, client->settings->ColorDepth);
 #if (SAMPLE_SERVER_USE_CLIENT_RESOLUTION == 1)
 
-	if (!rfx_context_reset(context->rfx_context, client->settings->DesktopWidth,
-	                       client->settings->DesktopHeight))
+	if (!rfx_context_reset(context->rfx_context, client->settings->DesktopWidth, client->settings->DesktopHeight))
 		return FALSE;
 
 	WLog_DBG(TAG, "Using resolution requested by client.");
 #else
 	client->settings->DesktopWidth = context->rfx_context->width;
 	client->settings->DesktopHeight = context->rfx_context->height;
-	WLog_DBG(TAG, "Resizing client to %"PRIu32"x%"PRIu32"", client->settings->DesktopWidth,
+	WLog_DBG(TAG, "Resizing client to %" PRIu32 "x%" PRIu32 "", client->settings->DesktopWidth,
 	         client->settings->DesktopHeight);
 	client->update->DesktopResize(client->update->context);
 #endif
@@ -568,8 +557,7 @@ BOOL tf_peer_post_connect(freerdp_peer* client)
 
 	if (WTSVirtualChannelManagerIsChannelJoined(context->vcm, "rdpdbg"))
 	{
-		context->debug_channel = WTSVirtualChannelOpen(context->vcm,
-		                         WTS_CURRENT_SESSION, "rdpdbg");
+		context->debug_channel = WTSVirtualChannelOpen(context->vcm, WTS_CURRENT_SESSION, "rdpdbg");
 
 		if (context->debug_channel != NULL)
 		{
@@ -581,8 +569,8 @@ BOOL tf_peer_post_connect(freerdp_peer* client)
 				return FALSE;
 			}
 
-			if (!(context->debug_channel_thread = CreateThread(NULL, 0,
-												  tf_debug_channel_thread_func, (void*) context, 0, NULL)))
+			if (!(context->debug_channel_thread =
+			        CreateThread(NULL, 0, tf_debug_channel_thread_func, (void*) context, 0, NULL)))
 			{
 				WLog_ERR(TAG, "Failed to create debug channel thread");
 				CloseHandle(context->stopEvent);
@@ -612,9 +600,9 @@ BOOL tf_peer_activate(freerdp_peer* client)
 {
 	testPeerContext* context = (testPeerContext*) client->context;
 	context->activated = TRUE;
-	//client->settings->CompressionLevel = PACKET_COMPR_TYPE_8K;
-	//client->settings->CompressionLevel = PACKET_COMPR_TYPE_64K;
-	//client->settings->CompressionLevel = PACKET_COMPR_TYPE_RDP6;
+	// client->settings->CompressionLevel = PACKET_COMPR_TYPE_8K;
+	// client->settings->CompressionLevel = PACKET_COMPR_TYPE_64K;
+	// client->settings->CompressionLevel = PACKET_COMPR_TYPE_RDP6;
 	client->settings->CompressionLevel = PACKET_COMPR_TYPE_RDP61;
 
 	if (test_pcap_file != NULL)
@@ -632,7 +620,7 @@ BOOL tf_peer_activate(freerdp_peer* client)
 
 BOOL tf_peer_synchronize_event(rdpInput* input, UINT32 flags)
 {
-	WLog_DBG(TAG, "Client sent a synchronize event (flags:0x%"PRIX32")", flags);
+	WLog_DBG(TAG, "Client sent a synchronize event (flags:0x%" PRIX32 ")", flags);
 	return TRUE;
 }
 
@@ -641,8 +629,7 @@ BOOL tf_peer_keyboard_event(rdpInput* input, UINT16 flags, UINT16 code)
 	freerdp_peer* client = input->context->peer;
 	rdpUpdate* update = client->update;
 	testPeerContext* context = (testPeerContext*) input->context;
-	WLog_DBG(TAG, "Client sent a keyboard event (flags:0x%04"PRIX16" code:0x%04"PRIX16")", flags,
-	         code);
+	WLog_DBG(TAG, "Client sent a keyboard event (flags:0x%04" PRIX16 " code:0x%04" PRIX16 ")", flags, code);
 
 	if ((flags & 0x4000) && code == 0x22) /* 'g' key */
 	{
@@ -657,8 +644,7 @@ BOOL tf_peer_keyboard_event(rdpInput* input, UINT16 flags, UINT16 code)
 			client->settings->DesktopHeight = SAMPLE_SERVER_DEFAULT_HEIGHT;
 		}
 
-		if (!rfx_context_reset(context->rfx_context, client->settings->DesktopWidth,
-		                       client->settings->DesktopHeight))
+		if (!rfx_context_reset(context->rfx_context, client->settings->DesktopWidth, client->settings->DesktopHeight))
 			return FALSE;
 
 		update->DesktopResize(update->context);
@@ -698,48 +684,43 @@ BOOL tf_peer_keyboard_event(rdpInput* input, UINT16 flags, UINT16 code)
 
 BOOL tf_peer_unicode_keyboard_event(rdpInput* input, UINT16 flags, UINT16 code)
 {
-	WLog_DBG(TAG, "Client sent a unicode keyboard event (flags:0x%04"PRIX16" code:0x%04"PRIX16")",
-	         flags, code);
+	WLog_DBG(TAG, "Client sent a unicode keyboard event (flags:0x%04" PRIX16 " code:0x%04" PRIX16 ")", flags, code);
 	return TRUE;
 }
 
 BOOL tf_peer_mouse_event(rdpInput* input, UINT16 flags, UINT16 x, UINT16 y)
 {
-	//WLog_DBG(TAG, "Client sent a mouse event (flags:0x%04"PRIX16" pos:%"PRIu16",%"PRIu16")", flags, x, y);
+	// WLog_DBG(TAG, "Client sent a mouse event (flags:0x%04"PRIX16" pos:%"PRIu16",%"PRIu16")", flags, x, y);
 	test_peer_draw_icon(input->context->peer, x + 10, y);
 	return TRUE;
 }
 
-BOOL tf_peer_extended_mouse_event(rdpInput* input, UINT16 flags, UINT16 x,
-                                  UINT16 y)
+BOOL tf_peer_extended_mouse_event(rdpInput* input, UINT16 flags, UINT16 x, UINT16 y)
 {
-	//WLog_DBG(TAG, "Client sent an extended mouse event (flags:0x%04"PRIX16" pos:%"PRIu16",%"PRIu16")", flags, x, y);
+	// WLog_DBG(TAG, "Client sent an extended mouse event (flags:0x%04"PRIX16" pos:%"PRIu16",%"PRIu16")", flags, x, y);
 	return TRUE;
 }
 
-static BOOL tf_peer_refresh_rect(rdpContext* context, BYTE count,
-                                 const RECTANGLE_16* areas)
+static BOOL tf_peer_refresh_rect(rdpContext* context, BYTE count, const RECTANGLE_16* areas)
 {
 	BYTE i;
 	WLog_DBG(TAG, "Client requested to refresh:");
 
 	for (i = 0; i < count; i++)
 	{
-		WLog_DBG(TAG, "  (%"PRIu16", %"PRIu16") (%"PRIu16", %"PRIu16")", areas[i].left, areas[i].top,
+		WLog_DBG(TAG, "  (%" PRIu16 ", %" PRIu16 ") (%" PRIu16 ", %" PRIu16 ")", areas[i].left, areas[i].top,
 		         areas[i].right, areas[i].bottom);
 	}
 
 	return TRUE;
 }
 
-static BOOL tf_peer_suppress_output(rdpContext* context, BYTE allow,
-                                    const RECTANGLE_16* area)
+static BOOL tf_peer_suppress_output(rdpContext* context, BYTE allow, const RECTANGLE_16* area)
 {
 	if (allow > 0)
 	{
-		WLog_DBG(TAG, "Client restore output (%"PRIu16", %"PRIu16") (%"PRIu16", %"PRIu16").", area->left,
-		         area->top,
-		         area->right, area->bottom);
+		WLog_DBG(TAG, "Client restore output (%" PRIu16 ", %" PRIu16 ") (%" PRIu16 ", %" PRIu16 ").", area->left,
+		         area->top, area->right, area->bottom);
 	}
 	else
 	{
@@ -768,8 +749,7 @@ static DWORD WINAPI test_peer_mainloop(LPVOID arg)
 	client->settings->PrivateKeyFile = _strdup("server.key");
 	client->settings->RdpKeyFile = _strdup("server.key");
 
-	if (!client->settings->CertificateFile || !client->settings->PrivateKeyFile
-	    || !client->settings->RdpKeyFile)
+	if (!client->settings->CertificateFile || !client->settings->PrivateKeyFile || !client->settings->RdpKeyFile)
 	{
 		WLog_ERR(TAG, "Memory allocation failed (strdup)");
 		freerdp_peer_free(client);
@@ -799,8 +779,7 @@ static DWORD WINAPI test_peer_mainloop(LPVOID arg)
 	client->settings->MultifragMaxRequestSize = 0xFFFFFF; /* FIXME */
 	client->Initialize(client);
 	context = (testPeerContext*) client->context;
-	WLog_INFO(TAG, "We've got a client %s",
-	          client->local ? "(local)" : client->hostname);
+	WLog_INFO(TAG, "We've got a client %s", client->local ? "(local)" : client->hostname);
 
 	while (1)
 	{
@@ -832,8 +811,7 @@ static DWORD WINAPI test_peer_mainloop(LPVOID arg)
 			break;
 	}
 
-	WLog_INFO(TAG, "Client %s disconnected.",
-	          client->local ? "(local)" : client->hostname);
+	WLog_INFO(TAG, "Client %s disconnected.", client->local ? "(local)" : client->hostname);
 	client->Disconnect(client);
 	freerdp_peer_context_free(client);
 	freerdp_peer_free(client);
@@ -945,8 +923,7 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	if ((localOnly || instance->Open(instance, NULL, port)) &&
-	    instance->OpenLocal(instance, file))
+	if ((localOnly || instance->Open(instance, NULL, port)) && instance->OpenLocal(instance, file))
 	{
 		/* Entering the server main loop. In a real server the listener can be run in its own thread. */
 		test_server_mainloop(instance);
@@ -957,4 +934,3 @@ int main(int argc, char* argv[])
 	WSACleanup();
 	return 0;
 }
-

@@ -36,11 +36,11 @@ void er_read_length(wStream* s, int* length)
 
 	if (!length)
 		return;
-	
+
 	*length = 0;
 	if (!s)
 		return;
-	
+
 	if (byte & 0x80)
 	{
 		byte &= ~(0x80);
@@ -200,10 +200,7 @@ int er_write_contextual_tag(wStream* s, BYTE tag, int length, BOOL pc, BOOL flag
 	return er_write_length(s, length, flag) + 1;
 }
 
-int er_skip_contextual_tag(int length)
-{
-	return _er_skip_length(length) + 1;
-}
+int er_skip_contextual_tag(int length) { return _er_skip_length(length) + 1; }
 
 BOOL er_read_sequence_tag(wStream* s, int* length)
 {
@@ -231,15 +228,9 @@ int er_write_sequence_tag(wStream* s, int length, BOOL flag)
 	return er_write_length(s, length, flag) + 1;
 }
 
-int er_skip_sequence(int length)
-{
-	return 1 + _er_skip_length(length) + length;
-}
+int er_skip_sequence(int length) { return 1 + _er_skip_length(length) + length; }
 
-int er_skip_sequence_tag(int length)
-{
-	return 1 + _er_skip_length(length);
-}
+int er_skip_sequence_tag(int length) { return 1 + _er_skip_length(length); }
 
 BOOL er_read_enumerated(wStream* s, BYTE* enumerated, BYTE count)
 {
@@ -286,7 +277,7 @@ BOOL er_write_bit_string_tag(wStream* s, UINT32 length, BYTE padding, BOOL flag)
 
 BOOL er_read_octet_string(wStream* s, int* length)
 {
-	if(!er_read_universal_tag(s, ER_TAG_OCTET_STRING, FALSE))
+	if (!er_read_universal_tag(s, ER_TAG_OCTET_STRING, FALSE))
 		return FALSE;
 	er_read_length(s, length);
 
@@ -314,10 +305,7 @@ int er_write_octet_string_tag(wStream* s, int length, BOOL flag)
 	return 1 + _er_skip_length(length);
 }
 
-int er_skip_octet_string(int length)
-{
-	return 1 + _er_skip_length(length) + length;
-}
+int er_skip_octet_string(int length) { return 1 + _er_skip_length(length) + length; }
 
 /**
  * Read a er BOOLEAN

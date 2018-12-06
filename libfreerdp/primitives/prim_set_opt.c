@@ -24,10 +24,10 @@
 #include <winpr/sysinfo.h>
 
 #ifdef WITH_SSE2
-# include <emmintrin.h>
+#include <emmintrin.h>
 #endif /* WITH_SSE2 */
 #ifdef WITH_IPP
-# include <ipps.h>
+#include <ipps.h>
 #endif /* WITH_IPP */
 
 #include "prim_internal.h"
@@ -36,19 +36,17 @@ static primitives_t* generic = NULL;
 
 /* ========================================================================= */
 #ifdef WITH_SSE2
-# if !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS)
-static pstatus_t sse2_set_8u(
-    BYTE val,
-    BYTE* pDst,
-    UINT32 len)
+#if !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS)
+static pstatus_t sse2_set_8u(BYTE val, BYTE* pDst, UINT32 len)
 {
 	BYTE byte, *dptr;
 	__m128i xmm0;
 	size_t count;
 
-	if (len < 16) return generic->set_8u(val, pDst, len);
+	if (len < 16)
+		return generic->set_8u(val, pDst, len);
 
-	byte  = val;
+	byte = val;
 	dptr = (BYTE*) pDst;
 
 	/* Seek 16-byte alignment. */
@@ -56,7 +54,8 @@ static pstatus_t sse2_set_8u(
 	{
 		*dptr++ = byte;
 
-		if (--len == 0) return PRIMITIVES_SUCCESS;
+		if (--len == 0)
+			return PRIMITIVES_SUCCESS;
 	}
 
 	xmm0 = _mm_set1_epi8(byte);
@@ -113,20 +112,18 @@ static pstatus_t sse2_set_8u(
 	}
 
 	/* Do leftover bytes. */
-	while (len--) *dptr++ = byte;
+	while (len--)
+		*dptr++ = byte;
 
 	return PRIMITIVES_SUCCESS;
 }
-# endif /* !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS) */
+#endif /* !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS) */
 #endif /* WITH_SSE2 */
 
 /* ------------------------------------------------------------------------- */
 #ifdef WITH_SSE2
-# if !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS)
-static pstatus_t sse2_set_32u(
-    UINT32 val,
-    UINT32* pDst,
-    UINT32 len)
+#if !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS)
+static pstatus_t sse2_set_32u(UINT32 val, UINT32* pDst, UINT32 len)
 {
 	const primitives_t* prim = primitives_get_generic();
 	UINT32* dptr = (UINT32*) pDst;
@@ -136,7 +133,8 @@ static pstatus_t sse2_set_32u(
 	/* If really short, just do it here. */
 	if (len < 32)
 	{
-		while (len--) *dptr++ = val;
+		while (len--)
+			*dptr++ = val;
 
 		return PRIMITIVES_SUCCESS;
 	}
@@ -152,7 +150,8 @@ static pstatus_t sse2_set_32u(
 	{
 		*dptr++ = val;
 
-		if (--len == 0) return PRIMITIVES_SUCCESS;
+		if (--len == 0)
+			return PRIMITIVES_SUCCESS;
 	}
 
 	xmm0 = _mm_set1_epi32(val);
@@ -209,29 +208,24 @@ static pstatus_t sse2_set_32u(
 	}
 
 	/* Do leftover bytes. */
-	while (len--) *dptr++ = val;
+	while (len--)
+		*dptr++ = val;
 
 	return PRIMITIVES_SUCCESS;
 }
 
 /* ------------------------------------------------------------------------- */
-static pstatus_t sse2_set_32s(
-    INT32 val,
-    INT32* pDst,
-    UINT32 len)
+static pstatus_t sse2_set_32s(INT32 val, INT32* pDst, UINT32 len)
 {
 	UINT32 uval = *((UINT32*) &val);
 	return sse2_set_32u(uval, (UINT32*) pDst, len);
 }
-# endif /* !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS) */
+#endif /* !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS) */
 #endif /* WITH_SSE2 */
 
 #ifdef WITH_IPP
 /* ------------------------------------------------------------------------- */
-static pstatus_t ipp_wrapper_set_32u(
-    UINT32 val,
-    UINT32* pDst,
-    INT32 len)
+static pstatus_t ipp_wrapper_set_32u(UINT32 val, UINT32* pDst, INT32 len)
 {
 	/* A little type conversion, then use the signed version. */
 	INT32 sval = *((INT32*) &val);
@@ -246,7 +240,7 @@ void primitives_init_set_opt(primitives_t* prims)
 	primitives_init_set(prims);
 	/* Pick tuned versions if possible. */
 #ifdef WITH_IPP
-	prims->set_8u  = (__set_8u_t)  ippsSet_8u;
+	prims->set_8u = (__set_8u_t) ippsSet_8u;
 	prims->set_32s = (__set_32s_t) ippsSet_32s;
 	prims->set_32u = (__set_32u_t) ipp_wrapper_set_32u;
 	prims->zero = (__zero_t) ippsZero_8u;
@@ -254,11 +248,10 @@ void primitives_init_set_opt(primitives_t* prims)
 
 	if (IsProcessorFeaturePresent(PF_SSE2_INSTRUCTIONS_AVAILABLE))
 	{
-		prims->set_8u  = sse2_set_8u;
+		prims->set_8u = sse2_set_8u;
 		prims->set_32s = sse2_set_32s;
 		prims->set_32u = sse2_set_32u;
 	}
 
 #endif
 }
-

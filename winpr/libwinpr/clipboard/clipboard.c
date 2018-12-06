@@ -44,30 +44,28 @@
  * http://www.w3.org/TR/clipboard-apis/
  */
 
-const char* CF_STANDARD_STRINGS[CF_MAX] =
-{
-	"CF_RAW",		/* 0 */
-	"CF_TEXT",		/* 1 */
-	"CF_BITMAP",		/* 2 */
-	"CF_METAFILEPICT",	/* 3 */
-	"CF_SYLK",		/* 4 */
-	"CF_DIF",		/* 5 */
-	"CF_TIFF",		/* 6 */
-	"CF_OEMTEXT",		/* 7 */
-	"CF_DIB",		/* 8 */
-	"CF_PALETTE",		/* 9 */
-	"CF_PENDATA",		/* 10 */
-	"CF_RIFF",		/* 11 */
-	"CF_WAVE",		/* 12 */
-	"CF_UNICODETEXT",	/* 13 */
-	"CF_ENHMETAFILE",	/* 14 */
-	"CF_HDROP",		/* 15 */
-	"CF_LOCALE",		/* 16 */
-	"CF_DIBV5"		/* 17 */
+const char* CF_STANDARD_STRINGS[CF_MAX] = {
+	"CF_RAW", /* 0 */
+	"CF_TEXT", /* 1 */
+	"CF_BITMAP", /* 2 */
+	"CF_METAFILEPICT", /* 3 */
+	"CF_SYLK", /* 4 */
+	"CF_DIF", /* 5 */
+	"CF_TIFF", /* 6 */
+	"CF_OEMTEXT", /* 7 */
+	"CF_DIB", /* 8 */
+	"CF_PALETTE", /* 9 */
+	"CF_PENDATA", /* 10 */
+	"CF_RIFF", /* 11 */
+	"CF_WAVE", /* 12 */
+	"CF_UNICODETEXT", /* 13 */
+	"CF_ENHMETAFILE", /* 14 */
+	"CF_HDROP", /* 15 */
+	"CF_LOCALE", /* 16 */
+	"CF_DIBV5" /* 17 */
 };
 
-wClipboardFormat* ClipboardFindFormat(wClipboard* clipboard, UINT32 formatId,
-                                      const char* name)
+wClipboardFormat* ClipboardFindFormat(wClipboard* clipboard, UINT32 formatId, const char* name)
 {
 	UINT32 index;
 	wClipboardFormat* format = NULL;
@@ -107,8 +105,7 @@ wClipboardFormat* ClipboardFindFormat(wClipboard* clipboard, UINT32 formatId,
 			if (format->formatId)
 				return NULL;
 
-			if (!format->formatName
-			    || (strcmp(format->formatName, CF_STANDARD_STRINGS[0]) == 0))
+			if (!format->formatName || (strcmp(format->formatName, CF_STANDARD_STRINGS[0]) == 0))
 				return format;
 		}
 	}
@@ -116,8 +113,7 @@ wClipboardFormat* ClipboardFindFormat(wClipboard* clipboard, UINT32 formatId,
 	return format;
 }
 
-wClipboardSynthesizer* ClipboardFindSynthesizer(wClipboardFormat* format,
-        UINT32 formatId)
+wClipboardSynthesizer* ClipboardFindSynthesizer(wClipboardFormat* format, UINT32 formatId)
 {
 	UINT32 index;
 	wClipboardSynthesizer* synthesizer;
@@ -180,8 +176,7 @@ UINT32 ClipboardCountRegisteredFormats(wClipboard* clipboard)
 	return clipboard->numFormats;
 }
 
-UINT32 ClipboardGetRegisteredFormatIds(wClipboard* clipboard,
-                                       UINT32** ppFormatIds)
+UINT32 ClipboardGetRegisteredFormatIds(wClipboard* clipboard, UINT32** ppFormatIds)
 {
 	UINT32 index;
 	UINT32* pFormatIds;
@@ -230,13 +225,12 @@ UINT32 ClipboardRegisterFormat(wClipboard* clipboard, const char* name)
 	{
 		UINT32 numFormats = clipboard->maxFormats * 2;
 		wClipboardFormat* tmpFormat;
-		tmpFormat = (wClipboardFormat*) realloc(clipboard->formats,
-		                                        numFormats * sizeof(wClipboardFormat));
+		tmpFormat = (wClipboardFormat*) realloc(clipboard->formats, numFormats * sizeof(wClipboardFormat));
 
 		if (!tmpFormat)
 			return 0;
 
-		clipboard->formats  = tmpFormat;
+		clipboard->formats = tmpFormat;
 		clipboard->maxFormats = numFormats;
 	}
 
@@ -256,8 +250,8 @@ UINT32 ClipboardRegisterFormat(wClipboard* clipboard, const char* name)
 	return format->formatId;
 }
 
-BOOL ClipboardRegisterSynthesizer(wClipboard* clipboard, UINT32 formatId,
-                                  UINT32 syntheticId, CLIPBOARD_SYNTHESIZE_FN pfnSynthesize)
+BOOL ClipboardRegisterSynthesizer(wClipboard* clipboard, UINT32 formatId, UINT32 syntheticId,
+                                  CLIPBOARD_SYNTHESIZE_FN pfnSynthesize)
 {
 	UINT32 index;
 	wClipboardFormat* format;
@@ -280,13 +274,13 @@ BOOL ClipboardRegisterSynthesizer(wClipboard* clipboard, UINT32 formatId,
 	{
 		wClipboardSynthesizer* tmpSynthesizer;
 		UINT32 numSynthesizers = format->numSynthesizers + 1;
-		tmpSynthesizer = (wClipboardSynthesizer*) realloc(format->synthesizers,
-		                 numSynthesizers * sizeof(wClipboardSynthesizer));
+		tmpSynthesizer =
+		  (wClipboardSynthesizer*) realloc(format->synthesizers, numSynthesizers * sizeof(wClipboardSynthesizer));
 
 		if (!tmpSynthesizer)
 			return FALSE;
 
-		format->synthesizers  = tmpSynthesizer;
+		format->synthesizers = tmpSynthesizer;
 		format->numSynthesizers = numSynthesizers;
 		index = numSynthesizers - 1;
 		synthesizer = &(format->synthesizers[index]);
@@ -464,16 +458,14 @@ void* ClipboardGetData(wClipboard* clipboard, UINT32 formatId, UINT32* pSize)
 			return NULL;
 
 		DstSize = SrcSize;
-		pDstData = synthesizer->pfnSynthesize(clipboard, format->formatId, pSrcData,
-		                                      &DstSize);
+		pDstData = synthesizer->pfnSynthesize(clipboard, format->formatId, pSrcData, &DstSize);
 		*pSize = DstSize;
 	}
 
 	return pDstData;
 }
 
-BOOL ClipboardSetData(wClipboard* clipboard, UINT32 formatId, const void* data,
-                      UINT32 size)
+BOOL ClipboardSetData(wClipboard* clipboard, UINT32 formatId, const void* data, UINT32 size)
 {
 	wClipboardFormat* format;
 
@@ -561,8 +553,7 @@ wClipboard* ClipboardCreate()
 	clipboard->numFormats = 0;
 	clipboard->maxFormats = 64;
 
-	clipboard->formats = (wClipboardFormat*)
-		calloc(clipboard->maxFormats, sizeof(wClipboardFormat));
+	clipboard->formats = (wClipboardFormat*) calloc(clipboard->maxFormats, sizeof(wClipboardFormat));
 	if (!clipboard->formats)
 		goto error_free_lock;
 

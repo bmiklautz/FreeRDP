@@ -46,15 +46,9 @@ wEventType* PubSub_GetEventTypes(wPubSub* pubSub, int* count)
  * Methods
  */
 
-void PubSub_Lock(wPubSub* pubSub)
-{
-	EnterCriticalSection(&pubSub->lock);
-}
+void PubSub_Lock(wPubSub* pubSub) { EnterCriticalSection(&pubSub->lock); }
 
-void PubSub_Unlock(wPubSub* pubSub)
-{
-	LeaveCriticalSection(&pubSub->lock);
-}
+void PubSub_Unlock(wPubSub* pubSub) { LeaveCriticalSection(&pubSub->lock); }
 
 wEventType* PubSub_FindEventType(wPubSub* pubSub, const char* EventName)
 {
@@ -81,7 +75,7 @@ void PubSub_AddEventTypes(wPubSub* pubSub, wEventType* events, int count)
 	while (pubSub->count + count >= pubSub->size)
 	{
 		int new_size;
-		wEventType *new_event;
+		wEventType* new_event;
 
 		new_size = pubSub->size * 2;
 		new_event = (wEventType*) realloc(pubSub->events, new_size * sizeof(wEventType));
@@ -151,7 +145,7 @@ int PubSub_Unsubscribe(wPubSub* pubSub, const char* EventName, pEventHandler Eve
 				event->EventHandlers[index] = NULL;
 				event->EventHandlerCount--;
 				MoveMemory(&event->EventHandlers[index], &event->EventHandlers[index + 1],
-				        (MAX_EVENT_HANDLERS - index - 1) * sizeof(pEventHandler));
+				           (MAX_EVENT_HANDLERS - index - 1) * sizeof(pEventHandler));
 				status = 1;
 			}
 		}

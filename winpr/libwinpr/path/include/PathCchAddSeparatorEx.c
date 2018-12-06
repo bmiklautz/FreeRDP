@@ -62,4 +62,3 @@ HRESULT PATH_CCH_ADD_SEPARATOR_EX(PSTR pszPath, size_t cchPath, PSTR* ppszEnd, s
 #undef _PATH_SEPARATOR_CHR
 #undef PATH_CCH_ADD_SEPARATOR_EX
 */
-

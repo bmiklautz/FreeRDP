@@ -36,11 +36,8 @@
 extern "C" {
 #endif
 
-
-
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* FREERDP_SERVER_SHADOW_SHADOW_H */
-

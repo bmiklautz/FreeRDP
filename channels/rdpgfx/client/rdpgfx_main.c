@@ -118,7 +118,7 @@ static UINT rdpgfx_send_caps_advertise_pdu(RDPGFX_CHANNEL_CALLBACK* callback)
 	}
 
 	header.pduLength = RDPGFX_HEADER_SIZE + 2 + (pdu.capsSetCount * RDPGFX_CAPSET_SIZE);
-	WLog_Print(gfx->log, WLOG_DEBUG, "SendCapsAdvertisePdu %"PRIu16"", pdu.capsSetCount);
+	WLog_Print(gfx->log, WLOG_DEBUG, "SendCapsAdvertisePdu %" PRIu16 "", pdu.capsSetCount);
 	s = Stream_New(NULL, header.pduLength);
 
 	if (!s)
@@ -142,8 +142,7 @@ static UINT rdpgfx_send_caps_advertise_pdu(RDPGFX_CHANNEL_CALLBACK* callback)
 	}
 
 	Stream_SealLength(s);
-	error = callback->channel->Write(callback->channel, (UINT32) Stream_Length(s),
-	                                 Stream_Buffer(s), NULL);
+	error = callback->channel->Write(callback->channel, (UINT32) Stream_Length(s), Stream_Buffer(s), NULL);
 fail:
 	Stream_Free(s, TRUE);
 	return error;
@@ -154,8 +153,7 @@ fail:
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT rdpgfx_recv_caps_confirm_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
-        wStream* s)
+static UINT rdpgfx_recv_caps_confirm_pdu(RDPGFX_CHANNEL_CALLBACK* callback, wStream* s)
 {
 	RDPGFX_CAPSET capsSet;
 	UINT32 capsDataLength;
@@ -176,8 +174,8 @@ static UINT rdpgfx_recv_caps_confirm_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
 
 	gfx->ConnectionCaps = capsSet;
 
-	WLog_Print(gfx->log, WLOG_DEBUG, "RecvCapsConfirmPdu: version: 0x%08"PRIX32" flags: 0x%08"PRIX32"",
-	         capsSet.version, capsSet.flags);
+	WLog_Print(gfx->log, WLOG_DEBUG, "RecvCapsConfirmPdu: version: 0x%08" PRIX32 " flags: 0x%08" PRIX32 "",
+	           capsSet.version, capsSet.flags);
 	return CHANNEL_RC_OK;
 }
 
@@ -186,8 +184,7 @@ static UINT rdpgfx_recv_caps_confirm_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT rdpgfx_send_frame_acknowledge_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
-        RDPGFX_FRAME_ACKNOWLEDGE_PDU* pdu)
+static UINT rdpgfx_send_frame_acknowledge_pdu(RDPGFX_CHANNEL_CALLBACK* callback, RDPGFX_FRAME_ACKNOWLEDGE_PDU* pdu)
 {
 	UINT error;
 	wStream* s;
@@ -197,7 +194,7 @@ static UINT rdpgfx_send_frame_acknowledge_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
 	header.flags = 0;
 	header.cmdId = RDPGFX_CMDID_FRAMEACKNOWLEDGE;
 	header.pduLength = RDPGFX_HEADER_SIZE + 12;
-	WLog_Print(gfx->log, WLOG_DEBUG, "SendFrameAcknowledgePdu: %"PRIu32"", pdu->frameId);
+	WLog_Print(gfx->log, WLOG_DEBUG, "SendFrameAcknowledgePdu: %" PRIu32 "", pdu->frameId);
 
 	s = Stream_New(NULL, header.pduLength);
 	if (!s)
@@ -212,10 +209,8 @@ static UINT rdpgfx_send_frame_acknowledge_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
 	/* RDPGFX_FRAME_ACKNOWLEDGE_PDU */
 	Stream_Write_UINT32(s, pdu->queueDepth); /* queueDepth (4 bytes) */
 	Stream_Write_UINT32(s, pdu->frameId); /* frameId (4 bytes) */
-	Stream_Write_UINT32(s,
-	                    pdu->totalFramesDecoded); /* totalFramesDecoded (4 bytes) */
-	error = callback->channel->Write(callback->channel, (UINT32) Stream_Length(s),
-	                                 Stream_Buffer(s), NULL);
+	Stream_Write_UINT32(s, pdu->totalFramesDecoded); /* totalFramesDecoded (4 bytes) */
+	error = callback->channel->Write(callback->channel, (UINT32) Stream_Length(s), Stream_Buffer(s), NULL);
 fail:
 	Stream_Free(s, TRUE);
 	return error;
@@ -232,7 +227,7 @@ static UINT rdpgfx_send_qoe_frame_acknowledge_pdu(RDPGFX_CHANNEL_CALLBACK* callb
 	header.flags = 0;
 	header.cmdId = RDPGFX_CMDID_QOEFRAMEACKNOWLEDGE;
 	header.pduLength = RDPGFX_HEADER_SIZE + 12;
-	WLog_Print(gfx->log, WLOG_DEBUG, "SendQoeFrameAcknowledgePdu: %"PRIu32"", pdu->frameId);
+	WLog_Print(gfx->log, WLOG_DEBUG, "SendQoeFrameAcknowledgePdu: %" PRIu32 "", pdu->frameId);
 
 	s = Stream_New(NULL, header.pduLength);
 	if (!s)
@@ -250,8 +245,7 @@ static UINT rdpgfx_send_qoe_frame_acknowledge_pdu(RDPGFX_CHANNEL_CALLBACK* callb
 	Stream_Write_UINT16(s, pdu->timeDiffSE);
 	Stream_Write_UINT16(s, pdu->timeDiffEDR);
 
-	error = callback->channel->Write(callback->channel, (UINT32) Stream_Length(s),
-	                                 Stream_Buffer(s), NULL);
+	error = callback->channel->Write(callback->channel, (UINT32) Stream_Length(s), Stream_Buffer(s), NULL);
 fail:
 	Stream_Free(s, TRUE);
 	return error;
@@ -262,8 +256,7 @@ fail:
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT rdpgfx_recv_reset_graphics_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
-        wStream* s)
+static UINT rdpgfx_recv_reset_graphics_pdu(RDPGFX_CHANNEL_CALLBACK* callback, wStream* s)
 {
 	int pad;
 	UINT32 index;
@@ -317,15 +310,16 @@ static UINT rdpgfx_recv_reset_graphics_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
 	}
 
 	Stream_Seek(s, pad); /* pad (total size is 340 bytes) */
-	WLog_Print(gfx->log, WLOG_DEBUG, "RecvResetGraphicsPdu: width: %"PRIu32" height: %"PRIu32" count: %"PRIu32"",
-	         pdu.width, pdu.height, pdu.monitorCount);
+	WLog_Print(gfx->log, WLOG_DEBUG, "RecvResetGraphicsPdu: width: %" PRIu32 " height: %" PRIu32 " count: %" PRIu32 "",
+	           pdu.width, pdu.height, pdu.monitorCount);
 
 	for (index = 0; index < pdu.monitorCount; index++)
 	{
 		monitor = &(pdu.monitorDefArray[index]);
 		WLog_Print(gfx->log, WLOG_DEBUG,
-		         "RecvResetGraphicsPdu: monitor left:%"PRIi32" top:%"PRIi32" right:%"PRIi32" left:%"PRIi32" flags:0x%"PRIx32"",
-		         monitor->left, monitor->top, monitor->right, monitor->bottom, monitor->flags);
+		           "RecvResetGraphicsPdu: monitor left:%" PRIi32 " top:%" PRIi32 " right:%" PRIi32 " left:%" PRIi32
+		           " flags:0x%" PRIx32 "",
+		           monitor->left, monitor->top, monitor->right, monitor->bottom, monitor->flags);
 	}
 
 	if (context)
@@ -333,7 +327,7 @@ static UINT rdpgfx_recv_reset_graphics_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
 		IFCALLRET(context->ResetGraphics, error, context, &pdu);
 
 		if (error)
-			WLog_Print(gfx->log, WLOG_ERROR, "context->ResetGraphics failed with error %"PRIu32"", error);
+			WLog_Print(gfx->log, WLOG_ERROR, "context->ResetGraphics failed with error %" PRIu32 "", error);
 	}
 
 	/* some listeners may be interested (namely the display channel) */
@@ -351,8 +345,7 @@ static UINT rdpgfx_recv_reset_graphics_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT rdpgfx_recv_evict_cache_entry_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
-        wStream* s)
+static UINT rdpgfx_recv_evict_cache_entry_pdu(RDPGFX_CHANNEL_CALLBACK* callback, wStream* s)
 {
 	RDPGFX_EVICT_CACHE_ENTRY_PDU pdu;
 	RDPGFX_PLUGIN* gfx = (RDPGFX_PLUGIN*) callback->plugin;
@@ -366,14 +359,14 @@ static UINT rdpgfx_recv_evict_cache_entry_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
 	}
 
 	Stream_Read_UINT16(s, pdu.cacheSlot); /* cacheSlot (2 bytes) */
-	WLog_Print(gfx->log, WLOG_DEBUG, "RecvEvictCacheEntryPdu: cacheSlot: %"PRIu16"", pdu.cacheSlot);
+	WLog_Print(gfx->log, WLOG_DEBUG, "RecvEvictCacheEntryPdu: cacheSlot: %" PRIu16 "", pdu.cacheSlot);
 
 	if (context)
 	{
 		IFCALLRET(context->EvictCacheEntry, error, context, &pdu);
 
 		if (error)
-			WLog_Print(gfx->log, WLOG_ERROR, "context->EvictCacheEntry failed with error %"PRIu32"", error);
+			WLog_Print(gfx->log, WLOG_ERROR, "context->EvictCacheEntry failed with error %" PRIu32 "", error);
 	}
 
 	return error;
@@ -384,8 +377,7 @@ static UINT rdpgfx_recv_evict_cache_entry_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT rdpgfx_recv_cache_import_reply_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
-        wStream* s)
+static UINT rdpgfx_recv_cache_import_reply_pdu(RDPGFX_CHANNEL_CALLBACK* callback, wStream* s)
 {
 	UINT16 index;
 	RDPGFX_CACHE_IMPORT_REPLY_PDU pdu;
@@ -419,15 +411,15 @@ static UINT rdpgfx_recv_cache_import_reply_pdu(RDPGFX_CHANNEL_CALLBACK* callback
 		Stream_Read_UINT16(s, pdu.cacheSlots[index]); /* cacheSlot (2 bytes) */
 	}
 
-	WLog_Print(gfx->log, WLOG_DEBUG, "RecvCacheImportReplyPdu: importedEntriesCount: %"PRIu16"",
-	         pdu.importedEntriesCount);
+	WLog_Print(gfx->log, WLOG_DEBUG, "RecvCacheImportReplyPdu: importedEntriesCount: %" PRIu16 "",
+	           pdu.importedEntriesCount);
 
 	if (context)
 	{
 		IFCALLRET(context->CacheImportReply, error, context, &pdu);
 
 		if (error)
-			WLog_Print(gfx->log, WLOG_ERROR, "context->CacheImportReply failed with error %"PRIu32"", error);
+			WLog_Print(gfx->log, WLOG_ERROR, "context->CacheImportReply failed with error %" PRIu32 "", error);
 	}
 
 	free(pdu.cacheSlots);
@@ -439,8 +431,7 @@ static UINT rdpgfx_recv_cache_import_reply_pdu(RDPGFX_CHANNEL_CALLBACK* callback
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT rdpgfx_recv_create_surface_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
-        wStream* s)
+static UINT rdpgfx_recv_create_surface_pdu(RDPGFX_CHANNEL_CALLBACK* callback, wStream* s)
 {
 	RDPGFX_CREATE_SURFACE_PDU pdu;
 	RDPGFX_PLUGIN* gfx = (RDPGFX_PLUGIN*) callback->plugin;
@@ -458,15 +449,16 @@ static UINT rdpgfx_recv_create_surface_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
 	Stream_Read_UINT16(s, pdu.height); /* height (2 bytes) */
 	Stream_Read_UINT8(s, pdu.pixelFormat); /* RDPGFX_PIXELFORMAT (1 byte) */
 	WLog_Print(gfx->log, WLOG_DEBUG,
-	         "RecvCreateSurfacePdu: surfaceId: %"PRIu16" width: %"PRIu16" height: %"PRIu16" pixelFormat: 0x%02"PRIX8"",
-	         pdu.surfaceId, pdu.width, pdu.height, pdu.pixelFormat);
+	           "RecvCreateSurfacePdu: surfaceId: %" PRIu16 " width: %" PRIu16 " height: %" PRIu16
+	           " pixelFormat: 0x%02" PRIX8 "",
+	           pdu.surfaceId, pdu.width, pdu.height, pdu.pixelFormat);
 
 	if (context)
 	{
 		IFCALLRET(context->CreateSurface, error, context, &pdu);
 
 		if (error)
-			WLog_Print(gfx->log, WLOG_ERROR, "context->CreateSurface failed with error %"PRIu32"", error);
+			WLog_Print(gfx->log, WLOG_ERROR, "context->CreateSurface failed with error %" PRIu32 "", error);
 	}
 
 	return error;
@@ -477,8 +469,7 @@ static UINT rdpgfx_recv_create_surface_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT rdpgfx_recv_delete_surface_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
-        wStream* s)
+static UINT rdpgfx_recv_delete_surface_pdu(RDPGFX_CHANNEL_CALLBACK* callback, wStream* s)
 {
 	RDPGFX_DELETE_SURFACE_PDU pdu;
 	RDPGFX_PLUGIN* gfx = (RDPGFX_PLUGIN*) callback->plugin;
@@ -492,14 +483,14 @@ static UINT rdpgfx_recv_delete_surface_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
 	}
 
 	Stream_Read_UINT16(s, pdu.surfaceId); /* surfaceId (2 bytes) */
-	WLog_Print(gfx->log, WLOG_DEBUG, "RecvDeleteSurfacePdu: surfaceId: %"PRIu16"", pdu.surfaceId);
+	WLog_Print(gfx->log, WLOG_DEBUG, "RecvDeleteSurfacePdu: surfaceId: %" PRIu16 "", pdu.surfaceId);
 
 	if (context)
 	{
 		IFCALLRET(context->DeleteSurface, error, context, &pdu);
 
 		if (error)
-			WLog_Print(gfx->log, WLOG_ERROR, "context->DeleteSurface failed with error %"PRIu32"", error);
+			WLog_Print(gfx->log, WLOG_ERROR, "context->DeleteSurface failed with error %" PRIu32 "", error);
 	}
 
 	return error;
@@ -510,8 +501,7 @@ static UINT rdpgfx_recv_delete_surface_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT rdpgfx_recv_start_frame_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
-                                        wStream* s)
+static UINT rdpgfx_recv_start_frame_pdu(RDPGFX_CHANNEL_CALLBACK* callback, wStream* s)
 {
 	RDPGFX_START_FRAME_PDU pdu;
 	RDPGFX_PLUGIN* gfx = (RDPGFX_PLUGIN*) callback->plugin;
@@ -526,8 +516,8 @@ static UINT rdpgfx_recv_start_frame_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
 
 	Stream_Read_UINT32(s, pdu.timestamp); /* timestamp (4 bytes) */
 	Stream_Read_UINT32(s, pdu.frameId); /* frameId (4 bytes) */
-	WLog_Print(gfx->log, WLOG_DEBUG, "RecvStartFramePdu: frameId: %"PRIu32" timestamp: 0x%08"PRIX32"",
-	         pdu.frameId, pdu.timestamp);
+	WLog_Print(gfx->log, WLOG_DEBUG, "RecvStartFramePdu: frameId: %" PRIu32 " timestamp: 0x%08" PRIX32 "", pdu.frameId,
+	           pdu.timestamp);
 
 	gfx->StartDecodingTime = GetTickCountPrecise();
 	if (context)
@@ -535,7 +525,7 @@ static UINT rdpgfx_recv_start_frame_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
 		IFCALLRET(context->StartFrame, error, context, &pdu);
 
 		if (error)
-			WLog_Print(gfx->log, WLOG_ERROR, "context->StartFrame failed with error %"PRIu32"", error);
+			WLog_Print(gfx->log, WLOG_ERROR, "context->StartFrame failed with error %" PRIu32 "", error);
 	}
 
 	gfx->UnacknowledgedFrames++;
@@ -547,8 +537,7 @@ static UINT rdpgfx_recv_start_frame_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT rdpgfx_recv_end_frame_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
-                                      wStream* s)
+static UINT rdpgfx_recv_end_frame_pdu(RDPGFX_CHANNEL_CALLBACK* callback, wStream* s)
 {
 	RDPGFX_END_FRAME_PDU pdu;
 	RDPGFX_FRAME_ACKNOWLEDGE_PDU ack;
@@ -563,7 +552,7 @@ static UINT rdpgfx_recv_end_frame_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
 	}
 
 	Stream_Read_UINT32(s, pdu.frameId); /* frameId (4 bytes) */
-	WLog_Print(gfx->log, WLOG_DEBUG, "RecvEndFramePdu: frameId: %"PRIu32"", pdu.frameId);
+	WLog_Print(gfx->log, WLOG_DEBUG, "RecvEndFramePdu: frameId: %" PRIu32 "", pdu.frameId);
 
 	if (context)
 	{
@@ -571,7 +560,7 @@ static UINT rdpgfx_recv_end_frame_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
 
 		if (error)
 		{
-			WLog_Print(gfx->log, WLOG_ERROR, "context->EndFrame failed with error %"PRIu32"", error);
+			WLog_Print(gfx->log, WLOG_ERROR, "context->EndFrame failed with error %" PRIu32 "", error);
 			return error;
 		}
 	}
@@ -587,39 +576,41 @@ static UINT rdpgfx_recv_end_frame_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
 
 		if (gfx->TotalDecodedFrames == 1)
 			if ((error = rdpgfx_send_frame_acknowledge_pdu(callback, &ack)))
-				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_send_frame_acknowledge_pdu failed with error %"PRIu32"", error);
+				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_send_frame_acknowledge_pdu failed with error %" PRIu32 "",
+				           error);
 	}
 	else
 	{
 		ack.queueDepth = QUEUE_DEPTH_UNAVAILABLE;
 
 		if ((error = rdpgfx_send_frame_acknowledge_pdu(callback, &ack)))
-			WLog_Print(gfx->log, WLOG_DEBUG, "rdpgfx_send_frame_acknowledge_pdu failed with error %"PRIu32"", error);
+			WLog_Print(gfx->log, WLOG_DEBUG, "rdpgfx_send_frame_acknowledge_pdu failed with error %" PRIu32 "", error);
 	}
 
-	switch(gfx->ConnectionCaps.version)
+	switch (gfx->ConnectionCaps.version)
 	{
-	case RDPGFX_CAPVERSION_10:
-	case RDPGFX_CAPVERSION_102:
-	case RDPGFX_CAPVERSION_103:
-		if (gfx->SendQoeAck)
-		{
-			RDPGFX_QOE_FRAME_ACKNOWLEDGE_PDU qoe;
-			UINT32 diff = (GetTickCountPrecise() - gfx->StartDecodingTime);
+		case RDPGFX_CAPVERSION_10:
+		case RDPGFX_CAPVERSION_102:
+		case RDPGFX_CAPVERSION_103:
+			if (gfx->SendQoeAck)
+			{
+				RDPGFX_QOE_FRAME_ACKNOWLEDGE_PDU qoe;
+				UINT32 diff = (GetTickCountPrecise() - gfx->StartDecodingTime);
 
-			if (diff > 65000)
-				diff = 0;
+				if (diff > 65000)
+					diff = 0;
 
-			qoe.frameId = pdu.frameId;
-			qoe.timestamp = gfx->StartDecodingTime;
-			qoe.timeDiffSE = diff;
-			qoe.timeDiffEDR = 1;
-			if ((error = rdpgfx_send_qoe_frame_acknowledge_pdu(callback, &qoe)))
-				WLog_Print(gfx->log, WLOG_DEBUG, "rdpgfx_send_frame_acknowledge_pdu failed with error %"PRIu32"", error);
-		}
-		break;
-	default:
-		break;
+				qoe.frameId = pdu.frameId;
+				qoe.timestamp = gfx->StartDecodingTime;
+				qoe.timeDiffSE = diff;
+				qoe.timeDiffEDR = 1;
+				if ((error = rdpgfx_send_qoe_frame_acknowledge_pdu(callback, &qoe)))
+					WLog_Print(gfx->log, WLOG_DEBUG, "rdpgfx_send_frame_acknowledge_pdu failed with error %" PRIu32 "",
+					           error);
+			}
+			break;
+		default:
+			break;
 	}
 
 	return error;
@@ -630,8 +621,7 @@ static UINT rdpgfx_recv_end_frame_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT rdpgfx_recv_wire_to_surface_1_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
-        wStream* s)
+static UINT rdpgfx_recv_wire_to_surface_1_pdu(RDPGFX_CHANNEL_CALLBACK* callback, wStream* s)
 {
 	RDPGFX_SURFACE_COMMAND cmd;
 	RDPGFX_WIRE_TO_SURFACE_PDU_1 pdu;
@@ -650,7 +640,7 @@ static UINT rdpgfx_recv_wire_to_surface_1_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
 
 	if ((error = rdpgfx_read_rect16(s, &(pdu.destRect)))) /* destRect (8 bytes) */
 	{
-		WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_read_rect16 failed with error %"PRIu32"", error);
+		WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_read_rect16 failed with error %" PRIu32 "", error);
 		return error;
 	}
 
@@ -665,13 +655,12 @@ static UINT rdpgfx_recv_wire_to_surface_1_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
 	pdu.bitmapData = Stream_Pointer(s);
 	Stream_Seek(s, pdu.bitmapDataLength);
 	WLog_Print(gfx->log, WLOG_DEBUG,
-	         "RecvWireToSurface1Pdu: surfaceId: %"PRIu16" codecId: %s (0x%04"PRIX16") pixelFormat: 0x%02"PRIX8" "
-	         "destRect: left: %"PRIu16" top: %"PRIu16" right: %"PRIu16" bottom: %"PRIu16" bitmapDataLength: %"PRIu32"",
-	         pdu.surfaceId, rdpgfx_get_codec_id_string(pdu.codecId),
-	         pdu.codecId, pdu.pixelFormat,
-	         pdu.destRect.left, pdu.destRect.top,
-	         pdu.destRect.right, pdu.destRect.bottom,
-	         pdu.bitmapDataLength);
+	           "RecvWireToSurface1Pdu: surfaceId: %" PRIu16 " codecId: %s (0x%04" PRIX16 ") pixelFormat: 0x%02" PRIX8
+	           " "
+	           "destRect: left: %" PRIu16 " top: %" PRIu16 " right: %" PRIu16 " bottom: %" PRIu16
+	           " bitmapDataLength: %" PRIu32 "",
+	           pdu.surfaceId, rdpgfx_get_codec_id_string(pdu.codecId), pdu.codecId, pdu.pixelFormat, pdu.destRect.left,
+	           pdu.destRect.top, pdu.destRect.right, pdu.destRect.bottom, pdu.bitmapDataLength);
 	cmd.surfaceId = pdu.surfaceId;
 	cmd.codecId = pdu.codecId;
 	cmd.contextId = 0;
@@ -701,7 +690,7 @@ static UINT rdpgfx_recv_wire_to_surface_1_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
 	cmd.extra = NULL;
 
 	if ((error = rdpgfx_decode(gfx, &cmd)))
-		WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_decode failed with error %"PRIu32"!", error);
+		WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_decode failed with error %" PRIu32 "!", error);
 
 	return error;
 }
@@ -711,8 +700,7 @@ static UINT rdpgfx_recv_wire_to_surface_1_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT rdpgfx_recv_wire_to_surface_2_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
-        wStream* s)
+static UINT rdpgfx_recv_wire_to_surface_2_pdu(RDPGFX_CHANNEL_CALLBACK* callback, wStream* s)
 {
 	RDPGFX_SURFACE_COMMAND cmd;
 	RDPGFX_WIRE_TO_SURFACE_PDU_2 pdu;
@@ -733,10 +721,11 @@ static UINT rdpgfx_recv_wire_to_surface_2_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
 	Stream_Read_UINT32(s, pdu.bitmapDataLength); /* bitmapDataLength (4 bytes) */
 	pdu.bitmapData = Stream_Pointer(s);
 	Stream_Seek(s, pdu.bitmapDataLength);
-	WLog_Print(gfx->log, WLOG_DEBUG, "RecvWireToSurface2Pdu: surfaceId: %"PRIu16" codecId: %s (0x%04"PRIX16") "
-	         "codecContextId: %"PRIu32" pixelFormat: 0x%02"PRIX8" bitmapDataLength: %"PRIu32"",
-	         pdu.surfaceId, rdpgfx_get_codec_id_string(pdu.codecId), pdu.codecId,
-	         pdu.codecContextId, pdu.pixelFormat, pdu.bitmapDataLength);
+	WLog_Print(gfx->log, WLOG_DEBUG,
+	           "RecvWireToSurface2Pdu: surfaceId: %" PRIu16 " codecId: %s (0x%04" PRIX16 ") "
+	           "codecContextId: %" PRIu32 " pixelFormat: 0x%02" PRIX8 " bitmapDataLength: %" PRIu32 "",
+	           pdu.surfaceId, rdpgfx_get_codec_id_string(pdu.codecId), pdu.codecId, pdu.codecContextId, pdu.pixelFormat,
+	           pdu.bitmapDataLength);
 	cmd.surfaceId = pdu.surfaceId;
 	cmd.codecId = pdu.codecId;
 	cmd.contextId = pdu.codecContextId;
@@ -756,7 +745,7 @@ static UINT rdpgfx_recv_wire_to_surface_2_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
 		IFCALLRET(context->SurfaceCommand, error, context, &cmd);
 
 		if (error)
-			WLog_Print(gfx->log, WLOG_ERROR, "context->SurfaceCommand failed with error %"PRIu32"", error);
+			WLog_Print(gfx->log, WLOG_ERROR, "context->SurfaceCommand failed with error %" PRIu32 "", error);
 	}
 
 	return error;
@@ -767,8 +756,7 @@ static UINT rdpgfx_recv_wire_to_surface_2_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT rdpgfx_recv_delete_encoding_context_pdu(RDPGFX_CHANNEL_CALLBACK*
-        callback, wStream* s)
+static UINT rdpgfx_recv_delete_encoding_context_pdu(RDPGFX_CHANNEL_CALLBACK* callback, wStream* s)
 {
 	RDPGFX_DELETE_ENCODING_CONTEXT_PDU pdu;
 	RDPGFX_PLUGIN* gfx = (RDPGFX_PLUGIN*) callback->plugin;
@@ -783,15 +771,15 @@ static UINT rdpgfx_recv_delete_encoding_context_pdu(RDPGFX_CHANNEL_CALLBACK*
 
 	Stream_Read_UINT16(s, pdu.surfaceId); /* surfaceId (2 bytes) */
 	Stream_Read_UINT32(s, pdu.codecContextId); /* codecContextId (4 bytes) */
-	WLog_Print(gfx->log, WLOG_DEBUG, "RecvDeleteEncodingContextPdu: surfaceId: %"PRIu16" codecContextId: %"PRIu32"",
-	         pdu.surfaceId, pdu.codecContextId);
+	WLog_Print(gfx->log, WLOG_DEBUG, "RecvDeleteEncodingContextPdu: surfaceId: %" PRIu16 " codecContextId: %" PRIu32 "",
+	           pdu.surfaceId, pdu.codecContextId);
 
 	if (context)
 	{
 		IFCALLRET(context->DeleteEncodingContext, error, context, &pdu);
 
 		if (error)
-			WLog_Print(gfx->log, WLOG_ERROR, "context->DeleteEncodingContext failed with error %"PRIu32"", error);
+			WLog_Print(gfx->log, WLOG_ERROR, "context->DeleteEncodingContext failed with error %" PRIu32 "", error);
 	}
 
 	return error;
@@ -821,7 +809,7 @@ static UINT rdpgfx_recv_solid_fill_pdu(RDPGFX_CHANNEL_CALLBACK* callback, wStrea
 
 	if ((error = rdpgfx_read_color32(s, &(pdu.fillPixel)))) /* fillPixel (4 bytes) */
 	{
-		WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_read_color32 failed with error %"PRIu32"!", error);
+		WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_read_color32 failed with error %" PRIu32 "!", error);
 		return error;
 	}
 
@@ -846,21 +834,21 @@ static UINT rdpgfx_recv_solid_fill_pdu(RDPGFX_CHANNEL_CALLBACK* callback, wStrea
 
 		if ((error = rdpgfx_read_rect16(s, fillRect)))
 		{
-			WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_read_rect16 failed with error %"PRIu32"!", error);
+			WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_read_rect16 failed with error %" PRIu32 "!", error);
 			free(pdu.fillRects);
 			return error;
 		}
 	}
 
-	WLog_Print(gfx->log, WLOG_DEBUG, "RecvSolidFillPdu: surfaceId: %"PRIu16" fillRectCount: %"PRIu16"",
-	         pdu.surfaceId, pdu.fillRectCount);
+	WLog_Print(gfx->log, WLOG_DEBUG, "RecvSolidFillPdu: surfaceId: %" PRIu16 " fillRectCount: %" PRIu16 "",
+	           pdu.surfaceId, pdu.fillRectCount);
 
 	if (context)
 	{
 		IFCALLRET(context->SolidFill, error, context, &pdu);
 
 		if (error)
-			WLog_Print(gfx->log, WLOG_ERROR, "context->SolidFill failed with error %"PRIu32"", error);
+			WLog_Print(gfx->log, WLOG_ERROR, "context->SolidFill failed with error %" PRIu32 "", error);
 	}
 
 	free(pdu.fillRects);
@@ -872,8 +860,7 @@ static UINT rdpgfx_recv_solid_fill_pdu(RDPGFX_CHANNEL_CALLBACK* callback, wStrea
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT rdpgfx_recv_surface_to_surface_pdu(RDPGFX_CHANNEL_CALLBACK*
-        callback, wStream* s)
+static UINT rdpgfx_recv_surface_to_surface_pdu(RDPGFX_CHANNEL_CALLBACK* callback, wStream* s)
 {
 	UINT16 index;
 	RDPGFX_POINT16* destPt;
@@ -893,7 +880,7 @@ static UINT rdpgfx_recv_surface_to_surface_pdu(RDPGFX_CHANNEL_CALLBACK*
 
 	if ((error = rdpgfx_read_rect16(s, &(pdu.rectSrc)))) /* rectSrc (8 bytes ) */
 	{
-		WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_read_rect16 failed with error %"PRIu32"!", error);
+		WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_read_rect16 failed with error %" PRIu32 "!", error);
 		return error;
 	}
 
@@ -918,24 +905,24 @@ static UINT rdpgfx_recv_surface_to_surface_pdu(RDPGFX_CHANNEL_CALLBACK*
 
 		if ((error = rdpgfx_read_point16(s, destPt)))
 		{
-			WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_read_point16 failed with error %"PRIu32"!", error);
+			WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_read_point16 failed with error %" PRIu32 "!", error);
 			free(pdu.destPts);
 			return error;
 		}
 	}
 
-	WLog_Print(gfx->log, WLOG_DEBUG, "RecvSurfaceToSurfacePdu: surfaceIdSrc: %"PRIu16" surfaceIdDest: %"PRIu16" "
-	         "left: %"PRIu16" top: %"PRIu16" right: %"PRIu16" bottom: %"PRIu16" destPtsCount: %"PRIu16"",
-	         pdu.surfaceIdSrc, pdu.surfaceIdDest,
-	         pdu.rectSrc.left, pdu.rectSrc.top, pdu.rectSrc.right, pdu.rectSrc.bottom,
-	         pdu.destPtsCount);
+	WLog_Print(gfx->log, WLOG_DEBUG,
+	           "RecvSurfaceToSurfacePdu: surfaceIdSrc: %" PRIu16 " surfaceIdDest: %" PRIu16 " "
+	           "left: %" PRIu16 " top: %" PRIu16 " right: %" PRIu16 " bottom: %" PRIu16 " destPtsCount: %" PRIu16 "",
+	           pdu.surfaceIdSrc, pdu.surfaceIdDest, pdu.rectSrc.left, pdu.rectSrc.top, pdu.rectSrc.right,
+	           pdu.rectSrc.bottom, pdu.destPtsCount);
 
 	if (context)
 	{
 		IFCALLRET(context->SurfaceToSurface, error, context, &pdu);
 
 		if (error)
-			WLog_Print(gfx->log, WLOG_ERROR, "context->SurfaceToSurface failed with error %"PRIu32"", error);
+			WLog_Print(gfx->log, WLOG_ERROR, "context->SurfaceToSurface failed with error %" PRIu32 "", error);
 	}
 
 	free(pdu.destPts);
@@ -947,8 +934,7 @@ static UINT rdpgfx_recv_surface_to_surface_pdu(RDPGFX_CHANNEL_CALLBACK*
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT rdpgfx_recv_surface_to_cache_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
-        wStream* s)
+static UINT rdpgfx_recv_surface_to_cache_pdu(RDPGFX_CHANNEL_CALLBACK* callback, wStream* s)
 {
 	RDPGFX_SURFACE_TO_CACHE_PDU pdu;
 	RDPGFX_PLUGIN* gfx = (RDPGFX_PLUGIN*) callback->plugin;
@@ -967,23 +953,22 @@ static UINT rdpgfx_recv_surface_to_cache_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
 
 	if ((error = rdpgfx_read_rect16(s, &(pdu.rectSrc)))) /* rectSrc (8 bytes ) */
 	{
-		WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_read_rect16 failed with error %"PRIu32"!", error);
+		WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_read_rect16 failed with error %" PRIu32 "!", error);
 		return error;
 	}
 
 	WLog_Print(gfx->log, WLOG_DEBUG,
-	         "RecvSurfaceToCachePdu: surfaceId: %"PRIu16" cacheKey: 0x%016"PRIX64" cacheSlot: %"PRIu16" "
-	         "left: %"PRIu16" top: %"PRIu16" right: %"PRIu16" bottom: %"PRIu16"",
-	         pdu.surfaceId, pdu.cacheKey, pdu.cacheSlot,
-	         pdu.rectSrc.left, pdu.rectSrc.top,
-	         pdu.rectSrc.right, pdu.rectSrc.bottom);
+	           "RecvSurfaceToCachePdu: surfaceId: %" PRIu16 " cacheKey: 0x%016" PRIX64 " cacheSlot: %" PRIu16 " "
+	           "left: %" PRIu16 " top: %" PRIu16 " right: %" PRIu16 " bottom: %" PRIu16 "",
+	           pdu.surfaceId, pdu.cacheKey, pdu.cacheSlot, pdu.rectSrc.left, pdu.rectSrc.top, pdu.rectSrc.right,
+	           pdu.rectSrc.bottom);
 
 	if (context)
 	{
 		IFCALLRET(context->SurfaceToCache, error, context, &pdu);
 
 		if (error)
-			WLog_Print(gfx->log, WLOG_ERROR, "context->SurfaceToCache failed with error %"PRIu32"", error);
+			WLog_Print(gfx->log, WLOG_ERROR, "context->SurfaceToCache failed with error %" PRIu32 "", error);
 	}
 
 	return error;
@@ -994,8 +979,7 @@ static UINT rdpgfx_recv_surface_to_cache_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT rdpgfx_recv_cache_to_surface_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
-        wStream* s)
+static UINT rdpgfx_recv_cache_to_surface_pdu(RDPGFX_CHANNEL_CALLBACK* callback, wStream* s)
 {
 	UINT16 index;
 	RDPGFX_POINT16* destPt;
@@ -1033,22 +1017,22 @@ static UINT rdpgfx_recv_cache_to_surface_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
 
 		if ((error = rdpgfx_read_point16(s, destPt)))
 		{
-			WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_read_point16 failed with error %"PRIu32"", error);
+			WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_read_point16 failed with error %" PRIu32 "", error);
 			free(pdu.destPts);
 			return error;
 		}
 	}
 
 	WLog_Print(gfx->log, WLOG_DEBUG,
-	         "RdpGfxRecvCacheToSurfacePdu: cacheSlot: %"PRIu16" surfaceId: %"PRIu16" destPtsCount: %"PRIu16"",
-	         pdu.cacheSlot, pdu.surfaceId, pdu.destPtsCount);
+	           "RdpGfxRecvCacheToSurfacePdu: cacheSlot: %" PRIu16 " surfaceId: %" PRIu16 " destPtsCount: %" PRIu16 "",
+	           pdu.cacheSlot, pdu.surfaceId, pdu.destPtsCount);
 
 	if (context)
 	{
 		IFCALLRET(context->CacheToSurface, error, context, &pdu);
 
 		if (error)
-			WLog_Print(gfx->log, WLOG_ERROR, "context->CacheToSurface failed with error %"PRIu32"", error);
+			WLog_Print(gfx->log, WLOG_ERROR, "context->CacheToSurface failed with error %" PRIu32 "", error);
 	}
 
 	free(pdu.destPts);
@@ -1060,8 +1044,7 @@ static UINT rdpgfx_recv_cache_to_surface_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT rdpgfx_recv_map_surface_to_output_pdu(RDPGFX_CHANNEL_CALLBACK*
-        callback, wStream* s)
+static UINT rdpgfx_recv_map_surface_to_output_pdu(RDPGFX_CHANNEL_CALLBACK* callback, wStream* s)
 {
 	RDPGFX_MAP_SURFACE_TO_OUTPUT_PDU pdu;
 	RDPGFX_PLUGIN* gfx = (RDPGFX_PLUGIN*) callback->plugin;
@@ -1079,15 +1062,16 @@ static UINT rdpgfx_recv_map_surface_to_output_pdu(RDPGFX_CHANNEL_CALLBACK*
 	Stream_Read_UINT32(s, pdu.outputOriginX); /* outputOriginX (4 bytes) */
 	Stream_Read_UINT32(s, pdu.outputOriginY); /* outputOriginY (4 bytes) */
 	WLog_Print(gfx->log, WLOG_DEBUG,
-	         "RecvMapSurfaceToOutputPdu: surfaceId: %"PRIu16" outputOriginX: %"PRIu32" outputOriginY: %"PRIu32"",
-	         pdu.surfaceId, pdu.outputOriginX, pdu.outputOriginY);
+	           "RecvMapSurfaceToOutputPdu: surfaceId: %" PRIu16 " outputOriginX: %" PRIu32 " outputOriginY: %" PRIu32
+	           "",
+	           pdu.surfaceId, pdu.outputOriginX, pdu.outputOriginY);
 
 	if (context)
 	{
 		IFCALLRET(context->MapSurfaceToOutput, error, context, &pdu);
 
 		if (error)
-			WLog_Print(gfx->log, WLOG_ERROR, "context->MapSurfaceToOutput failed with error %"PRIu32"", error);
+			WLog_Print(gfx->log, WLOG_ERROR, "context->MapSurfaceToOutput failed with error %" PRIu32 "", error);
 	}
 
 	return error;
@@ -1098,8 +1082,7 @@ static UINT rdpgfx_recv_map_surface_to_output_pdu(RDPGFX_CHANNEL_CALLBACK*
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT rdpgfx_recv_map_surface_to_window_pdu(RDPGFX_CHANNEL_CALLBACK* callback,
-        wStream* s)
+static UINT rdpgfx_recv_map_surface_to_window_pdu(RDPGFX_CHANNEL_CALLBACK* callback, wStream* s)
 {
 	RDPGFX_MAP_SURFACE_TO_WINDOW_PDU pdu;
 	RDPGFX_PLUGIN* gfx = (RDPGFX_PLUGIN*) callback->plugin;
@@ -1117,15 +1100,16 @@ static UINT rdpgfx_recv_map_surface_to_window_pdu(RDPGFX_CHANNEL_CALLBACK* callb
 	Stream_Read_UINT32(s, pdu.mappedWidth); /* mappedWidth (4 bytes) */
 	Stream_Read_UINT32(s, pdu.mappedHeight); /* mappedHeight (4 bytes) */
 	WLog_Print(gfx->log, WLOG_DEBUG,
-	         "RecvMapSurfaceToWindowPdu: surfaceId: %"PRIu16" windowId: 0x%016"PRIX64" mappedWidth: %"PRIu32" mappedHeight: %"PRIu32"",
-	         pdu.surfaceId, pdu.windowId, pdu.mappedWidth, pdu.mappedHeight);
+	           "RecvMapSurfaceToWindowPdu: surfaceId: %" PRIu16 " windowId: 0x%016" PRIX64 " mappedWidth: %" PRIu32
+	           " mappedHeight: %" PRIu32 "",
+	           pdu.surfaceId, pdu.windowId, pdu.mappedWidth, pdu.mappedHeight);
 
 	if (context && context->MapSurfaceToWindow)
 	{
 		IFCALLRET(context->MapSurfaceToWindow, error, context, &pdu);
 
 		if (error)
-			WLog_Print(gfx->log, WLOG_ERROR, "context->MapSurfaceToWindow failed with error %"PRIu32"", error);
+			WLog_Print(gfx->log, WLOG_ERROR, "context->MapSurfaceToWindow failed with error %" PRIu32 "", error);
 	}
 
 	return error;
@@ -1147,123 +1131,127 @@ static UINT rdpgfx_recv_pdu(RDPGFX_CHANNEL_CALLBACK* callback, wStream* s)
 
 	if ((error = rdpgfx_read_header(s, &header)))
 	{
-		WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_read_header failed with error %"PRIu32"!", error);
+		WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_read_header failed with error %" PRIu32 "!", error);
 		return error;
 	}
 
-	WLog_Print(gfx->log, WLOG_DEBUG, "cmdId: %s (0x%04"PRIX16") flags: 0x%04"PRIX16" pduLength: %"PRIu32"",
-	         rdpgfx_get_cmd_id_string(header.cmdId), header.cmdId, header.flags,
-	         header.pduLength);
+	WLog_Print(gfx->log, WLOG_DEBUG, "cmdId: %s (0x%04" PRIX16 ") flags: 0x%04" PRIX16 " pduLength: %" PRIu32 "",
+	           rdpgfx_get_cmd_id_string(header.cmdId), header.cmdId, header.flags, header.pduLength);
 
 	switch (header.cmdId)
 	{
 		case RDPGFX_CMDID_WIRETOSURFACE_1:
 			if ((error = rdpgfx_recv_wire_to_surface_1_pdu(callback, s)))
-				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_wire_to_surface_1_pdu failed with error %"PRIu32"!",
-				         error);
+				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_wire_to_surface_1_pdu failed with error %" PRIu32 "!",
+				           error);
 
 			break;
 
 		case RDPGFX_CMDID_WIRETOSURFACE_2:
 			if ((error = rdpgfx_recv_wire_to_surface_2_pdu(callback, s)))
-				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_wire_to_surface_2_pdu failed with error %"PRIu32"!",
-				         error);
+				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_wire_to_surface_2_pdu failed with error %" PRIu32 "!",
+				           error);
 
 			break;
 
 		case RDPGFX_CMDID_DELETEENCODINGCONTEXT:
 			if ((error = rdpgfx_recv_delete_encoding_context_pdu(callback, s)))
-				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_delete_encoding_context_pdu failed with error %"PRIu32"!",
-				         error);
+				WLog_Print(gfx->log, WLOG_ERROR,
+				           "rdpgfx_recv_delete_encoding_context_pdu failed with error %" PRIu32 "!", error);
 
 			break;
 
 		case RDPGFX_CMDID_SOLIDFILL:
 			if ((error = rdpgfx_recv_solid_fill_pdu(callback, s)))
-				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_solid_fill_pdu failed with error %"PRIu32"!", error);
+				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_solid_fill_pdu failed with error %" PRIu32 "!", error);
 
 			break;
 
 		case RDPGFX_CMDID_SURFACETOSURFACE:
 			if ((error = rdpgfx_recv_surface_to_surface_pdu(callback, s)))
-				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_surface_to_surface_pdu failed with error %"PRIu32"!",
-				         error);
+				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_surface_to_surface_pdu failed with error %" PRIu32 "!",
+				           error);
 
 			break;
 
 		case RDPGFX_CMDID_SURFACETOCACHE:
 			if ((error = rdpgfx_recv_surface_to_cache_pdu(callback, s)))
-				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_surface_to_cache_pdu failed with error %"PRIu32"!", error);
+				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_surface_to_cache_pdu failed with error %" PRIu32 "!",
+				           error);
 
 			break;
 
 		case RDPGFX_CMDID_CACHETOSURFACE:
 			if ((error = rdpgfx_recv_cache_to_surface_pdu(callback, s)))
-				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_cache_to_surface_pdu failed with error %"PRIu32"!", error);
+				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_cache_to_surface_pdu failed with error %" PRIu32 "!",
+				           error);
 
 			break;
 
 		case RDPGFX_CMDID_EVICTCACHEENTRY:
 			if ((error = rdpgfx_recv_evict_cache_entry_pdu(callback, s)))
-				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_evict_cache_entry_pdu failed with error %"PRIu32"!",
-				         error);
+				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_evict_cache_entry_pdu failed with error %" PRIu32 "!",
+				           error);
 
 			break;
 
 		case RDPGFX_CMDID_CREATESURFACE:
 			if ((error = rdpgfx_recv_create_surface_pdu(callback, s)))
-				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_create_surface_pdu failed with error %"PRIu32"!", error);
+				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_create_surface_pdu failed with error %" PRIu32 "!",
+				           error);
 
 			break;
 
 		case RDPGFX_CMDID_DELETESURFACE:
 			if ((error = rdpgfx_recv_delete_surface_pdu(callback, s)))
-				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_delete_surface_pdu failed with error %"PRIu32"!", error);
+				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_delete_surface_pdu failed with error %" PRIu32 "!",
+				           error);
 
 			break;
 
 		case RDPGFX_CMDID_STARTFRAME:
 			if ((error = rdpgfx_recv_start_frame_pdu(callback, s)))
-				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_start_frame_pdu failed with error %"PRIu32"!", error);
+				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_start_frame_pdu failed with error %" PRIu32 "!", error);
 
 			break;
 
 		case RDPGFX_CMDID_ENDFRAME:
 			if ((error = rdpgfx_recv_end_frame_pdu(callback, s)))
-				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_end_frame_pdu failed with error %"PRIu32"!", error);
+				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_end_frame_pdu failed with error %" PRIu32 "!", error);
 
 			break;
 
 		case RDPGFX_CMDID_RESETGRAPHICS:
 			if ((error = rdpgfx_recv_reset_graphics_pdu(callback, s)))
-				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_reset_graphics_pdu failed with error %"PRIu32"!", error);
+				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_reset_graphics_pdu failed with error %" PRIu32 "!",
+				           error);
 
 			break;
 
 		case RDPGFX_CMDID_MAPSURFACETOOUTPUT:
 			if ((error = rdpgfx_recv_map_surface_to_output_pdu(callback, s)))
-				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_map_surface_to_output_pdu failed with error %"PRIu32"!",
-				         error);
+				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_map_surface_to_output_pdu failed with error %" PRIu32 "!",
+				           error);
 
 			break;
 
 		case RDPGFX_CMDID_CACHEIMPORTREPLY:
 			if ((error = rdpgfx_recv_cache_import_reply_pdu(callback, s)))
-				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_cache_import_reply_pdu failed with error %"PRIu32"!",
-				         error);
+				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_cache_import_reply_pdu failed with error %" PRIu32 "!",
+				           error);
 
 			break;
 
 		case RDPGFX_CMDID_CAPSCONFIRM:
 			if ((error = rdpgfx_recv_caps_confirm_pdu(callback, s)))
-				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_caps_confirm_pdu failed with error %"PRIu32"!", error);
+				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_caps_confirm_pdu failed with error %" PRIu32 "!", error);
 
 			break;
 
 		case RDPGFX_CMDID_MAPSURFACETOWINDOW:
 			if ((error = rdpgfx_recv_map_surface_to_window_pdu(callback, s)))
-				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_map_surface_to_window_pdu failed with error %"PRIu32"!",
-				         error);
+				WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_map_surface_to_window_pdu failed with error %" PRIu32 "!",
+				           error);
 
 			break;
 
@@ -1274,8 +1262,8 @@ static UINT rdpgfx_recv_pdu(RDPGFX_CHANNEL_CALLBACK* callback, wStream* s)
 
 	if (error)
 	{
-		WLog_Print(gfx->log, WLOG_ERROR,  "Error while parsing GFX cmdId: %s (0x%04"PRIX16")",
-		         rdpgfx_get_cmd_id_string(header.cmdId), header.cmdId);
+		WLog_Print(gfx->log, WLOG_ERROR, "Error while parsing GFX cmdId: %s (0x%04" PRIX16 ")",
+		           rdpgfx_get_cmd_id_string(header.cmdId), header.cmdId);
 		return error;
 	}
 
@@ -1283,8 +1271,8 @@ static UINT rdpgfx_recv_pdu(RDPGFX_CHANNEL_CALLBACK* callback, wStream* s)
 
 	if (end != (beg + header.pduLength))
 	{
-		WLog_Print(gfx->log, WLOG_ERROR,  "Unexpected gfx pdu end: Actual: %d, Expected: %"PRIu32"",
-		         end, (beg + header.pduLength));
+		WLog_Print(gfx->log, WLOG_ERROR, "Unexpected gfx pdu end: Actual: %d, Expected: %" PRIu32 "", end,
+		           (beg + header.pduLength));
 		Stream_SetPosition(s, (beg + header.pduLength));
 	}
 
@@ -1296,8 +1284,7 @@ static UINT rdpgfx_recv_pdu(RDPGFX_CHANNEL_CALLBACK* callback, wStream* s)
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT rdpgfx_on_data_received(IWTSVirtualChannelCallback*
-                                    pChannelCallback, wStream* data)
+static UINT rdpgfx_on_data_received(IWTSVirtualChannelCallback* pChannelCallback, wStream* data)
 {
 	wStream* s;
 	int status = 0;
@@ -1306,8 +1293,7 @@ static UINT rdpgfx_on_data_received(IWTSVirtualChannelCallback*
 	RDPGFX_CHANNEL_CALLBACK* callback = (RDPGFX_CHANNEL_CALLBACK*) pChannelCallback;
 	RDPGFX_PLUGIN* gfx = (RDPGFX_PLUGIN*) callback->plugin;
 	UINT error = CHANNEL_RC_OK;
-	status = zgfx_decompress(gfx->zgfx, Stream_Pointer(data), Stream_GetRemainingLength(data),
-							&pDstData, &DstSize, 0);
+	status = zgfx_decompress(gfx->zgfx, Stream_Pointer(data), Stream_GetRemainingLength(data), &pDstData, &DstSize, 0);
 
 	if (status < 0)
 	{
@@ -1326,7 +1312,7 @@ static UINT rdpgfx_on_data_received(IWTSVirtualChannelCallback*
 	{
 		if ((error = rdpgfx_recv_pdu(callback, s)))
 		{
-			WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_pdu failed with error %"PRIu32"!", error);
+			WLog_Print(gfx->log, WLOG_ERROR, "rdpgfx_recv_pdu failed with error %" PRIu32 "!", error);
 			break;
 		}
 	}
@@ -1414,13 +1400,11 @@ static UINT rdpgfx_on_close(IWTSVirtualChannelCallback* pChannelCallback)
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT rdpgfx_on_new_channel_connection(IWTSListenerCallback*
-        pListenerCallback,
-        IWTSVirtualChannel* pChannel, BYTE* Data, BOOL* pbAccept,
-        IWTSVirtualChannelCallback** ppCallback)
+static UINT rdpgfx_on_new_channel_connection(IWTSListenerCallback* pListenerCallback, IWTSVirtualChannel* pChannel,
+                                             BYTE* Data, BOOL* pbAccept, IWTSVirtualChannelCallback** ppCallback)
 {
 	RDPGFX_CHANNEL_CALLBACK* callback;
-	RDPGFX_LISTENER_CALLBACK* listener_callback = (RDPGFX_LISTENER_CALLBACK*)pListenerCallback;
+	RDPGFX_LISTENER_CALLBACK* listener_callback = (RDPGFX_LISTENER_CALLBACK*) pListenerCallback;
 
 	callback = (RDPGFX_CHANNEL_CALLBACK*) calloc(1, sizeof(RDPGFX_CHANNEL_CALLBACK));
 	if (!callback)
@@ -1445,8 +1429,7 @@ static UINT rdpgfx_on_new_channel_connection(IWTSListenerCallback*
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT rdpgfx_plugin_initialize(IWTSPlugin* pPlugin,
-                                     IWTSVirtualChannelManager* pChannelMgr)
+static UINT rdpgfx_plugin_initialize(IWTSPlugin* pPlugin, IWTSVirtualChannelManager* pChannelMgr)
 {
 	UINT error;
 	RDPGFX_PLUGIN* gfx = (RDPGFX_PLUGIN*) pPlugin;
@@ -1508,7 +1491,7 @@ static UINT rdpgfx_plugin_terminated(IWTSPlugin* pPlugin)
 
 			if (error)
 			{
-				WLog_Print(gfx->log, WLOG_ERROR, "context->DeleteSurface failed with error %"PRIu32"", error);
+				WLog_Print(gfx->log, WLOG_ERROR, "context->DeleteSurface failed with error %" PRIu32 "", error);
 				free(pKeys);
 				free(context);
 				free(gfx);
@@ -1533,7 +1516,7 @@ static UINT rdpgfx_plugin_terminated(IWTSPlugin* pPlugin)
 
 				if (error)
 				{
-					WLog_Print(gfx->log, WLOG_ERROR, "context->EvictCacheEntry failed with error %"PRIu32"", error);
+					WLog_Print(gfx->log, WLOG_ERROR, "context->EvictCacheEntry failed with error %" PRIu32 "", error);
 					free(context);
 					free(gfx);
 					return error;
@@ -1554,8 +1537,7 @@ static UINT rdpgfx_plugin_terminated(IWTSPlugin* pPlugin)
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT rdpgfx_set_surface_data(RdpgfxClientContext* context,
-                                    UINT16 surfaceId, void* pData)
+static UINT rdpgfx_set_surface_data(RdpgfxClientContext* context, UINT16 surfaceId, void* pData)
 {
 	ULONG_PTR key;
 	RDPGFX_PLUGIN* gfx = (RDPGFX_PLUGIN*) context->handle;
@@ -1574,8 +1556,7 @@ static UINT rdpgfx_set_surface_data(RdpgfxClientContext* context,
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT rdpgfx_get_surface_ids(RdpgfxClientContext* context,
-                                   UINT16** ppSurfaceIds, UINT16* count_out)
+static UINT rdpgfx_get_surface_ids(RdpgfxClientContext* context, UINT16** ppSurfaceIds, UINT16* count_out)
 {
 	int count;
 	int index;
@@ -1606,12 +1587,11 @@ static UINT rdpgfx_get_surface_ids(RdpgfxClientContext* context,
 
 	free(pKeys);
 	*ppSurfaceIds = pSurfaceIds;
-	*count_out = (UINT16)count;
+	*count_out = (UINT16) count;
 	return CHANNEL_RC_OK;
 }
 
-static void* rdpgfx_get_surface_data(RdpgfxClientContext* context,
-                                     UINT16 surfaceId)
+static void* rdpgfx_get_surface_data(RdpgfxClientContext* context, UINT16 surfaceId)
 {
 	ULONG_PTR key;
 	void* pData = NULL;
@@ -1626,15 +1606,14 @@ static void* rdpgfx_get_surface_data(RdpgfxClientContext* context,
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT rdpgfx_set_cache_slot_data(RdpgfxClientContext* context,
-                                       UINT16 cacheSlot, void* pData)
+static UINT rdpgfx_set_cache_slot_data(RdpgfxClientContext* context, UINT16 cacheSlot, void* pData)
 {
 	RDPGFX_PLUGIN* gfx = (RDPGFX_PLUGIN*) context->handle;
 
 	if (cacheSlot >= gfx->MaxCacheSlot)
 	{
-		WLog_ERR(TAG, "%s: invalid cache slot %"PRIu16" maxAllowed=%"PRIu16"", __FUNCTION__,
-				cacheSlot, gfx->MaxCacheSlot);
+		WLog_ERR(TAG, "%s: invalid cache slot %" PRIu16 " maxAllowed=%" PRIu16 "", __FUNCTION__, cacheSlot,
+		         gfx->MaxCacheSlot);
 		return ERROR_INVALID_INDEX;
 	}
 
@@ -1649,8 +1628,8 @@ static void* rdpgfx_get_cache_slot_data(RdpgfxClientContext* context, UINT16 cac
 
 	if (cacheSlot >= gfx->MaxCacheSlot)
 	{
-		WLog_ERR(TAG, "%s: invalid cache slot %"PRIu16" maxAllowed=%"PRIu16"", __FUNCTION__,
-				cacheSlot, gfx->MaxCacheSlot);
+		WLog_ERR(TAG, "%s: invalid cache slot %" PRIu16 " maxAllowed=%" PRIu16 "", __FUNCTION__, cacheSlot,
+		         gfx->MaxCacheSlot);
 		return NULL;
 	}
 
@@ -1659,9 +1638,9 @@ static void* rdpgfx_get_cache_slot_data(RdpgfxClientContext* context, UINT16 cac
 }
 
 #ifdef BUILTIN_CHANNELS
-#define DVCPluginEntry		rdpgfx_DVCPluginEntry
+#define DVCPluginEntry rdpgfx_DVCPluginEntry
 #else
-#define DVCPluginEntry		FREERDP_API DVCPluginEntry
+#define DVCPluginEntry FREERDP_API DVCPluginEntry
 #endif
 
 /**
@@ -1699,7 +1678,7 @@ UINT DVCPluginEntry(IDRDYNVC_ENTRY_POINTS* pEntryPoints)
 		gfx->iface.Connected = NULL;
 		gfx->iface.Disconnected = NULL;
 		gfx->iface.Terminated = rdpgfx_plugin_terminated;
-		gfx->rdpcontext = ((freerdp *)gfx->settings->instance)->context;
+		gfx->rdpcontext = ((freerdp*) gfx->settings->instance)->context;
 
 		gfx->SurfaceTable = HashTable_New(TRUE);
 		if (!gfx->SurfaceTable)
@@ -1722,7 +1701,7 @@ UINT DVCPluginEntry(IDRDYNVC_ENTRY_POINTS* pEntryPoints)
 
 		gfx->MaxCacheSlot = gfx->SmallCache ? 4096 : 25600;
 
-		context = (RdpgfxClientContext *)calloc(1, sizeof(RdpgfxClientContext));
+		context = (RdpgfxClientContext*) calloc(1, sizeof(RdpgfxClientContext));
 		if (!context)
 		{
 			free(gfx);

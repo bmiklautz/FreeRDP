@@ -34,7 +34,8 @@
  * TPDUs are defined in:
  *
  * http://www.itu.int/rec/T-REC-X.224-199511-I/
- * X.224: Information technology - Open Systems Interconnection - Protocol for providing the connection-mode transport service
+ * X.224: Information technology - Open Systems Interconnection - Protocol for providing the connection-mode transport
+ * service
  *
  * RDP uses only TPDUs of class 0, the "simple class" defined in section 8 of X.224
  *
@@ -134,7 +135,7 @@ BOOL tpdu_read_connection_request(wStream* s, BYTE* li)
 
 	if (code != X224_TPDU_CONNECTION_REQUEST)
 	{
-		WLog_ERR(TAG,  "Error: expected X224_TPDU_CONNECTION_REQUEST");
+		WLog_ERR(TAG, "Error: expected X224_TPDU_CONNECTION_REQUEST");
 		return FALSE;
 	}
 
@@ -172,7 +173,7 @@ BOOL tpdu_read_connection_confirm(wStream* s, BYTE* li)
 
 	if (code != X224_TPDU_CONNECTION_CONFIRM)
 	{
-		WLog_ERR(TAG,  "Error: expected X224_TPDU_CONNECTION_CONFIRM");
+		WLog_ERR(TAG, "Error: expected X224_TPDU_CONNECTION_CONFIRM");
 		return FALSE;
 	}
 	/*
@@ -184,7 +185,7 @@ BOOL tpdu_read_connection_confirm(wStream* s, BYTE* li)
 	 */
 	bytes_read = (Stream_GetPosition(s) - position) - 1;
 
-	return (Stream_GetRemainingLength(s) >= (size_t) (*li - bytes_read));
+	return (Stream_GetRemainingLength(s) >= (size_t)(*li - bytes_read));
 }
 
 /**
@@ -214,10 +215,7 @@ void tpdu_write_disconnect_request(wStream* s, UINT16 length)
  * @param s stream
  */
 
-void tpdu_write_data(wStream* s)
-{
-	tpdu_write_header(s, 2, X224_TPDU_DATA);
-}
+void tpdu_write_data(wStream* s) { tpdu_write_header(s, 2, X224_TPDU_DATA); }
 
 /**
  * Read Data TPDU.

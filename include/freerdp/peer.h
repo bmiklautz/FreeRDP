@@ -30,15 +30,14 @@
 #include <winpr/sspi.h>
 #include <winpr/ntlm.h>
 
-
 typedef BOOL (*psPeerContextNew)(freerdp_peer* peer, rdpContext* context);
 typedef void (*psPeerContextFree)(freerdp_peer* peer, rdpContext* context);
 
 typedef BOOL (*psPeerInitialize)(freerdp_peer* peer);
 typedef BOOL (*psPeerGetFileDescriptor)(freerdp_peer* peer, void** rfds, int* rcount);
-typedef HANDLE(*psPeerGetEventHandle)(freerdp_peer* peer);
+typedef HANDLE (*psPeerGetEventHandle)(freerdp_peer* peer);
 typedef DWORD (*psPeerGetEventHandles)(freerdp_peer* peer, HANDLE* events, DWORD count);
-typedef HANDLE(*psPeerGetReceiveEventHandle)(freerdp_peer* peer);
+typedef HANDLE (*psPeerGetReceiveEventHandle)(freerdp_peer* peer);
 typedef BOOL (*psPeerCheckFileDescriptor)(freerdp_peer* peer);
 typedef BOOL (*psPeerIsWriteBlocked)(freerdp_peer* peer);
 typedef int (*psPeerDrainOutputBuffer)(freerdp_peer* peer);
@@ -52,21 +51,16 @@ typedef BOOL (*psPeerLogon)(freerdp_peer* peer, SEC_WINNT_AUTH_IDENTITY* identit
 typedef BOOL (*psPeerAdjustMonitorsLayout)(freerdp_peer* peer);
 typedef BOOL (*psPeerClientCapabilities)(freerdp_peer* peer);
 
-typedef int (*psPeerSendChannelData)(freerdp_peer* peer, UINT16 channelId, const BYTE* data,
-                                     int size);
-typedef int (*psPeerReceiveChannelData)(freerdp_peer* peer, UINT16 channelId, const BYTE* data,
-                                        int size,
-                                        int flags, int totalSize);
+typedef int (*psPeerSendChannelData)(freerdp_peer* peer, UINT16 channelId, const BYTE* data, int size);
+typedef int (*psPeerReceiveChannelData)(freerdp_peer* peer, UINT16 channelId, const BYTE* data, int size, int flags,
+                                        int totalSize);
 
-typedef HANDLE(*psPeerVirtualChannelOpen)(freerdp_peer* peer, const char* name, UINT32 flags);
+typedef HANDLE (*psPeerVirtualChannelOpen)(freerdp_peer* peer, const char* name, UINT32 flags);
 typedef BOOL (*psPeerVirtualChannelClose)(freerdp_peer* peer, HANDLE hChannel);
-typedef int (*psPeerVirtualChannelRead)(freerdp_peer* peer, HANDLE hChannel, BYTE* buffer,
-                                        UINT32 length);
-typedef int (*psPeerVirtualChannelWrite)(freerdp_peer* peer, HANDLE hChannel, BYTE* buffer,
-        UINT32 length);
+typedef int (*psPeerVirtualChannelRead)(freerdp_peer* peer, HANDLE hChannel, BYTE* buffer, UINT32 length);
+typedef int (*psPeerVirtualChannelWrite)(freerdp_peer* peer, HANDLE hChannel, BYTE* buffer, UINT32 length);
 typedef void* (*psPeerVirtualChannelGetData)(freerdp_peer* peer, HANDLE hChannel);
 typedef int (*psPeerVirtualChannelSetData)(freerdp_peer* peer, HANDLE hChannel, void* data);
-
 
 struct rdp_freerdp_peer
 {

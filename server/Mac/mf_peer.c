@@ -45,7 +45,7 @@
 
 #include "CoreVideo/CoreVideo.h"
 
-//refactor these
+// refactor these
 static int info_last_sec = 0;
 static int info_last_nsec = 0;
 
@@ -63,15 +63,14 @@ static BOOL mf_peer_get_fds(freerdp_peer* client, void** rfds, int* rcount)
 	if (info_event_queue->pipe_fd[0] == -1)
 		return TRUE;
 
-	rfds[*rcount] = (void*)(long) info_event_queue->pipe_fd[0];
+	rfds[*rcount] = (void*) (long) info_event_queue->pipe_fd[0];
 	(*rcount)++;
 	return TRUE;
 }
 
-
 static void mf_peer_rfx_update(freerdp_peer* client)
 {
-	//check
+	// check
 	mfInfo* mfi = mf_info_get_instance();
 	mf_info_find_invalid_region(mfi);
 
@@ -86,7 +85,7 @@ static void mf_peer_rfx_update(freerdp_peer* client)
 	BYTE* dataBits = NULL;
 	mf_info_getScreenData(mfi, &width, &height, &dataBits, &pitch);
 	mf_info_clear_invalid_region(mfi);
-	//encode
+	// encode
 	wStream* s;
 	RFX_RECT rect;
 	rdpUpdate* update;
@@ -106,8 +105,7 @@ static void mf_peer_rfx_update(freerdp_peer* client)
 	mfp->rfx_context->width = mfi->servscreen_width;
 	mfp->rfx_context->height = mfi->servscreen_height;
 
-	if (!(rfx_compose_message(mfp->rfx_context, s, &rect, 1,
-	                          (BYTE*) dataBits, rect.width, rect.height, pitch)))
+	if (!(rfx_compose_message(mfp->rfx_context, s, &rect, 1, (BYTE*) dataBits, rect.width, rect.height, pitch)))
 	{
 		return;
 	}
@@ -122,9 +120,9 @@ static void mf_peer_rfx_update(freerdp_peer* client)
 	cmd.bmp.height = rect.height;
 	cmd.bmp.bitmapDataLength = Stream_GetPosition(s);
 	cmd.bmp.bitmapData = Stream_Buffer(s);
-	//send
+	// send
 	update->SurfaceBits(update->context, &cmd);
-	//clean up... maybe?
+	// clean up... maybe?
 }
 
 static BOOL mf_peer_check_fds(freerdp_peer* client)
@@ -196,7 +194,7 @@ static void mf_peer_context_free(freerdp_peer* client, mfPeerContext* context)
 		dispatch_suspend(info_timer);
 		Stream_Free(context->s, TRUE);
 		rfx_context_free(context->rfx_context);
-		//nsc_context_free(context->nsc_context);
+		// nsc_context_free(context->nsc_context);
 #ifdef CHANNEL_AUDIN_SERVER
 
 		if (context->audin)
@@ -225,23 +223,18 @@ static BOOL mf_peer_init(freerdp_peer* client)
 		return FALSE;
 
 	info_event_queue = mf_event_queue_new();
-	info_queue = dispatch_queue_create("FreeRDP.update.timer",
-	                                   DISPATCH_QUEUE_SERIAL);
-	info_timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0,
-	                                    info_queue);
+	info_queue = dispatch_queue_create("FreeRDP.update.timer", DISPATCH_QUEUE_SERIAL);
+	info_timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, info_queue);
 
 	if (info_timer)
 	{
-		//DEBUG_WARN( "created timer\n");
-		dispatch_source_set_timer(info_timer, DISPATCH_TIME_NOW, 42ull * NSEC_PER_MSEC,
-		                          100ull * NSEC_PER_MSEC);
-		dispatch_source_set_event_handler(info_timer, ^
-		{
-			//DEBUG_WARN( "dispatch\n");
+		// DEBUG_WARN( "created timer\n");
+		dispatch_source_set_timer(info_timer, DISPATCH_TIME_NOW, 42ull * NSEC_PER_MSEC, 100ull * NSEC_PER_MSEC);
+		dispatch_source_set_event_handler(info_timer, ^{
+			// DEBUG_WARN( "dispatch\n");
 			mfEvent* event = mf_event_new(FREERDP_SERVER_MAC_EVENT_TYPE_FRAME_TICK);
 			mf_event_push(info_event_queue, (mfEvent*) event);
-		}
-		                                 );
+		});
 		dispatch_resume(info_timer);
 	}
 
@@ -254,12 +247,11 @@ static BOOL mf_peer_post_connect(freerdp_peer* client)
 	rdpSettings* settings = client->settings;
 	mfInfo* mfi = mf_info_get_instance();
 	mfi->scale = 1;
-	//mfi->servscreen_width = 2880 / mfi->scale;
-	//mfi->servscreen_height = 1800 / mfi->scale;
+	// mfi->servscreen_width = 2880 / mfi->scale;
+	// mfi->servscreen_height = 1800 / mfi->scale;
 	UINT32 bitsPerPixel = 32;
 
-	if ((settings->DesktopWidth != mfi->servscreen_width)
-	    || (settings->DesktopHeight != mfi->servscreen_height))
+	if ((settings->DesktopWidth != mfi->servscreen_width) || (settings->DesktopHeight != mfi->servscreen_height))
 	{
 	}
 
@@ -288,21 +280,17 @@ static BOOL mf_peer_post_connect(freerdp_peer* client)
 static BOOL mf_peer_activate(freerdp_peer* client)
 {
 	mfPeerContext* context = (mfPeerContext*) client->context;
-	rfx_context_reset(context->rfx_context, client->settings->DesktopWidth,
-	                  client->settings->DesktopHeight);
+	rfx_context_reset(context->rfx_context, client->settings->DesktopWidth, client->settings->DesktopHeight);
 	context->activated = TRUE;
 	return TRUE;
 }
 
-static BOOL mf_peer_synchronize_event(rdpInput* input, UINT32 flags)
-{
-	return TRUE;
-}
+static BOOL mf_peer_synchronize_event(rdpInput* input, UINT32 flags) { return TRUE; }
 
 void mf_peer_keyboard_event(rdpInput* input, UINT16 flags, UINT16 code)
 {
 	UINT16 down = 0x4000;
-	//UINT16 up = 0x8000;
+	// UINT16 up = 0x8000;
 	bool state_down = FALSE;
 
 	if (flags == down)
@@ -311,17 +299,9 @@ void mf_peer_keyboard_event(rdpInput* input, UINT16 flags, UINT16 code)
 	}
 }
 
-static BOOL mf_peer_unicode_keyboard_event(rdpInput* input, UINT16 flags, UINT16 code)
-{
-	return FALSE;
-}
+static BOOL mf_peer_unicode_keyboard_event(rdpInput* input, UINT16 flags, UINT16 code) { return FALSE; }
 
-static BOOL mf_peer_suppress_output(rdpContext* context, BYTE allow,
-                                    const RECTANGLE_16* area)
-{
-	return FALSE;
-}
-
+static BOOL mf_peer_suppress_output(rdpContext* context, BYTE allow, const RECTANGLE_16* area) { return FALSE; }
 
 static void* mf_peer_main_loop(void* arg)
 {
@@ -359,11 +339,11 @@ static void* mf_peer_main_loop(void* arg)
 	client->PostConnect = mf_peer_post_connect;
 	client->Activate = mf_peer_activate;
 	client->input->SynchronizeEvent = mf_peer_synchronize_event;
-	client->input->KeyboardEvent = mf_input_keyboard_event;//mf_peer_keyboard_event;
+	client->input->KeyboardEvent = mf_input_keyboard_event; // mf_peer_keyboard_event;
 	client->input->UnicodeKeyboardEvent = mf_peer_unicode_keyboard_event;
 	client->input->MouseEvent = mf_input_mouse_event;
 	client->input->ExtendedMouseEvent = mf_input_extended_mouse_event;
-	//client->update->RefreshRect = mf_peer_refresh_rect;
+	// client->update->RefreshRect = mf_peer_refresh_rect;
 	client->update->SuppressOutput = mf_peer_suppress_output;
 	client->Initialize(client);
 	context = (mfPeerContext*) client->context;
@@ -388,7 +368,7 @@ static void* mf_peer_main_loop(void* arg)
 
 		for (i = 0; i < rcount; i++)
 		{
-			fds = (int)(long)(rfds[i]);
+			fds = (int) (long) (rfds[i]);
 
 			if (fds > max_fds)
 				max_fds = fds;
@@ -402,9 +382,7 @@ static void* mf_peer_main_loop(void* arg)
 		if (select(max_fds + 1, &rfds_set, NULL, NULL, NULL) == -1)
 		{
 			/* these are not really errors */
-			if (!((errno == EAGAIN) ||
-			      (errno == EWOULDBLOCK) ||
-			      (errno == EINPROGRESS) ||
+			if (!((errno == EAGAIN) || (errno == EWOULDBLOCK) || (errno == EINPROGRESS) ||
 			      (errno == EINTR))) /* signal occurred */
 			{
 				break;

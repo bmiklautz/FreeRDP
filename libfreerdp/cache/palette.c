@@ -36,8 +36,7 @@ static void* palette_cache_get(rdpPaletteCache* palette, UINT32 index);
 
 static void palette_cache_put(rdpPaletteCache* palette, UINT32 index, void* entry);
 
-static BOOL update_gdi_cache_color_table(rdpContext* context,
-        const CACHE_COLOR_TABLE_ORDER* cacheColorTable)
+static BOOL update_gdi_cache_color_table(rdpContext* context, const CACHE_COLOR_TABLE_ORDER* cacheColorTable)
 {
 	UINT32* colorTable;
 	rdpCache* cache = context->cache;
@@ -57,7 +56,7 @@ void* palette_cache_get(rdpPaletteCache* paletteCache, UINT32 index)
 
 	if (index >= paletteCache->maxEntries)
 	{
-		WLog_ERR(TAG,  "invalid color table index: 0x%08"PRIX32"", index);
+		WLog_ERR(TAG, "invalid color table index: 0x%08" PRIX32 "", index);
 		return NULL;
 	}
 
@@ -65,7 +64,7 @@ void* palette_cache_get(rdpPaletteCache* paletteCache, UINT32 index)
 
 	if (!entry)
 	{
-		WLog_ERR(TAG,  "invalid color table at index: 0x%08"PRIX32"", index);
+		WLog_ERR(TAG, "invalid color table at index: 0x%08" PRIX32 "", index);
 		return NULL;
 	}
 
@@ -76,7 +75,7 @@ void palette_cache_put(rdpPaletteCache* paletteCache, UINT32 index, void* entry)
 {
 	if (index >= paletteCache->maxEntries)
 	{
-		WLog_ERR(TAG,  "invalid color table index: 0x%08"PRIX32"", index);
+		WLog_ERR(TAG, "invalid color table index: 0x%08" PRIX32 "", index);
 		free(entry);
 		return;
 	}
@@ -99,8 +98,7 @@ rdpPaletteCache* palette_cache_new(rdpSettings* settings)
 	{
 		paletteCache->settings = settings;
 		paletteCache->maxEntries = 6;
-		paletteCache->entries = (PALETTE_TABLE_ENTRY*) calloc(paletteCache->maxEntries,
-		                        sizeof(PALETTE_TABLE_ENTRY));
+		paletteCache->entries = (PALETTE_TABLE_ENTRY*) calloc(paletteCache->maxEntries, sizeof(PALETTE_TABLE_ENTRY));
 	}
 
 	return paletteCache;
@@ -120,10 +118,7 @@ void palette_cache_free(rdpPaletteCache* paletteCache)
 	}
 }
 
-void free_palette_update(rdpContext* context, PALETTE_UPDATE* pointer)
-{
-	free(pointer);
-}
+void free_palette_update(rdpContext* context, PALETTE_UPDATE* pointer) { free(pointer); }
 
 PALETTE_UPDATE* copy_palette_update(rdpContext* context, const PALETTE_UPDATE* pointer)
 {

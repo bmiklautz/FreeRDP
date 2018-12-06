@@ -60,9 +60,7 @@ void Bitmap_Free(rdpContext* context, rdpBitmap* bitmap)
 		bitmap->Free(context, bitmap);
 }
 
-BOOL Bitmap_SetRectangle(rdpBitmap* bitmap,
-                         UINT16 left,
-                         UINT16 top, UINT16 right, UINT16 bottom)
+BOOL Bitmap_SetRectangle(rdpBitmap* bitmap, UINT16 left, UINT16 top, UINT16 right, UINT16 bottom)
 {
 	if (!bitmap)
 		return FALSE;
@@ -74,9 +72,7 @@ BOOL Bitmap_SetRectangle(rdpBitmap* bitmap,
 	return TRUE;
 }
 
-BOOL Bitmap_SetDimensions(rdpBitmap* bitmap,
-                          UINT16 width,
-                          UINT16 height)
+BOOL Bitmap_SetDimensions(rdpBitmap* bitmap, UINT16 width, UINT16 height)
 {
 	if (!bitmap)
 		return FALSE;
@@ -129,8 +125,7 @@ void graphics_register_pointer(rdpGraphics* graphics, rdpPointer* pointer)
 
 /* Glyph Class */
 
-rdpGlyph* Glyph_Alloc(rdpContext* context, INT32 x, INT32 y,
-                      UINT32 cx, UINT32 cy, UINT32 cb, const BYTE* aj)
+rdpGlyph* Glyph_Alloc(rdpContext* context, INT32 x, INT32 y, UINT32 cx, UINT32 cy, UINT32 cb, const BYTE* aj)
 {
 	rdpGlyph* glyph;
 	rdpGraphics* graphics;

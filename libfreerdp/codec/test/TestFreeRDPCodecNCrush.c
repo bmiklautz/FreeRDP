@@ -5,10 +5,9 @@
 
 static const BYTE TEST_BELLS_DATA[] = "for.whom.the.bell.tolls,.the.bell.tolls.for.thee!";
 
-static const BYTE TEST_BELLS_NCRUSH[] =
-    "\xfb\x1d\x7e\xe4\xda\xc7\x1d\x70\xf8\xa1\x6b\x1f\x7d\xc0\xbe\x6b"
-    "\xef\xb5\xef\x21\x87\xd0\xc5\xe1\x85\x71\xd4\x10\x16\xe7\xda\xfb"
-    "\x1d\x7e\xe4\xda\x47\x1f\xb0\xef\xbe\xbd\xff\x2f";
+static const BYTE TEST_BELLS_NCRUSH[] = "\xfb\x1d\x7e\xe4\xda\xc7\x1d\x70\xf8\xa1\x6b\x1f\x7d\xc0\xbe\x6b"
+                                        "\xef\xb5\xef\x21\x87\xd0\xc5\xe1\x85\x71\xd4\x10\x16\xe7\xda\xfb"
+                                        "\x1d\x7e\xe4\xda\x47\x1f\xb0\xef\xbe\xbd\xff\x2f";
 
 static BOOL test_NCrushCompressBells(void)
 {
@@ -37,12 +36,12 @@ static BOOL test_NCrushCompressBells(void)
 	if (status < 0)
 		goto fail;
 
-	printf("status: %d Flags: 0x%08"PRIX32" DstSize: %"PRIu32"\n", status, Flags, DstSize);
+	printf("status: %d Flags: 0x%08" PRIX32 " DstSize: %" PRIu32 "\n", status, Flags, DstSize);
 
 	if (DstSize != expectedSize)
 	{
-		printf("NCrushCompressBells: output size mismatch: Actual: %"PRIu32", Expected: %"PRIu32"\n",
-		       DstSize, expectedSize);
+		printf("NCrushCompressBells: output size mismatch: Actual: %" PRIu32 ", Expected: %" PRIu32 "\n", DstSize,
+		       expectedSize);
 		printf("Actual\n");
 		BitDump(__FUNCTION__, WLOG_INFO, pDstData, DstSize * 8, 0);
 		printf("Expected\n");
@@ -90,12 +89,12 @@ static BOOL test_NCrushDecompressBells(void)
 	if (status < 0)
 		goto fail;
 
-	printf("Flags: 0x%08"PRIX32" DstSize: %"PRIu32"\n", Flags, DstSize);
+	printf("Flags: 0x%08" PRIX32 " DstSize: %" PRIu32 "\n", Flags, DstSize);
 
 	if (DstSize != expectedSize)
 	{
-		printf("NCrushDecompressBells: output size mismatch: Actual: %"PRIu32", Expected: %"PRIu32"\n",
-		       DstSize, expectedSize);
+		printf("NCrushDecompressBells: output size mismatch: Actual: %" PRIu32 ", Expected: %" PRIu32 "\n", DstSize,
+		       expectedSize);
 		goto fail;
 	}
 

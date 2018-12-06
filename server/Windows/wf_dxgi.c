@@ -37,8 +37,7 @@
 #define TAG SERVER_TAG("windows")
 
 /* Driver types supported */
-D3D_DRIVER_TYPE DriverTypes[] =
-{
+D3D_DRIVER_TYPE DriverTypes[] = {
 	D3D_DRIVER_TYPE_HARDWARE,
 	D3D_DRIVER_TYPE_WARP,
 	D3D_DRIVER_TYPE_REFERENCE,
@@ -46,13 +45,8 @@ D3D_DRIVER_TYPE DriverTypes[] =
 UINT NumDriverTypes = ARRAYSIZE(DriverTypes);
 
 /* Feature levels supported */
-D3D_FEATURE_LEVEL FeatureLevels[] =
-{
-	D3D_FEATURE_LEVEL_11_0,
-	D3D_FEATURE_LEVEL_10_1,
-	D3D_FEATURE_LEVEL_10_0,
-	D3D_FEATURE_LEVEL_9_1
-};
+D3D_FEATURE_LEVEL FeatureLevels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0,
+	                                  D3D_FEATURE_LEVEL_9_1 };
 
 UINT NumFeatureLevels = ARRAYSIZE(FeatureLevels);
 
@@ -93,7 +87,7 @@ int wf_dxgi_createDevice(wfInfo* wfi)
 	for (DriverTypeIndex = 0; DriverTypeIndex < NumDriverTypes; ++DriverTypeIndex)
 	{
 		status = D3D11CreateDevice(NULL, DriverTypes[DriverTypeIndex], NULL, 0, FeatureLevels, NumFeatureLevels,
-								D3D11_SDK_VERSION, &gDevice, &FeatureLevel, &gContext);
+		                           D3D11_SDK_VERSION, &gDevice, &FeatureLevel, &gContext);
 		if (SUCCEEDED(status))
 			break;
 
@@ -114,7 +108,7 @@ int wf_dxgi_getDuplication(wfInfo* wfi)
 	HRESULT status;
 	UINT dTop, i = 0;
 	DXGI_OUTPUT_DESC desc;
-	IDXGIOutput * pOutput;
+	IDXGIOutput* pOutput;
 	IDXGIDevice* DxgiDevice = NULL;
 	IDXGIAdapter* DxgiAdapter = NULL;
 	IDXGIOutput* DxgiOutput = NULL;
@@ -127,17 +121,17 @@ int wf_dxgi_getDuplication(wfInfo* wfi)
 		WLog_ERR(TAG, "Failed to get QI for DXGI Device");
 		return 1;
 	}
-	
+
 	status = DxgiDevice->lpVtbl->GetParent(DxgiDevice, &IID_IDXGIAdapter, (void**) &DxgiAdapter);
 	DxgiDevice->lpVtbl->Release(DxgiDevice);
 	DxgiDevice = NULL;
-	
+
 	if (FAILED(status))
 	{
 		WLog_ERR(TAG, "Failed to get parent DXGI Adapter");
 		return 1;
 	}
-	
+
 	ZeroMemory(&desc, sizeof(desc));
 	pOutput = NULL;
 
@@ -167,7 +161,7 @@ int wf_dxgi_getDuplication(wfInfo* wfi)
 	status = DxgiAdapter->lpVtbl->EnumOutputs(DxgiAdapter, dTop, &DxgiOutput);
 	DxgiAdapter->lpVtbl->Release(DxgiAdapter);
 	DxgiAdapter = NULL;
-	
+
 	if (FAILED(status))
 	{
 		WLog_ERR(TAG, "Failed to get output");
@@ -177,22 +171,24 @@ int wf_dxgi_getDuplication(wfInfo* wfi)
 	status = DxgiOutput->lpVtbl->QueryInterface(DxgiOutput, &IID_IDXGIOutput1, (void**) &DxgiOutput1);
 	DxgiOutput->lpVtbl->Release(DxgiOutput);
 	DxgiOutput = NULL;
-	
+
 	if (FAILED(status))
 	{
 		WLog_ERR(TAG, "Failed to get IDXGIOutput1");
 		return 1;
 	}
 
-	status = DxgiOutput1->lpVtbl->DuplicateOutput(DxgiOutput1, (IUnknown*)gDevice, &gOutputDuplication);
+	status = DxgiOutput1->lpVtbl->DuplicateOutput(DxgiOutput1, (IUnknown*) gDevice, &gOutputDuplication);
 	DxgiOutput1->lpVtbl->Release(DxgiOutput1);
 	DxgiOutput1 = NULL;
-	
+
 	if (FAILED(status))
 	{
 		if (status == DXGI_ERROR_NOT_CURRENTLY_AVAILABLE)
 		{
-			WLog_ERR(TAG, "There is already the maximum number of applications using the Desktop Duplication API running, please close one of those applications and then try again.");
+			WLog_ERR(TAG,
+			         "There is already the maximum number of applications using the Desktop Duplication API running, "
+			         "please close one of those applications and then try again.");
 			return 1;
 		}
 
@@ -202,7 +198,6 @@ int wf_dxgi_getDuplication(wfInfo* wfi)
 
 	return 0;
 }
-
 
 int wf_dxgi_cleanup(wfInfo* wfi)
 {
@@ -223,13 +218,13 @@ int wf_dxgi_cleanup(wfInfo* wfi)
 		gOutputDuplication = NULL;
 	}
 
-	if(gContext)
+	if (gContext)
 	{
 		gContext->lpVtbl->Release(gContext);
 		gContext = NULL;
 	}
 
-	if(gDevice)
+	if (gDevice)
 	{
 		gDevice->lpVtbl->Release(gDevice);
 		gDevice = NULL;
@@ -281,7 +276,7 @@ int wf_dxgi_nextFrame(wfInfo* wfi, UINT timeout)
 			{
 				gOutputDuplication->lpVtbl->Release(gOutputDuplication);
 				gOutputDuplication = NULL;
-			} 
+			}
 
 			wf_dxgi_getDuplication(wfi);
 
@@ -296,18 +291,19 @@ int wf_dxgi_nextFrame(wfInfo* wfi, UINT timeout)
 			{
 				WLog_ERR(TAG, "Failed to release frame with status=%ld", status);
 			}
-		
+
 			return 1;
 		}
 	}
-		
-	status = DesktopResource->lpVtbl->QueryInterface(DesktopResource, &IID_ID3D11Texture2D, (void**) &gAcquiredDesktopImage);
+
+	status =
+	  DesktopResource->lpVtbl->QueryInterface(DesktopResource, &IID_ID3D11Texture2D, (void**) &gAcquiredDesktopImage);
 	DesktopResource->lpVtbl->Release(DesktopResource);
 	DesktopResource = NULL;
 
 	if (FAILED(status))
 	{
-			return 1;
+		return 1;
 	}
 
 	wfi->framesWaiting = FrameInfo.AccumulatedFrames;
@@ -360,8 +356,9 @@ int wf_dxgi_getPixelData(wfInfo* wfi, BYTE** data, int* pitch, RECT* invalid)
 		return 1;
 	}
 
-	gContext->lpVtbl->CopySubresourceRegion(gContext, (ID3D11Resource*) sStage, 0,0,0,0, (ID3D11Resource*) gAcquiredDesktopImage, 0, &Box);	 
-		
+	gContext->lpVtbl->CopySubresourceRegion(gContext, (ID3D11Resource*) sStage, 0, 0, 0, 0,
+	                                        (ID3D11Resource*) gAcquiredDesktopImage, 0, &Box);
+
 	status = sStage->lpVtbl->QueryInterface(sStage, &IID_IDXGISurface, (void**) &surf);
 
 	if (FAILED(status))
@@ -379,7 +376,7 @@ int wf_dxgi_getPixelData(wfInfo* wfi, BYTE** data, int* pitch, RECT* invalid)
 		exit(1);
 		return 1;
 	}
-		
+
 	*data = mappedRect.pBits;
 	*pitch = mappedRect.Pitch;
 
@@ -437,7 +434,7 @@ int wf_dxgi_getInvalidRegion(RECT* invalid)
 			}
 
 			DataBuffer = (BYTE*) malloc(FrameInfo.TotalMetadataBufferSize);
-			
+
 			if (!DataBuffer)
 			{
 				DataBufferSize = 0;
@@ -450,7 +447,8 @@ int wf_dxgi_getInvalidRegion(RECT* invalid)
 
 		BufSize = FrameInfo.TotalMetadataBufferSize;
 
-		status = gOutputDuplication->lpVtbl->GetFrameMoveRects(gOutputDuplication, BufSize, (DXGI_OUTDUPL_MOVE_RECT*) DataBuffer, &BufSize);
+		status = gOutputDuplication->lpVtbl->GetFrameMoveRects(gOutputDuplication, BufSize,
+		                                                       (DXGI_OUTDUPL_MOVE_RECT*) DataBuffer, &BufSize);
 
 		if (FAILED(status))
 		{
@@ -461,7 +459,8 @@ int wf_dxgi_getInvalidRegion(RECT* invalid)
 		DirtyRects = DataBuffer + BufSize;
 		BufSize = FrameInfo.TotalMetadataBufferSize - BufSize;
 
-		status = gOutputDuplication->lpVtbl->GetFrameDirtyRects(gOutputDuplication, BufSize, (RECT*) DirtyRects, &BufSize);
+		status =
+		  gOutputDuplication->lpVtbl->GetFrameDirtyRects(gOutputDuplication, BufSize, (RECT*) DirtyRects, &BufSize);
 
 		if (FAILED(status))
 		{
@@ -472,7 +471,7 @@ int wf_dxgi_getInvalidRegion(RECT* invalid)
 
 		pRect = (RECT*) DirtyRects;
 
-		for(i = 0; i<dirty; ++i)
+		for (i = 0; i < dirty; ++i)
 		{
 			UnionRect(invalid, invalid, pRect);
 			++pRect;

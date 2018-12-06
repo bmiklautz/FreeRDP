@@ -1,22 +1,22 @@
 /**
-* FreeRDP: A Remote Desktop Protocol Client
-* FreeRDP Windows Server
-*
-* Copyright 2012 Marc-Andre Moreau <marcandre.moreau@gmail.com>
-* Copyright 2012 Corey Clayton <can.of.tuna@gmail.com>
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * FreeRDP: A Remote Desktop Protocol Client
+ * FreeRDP Windows Server
+ *
+ * Copyright 2012 Marc-Andre Moreau <marcandre.moreau@gmail.com>
+ * Copyright 2012 Corey Clayton <can.of.tuna@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -42,8 +42,7 @@
 
 #define TAG SERVER_TAG("windows")
 
-#define SERVER_KEY "Software\\"FREERDP_VENDOR_STRING"\\" \
-	FREERDP_PRODUCT_STRING
+#define SERVER_KEY "Software\\" FREERDP_VENDOR_STRING "\\" FREERDP_PRODUCT_STRING
 
 static DWORD WINAPI wf_peer_main_loop(LPVOID lpParam);
 
@@ -98,24 +97,21 @@ static BOOL wf_peer_post_connect(freerdp_peer* client)
 	wfi = context->info;
 	settings = client->settings;
 
-	if ((get_screen_info(wfi->screenID, NULL, &wfi->servscreen_width, &wfi->servscreen_height,
-	                     &wfi->bitsPerPixel) == 0) ||
-	    (wfi->servscreen_width == 0) ||
-	    (wfi->servscreen_height == 0) ||
-	    (wfi->bitsPerPixel == 0))
+	if ((get_screen_info(wfi->screenID, NULL, &wfi->servscreen_width, &wfi->servscreen_height, &wfi->bitsPerPixel) ==
+	     0) ||
+	    (wfi->servscreen_width == 0) || (wfi->servscreen_height == 0) || (wfi->bitsPerPixel == 0))
 	{
 		WLog_ERR(TAG, "postconnect: error getting screen info for screen %d", wfi->screenID);
 		WLog_ERR(TAG, "\t%dx%dx%d", wfi->servscreen_height, wfi->servscreen_width, wfi->bitsPerPixel);
 		return FALSE;
 	}
 
-	if ((settings->DesktopWidth != wfi->servscreen_width) ||
-	    (settings->DesktopHeight != wfi->servscreen_height))
+	if ((settings->DesktopWidth != wfi->servscreen_width) || (settings->DesktopHeight != wfi->servscreen_height))
 	{
 		/*
 		WLog_DBG(TAG, "Client requested resolution %"PRIu32"x%"PRIu32", but will resize to %dx%d",
-			settings->DesktopWidth, settings->DesktopHeight, wfi->servscreen_width, wfi->servscreen_height);
-			*/
+		    settings->DesktopWidth, settings->DesktopHeight, wfi->servscreen_width, wfi->servscreen_height);
+		    */
 		settings->DesktopWidth = wfi->servscreen_width;
 		settings->DesktopHeight = wfi->servscreen_height;
 		settings->ColorDepth = wfi->bitsPerPixel;
@@ -149,10 +145,7 @@ static BOOL wf_peer_logon(freerdp_peer* client, SEC_WINNT_AUTH_IDENTITY* identit
 	return TRUE;
 }
 
-static BOOL wf_peer_synchronize_event(rdpInput* input, UINT32 flags)
-{
-	return TRUE;
-}
+static BOOL wf_peer_synchronize_event(rdpInput* input, UINT32 flags) { return TRUE; }
 
 BOOL wf_peer_accepted(freerdp_listener* instance, freerdp_peer* client)
 {
@@ -192,7 +185,7 @@ static DWORD WINAPI wf_peer_socket_listener(LPVOID lpParam)
 
 		for (i = 0; i < rcount; i++)
 		{
-			fds = (int)(long)(rfds[i]);
+			fds = (int) (long) (rfds[i]);
 
 			if (fds > max_fds)
 				max_fds = fds;
@@ -216,8 +209,8 @@ static DWORD WINAPI wf_peer_socket_listener(LPVOID lpParam)
 
 static BOOL wf_peer_read_settings(freerdp_peer* client)
 {
-	if (!wf_settings_read_string_ascii(HKEY_LOCAL_MACHINE, SERVER_KEY,
-	                                   _T("CertificateFile"), &(client->settings->CertificateFile)))
+	if (!wf_settings_read_string_ascii(HKEY_LOCAL_MACHINE, SERVER_KEY, _T("CertificateFile"),
+	                                   &(client->settings->CertificateFile)))
 	{
 		client->settings->CertificateFile = _strdup("server.crt");
 
@@ -225,8 +218,8 @@ static BOOL wf_peer_read_settings(freerdp_peer* client)
 			return FALSE;
 	}
 
-	if (!wf_settings_read_string_ascii(HKEY_LOCAL_MACHINE, SERVER_KEY,
-	                                   _T("PrivateKeyFile"), &(client->settings->PrivateKeyFile)))
+	if (!wf_settings_read_string_ascii(HKEY_LOCAL_MACHINE, SERVER_KEY, _T("PrivateKeyFile"),
+	                                   &(client->settings->PrivateKeyFile)))
 	{
 		client->settings->PrivateKeyFile = _strdup("server.key");
 
@@ -335,7 +328,7 @@ DWORD WINAPI wf_peer_main_loop(LPVOID lpParam)
 				break;
 		}
 
-		//force disconnect
+		// force disconnect
 		if (wfi->force_all_disconnect == TRUE)
 		{
 			WLog_INFO(TAG, "Forcing Disconnect -> ");

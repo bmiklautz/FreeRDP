@@ -18,9 +18,10 @@
 static BOOL run_encode_decode_single(UINT16 bpp, BITMAP_INTERLEAVED_CONTEXT* encoder,
                                      BITMAP_INTERLEAVED_CONTEXT* decoder
 #if defined(WITH_PROFILER)
-                                     , PROFILER* profiler_comp, PROFILER* profiler_decomp
+                                     ,
+                                     PROFILER* profiler_comp, PROFILER* profiler_decomp
 #endif
-                                    )
+)
 {
 	BOOL rc2 = FALSE;
 	BOOL rc;
@@ -48,16 +49,14 @@ static BOOL run_encode_decode_single(UINT16 bpp, BITMAP_INTERLEAVED_CONTEXT* enc
 		goto fail;
 
 	PROFILER_ENTER(profiler_comp);
-	rc = interleaved_compress(encoder, tmp, &DstSize, w, h, pSrcData,
-	                          format, step, x, y, NULL, bpp);
+	rc = interleaved_compress(encoder, tmp, &DstSize, w, h, pSrcData, format, step, x, y, NULL, bpp);
 	PROFILER_EXIT(profiler_comp);
 
 	if (!rc)
 		goto fail;
 
 	PROFILER_ENTER(profiler_decomp);
-	rc = interleaved_decompress(decoder, tmp, DstSize, w, h, bpp, pDstData,
-	                            format, step, x, y, w, h, NULL);
+	rc = interleaved_decompress(decoder, tmp, DstSize, w, h, bpp, pDstData, format, step, x, y, w, h, NULL);
 	PROFILER_EXIT(profiler_decomp);
 
 	if (!rc)
@@ -76,13 +75,13 @@ static BOOL run_encode_decode_single(UINT16 bpp, BITMAP_INTERLEAVED_CONTEXT* enc
 			SplitColor(srcColor, format, &r, &g, &b, NULL, NULL);
 			SplitColor(dstColor, format, &dr, &dg, &db, NULL, NULL);
 
-			if (fabsf((float)r - dr) > maxDiff)
+			if (fabsf((float) r - dr) > maxDiff)
 				goto fail;
 
-			if (fabsf((float)g - dg) > maxDiff)
+			if (fabsf((float) g - dg) > maxDiff)
 				goto fail;
 
-			if (fabsf((float)b - db) > maxDiff)
+			if (fabsf((float) b - db) > maxDiff)
 				goto fail;
 		}
 	}
@@ -122,8 +121,7 @@ static const char* get_profiler_name(BOOL encode, UINT16 bpp)
 	}
 }
 
-static BOOL run_encode_decode(UINT16 bpp, BITMAP_INTERLEAVED_CONTEXT* encoder,
-                              BITMAP_INTERLEAVED_CONTEXT* decoder)
+static BOOL run_encode_decode(UINT16 bpp, BITMAP_INTERLEAVED_CONTEXT* encoder, BITMAP_INTERLEAVED_CONTEXT* decoder)
 {
 	BOOL rc = FALSE;
 	UINT32 x;
@@ -136,9 +134,10 @@ static BOOL run_encode_decode(UINT16 bpp, BITMAP_INTERLEAVED_CONTEXT* encoder,
 	{
 		if (!run_encode_decode_single(bpp, encoder, decoder
 #if defined(WITH_PROFILER)
-		                              , profiler_comp, profiler_decomp
+		                              ,
+		                              profiler_comp, profiler_decomp
 #endif
-		                             ))
+		                              ))
 			goto fail;
 	}
 
@@ -154,7 +153,7 @@ fail:
 }
 int TestFreeRDPCodecInterleaved(int argc, char* argv[])
 {
-	BITMAP_INTERLEAVED_CONTEXT* encoder, * decoder;
+	BITMAP_INTERLEAVED_CONTEXT *encoder, *decoder;
 	int rc = -1;
 	encoder = bitmap_interleaved_context_new(TRUE);
 	decoder = bitmap_interleaved_context_new(FALSE);

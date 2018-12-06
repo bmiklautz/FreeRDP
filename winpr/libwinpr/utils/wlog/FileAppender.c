@@ -40,7 +40,6 @@ struct _wLogFileAppender
 };
 typedef struct _wLogFileAppender wLogFileAppender;
 
-
 static BOOL WLog_FileAppender_SetOutputFileName(wLogFileAppender* appender, const char* filename)
 {
 	appender->FileName = _strdup(filename);
@@ -68,7 +67,7 @@ static BOOL WLog_FileAppender_Open(wLog* log, wLogAppender* appender)
 	if (!log || !appender)
 		return FALSE;
 
-	fileAppender = (wLogFileAppender*)appender;
+	fileAppender = (wLogFileAppender*) appender;
 
 	if (!fileAppender->FilePath)
 	{
@@ -85,7 +84,7 @@ static BOOL WLog_FileAppender_Open(wLog* log, wLogAppender* appender)
 		if (!fileAppender->FileName)
 			return FALSE;
 
-		sprintf_s(fileAppender->FileName, MAX_PATH, "%"PRIu32".log", GetCurrentProcessId());
+		sprintf_s(fileAppender->FileName, MAX_PATH, "%" PRIu32 ".log", GetCurrentProcessId());
 	}
 
 	if (!fileAppender->FullFileName)
@@ -119,7 +118,7 @@ static BOOL WLog_FileAppender_Close(wLog* log, wLogAppender* appender)
 	if (!log || !appender)
 		return FALSE;
 
-	fileAppender = (wLogFileAppender*)appender;
+	fileAppender = (wLogFileAppender*) appender;
 
 	if (!fileAppender->FileDescriptor)
 		return TRUE;
@@ -138,7 +137,7 @@ static BOOL WLog_FileAppender_WriteMessage(wLog* log, wLogAppender* appender, wL
 	if (!log || !appender || !message)
 		return FALSE;
 
-	fileAppender = (wLogFileAppender*)appender;
+	fileAppender = (wLogFileAppender*) appender;
 	fp = fileAppender->FileDescriptor;
 
 	if (!fp)
@@ -153,8 +152,7 @@ static BOOL WLog_FileAppender_WriteMessage(wLog* log, wLogAppender* appender, wL
 
 static int g_DataId = 0;
 
-static BOOL WLog_FileAppender_WriteDataMessage(wLog* log, wLogAppender* appender,
-        wLogMessage* message)
+static BOOL WLog_FileAppender_WriteDataMessage(wLog* log, wLogAppender* appender, wLogMessage* message)
 {
 	int DataId;
 	char* FullFileName;
@@ -171,8 +169,7 @@ static BOOL WLog_FileAppender_WriteDataMessage(wLog* log, wLogAppender* appender
 
 static int g_ImageId = 0;
 
-static BOOL WLog_FileAppender_WriteImageMessage(wLog* log, wLogAppender* appender,
-        wLogMessage* message)
+static BOOL WLog_FileAppender_WriteImageMessage(wLog* log, wLogAppender* appender, wLogMessage* message)
 {
 	int ImageId;
 	char* FullFileName;
@@ -182,8 +179,8 @@ static BOOL WLog_FileAppender_WriteImageMessage(wLog* log, wLogAppender* appende
 
 	ImageId = g_ImageId++;
 	FullFileName = WLog_Message_GetOutputFileName(ImageId, "bmp");
-	WLog_ImageMessage_Write(FullFileName, message->ImageData,
-	                        message->ImageWidth, message->ImageHeight, message->ImageBpp);
+	WLog_ImageMessage_Write(FullFileName, message->ImageData, message->ImageWidth, message->ImageHeight,
+	                        message->ImageBpp);
 	free(FullFileName);
 	return TRUE;
 }
@@ -196,9 +193,9 @@ static BOOL WLog_FileAppender_Set(wLogAppender* appender, const char* setting, v
 		return FALSE;
 
 	if (!strcmp("outputfilename", setting))
-		return WLog_FileAppender_SetOutputFileName(fileAppender, (const char*)value);
+		return WLog_FileAppender_SetOutputFileName(fileAppender, (const char*) value);
 	else if (!strcmp("outputfilepath", setting))
-		return WLog_FileAppender_SetOutputFilePath(fileAppender, (const char*)value);
+		return WLog_FileAppender_SetOutputFilePath(fileAppender, (const char*) value);
 	else
 		return FALSE;
 
@@ -211,7 +208,7 @@ static void WLog_FileAppender_Free(wLogAppender* appender)
 
 	if (appender)
 	{
-		fileAppender = (wLogFileAppender*)appender;
+		fileAppender = (wLogFileAppender*) appender;
 		free(fileAppender->FileName);
 		free(fileAppender->FilePath);
 		free(fileAppender->FullFileName);
@@ -281,7 +278,7 @@ wLogAppender* WLog_FileAppender_New(wLog* log)
 			goto error_output_file_name;
 	}
 
-	return (wLogAppender*)FileAppender;
+	return (wLogAppender*) FileAppender;
 error_output_file_name:
 	free(FileAppender->FilePath);
 error_free:

@@ -48,12 +48,13 @@ int TestArrayList(int argc, char* argv[])
 	if (index != 6)
 		return -1;
 
-	for (index = 0; index < elemsToInsert; index++) {
-		val = (size_t)ArrayList_GetItem(arrayList, 0);
+	for (index = 0; index < elemsToInsert; index++)
+	{
+		val = (size_t) ArrayList_GetItem(arrayList, 0);
 		ArrayList_RemoveAt(arrayList, 0);
 		if (val != index)
 		{
-			printf("ArrayList: shifted %d entries, expected value %d, got %"PRIdz"\n", index, index, val);
+			printf("ArrayList: shifted %d entries, expected value %d, got %" PRIdz "\n", index, index, val);
 			return -1;
 		}
 	}

@@ -84,7 +84,7 @@ ITSMFAudioDevice* tsmf_load_audio_device(const char* name, const char* device)
 			audio = tsmf_load_audio_device_by_name("alsa", device);
 #endif
 	}
-	
+
 	if (audio == NULL)
 	{
 		WLog_ERR(TAG, "no sound device.");
@@ -96,4 +96,3 @@ ITSMFAudioDevice* tsmf_load_audio_device(const char* name, const char* device)
 
 	return audio;
 }
-

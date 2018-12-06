@@ -78,35 +78,24 @@ struct _NSC_CONTEXT
 	const BYTE* palette;
 
 	BOOL (*decode)(NSC_CONTEXT* context);
-	BOOL (*encode)(NSC_CONTEXT* context, const BYTE* BitmapData,
-	               UINT32 rowstride);
+	BOOL (*encode)(NSC_CONTEXT* context, const BYTE* BitmapData, UINT32 rowstride);
 
 	NSC_CONTEXT_PRIV* priv;
 };
 
-FREERDP_API BOOL nsc_context_set_pixel_format(NSC_CONTEXT* context,
-        UINT32 pixel_format);
-FREERDP_API BOOL nsc_process_message(NSC_CONTEXT* context, UINT16 bpp,
-                                     UINT32 width, UINT32 height,
-                                     const BYTE* data, UINT32 length,
-                                     BYTE* pDstData, UINT32 DstFormat,
-                                     UINT32 nDstStride, UINT32 nXDst, UINT32 nYDst,
-                                     UINT32 nWidth, UINT32 nHeight, UINT32 flip);
-FREERDP_API BOOL nsc_compose_message(NSC_CONTEXT* context, wStream* s,
-                                     const BYTE* bmpdata,
-                                     UINT32 width, UINT32 height, UINT32 rowstride);
+FREERDP_API BOOL nsc_context_set_pixel_format(NSC_CONTEXT* context, UINT32 pixel_format);
+FREERDP_API BOOL nsc_process_message(NSC_CONTEXT* context, UINT16 bpp, UINT32 width, UINT32 height, const BYTE* data,
+                                     UINT32 length, BYTE* pDstData, UINT32 DstFormat, UINT32 nDstStride, UINT32 nXDst,
+                                     UINT32 nYDst, UINT32 nWidth, UINT32 nHeight, UINT32 flip);
+FREERDP_API BOOL nsc_compose_message(NSC_CONTEXT* context, wStream* s, const BYTE* bmpdata, UINT32 width, UINT32 height,
+                                     UINT32 rowstride);
 
-FREERDP_API NSC_MESSAGE* nsc_encode_messages(NSC_CONTEXT* context,
-        const BYTE* data,
-        UINT32 x, UINT32 y,
-        UINT32 width, UINT32 height, UINT32 scanline,
-        UINT32* numMessages, UINT32 maxDataSize);
-FREERDP_API BOOL nsc_write_message(NSC_CONTEXT* context, wStream* s,
-                                   NSC_MESSAGE* message);
+FREERDP_API NSC_MESSAGE* nsc_encode_messages(NSC_CONTEXT* context, const BYTE* data, UINT32 x, UINT32 y, UINT32 width,
+                                             UINT32 height, UINT32 scanline, UINT32* numMessages, UINT32 maxDataSize);
+FREERDP_API BOOL nsc_write_message(NSC_CONTEXT* context, wStream* s, NSC_MESSAGE* message);
 FREERDP_API void nsc_message_free(NSC_CONTEXT* context, NSC_MESSAGE* message);
 
-FREERDP_API BOOL nsc_context_reset(NSC_CONTEXT* context, UINT32 width,
-                                   UINT32 height);
+FREERDP_API BOOL nsc_context_reset(NSC_CONTEXT* context, UINT32 width, UINT32 height);
 
 FREERDP_API NSC_CONTEXT* nsc_context_new(void);
 FREERDP_API void nsc_context_free(NSC_CONTEXT* context);

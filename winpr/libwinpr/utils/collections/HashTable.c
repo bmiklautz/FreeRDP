@@ -33,15 +33,9 @@
  * http://www.pomakis.com/hashtable/hashtable.h
  */
 
-BOOL HashTable_PointerCompare(void* pointer1, void* pointer2)
-{
-	return (pointer1 == pointer2);
-}
+BOOL HashTable_PointerCompare(void* pointer1, void* pointer2) { return (pointer1 == pointer2); }
 
-UINT32 HashTable_PointerHash(void* pointer)
-{
-	return ((UINT32)(UINT_PTR) pointer) >> 4;
-}
+UINT32 HashTable_PointerHash(void* pointer) { return ((UINT32)(UINT_PTR) pointer) >> 4; }
 
 BOOL HashTable_StringCompare(void* string1, void* string2)
 {
@@ -64,15 +58,9 @@ UINT32 HashTable_StringHash(void* key)
 	return hash;
 }
 
-void* HashTable_StringClone(void* str)
-{
-	return _strdup((char*) str);
-}
+void* HashTable_StringClone(void* str) { return _strdup((char*) str); }
 
-void HashTable_StringFree(void* str)
-{
-	free(str);
-}
+void HashTable_StringFree(void* str) { free(str); }
 
 static int HashTable_IsProbablePrime(int oddNumber)
 {
@@ -148,8 +136,8 @@ void HashTable_Rehash(wHashTable* table, int numOfBuckets)
 	table->numOfBuckets = numOfBuckets;
 }
 
-void HashTable_SetIdealRatio(wHashTable* table, float idealRatio,
-                             float lowerRehashThreshold, float upperRehashThreshold)
+void HashTable_SetIdealRatio(wHashTable* table, float idealRatio, float lowerRehashThreshold,
+                             float upperRehashThreshold)
 {
 	table->idealRatio = idealRatio;
 	table->lowerRehashThreshold = lowerRehashThreshold;
@@ -182,10 +170,7 @@ wKeyValuePair* HashTable_Get(wHashTable* table, void* key)
  * Gets the number of key/value pairs contained in the HashTable.
  */
 
-int HashTable_Count(wHashTable* table)
-{
-	return table->numOfElements;
-}
+int HashTable_Count(wHashTable* table) { return table->numOfElements; }
 
 /**
  * Methods

@@ -62,7 +62,7 @@ DEVMAN* devman_new(rdpdrPlugin* rdpdr)
 
 	if (!devman)
 	{
-		WLog_INFO(TAG,  "calloc failed!");
+		WLog_INFO(TAG, "calloc failed!");
 		return NULL;
 	}
 
@@ -72,7 +72,7 @@ DEVMAN* devman_new(rdpdrPlugin* rdpdr)
 	devman->devices = ListDictionary_New(TRUE);
 	if (!devman->devices)
 	{
-		WLog_INFO(TAG,  "ListDictionary_New failed!");
+		WLog_INFO(TAG, "ListDictionary_New failed!");
 		free(devman);
 		return NULL;
 	}
@@ -118,7 +118,7 @@ static UINT devman_register_device(DEVMAN* devman, DEVICE* device)
 
 	if (!ListDictionary_Add(devman->devices, key, device))
 	{
-		WLog_INFO(TAG,  "ListDictionary_Add failed!");
+		WLog_INFO(TAG, "ListDictionary_Add failed!");
 		return ERROR_INTERNAL_ERROR;
 	}
 	return CHANNEL_RC_OK;
@@ -170,19 +170,19 @@ UINT devman_load_device_service(DEVMAN* devman, RDPDR_DEVICE* device, rdpContext
 
 	if (!ServiceName)
 	{
-		WLog_INFO(TAG,  "ServiceName %s did not match!", ServiceName);
+		WLog_INFO(TAG, "ServiceName %s did not match!", ServiceName);
 		return ERROR_INVALID_NAME;
 	}
 
 	if (device->Name)
-		WLog_INFO(TAG,  "Loading device service %s [%s] (static)", ServiceName, device->Name);
+		WLog_INFO(TAG, "Loading device service %s [%s] (static)", ServiceName, device->Name);
 	else
-		WLog_INFO(TAG,  "Loading device service %s (static)", ServiceName);
+		WLog_INFO(TAG, "Loading device service %s (static)", ServiceName);
 	entry = (PDEVICE_SERVICE_ENTRY) freerdp_load_channel_addin_entry(ServiceName, NULL, "DeviceServiceEntry", 0);
 
 	if (!entry)
 	{
-		WLog_INFO(TAG,  "freerdp_load_channel_addin_entry failed!");
+		WLog_INFO(TAG, "freerdp_load_channel_addin_entry failed!");
 		return ERROR_INTERNAL_ERROR;
 	}
 

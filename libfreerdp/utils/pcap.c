@@ -51,7 +51,7 @@ int gettimeofday(struct timeval* tp, void* tz)
 #include <freerdp/types.h>
 #include <freerdp/utils/pcap.h>
 
-#define PCAP_MAGIC	0xA1B2C3D4
+#define PCAP_MAGIC 0xA1B2C3D4
 
 static BOOL pcap_read_header(rdpPcap* pcap, pcap_header* header)
 {
@@ -94,8 +94,7 @@ static BOOL pcap_read_record(rdpPcap* pcap, pcap_record* record)
 
 static BOOL pcap_write_record(rdpPcap* pcap, pcap_record* record)
 {
-	return pcap_write_record_header(pcap, &record->header) &&
-			(fwrite(record->data, record->length, 1, pcap->fp) == 1);
+	return pcap_write_record_header(pcap, &record->header) && (fwrite(record->data, record->length, 1, pcap->fp) == 1);
 }
 
 BOOL pcap_add_record(rdpPcap* pcap, void* data, UINT32 length)
@@ -163,8 +162,7 @@ BOOL pcap_get_next_record_content(rdpPcap* pcap, pcap_record* record)
 
 BOOL pcap_get_next_record(rdpPcap* pcap, pcap_record* record)
 {
-	return pcap_has_next_record(pcap) &&
-			pcap_read_record(pcap, record);
+	return pcap_has_next_record(pcap) && pcap_read_record(pcap, record);
 }
 
 rdpPcap* pcap_open(char* name, BOOL write)

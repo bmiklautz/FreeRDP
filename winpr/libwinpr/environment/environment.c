@@ -77,7 +77,7 @@ DWORD GetCurrentDirectoryA(DWORD nBufferLength, LPSTR lpBuffer)
 		if ((length + 1) > nBufferLength)
 		{
 			free(cwd);
-			return (DWORD) (length + 1);
+			return (DWORD)(length + 1);
 		}
 
 		memcpy(lpBuffer, cwd, length + 1);
@@ -87,50 +87,31 @@ DWORD GetCurrentDirectoryA(DWORD nBufferLength, LPSTR lpBuffer)
 	return 0;
 }
 
-DWORD GetCurrentDirectoryW(DWORD nBufferLength, LPWSTR lpBuffer)
+DWORD GetCurrentDirectoryW(DWORD nBufferLength, LPWSTR lpBuffer) { return 0; }
+
+BOOL SetCurrentDirectoryA(LPCSTR lpPathName) { return TRUE; }
+
+BOOL SetCurrentDirectoryW(LPCWSTR lpPathName) { return TRUE; }
+
+DWORD SearchPathA(LPCSTR lpPath, LPCSTR lpFileName, LPCSTR lpExtension, DWORD nBufferLength, LPSTR lpBuffer,
+                  LPSTR* lpFilePart)
 {
 	return 0;
 }
 
-BOOL SetCurrentDirectoryA(LPCSTR lpPathName)
-{
-	return TRUE;
-}
-
-BOOL SetCurrentDirectoryW(LPCWSTR lpPathName)
-{
-	return TRUE;
-}
-
-DWORD SearchPathA(LPCSTR lpPath, LPCSTR lpFileName, LPCSTR lpExtension, DWORD nBufferLength, LPSTR lpBuffer, LPSTR* lpFilePart)
+DWORD SearchPathW(LPCWSTR lpPath, LPCWSTR lpFileName, LPCWSTR lpExtension, DWORD nBufferLength, LPWSTR lpBuffer,
+                  LPWSTR* lpFilePart)
 {
 	return 0;
 }
 
-DWORD SearchPathW(LPCWSTR lpPath, LPCWSTR lpFileName, LPCWSTR lpExtension, DWORD nBufferLength, LPWSTR lpBuffer, LPWSTR* lpFilePart)
-{
-	return 0;
-}
+LPSTR GetCommandLineA(VOID) { return NULL; }
 
-LPSTR GetCommandLineA(VOID)
-{
-	return NULL;
-}
+LPWSTR GetCommandLineW(VOID) { return NULL; }
 
-LPWSTR GetCommandLineW(VOID)
-{
-	return NULL;
-}
+BOOL NeedCurrentDirectoryForExePathA(LPCSTR ExeName) { return TRUE; }
 
-BOOL NeedCurrentDirectoryForExePathA(LPCSTR ExeName)
-{
-	return TRUE;
-}
-
-BOOL NeedCurrentDirectoryForExePathW(LPCWSTR ExeName)
-{
-	return TRUE;
-}
+BOOL NeedCurrentDirectoryForExePathW(LPCWSTR ExeName) { return TRUE; }
 
 #endif
 
@@ -179,7 +160,7 @@ BOOL SetEnvironmentVariableA(LPCSTR lpName, LPCSTR lpValue)
 
 	if (lpValue)
 	{
-		if (0 != setenv(lpName,lpValue,1))
+		if (0 != setenv(lpName, lpValue, 1))
 			return FALSE;
 	}
 	else
@@ -194,10 +175,7 @@ BOOL SetEnvironmentVariableA(LPCSTR lpName, LPCSTR lpValue)
 #endif
 }
 
-BOOL SetEnvironmentVariableW(LPCWSTR lpName, LPCWSTR lpValue)
-{
-	return FALSE;
-}
+BOOL SetEnvironmentVariableW(LPCWSTR lpName, LPCWSTR lpValue) { return FALSE; }
 
 /**
  * GetEnvironmentStrings function:
@@ -273,30 +251,15 @@ LPCH GetEnvironmentStringsA(VOID)
 #endif
 }
 
-LPWCH GetEnvironmentStringsW(VOID)
-{
-	return NULL;
-}
+LPWCH GetEnvironmentStringsW(VOID) { return NULL; }
 
-BOOL SetEnvironmentStringsA(LPCH NewEnvironment)
-{
-	return TRUE;
-}
+BOOL SetEnvironmentStringsA(LPCH NewEnvironment) { return TRUE; }
 
-BOOL SetEnvironmentStringsW(LPWCH NewEnvironment)
-{
-	return TRUE;
-}
+BOOL SetEnvironmentStringsW(LPWCH NewEnvironment) { return TRUE; }
 
-DWORD ExpandEnvironmentStringsA(LPCSTR lpSrc, LPSTR lpDst, DWORD nSize)
-{
-	return 0;
-}
+DWORD ExpandEnvironmentStringsA(LPCSTR lpSrc, LPSTR lpDst, DWORD nSize) { return 0; }
 
-DWORD ExpandEnvironmentStringsW(LPCWSTR lpSrc, LPWSTR lpDst, DWORD nSize)
-{
-	return 0;
-}
+DWORD ExpandEnvironmentStringsW(LPCWSTR lpSrc, LPWSTR lpDst, DWORD nSize) { return 0; }
 
 BOOL FreeEnvironmentStringsA(LPCH lpszEnvironmentBlock)
 {
@@ -305,10 +268,7 @@ BOOL FreeEnvironmentStringsA(LPCH lpszEnvironmentBlock)
 	return TRUE;
 }
 
-BOOL FreeEnvironmentStringsW(LPWCH lpszEnvironmentBlock)
-{
-	return TRUE;
-}
+BOOL FreeEnvironmentStringsW(LPWCH lpszEnvironmentBlock) { return TRUE; }
 
 #endif
 
@@ -373,9 +333,9 @@ LPCH MergeEnvironmentStrings(PCSTR original, PCSTR merge)
 		return NULL;
 	}
 
-	envp  = original;
+	envp = original;
 
-	while ((original != NULL) && (*envp && *(envp+1)))
+	while ((original != NULL) && (*envp && *(envp + 1)))
 	{
 		ULONG old_offset = offset;
 		length = (int) strlen(envp);
@@ -399,7 +359,7 @@ LPCH MergeEnvironmentStrings(PCSTR original, PCSTR merge)
 
 		// check if this value is in the mergeStrings
 		foundMerge = 0;
-		for (run = 0; run < mergeStringLength; run ++)
+		for (run = 0; run < mergeStringLength; run++)
 		{
 			if (!mergeStrings[run])
 				continue;
@@ -452,11 +412,11 @@ LPCH MergeEnvironmentStrings(PCSTR original, PCSTR merge)
 			offset += (length + 1);
 		}
 
-		envp += (length +1);
+		envp += (length + 1);
 	}
 
 	// now merge the not already merged env
-	for (run = 0; run < mergeStringLength; run ++)
+	for (run = 0; run < mergeStringLength; run++)
 	{
 		if (!mergeStrings[run])
 			continue;
@@ -513,7 +473,7 @@ DWORD GetEnvironmentVariableEBA(LPCSTR envBlock, LPCSTR lpName, LPSTR lpBuffer, 
 	while (*penvb && *(penvb + 1))
 	{
 		fLength = (int) strlen(penvb);
-		foundEquals = strstr(penvb,"=");
+		foundEquals = strstr(penvb, "=");
 
 		if (!foundEquals)
 		{
@@ -525,7 +485,7 @@ DWORD GetEnvironmentVariableEBA(LPCSTR envBlock, LPCSTR lpName, LPSTR lpBuffer, 
 
 		if (nLength != lpNameLength)
 		{
-			penvb += (fLength +1);
+			penvb += (fLength + 1);
 			continue;
 		}
 
@@ -535,7 +495,7 @@ DWORD GetEnvironmentVariableEBA(LPCSTR envBlock, LPCSTR lpName, LPSTR lpBuffer, 
 			break;
 		}
 
-		penvb += (fLength +1);
+		penvb += (fLength + 1);
 	}
 
 	if (!env)

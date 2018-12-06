@@ -31,31 +31,33 @@
 
 #define TAG CLIENT_TAG("x11")
 
-#define FLOATBAR_HEIGHT				26
-#define FLOATBAR_DEFAULT_WIDTH		576
-#define FLOATBAR_MIN_WIDTH			200
-#define FLOATBAR_BORDER				24
-#define FLOATBAR_BUTTON_WIDTH		24
-#define FLOATBAR_COLOR_BACKGROUND 	"RGB:31/6c/a9"
-#define FLOATBAR_COLOR_BORDER 		"RGB:75/9a/c8"
-#define FLOATBAR_COLOR_FOREGROUND 	"RGB:FF/FF/FF"
+#define FLOATBAR_HEIGHT 26
+#define FLOATBAR_DEFAULT_WIDTH 576
+#define FLOATBAR_MIN_WIDTH 200
+#define FLOATBAR_BORDER 24
+#define FLOATBAR_BUTTON_WIDTH 24
+#define FLOATBAR_COLOR_BACKGROUND "RGB:31/6c/a9"
+#define FLOATBAR_COLOR_BORDER "RGB:75/9a/c8"
+#define FLOATBAR_COLOR_FOREGROUND "RGB:FF/FF/FF"
 
 #ifdef WITH_DEBUG_X11
 #define DEBUG_X11(...) WLog_DBG(TAG, __VA_ARGS__)
 #else
-#define DEBUG_X11(...) do { } while (0)
+#define DEBUG_X11(...)                                                                                                 \
+	do                                                                                                                 \
+	{                                                                                                                  \
+	} while (0)
 #endif
 
-#define XF_FLOATBAR_MODE_NONE 			0
-#define XF_FLOATBAR_MODE_DRAGGING 		1
-#define XF_FLOATBAR_MODE_RESIZE_LEFT 	2
-#define XF_FLOATBAR_MODE_RESIZE_RIGHT 	3
+#define XF_FLOATBAR_MODE_NONE 0
+#define XF_FLOATBAR_MODE_DRAGGING 1
+#define XF_FLOATBAR_MODE_RESIZE_LEFT 2
+#define XF_FLOATBAR_MODE_RESIZE_RIGHT 3
 
-
-#define XF_FLOATBAR_BUTTON_CLOSE 	1
-#define XF_FLOATBAR_BUTTON_RESTORE 	2
+#define XF_FLOATBAR_BUTTON_CLOSE 1
+#define XF_FLOATBAR_BUTTON_RESTORE 2
 #define XF_FLOATBAR_BUTTON_MINIMIZE 3
-#define XF_FLOATBAR_BUTTON_LOCKED 	4
+#define XF_FLOATBAR_BUTTON_LOCKED 4
 
 typedef struct xf_floatbar_button xfFloatbarButton;
 
@@ -84,20 +86,11 @@ struct xf_floatbar_button
 	Window handle;
 };
 
-static void xf_floatbar_button_onclick_close(xfContext* xfc)
-{
-	ExitProcess(EXIT_SUCCESS);
-}
+static void xf_floatbar_button_onclick_close(xfContext* xfc) { ExitProcess(EXIT_SUCCESS); }
 
-static void xf_floatbar_button_onclick_minimize(xfContext* xfc)
-{
-	xf_SetWindowMinimized(xfc, xfc->window);
-}
+static void xf_floatbar_button_onclick_minimize(xfContext* xfc) { xf_SetWindowMinimized(xfc, xfc->window); }
 
-static void xf_floatbar_button_onclick_restore(xfContext* xfc)
-{
-	xf_toggle_fullscreen(xfc);
-}
+static void xf_floatbar_button_onclick_restore(xfContext* xfc) { xf_toggle_fullscreen(xfc); }
 
 static void xf_floatbar_button_onclick_locked(xfContext* xfc)
 {
@@ -120,8 +113,7 @@ void xf_floatbar_hide_and_show(xfContext* xfc)
 
 	if (!floatbar->locked)
 	{
-		if ((floatbar->mode == 0) && (floatbar->last_motion_y_root > 10) &&
-		    (floatbar->y > (FLOATBAR_HEIGHT * -1)))
+		if ((floatbar->mode == 0) && (floatbar->last_motion_y_root > 10) && (floatbar->y > (FLOATBAR_HEIGHT * -1)))
 		{
 			floatbar->y = floatbar->y - 1;
 			XMoveWindow(xfc->display, floatbar->handle, floatbar->x, floatbar->y);
@@ -193,8 +185,9 @@ static xfFloatbarButton* xf_floatbar_new_button(xfContext* xfc, xfFloatbar* floa
 	button->focus = FALSE;
 	button->handle = XCreateWindow(xfc->display, floatbar->handle, button->x, 0, FLOATBAR_BUTTON_WIDTH,
 	                               FLOATBAR_BUTTON_WIDTH, 0, CopyFromParent, InputOutput, CopyFromParent, 0, NULL);
-	XSelectInput(xfc->display, button->handle, ExposureMask | ButtonPressMask | ButtonReleaseMask |
-	             FocusChangeMask | LeaveWindowMask | EnterWindowMask | StructureNotifyMask);
+	XSelectInput(xfc->display, button->handle,
+	             ExposureMask | ButtonPressMask | ButtonReleaseMask | FocusChangeMask | LeaveWindowMask |
+	               EnterWindowMask | StructureNotifyMask);
 	return button;
 }
 
@@ -220,8 +213,7 @@ xfFloatbar* xf_floatbar_new(xfContext* xfc, Window window)
 	}
 
 	floatbar->y = 0;
-	floatbar->handle = XCreateWindow(xfc->display, window, floatbar->x, 0, FLOATBAR_DEFAULT_WIDTH,
-	                                 FLOATBAR_HEIGHT, 0,
+	floatbar->handle = XCreateWindow(xfc->display, window, floatbar->x, 0, FLOATBAR_DEFAULT_WIDTH, FLOATBAR_HEIGHT, 0,
 	                                 CopyFromParent, InputOutput, CopyFromParent, 0, NULL);
 	floatbar->width = FLOATBAR_DEFAULT_WIDTH;
 	floatbar->height = FLOATBAR_HEIGHT;
@@ -230,9 +222,9 @@ xfFloatbar* xf_floatbar_new(xfContext* xfc, Window window)
 	floatbar->buttons[1] = xf_floatbar_new_button(xfc, floatbar, XF_FLOATBAR_BUTTON_RESTORE);
 	floatbar->buttons[2] = xf_floatbar_new_button(xfc, floatbar, XF_FLOATBAR_BUTTON_MINIMIZE);
 	floatbar->buttons[3] = xf_floatbar_new_button(xfc, floatbar, XF_FLOATBAR_BUTTON_LOCKED);
-	XSelectInput(xfc->display, floatbar->handle, ExposureMask | ButtonPressMask | ButtonReleaseMask |
-	             PointerMotionMask | FocusChangeMask | LeaveWindowMask | EnterWindowMask | StructureNotifyMask |
-	             PropertyChangeMask);
+	XSelectInput(xfc->display, floatbar->handle,
+	             ExposureMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | FocusChangeMask |
+	               LeaveWindowMask | EnterWindowMask | StructureNotifyMask | PropertyChangeMask);
 	return floatbar;
 }
 
@@ -283,8 +275,7 @@ static void xf_floatbar_event_expose(xfContext* xfc, XEvent* event)
 	border[4].y = border[0].y;
 	/* Fill all pixels with 0 */
 	XSetForeground(xfc->display, shape_gc, 0);
-	XFillRectangle(xfc->display, pmap, shape_gc, 0, 0, floatbar->width,
-	               floatbar->height);
+	XFillRectangle(xfc->display, pmap, shape_gc, 0, 0, floatbar->width, floatbar->height);
 	/* Fill all pixels which should be shown with 1 */
 	XSetForeground(xfc->display, shape_gc, 1);
 	XFillPolygon(xfc->display, pmap, shape_gc, shape, 5, 0, CoordModeOrigin);
@@ -398,8 +389,8 @@ static void xf_floatbar_button_event_expose(xfContext* xfc, XEvent* event)
 			break;
 	}
 
-	pattern = XCreateBitmapFromData(xfc->display, button->handle, (const char*)bits,
-	                                FLOATBAR_BUTTON_WIDTH, FLOATBAR_BUTTON_WIDTH);
+	pattern = XCreateBitmapFromData(xfc->display, button->handle, (const char*) bits, FLOATBAR_BUTTON_WIDTH,
+	                                FLOATBAR_BUTTON_WIDTH);
 
 	if (!(button->focus))
 		XSetForeground(xfc->display, gc, xf_floatbar_get_color(xfc, FLOATBAR_COLOR_BACKGROUND));
@@ -407,8 +398,7 @@ static void xf_floatbar_button_event_expose(xfContext* xfc, XEvent* event)
 		XSetForeground(xfc->display, gc, xf_floatbar_get_color(xfc, FLOATBAR_COLOR_BORDER));
 
 	XSetBackground(xfc->display, gc, xf_floatbar_get_color(xfc, FLOATBAR_COLOR_FOREGROUND));
-	XCopyPlane(xfc->display, pattern, button->handle, gc, 0, 0, FLOATBAR_BUTTON_WIDTH,
-	           FLOATBAR_BUTTON_WIDTH, 0, 0, 1);
+	XCopyPlane(xfc->display, pattern, button->handle, gc, 0, 0, FLOATBAR_BUTTON_WIDTH, FLOATBAR_BUTTON_WIDTH, 0, 0, 1);
 	XFreePixmap(xfc->display, pattern);
 	XFreeGC(xfc->display, gc);
 }
@@ -444,7 +434,7 @@ static void xf_floatbar_event_buttonpress(xfContext* xfc, XEvent* event)
 		case Button1:
 			if (event->xmotion.x <= FLOATBAR_BORDER)
 				floatbar->mode = XF_FLOATBAR_MODE_RESIZE_LEFT;
-			else if	(event->xmotion.x >= (floatbar->width - FLOATBAR_BORDER))
+			else if (event->xmotion.x >= (floatbar->width - FLOATBAR_BORDER))
 				floatbar->mode = XF_FLOATBAR_MODE_RESIZE_RIGHT;
 			else
 				floatbar->mode = XF_FLOATBAR_MODE_DRAGGING;
@@ -537,8 +527,7 @@ static void xf_floatbar_event_motionnotify(xfContext* xfc, XEvent* event)
 	}
 	else
 	{
-		if (event->xmotion.x <= FLOATBAR_BORDER ||
-		    event->xmotion.x >= xfc->window->floatbar->width - FLOATBAR_BORDER)
+		if (event->xmotion.x <= FLOATBAR_BORDER || event->xmotion.x >= xfc->window->floatbar->width - FLOATBAR_BORDER)
 			cursor = XCreateFontCursor(xfc->display, XC_sb_h_double_arrow);
 	}
 

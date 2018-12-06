@@ -16,7 +16,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 #include <sys/types.h>
 #include <sys/mman.h>
@@ -65,17 +65,17 @@
 struct X11Handle
 {
 	int shmid;
-	int *xfwin;
+	int* xfwin;
 #if defined(WITH_XEXT)
 	BOOL has_shape;
 #endif
-	Display *disp;
+	Display* disp;
 	Window subwin;
 	BOOL subwinMapped;
 #if GST_VERSION_MAJOR > 0
-	GstVideoOverlay *overlay;
+	GstVideoOverlay* overlay;
 #else
-	GstXOverlay *overlay;
+	GstXOverlay* overlay;
 #endif
 	int subwinWidth;
 	int subwinHeight;
@@ -90,20 +90,20 @@ static const char* get_shm_id()
 	return shm_id;
 }
 
-static GstBusSyncReply tsmf_platform_bus_sync_handler(GstBus *bus, GstMessage *message, gpointer user_data)
+static GstBusSyncReply tsmf_platform_bus_sync_handler(GstBus* bus, GstMessage* message, gpointer user_data)
 {
 	struct X11Handle* hdl;
 
 	TSMFGstreamerDecoder* decoder = user_data;
 
-	if (GST_MESSAGE_TYPE (message) != GST_MESSAGE_ELEMENT)
+	if (GST_MESSAGE_TYPE(message) != GST_MESSAGE_ELEMENT)
 		return GST_BUS_PASS;
 
 #if GST_VERSION_MAJOR > 0
-	if (!gst_is_video_overlay_prepare_window_handle_message (message))
+	if (!gst_is_video_overlay_prepare_window_handle_message(message))
 		return GST_BUS_PASS;
 #else
-	if (!gst_structure_has_name (message->structure, "prepare-xwindow-id"))
+	if (!gst_structure_has_name(message->structure, "prepare-xwindow-id"))
 		return GST_BUS_PASS;
 #endif
 
@@ -112,12 +112,12 @@ static GstBusSyncReply tsmf_platform_bus_sync_handler(GstBus *bus, GstMessage *m
 	if (hdl->subwin)
 	{
 #if GST_VERSION_MAJOR > 0
-		hdl->overlay = GST_VIDEO_OVERLAY (GST_MESSAGE_SRC (message));
+		hdl->overlay = GST_VIDEO_OVERLAY(GST_MESSAGE_SRC(message));
 		gst_video_overlay_set_window_handle(hdl->overlay, hdl->subwin);
 		gst_video_overlay_handle_events(hdl->overlay, TRUE);
 #else
-		hdl->overlay = GST_X_OVERLAY (GST_MESSAGE_SRC (message));
-#if GST_CHECK_VERSION(0,10,31) 
+		hdl->overlay = GST_X_OVERLAY(GST_MESSAGE_SRC(message));
+#if GST_CHECK_VERSION(0, 10, 31)
 		gst_x_overlay_set_window_handle(hdl->overlay, hdl->subwin);
 #else
 		gst_x_overlay_set_xwindow_id(hdl->overlay, hdl->subwin);
@@ -147,24 +147,20 @@ static GstBusSyncReply tsmf_platform_bus_sync_handler(GstBus *bus, GstMessage *m
 			XSync(hdl->disp, FALSE);
 			XUnlockDisplay(hdl->disp);
 		}
-	} else {
-		g_warning ("Window was not available before retrieving the overlay!");
+	}
+	else
+	{
+		g_warning("Window was not available before retrieving the overlay!");
 	}
 
-	gst_message_unref (message);
+	gst_message_unref(message);
 
 	return GST_BUS_DROP;
 }
 
-const char* tsmf_platform_get_video_sink(void)
-{
-	return "autovideosink";
-}
+const char* tsmf_platform_get_video_sink(void) { return "autovideosink"; }
 
-const char* tsmf_platform_get_audio_sink(void)
-{
-	return "autoaudiosink";
-}
+const char* tsmf_platform_get_audio_sink(void) { return "autoaudiosink"; }
 
 int tsmf_platform_create(TSMFGstreamerDecoder* decoder)
 {
@@ -187,11 +183,12 @@ int tsmf_platform_create(TSMFGstreamerDecoder* decoder)
 	hdl->shmid = shm_open(get_shm_id(), (O_RDWR | O_CREAT), (PROT_READ | PROT_WRITE));
 	if (hdl->shmid == -1)
 	{
-		WLog_ERR(TAG, "failed to get access to shared memory - shmget(%s): %i - %s", get_shm_id(), errno, strerror(errno));
+		WLog_ERR(TAG, "failed to get access to shared memory - shmget(%s): %i - %s", get_shm_id(), errno,
+		         strerror(errno));
 		return -2;
 	}
 
-	hdl->xfwin = mmap(0, sizeof(void *), PROT_READ | PROT_WRITE, MAP_SHARED, hdl->shmid, 0);
+	hdl->xfwin = mmap(0, sizeof(void*), PROT_READ | PROT_WRITE, MAP_SHARED, hdl->shmid, 0);
 	if (hdl->xfwin == MAP_FAILED)
 	{
 		WLog_ERR(TAG, "shmat failed!");
@@ -221,7 +218,6 @@ int tsmf_platform_set_format(TSMFGstreamerDecoder* decoder)
 
 	if (decoder->media_type == TSMF_MAJOR_TYPE_VIDEO)
 	{
-
 	}
 
 	return 0;
@@ -240,9 +236,9 @@ int tsmf_platform_register_handler(TSMFGstreamerDecoder* decoder)
 	bus = gst_pipeline_get_bus(GST_PIPELINE(decoder->pipe));
 
 #if GST_VERSION_MAJOR > 0
-	gst_bus_set_sync_handler (bus, (GstBusSyncHandler) tsmf_platform_bus_sync_handler, decoder, NULL);
+	gst_bus_set_sync_handler(bus, (GstBusSyncHandler) tsmf_platform_bus_sync_handler, decoder, NULL);
 #else
-	gst_bus_set_sync_handler (bus, (GstBusSyncHandler) tsmf_platform_bus_sync_handler, decoder);
+	gst_bus_set_sync_handler(bus, (GstBusSyncHandler) tsmf_platform_bus_sync_handler, decoder);
 #endif
 
 	if (!bus)
@@ -251,7 +247,7 @@ int tsmf_platform_register_handler(TSMFGstreamerDecoder* decoder)
 		return 1;
 	}
 
-	gst_object_unref (bus);
+	gst_object_unref(bus);
 
 	return 0;
 }
@@ -300,7 +296,7 @@ int tsmf_window_create(TSMFGstreamerDecoder* decoder)
 		if (!hdl->subwin)
 		{
 			XLockDisplay(hdl->disp);
-			hdl->subwin = XCreateSimpleWindow(hdl->disp, *(int *)hdl->xfwin, 0, 0, 1, 1, 0, 0, 0);
+			hdl->subwin = XCreateSimpleWindow(hdl->disp, *(int*) hdl->xfwin, 0, 0, 1, 1, 0, 0, 0);
 			XUnlockDisplay(hdl->disp);
 
 			if (!hdl->subwin)
@@ -313,18 +309,18 @@ int tsmf_window_create(TSMFGstreamerDecoder* decoder)
 
 		decoder->ready = TRUE;
 #if defined(WITH_XEXT)
-	int event, error;
-	XLockDisplay(hdl->disp);
-	hdl->has_shape = XShapeQueryExtension(hdl->disp, &event, &error);
-	XUnlockDisplay(hdl->disp);
+		int event, error;
+		XLockDisplay(hdl->disp);
+		hdl->has_shape = XShapeQueryExtension(hdl->disp, &event, &error);
+		XUnlockDisplay(hdl->disp);
 #endif
 	}
 
 	return 0;
 }
 
-int tsmf_window_resize(TSMFGstreamerDecoder* decoder, int x, int y, int width,
-				   int height, int nr_rects, RDP_RECT *rects)
+int tsmf_window_resize(TSMFGstreamerDecoder* decoder, int x, int y, int width, int height, int nr_rects,
+                       RDP_RECT* rects)
 {
 	struct X11Handle* hdl;
 
@@ -382,7 +378,7 @@ int tsmf_window_resize(TSMFGstreamerDecoder* decoder, int x, int y, int width,
 		if (hdl->has_shape)
 		{
 			int i;
-			XRectangle *xrects = NULL;
+			XRectangle* xrects = NULL;
 
 			if (nr_rects == 0)
 			{
@@ -396,7 +392,7 @@ int tsmf_window_resize(TSMFGstreamerDecoder* decoder, int x, int y, int width,
 			{
 				xrects = calloc(nr_rects, sizeof(XRectangle));
 			}
-			
+
 			if (xrects)
 			{
 				for (i = 0; i < nr_rects; i++)
@@ -469,14 +465,13 @@ int tsmf_window_unmap(TSMFGstreamerDecoder* decoder)
 	{
 		XLockDisplay(hdl->disp);
 		XUnmapWindow(hdl->disp, hdl->subwin);
-		hdl->subwinMapped = FALSE; 
-		XSync(hdl->disp, FALSE); 
+		hdl->subwinMapped = FALSE;
+		XSync(hdl->disp, FALSE);
 		XUnlockDisplay(hdl->disp);
 	}
 
 	return 0;
 }
-
 
 int tsmf_window_destroy(TSMFGstreamerDecoder* decoder)
 {
@@ -512,4 +507,3 @@ int tsmf_window_destroy(TSMFGstreamerDecoder* decoder)
 	hdl->subwinHeight = -1;
 	return 0;
 }
-

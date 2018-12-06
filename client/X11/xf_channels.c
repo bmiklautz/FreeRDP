@@ -68,22 +68,22 @@ void xf_OnChannelConnectedEventHandler(void* context, ChannelConnectedEventArgs*
 	}
 	else if (strcmp(e->name, DISP_DVC_CHANNEL_NAME) == 0)
 	{
-		xf_disp_init(xfc->xfDisp, (DispClientContext*)e->pInterface);
+		xf_disp_init(xfc->xfDisp, (DispClientContext*) e->pInterface);
 	}
 	else if (strcmp(e->name, GEOMETRY_DVC_CHANNEL_NAME) == 0)
 	{
-		gdi_video_geometry_init(xfc->context.gdi, (GeometryClientContext*)e->pInterface);
+		gdi_video_geometry_init(xfc->context.gdi, (GeometryClientContext*) e->pInterface);
 	}
 	else if (strcmp(e->name, VIDEO_CONTROL_DVC_CHANNEL_NAME) == 0)
 	{
 		if (settings->SoftwareGdi)
-			gdi_video_control_init(xfc->context.gdi, (VideoClientContext*)e->pInterface);
+			gdi_video_control_init(xfc->context.gdi, (VideoClientContext*) e->pInterface);
 		else
-			xf_video_control_init(xfc, (VideoClientContext*)e->pInterface);
+			xf_video_control_init(xfc, (VideoClientContext*) e->pInterface);
 	}
 	else if (strcmp(e->name, VIDEO_DATA_DVC_CHANNEL_NAME) == 0)
 	{
-		gdi_video_data_init(xfc->context.gdi, (VideoClientContext*)e->pInterface);
+		gdi_video_data_init(xfc->context.gdi, (VideoClientContext*) e->pInterface);
 	}
 }
 
@@ -98,7 +98,7 @@ void xf_OnChannelDisconnectedEventHandler(void* context, ChannelDisconnectedEven
 	}
 	else if (strcmp(e->name, DISP_DVC_CHANNEL_NAME) == 0)
 	{
-		xf_disp_uninit(xfc->xfDisp, (DispClientContext*)e->pInterface);
+		xf_disp_uninit(xfc->xfDisp, (DispClientContext*) e->pInterface);
 	}
 	else if (strcmp(e->name, TSMF_DVC_CHANNEL_NAME) == 0)
 	{
@@ -125,17 +125,17 @@ void xf_OnChannelDisconnectedEventHandler(void* context, ChannelDisconnectedEven
 	}
 	else if (strcmp(e->name, GEOMETRY_DVC_CHANNEL_NAME) == 0)
 	{
-		gdi_video_geometry_uninit(xfc->context.gdi, (GeometryClientContext*)e->pInterface);
+		gdi_video_geometry_uninit(xfc->context.gdi, (GeometryClientContext*) e->pInterface);
 	}
 	else if (strcmp(e->name, VIDEO_CONTROL_DVC_CHANNEL_NAME) == 0)
 	{
 		if (settings->SoftwareGdi)
-			gdi_video_control_uninit(xfc->context.gdi, (VideoClientContext*)e->pInterface);
+			gdi_video_control_uninit(xfc->context.gdi, (VideoClientContext*) e->pInterface);
 		else
-			xf_video_control_uninit(xfc, (VideoClientContext*)e->pInterface);
+			xf_video_control_uninit(xfc, (VideoClientContext*) e->pInterface);
 	}
 	else if (strcmp(e->name, VIDEO_DATA_DVC_CHANNEL_NAME) == 0)
 	{
-		gdi_video_data_uninit(xfc->context.gdi, (VideoClientContext*)e->pInterface);
+		gdi_video_data_uninit(xfc->context.gdi, (VideoClientContext*) e->pInterface);
 	}
 }

@@ -50,8 +50,7 @@ VOID InitializeCriticalSection(LPCRITICAL_SECTION lpCriticalSection)
 	InitializeCriticalSectionEx(lpCriticalSection, 0, 0);
 }
 
-BOOL InitializeCriticalSectionEx(LPCRITICAL_SECTION lpCriticalSection, DWORD dwSpinCount,
-                                 DWORD Flags)
+BOOL InitializeCriticalSectionEx(LPCRITICAL_SECTION lpCriticalSection, DWORD dwSpinCount, DWORD Flags)
 {
 	/**
 	 * See http://msdn.microsoft.com/en-us/library/ff541979(v=vs.85).aspx
@@ -80,8 +79,7 @@ BOOL InitializeCriticalSectionEx(LPCRITICAL_SECTION lpCriticalSection, DWORD dwS
 
 #if defined(__APPLE__)
 
-	if (semaphore_create(mach_task_self(), lpCriticalSection->LockSemaphore, SYNC_POLICY_FIFO,
-	                     0) != KERN_SUCCESS)
+	if (semaphore_create(mach_task_self(), lpCriticalSection->LockSemaphore, SYNC_POLICY_FIFO, 0) != KERN_SUCCESS)
 		goto out_fail;
 
 #else

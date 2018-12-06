@@ -57,5 +57,4 @@ struct rdp_autodetect
 	UINT64 paddingB[32 - 23]; /* 23 */
 };
 
-
 #endif /* FREERDP_AUTODETECT_H */

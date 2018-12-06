@@ -55,16 +55,7 @@ typedef struct _wLogFilter wLogFilter;
  * http://docs.python.org/2/library/logging.html
  */
 
-LPCSTR WLOG_LEVELS[7] =
-{
-	"TRACE",
-	"DEBUG",
-	"INFO",
-	"WARN",
-	"ERROR",
-	"FATAL",
-	"OFF"
-};
+LPCSTR WLOG_LEVELS[7] = { "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL", "OFF" };
 
 static INIT_ONCE _WLogInitialized = INIT_ONCE_STATIC_INIT;
 static DWORD g_FilterCount = 0;
@@ -189,8 +180,7 @@ static BOOL log_recursion(LPCSTR file, LPCSTR fkt, int line)
 	if (__android_log_print(ANDROID_LOG_FATAL, tag, "Recursion detected!!!") < 0)
 		goto out;
 
-	if (__android_log_print(ANDROID_LOG_FATAL, tag, "Check %s [%s:%d]", fkt, file,
-	                        line) < 0)
+	if (__android_log_print(ANDROID_LOG_FATAL, tag, "Check %s [%s:%d]", fkt, file, line) < 0)
 		goto out;
 
 	for (i = 0; i < used; i++)
@@ -206,7 +196,7 @@ static BOOL log_recursion(LPCSTR file, LPCSTR fkt, int line)
 		goto out;
 
 	for (i = 0; i < used; i++)
-		if (fprintf(stderr, "%s: %"PRIuz": %s\n", fkt, i, msg[i]) < 0)
+		if (fprintf(stderr, "%s: %" PRIuz ": %s\n", fkt, i, msg[i]) < 0)
 			goto out;
 
 #endif
@@ -236,8 +226,7 @@ static BOOL WLog_Write(wLog* log, wLogMessage* message)
 	EnterCriticalSection(&appender->lock);
 
 	if (appender->recursive)
-		status = log_recursion(message->FileName, message->FunctionName,
-		                       message->LineNumber);
+		status = log_recursion(message->FileName, message->FunctionName, message->LineNumber);
 	else
 	{
 		appender->recursive = TRUE;
@@ -268,8 +257,7 @@ static BOOL WLog_WriteData(wLog* log, wLogMessage* message)
 	EnterCriticalSection(&appender->lock);
 
 	if (appender->recursive)
-		status = log_recursion(message->FileName, message->FunctionName,
-		                       message->LineNumber);
+		status = log_recursion(message->FileName, message->FunctionName, message->LineNumber);
 	else
 	{
 		appender->recursive = TRUE;
@@ -300,8 +288,7 @@ static BOOL WLog_WriteImage(wLog* log, wLogMessage* message)
 	EnterCriticalSection(&appender->lock);
 
 	if (appender->recursive)
-		status = log_recursion(message->FileName, message->FunctionName,
-		                       message->LineNumber);
+		status = log_recursion(message->FileName, message->FunctionName, message->LineNumber);
 	else
 	{
 		appender->recursive = TRUE;
@@ -332,8 +319,7 @@ static BOOL WLog_WritePacket(wLog* log, wLogMessage* message)
 	EnterCriticalSection(&appender->lock);
 
 	if (appender->recursive)
-		status = log_recursion(message->FileName, message->FunctionName,
-		                       message->LineNumber);
+		status = log_recursion(message->FileName, message->FunctionName, message->LineNumber);
 	else
 	{
 		appender->recursive = TRUE;
@@ -345,8 +331,8 @@ static BOOL WLog_WritePacket(wLog* log, wLogMessage* message)
 	return status;
 }
 
-BOOL WLog_PrintMessageVA(wLog* log, DWORD type, DWORD level, DWORD line,
-                         const char* file, const char* function, va_list args)
+BOOL WLog_PrintMessageVA(wLog* log, DWORD type, DWORD level, DWORD line, const char* file, const char* function,
+                         va_list args)
 {
 	BOOL status = FALSE;
 	wLogMessage message = { 0 };
@@ -369,8 +355,7 @@ BOOL WLog_PrintMessageVA(wLog* log, DWORD type, DWORD level, DWORD line,
 			{
 				char formattedLogMessage[WLOG_MAX_STRING_SIZE];
 
-				if (wvsnprintfx(formattedLogMessage, WLOG_MAX_STRING_SIZE - 1,
-				                message.FormatString, args) < 0)
+				if (wvsnprintfx(formattedLogMessage, WLOG_MAX_STRING_SIZE - 1, message.FormatString, args) < 0)
 					return FALSE;
 
 				message.TextString = formattedLogMessage;
@@ -407,8 +392,7 @@ BOOL WLog_PrintMessageVA(wLog* log, DWORD type, DWORD level, DWORD line,
 	return status;
 }
 
-BOOL WLog_PrintMessage(wLog* log, DWORD type, DWORD level, DWORD line,
-                       const char* file, const char* function, ...)
+BOOL WLog_PrintMessage(wLog* log, DWORD type, DWORD level, DWORD line, const char* file, const char* function, ...)
 {
 	BOOL status;
 	va_list args;
@@ -460,7 +444,7 @@ BOOL WLog_AddStringLogFilters(LPCSTR filter)
 		return FALSE;
 
 	count = 1;
-	p = (LPSTR)filter;
+	p = (LPSTR) filter;
 
 	while ((p = strchr(p, ',')) != NULL)
 	{
@@ -476,7 +460,7 @@ BOOL WLog_AddStringLogFilters(LPCSTR filter)
 		return FALSE;
 
 	g_Filters = tmp;
-	cp = (LPSTR)_strdup(filter);
+	cp = (LPSTR) _strdup(filter);
 
 	if (!cp)
 		return FALSE;
@@ -507,8 +491,7 @@ BOOL WLog_AddStringLogFilters(LPCSTR filter)
 			filterStr = p + 1;
 			p++;
 		}
-	}
-	while (p != NULL);
+	} while (p != NULL);
 
 	g_FilterCount = size;
 	free(cp);
@@ -933,13 +916,6 @@ wLog* WLog_Get(LPCSTR name)
 	return log;
 }
 
-BOOL WLog_Init(void)
-{
-	return WLog_GetRoot() != NULL;
-}
+BOOL WLog_Init(void) { return WLog_GetRoot() != NULL; }
 
-BOOL WLog_Uninit(void)
-{
-	return TRUE;
-}
-
+BOOL WLog_Uninit(void) { return TRUE; }

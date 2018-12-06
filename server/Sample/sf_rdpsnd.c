@@ -25,17 +25,13 @@
 
 #include <freerdp/server/audin.h>
 
-
 #include "sf_rdpsnd.h"
 
 #include <freerdp/server/server-common.h>
 #include <freerdp/log.h>
 #define TAG SERVER_TAG("sample")
 
-static void sf_peer_rdpsnd_activated(RdpsndServerContext* context)
-{
-	WLog_DBG(TAG, "RDPSND Activated");
-}
+static void sf_peer_rdpsnd_activated(RdpsndServerContext* context) { WLog_DBG(TAG, "RDPSND Activated"); }
 
 BOOL sf_peer_rdpsnd_init(testPeerContext* context)
 {

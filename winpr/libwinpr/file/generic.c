@@ -179,11 +179,9 @@
 #define EPOCH_DIFF 11644473600LL
 #define STAT_TIME_TO_FILETIME(_t) (((UINT64)(_t) + EPOCH_DIFF) * 10000000LL)
 
-
 static wArrayList* _HandleCreators;
 
 static pthread_once_t _HandleCreatorsInitialized = PTHREAD_ONCE_INIT;
-
 
 HANDLE_CREATOR* GetNamedPipeClientHandleCreator(void);
 
@@ -209,15 +207,11 @@ static void _HandleCreatorsInit()
 	ArrayList_Add(_HandleCreators, GetFileHandleCreator());
 }
 
-
 #ifdef HAVE_AIO_H
 
 static BOOL g_AioSignalHandlerInstalled = FALSE;
 
-void AioSignalHandler(int signum, siginfo_t* siginfo, void* arg)
-{
-	WLog_INFO("%d", signum);
-}
+void AioSignalHandler(int signum, siginfo_t* siginfo, void* arg) { WLog_INFO("%d", signum); }
 
 int InstallAioSignalHandler()
 {
@@ -238,8 +232,8 @@ int InstallAioSignalHandler()
 #endif /* HAVE_AIO_H */
 
 HANDLE CreateFileA(LPCSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
-                   LPSECURITY_ATTRIBUTES lpSecurityAttributes,
-                   DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile)
+                   LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes,
+                   HANDLE hTemplateFile)
 {
 	int i;
 
@@ -266,9 +260,8 @@ HANDLE CreateFileA(LPCSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
 
 		if (creator && creator->IsHandled(lpFileName))
 		{
-			HANDLE newHandle = creator->CreateFileA(lpFileName, dwDesiredAccess,
-			                                        dwShareMode, lpSecurityAttributes, dwCreationDisposition,
-			                                        dwFlagsAndAttributes, hTemplateFile);
+			HANDLE newHandle = creator->CreateFileA(lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes,
+			                                        dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
 			ArrayList_Unlock(_HandleCreators);
 			return newHandle;
 		}
@@ -279,8 +272,8 @@ HANDLE CreateFileA(LPCSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
 }
 
 HANDLE CreateFileW(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
-                   LPSECURITY_ATTRIBUTES lpSecurityAttributes,
-                   DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile)
+                   LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes,
+                   HANDLE hTemplateFile)
 {
 	LPSTR lpFileNameA = NULL;
 	HANDLE hdl;
@@ -288,8 +281,8 @@ HANDLE CreateFileW(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
 	if (ConvertFromUnicode(CP_UTF8, 0, lpFileName, -1, &lpFileNameA, 0, NULL, NULL) < 1)
 		return NULL;
 
-	hdl = CreateFileA(lpFileNameA, dwDesiredAccess, dwShareMode, lpSecurityAttributes,
-	                  dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+	hdl = CreateFileA(lpFileNameA, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition,
+	                  dwFlagsAndAttributes, hTemplateFile);
 	free(lpFileNameA);
 	return hdl;
 }
@@ -314,8 +307,8 @@ BOOL DeleteFileW(LPCWSTR lpFileName)
 	return rc;
 }
 
-BOOL ReadFile(HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead,
-              LPDWORD lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped)
+BOOL ReadFile(HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead, LPDWORD lpNumberOfBytesRead,
+              LPOVERLAPPED lpOverlapped)
 {
 	ULONG Type;
 	WINPR_HANDLE* handle;
@@ -334,18 +327,17 @@ BOOL ReadFile(HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead,
 	if (!winpr_Handle_GetInfo(hFile, &Type, &handle))
 		return FALSE;
 
-	handle = (WINPR_HANDLE*)hFile;
+	handle = (WINPR_HANDLE*) hFile;
 
 	if (handle->ops->ReadFile)
-		return handle->ops->ReadFile(handle, lpBuffer, nNumberOfBytesToRead,
-		                             lpNumberOfBytesRead, lpOverlapped);
+		return handle->ops->ReadFile(handle, lpBuffer, nNumberOfBytesToRead, lpNumberOfBytesRead, lpOverlapped);
 
 	WLog_ERR(TAG, "ReadFile operation not implemented");
 	return FALSE;
 }
 
-BOOL ReadFileEx(HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead,
-                LPOVERLAPPED lpOverlapped, LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
+BOOL ReadFileEx(HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead, LPOVERLAPPED lpOverlapped,
+                LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
 {
 	ULONG Type;
 	WINPR_HANDLE* handle;
@@ -356,19 +348,18 @@ BOOL ReadFileEx(HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead,
 	if (!winpr_Handle_GetInfo(hFile, &Type, &handle))
 		return FALSE;
 
-	handle = (WINPR_HANDLE*)hFile;
+	handle = (WINPR_HANDLE*) hFile;
 
 	if (handle->ops->ReadFileEx)
-		return handle->ops->ReadFileEx(handle, lpBuffer, nNumberOfBytesToRead,
-		                               lpOverlapped, lpCompletionRoutine);
+		return handle->ops->ReadFileEx(handle, lpBuffer, nNumberOfBytesToRead, lpOverlapped, lpCompletionRoutine);
 
 	WLog_ERR(TAG, "ReadFileEx operation not implemented");
 	return FALSE;
 	return TRUE;
 }
 
-BOOL ReadFileScatter(HANDLE hFile, FILE_SEGMENT_ELEMENT aSegmentArray[],
-                     DWORD nNumberOfBytesToRead, LPDWORD lpReserved, LPOVERLAPPED lpOverlapped)
+BOOL ReadFileScatter(HANDLE hFile, FILE_SEGMENT_ELEMENT aSegmentArray[], DWORD nNumberOfBytesToRead, LPDWORD lpReserved,
+                     LPOVERLAPPED lpOverlapped)
 {
 	ULONG Type;
 	WINPR_HANDLE* handle;
@@ -379,18 +370,17 @@ BOOL ReadFileScatter(HANDLE hFile, FILE_SEGMENT_ELEMENT aSegmentArray[],
 	if (!winpr_Handle_GetInfo(hFile, &Type, &handle))
 		return FALSE;
 
-	handle = (WINPR_HANDLE*)hFile;
+	handle = (WINPR_HANDLE*) hFile;
 
 	if (handle->ops->ReadFileScatter)
-		return handle->ops->ReadFileScatter(handle, aSegmentArray, nNumberOfBytesToRead,
-		                                    lpReserved, lpOverlapped);
+		return handle->ops->ReadFileScatter(handle, aSegmentArray, nNumberOfBytesToRead, lpReserved, lpOverlapped);
 
 	WLog_ERR(TAG, "ReadFileScatter operation not implemented");
 	return FALSE;
 }
 
-BOOL WriteFile(HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite,
-               LPDWORD lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped)
+BOOL WriteFile(HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite, LPDWORD lpNumberOfBytesWritten,
+               LPOVERLAPPED lpOverlapped)
 {
 	ULONG Type;
 	WINPR_HANDLE* handle;
@@ -401,18 +391,17 @@ BOOL WriteFile(HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite,
 	if (!winpr_Handle_GetInfo(hFile, &Type, &handle))
 		return FALSE;
 
-	handle = (WINPR_HANDLE*)hFile;
+	handle = (WINPR_HANDLE*) hFile;
 
 	if (handle->ops->WriteFile)
-		return handle->ops->WriteFile(handle, lpBuffer, nNumberOfBytesToWrite,
-		                              lpNumberOfBytesWritten, lpOverlapped);
+		return handle->ops->WriteFile(handle, lpBuffer, nNumberOfBytesToWrite, lpNumberOfBytesWritten, lpOverlapped);
 
 	WLog_ERR(TAG, "WriteFile operation not implemented");
 	return FALSE;
 }
 
-BOOL WriteFileEx(HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite,
-                 LPOVERLAPPED lpOverlapped, LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
+BOOL WriteFileEx(HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite, LPOVERLAPPED lpOverlapped,
+                 LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
 {
 	ULONG Type;
 	WINPR_HANDLE* handle;
@@ -423,18 +412,17 @@ BOOL WriteFileEx(HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite,
 	if (!winpr_Handle_GetInfo(hFile, &Type, &handle))
 		return FALSE;
 
-	handle = (WINPR_HANDLE*)hFile;
+	handle = (WINPR_HANDLE*) hFile;
 
 	if (handle->ops->WriteFileEx)
-		return handle->ops->WriteFileEx(handle, lpBuffer, nNumberOfBytesToWrite,
-		                                lpOverlapped, lpCompletionRoutine);
+		return handle->ops->WriteFileEx(handle, lpBuffer, nNumberOfBytesToWrite, lpOverlapped, lpCompletionRoutine);
 
 	WLog_ERR(TAG, "WriteFileEx operation not implemented");
 	return FALSE;
 }
 
-BOOL WriteFileGather(HANDLE hFile, FILE_SEGMENT_ELEMENT aSegmentArray[],
-                     DWORD nNumberOfBytesToWrite, LPDWORD lpReserved, LPOVERLAPPED lpOverlapped)
+BOOL WriteFileGather(HANDLE hFile, FILE_SEGMENT_ELEMENT aSegmentArray[], DWORD nNumberOfBytesToWrite,
+                     LPDWORD lpReserved, LPOVERLAPPED lpOverlapped)
 {
 	ULONG Type;
 	WINPR_HANDLE* handle;
@@ -445,11 +433,10 @@ BOOL WriteFileGather(HANDLE hFile, FILE_SEGMENT_ELEMENT aSegmentArray[],
 	if (!winpr_Handle_GetInfo(hFile, &Type, &handle))
 		return FALSE;
 
-	handle = (WINPR_HANDLE*)hFile;
+	handle = (WINPR_HANDLE*) hFile;
 
 	if (handle->ops->WriteFileGather)
-		return handle->ops->WriteFileGather(handle, aSegmentArray, nNumberOfBytesToWrite,
-		                                    lpReserved, lpOverlapped);
+		return handle->ops->WriteFileGather(handle, aSegmentArray, nNumberOfBytesToWrite, lpReserved, lpOverlapped);
 
 	WLog_ERR(TAG, "WriteFileGather operation not implemented");
 	return FALSE;
@@ -466,7 +453,7 @@ BOOL FlushFileBuffers(HANDLE hFile)
 	if (!winpr_Handle_GetInfo(hFile, &Type, &handle))
 		return FALSE;
 
-	handle = (WINPR_HANDLE*)hFile;
+	handle = (WINPR_HANDLE*) hFile;
 
 	if (handle->ops->FlushFileBuffers)
 		return handle->ops->FlushFileBuffers(handle);
@@ -475,8 +462,7 @@ BOOL FlushFileBuffers(HANDLE hFile)
 	return FALSE;
 }
 
-BOOL WINAPI GetFileAttributesExA(LPCSTR lpFileName, GET_FILEEX_INFO_LEVELS fInfoLevelId,
-                                 LPVOID lpFileInformation)
+BOOL WINAPI GetFileAttributesExA(LPCSTR lpFileName, GET_FILEEX_INFO_LEVELS fInfoLevelId, LPVOID lpFileInformation)
 {
 	LPWIN32_FILE_ATTRIBUTE_DATA fd = lpFileInformation;
 	WIN32_FIND_DATAA findFileData;
@@ -498,8 +484,7 @@ BOOL WINAPI GetFileAttributesExA(LPCSTR lpFileName, GET_FILEEX_INFO_LEVELS fInfo
 	return TRUE;
 }
 
-BOOL WINAPI GetFileAttributesExW(LPCWSTR lpFileName, GET_FILEEX_INFO_LEVELS fInfoLevelId,
-                                 LPVOID lpFileInformation)
+BOOL WINAPI GetFileAttributesExW(LPCWSTR lpFileName, GET_FILEEX_INFO_LEVELS fInfoLevelId, LPVOID lpFileInformation)
 {
 	BOOL ret;
 	LPSTR lpCFileName;
@@ -596,7 +581,7 @@ BOOL SetEndOfFile(HANDLE hFile)
 	if (!winpr_Handle_GetInfo(hFile, &Type, &handle))
 		return FALSE;
 
-	handle = (WINPR_HANDLE*)hFile;
+	handle = (WINPR_HANDLE*) hFile;
 
 	if (handle->ops->SetEndOfFile)
 		return handle->ops->SetEndOfFile(handle);
@@ -616,7 +601,7 @@ DWORD WINAPI GetFileSize(HANDLE hFile, LPDWORD lpFileSizeHigh)
 	if (!winpr_Handle_GetInfo(hFile, &Type, &handle))
 		return FALSE;
 
-	handle = (WINPR_HANDLE*)hFile;
+	handle = (WINPR_HANDLE*) hFile;
 
 	if (handle->ops->GetFileSize)
 		return handle->ops->GetFileSize(handle, lpFileSizeHigh);
@@ -625,8 +610,7 @@ DWORD WINAPI GetFileSize(HANDLE hFile, LPDWORD lpFileSizeHigh)
 	return 0;
 }
 
-DWORD SetFilePointer(HANDLE hFile, LONG lDistanceToMove,
-                     PLONG lpDistanceToMoveHigh, DWORD dwMoveMethod)
+DWORD SetFilePointer(HANDLE hFile, LONG lDistanceToMove, PLONG lpDistanceToMoveHigh, DWORD dwMoveMethod)
 {
 	ULONG Type;
 	WINPR_HANDLE* handle;
@@ -637,18 +621,16 @@ DWORD SetFilePointer(HANDLE hFile, LONG lDistanceToMove,
 	if (!winpr_Handle_GetInfo(hFile, &Type, &handle))
 		return FALSE;
 
-	handle = (WINPR_HANDLE*)hFile;
+	handle = (WINPR_HANDLE*) hFile;
 
 	if (handle->ops->SetFilePointer)
-		return handle->ops->SetFilePointer(handle, lDistanceToMove,
-		                                   lpDistanceToMoveHigh, dwMoveMethod);
+		return handle->ops->SetFilePointer(handle, lDistanceToMove, lpDistanceToMoveHigh, dwMoveMethod);
 
 	WLog_ERR(TAG, "SetFilePointer operation not implemented");
 	return 0;
 }
 
-BOOL SetFilePointerEx(HANDLE hFile, LARGE_INTEGER liDistanceToMove,
-                      PLARGE_INTEGER lpNewFilePointer, DWORD dwMoveMethod)
+BOOL SetFilePointerEx(HANDLE hFile, LARGE_INTEGER liDistanceToMove, PLARGE_INTEGER lpNewFilePointer, DWORD dwMoveMethod)
 {
 	ULONG Type;
 	WINPR_HANDLE* handle;
@@ -659,18 +641,17 @@ BOOL SetFilePointerEx(HANDLE hFile, LARGE_INTEGER liDistanceToMove,
 	if (!winpr_Handle_GetInfo(hFile, &Type, &handle))
 		return FALSE;
 
-	handle = (WINPR_HANDLE*)hFile;
+	handle = (WINPR_HANDLE*) hFile;
 
 	if (handle->ops->SetFilePointerEx)
-		return handle->ops->SetFilePointerEx(handle, liDistanceToMove,
-		                                     lpNewFilePointer, dwMoveMethod);
+		return handle->ops->SetFilePointerEx(handle, liDistanceToMove, lpNewFilePointer, dwMoveMethod);
 
 	WLog_ERR(TAG, "SetFilePointerEx operation not implemented");
 	return 0;
 }
 
-BOOL LockFile(HANDLE hFile, DWORD dwFileOffsetLow, DWORD dwFileOffsetHigh,
-              DWORD nNumberOfBytesToLockLow, DWORD nNumberOfBytesToLockHigh)
+BOOL LockFile(HANDLE hFile, DWORD dwFileOffsetLow, DWORD dwFileOffsetHigh, DWORD nNumberOfBytesToLockLow,
+              DWORD nNumberOfBytesToLockHigh)
 {
 	ULONG Type;
 	WINPR_HANDLE* handle;
@@ -681,18 +662,18 @@ BOOL LockFile(HANDLE hFile, DWORD dwFileOffsetLow, DWORD dwFileOffsetHigh,
 	if (!winpr_Handle_GetInfo(hFile, &Type, &handle))
 		return FALSE;
 
-	handle = (WINPR_HANDLE*)hFile;
+	handle = (WINPR_HANDLE*) hFile;
 
 	if (handle->ops->LockFile)
-		return handle->ops->LockFile(handle, dwFileOffsetLow, dwFileOffsetHigh,
-		                             nNumberOfBytesToLockLow, nNumberOfBytesToLockHigh);
+		return handle->ops->LockFile(handle, dwFileOffsetLow, dwFileOffsetHigh, nNumberOfBytesToLockLow,
+		                             nNumberOfBytesToLockHigh);
 
 	WLog_ERR(TAG, "LockFile operation not implemented");
 	return FALSE;
 }
 
-BOOL LockFileEx(HANDLE hFile, DWORD dwFlags, DWORD dwReserved,
-                DWORD nNumberOfBytesToLockLow, DWORD nNumberOfBytesToLockHigh, LPOVERLAPPED lpOverlapped)
+BOOL LockFileEx(HANDLE hFile, DWORD dwFlags, DWORD dwReserved, DWORD nNumberOfBytesToLockLow,
+                DWORD nNumberOfBytesToLockHigh, LPOVERLAPPED lpOverlapped)
 {
 	ULONG Type;
 	WINPR_HANDLE* handle;
@@ -703,18 +684,18 @@ BOOL LockFileEx(HANDLE hFile, DWORD dwFlags, DWORD dwReserved,
 	if (!winpr_Handle_GetInfo(hFile, &Type, &handle))
 		return FALSE;
 
-	handle = (WINPR_HANDLE*)hFile;
+	handle = (WINPR_HANDLE*) hFile;
 
 	if (handle->ops->LockFileEx)
-		return handle->ops->LockFileEx(handle, dwFlags, dwReserved,
-		                               nNumberOfBytesToLockLow, nNumberOfBytesToLockHigh, lpOverlapped);
+		return handle->ops->LockFileEx(handle, dwFlags, dwReserved, nNumberOfBytesToLockLow, nNumberOfBytesToLockHigh,
+		                               lpOverlapped);
 
 	WLog_ERR(TAG, "LockFileEx operation not implemented");
 	return FALSE;
 }
 
-BOOL UnlockFile(HANDLE hFile, DWORD dwFileOffsetLow, DWORD dwFileOffsetHigh,
-                DWORD nNumberOfBytesToUnlockLow, DWORD nNumberOfBytesToUnlockHigh)
+BOOL UnlockFile(HANDLE hFile, DWORD dwFileOffsetLow, DWORD dwFileOffsetHigh, DWORD nNumberOfBytesToUnlockLow,
+                DWORD nNumberOfBytesToUnlockHigh)
 {
 	ULONG Type;
 	WINPR_HANDLE* handle;
@@ -725,18 +706,18 @@ BOOL UnlockFile(HANDLE hFile, DWORD dwFileOffsetLow, DWORD dwFileOffsetHigh,
 	if (!winpr_Handle_GetInfo(hFile, &Type, &handle))
 		return FALSE;
 
-	handle = (WINPR_HANDLE*)hFile;
+	handle = (WINPR_HANDLE*) hFile;
 
 	if (handle->ops->UnlockFile)
-		return handle->ops->UnlockFile(handle, dwFileOffsetLow, dwFileOffsetHigh,
-		                               nNumberOfBytesToUnlockLow, nNumberOfBytesToUnlockHigh);
+		return handle->ops->UnlockFile(handle, dwFileOffsetLow, dwFileOffsetHigh, nNumberOfBytesToUnlockLow,
+		                               nNumberOfBytesToUnlockHigh);
 
 	WLog_ERR(TAG, "UnLockFile operation not implemented");
 	return FALSE;
 }
 
-BOOL UnlockFileEx(HANDLE hFile, DWORD dwReserved, DWORD nNumberOfBytesToUnlockLow,
-                  DWORD nNumberOfBytesToUnlockHigh, LPOVERLAPPED lpOverlapped)
+BOOL UnlockFileEx(HANDLE hFile, DWORD dwReserved, DWORD nNumberOfBytesToUnlockLow, DWORD nNumberOfBytesToUnlockHigh,
+                  LPOVERLAPPED lpOverlapped)
 {
 	ULONG Type;
 	WINPR_HANDLE* handle;
@@ -747,18 +728,18 @@ BOOL UnlockFileEx(HANDLE hFile, DWORD dwReserved, DWORD nNumberOfBytesToUnlockLo
 	if (!winpr_Handle_GetInfo(hFile, &Type, &handle))
 		return FALSE;
 
-	handle = (WINPR_HANDLE*)hFile;
+	handle = (WINPR_HANDLE*) hFile;
 
 	if (handle->ops->UnlockFileEx)
-		return handle->ops->UnlockFileEx(handle, dwReserved,
-		                                 nNumberOfBytesToUnlockLow, nNumberOfBytesToUnlockHigh, lpOverlapped);
+		return handle->ops->UnlockFileEx(handle, dwReserved, nNumberOfBytesToUnlockLow, nNumberOfBytesToUnlockHigh,
+		                                 lpOverlapped);
 
 	WLog_ERR(TAG, "UnLockFileEx operation not implemented");
 	return FALSE;
 }
 
-BOOL WINAPI SetFileTime(HANDLE hFile, const FILETIME* lpCreationTime,
-                        const FILETIME* lpLastAccessTime, const FILETIME* lpLastWriteTime)
+BOOL WINAPI SetFileTime(HANDLE hFile, const FILETIME* lpCreationTime, const FILETIME* lpLastAccessTime,
+                        const FILETIME* lpLastWriteTime)
 {
 	ULONG Type;
 	WINPR_HANDLE* handle;
@@ -769,11 +750,10 @@ BOOL WINAPI SetFileTime(HANDLE hFile, const FILETIME* lpCreationTime,
 	if (!winpr_Handle_GetInfo(hFile, &Type, &handle))
 		return FALSE;
 
-	handle = (WINPR_HANDLE*)hFile;
+	handle = (WINPR_HANDLE*) hFile;
 
 	if (handle->ops->SetFileTime)
-		return handle->ops->SetFileTime(handle, lpCreationTime,
-		                                lpLastAccessTime, lpLastWriteTime);
+		return handle->ops->SetFileTime(handle, lpCreationTime, lpLastAccessTime, lpLastWriteTime);
 
 	WLog_ERR(TAG, "%s operation not implemented", __FUNCTION__);
 	return FALSE;
@@ -788,8 +768,7 @@ struct _WIN32_FILE_SEARCH
 };
 typedef struct _WIN32_FILE_SEARCH WIN32_FILE_SEARCH;
 
-static BOOL FindDataFromStat(const char* path, const struct stat* fileStat,
-                             LPWIN32_FIND_DATAA lpFindFileData)
+static BOOL FindDataFromStat(const char* path, const struct stat* fileStat, LPWIN32_FIND_DATAA lpFindFileData)
 {
 	UINT64 ft;
 	char* lastSep;
@@ -820,15 +799,15 @@ static BOOL FindDataFromStat(const char* path, const struct stat* fileStat,
 #else
 	ft = STAT_TIME_TO_FILETIME(fileStat->st_ctime);
 #endif
-	lpFindFileData->ftCreationTime.dwHighDateTime = ((UINT64)ft) >> 32ULL;
+	lpFindFileData->ftCreationTime.dwHighDateTime = ((UINT64) ft) >> 32ULL;
 	lpFindFileData->ftCreationTime.dwLowDateTime = ft & 0xFFFFFFFF;
 	ft = STAT_TIME_TO_FILETIME(fileStat->st_mtime);
-	lpFindFileData->ftLastWriteTime.dwHighDateTime = ((UINT64)ft) >> 32ULL;
+	lpFindFileData->ftLastWriteTime.dwHighDateTime = ((UINT64) ft) >> 32ULL;
 	lpFindFileData->ftLastWriteTime.dwLowDateTime = ft & 0xFFFFFFFF;
 	ft = STAT_TIME_TO_FILETIME(fileStat->st_atime);
-	lpFindFileData->ftLastAccessTime.dwHighDateTime = ((UINT64)ft) >> 32ULL;
+	lpFindFileData->ftLastAccessTime.dwHighDateTime = ((UINT64) ft) >> 32ULL;
 	lpFindFileData->ftLastAccessTime.dwLowDateTime = ft & 0xFFFFFFFF;
-	lpFindFileData->nFileSizeHigh = ((UINT64)fileStat->st_size) >> 32ULL;
+	lpFindFileData->nFileSizeHigh = ((UINT64) fileStat->st_size) >> 32ULL;
 	lpFindFileData->nFileSizeLow = fileStat->st_size & 0xFFFFFFFF;
 	return TRUE;
 }
@@ -936,7 +915,7 @@ HANDLE FindFirstFileA(LPCSTR lpFileName, LPWIN32_FIND_DATAA lpFindFileData)
 	{
 		if (isDir)
 		{
-			const char* name =  strrchr(lpFileName, '/');
+			const char* name = strrchr(lpFileName, '/');
 
 			if (!name)
 				name = lpFileName;
@@ -954,8 +933,7 @@ HANDLE FindFirstFileA(LPCSTR lpFileName, LPWIN32_FIND_DATAA lpFindFileData)
 	return INVALID_HANDLE_VALUE;
 }
 
-static BOOL ConvertFindDataAToW(LPWIN32_FIND_DATAA lpFindFileDataA,
-                                LPWIN32_FIND_DATAW lpFindFileDataW)
+static BOOL ConvertFindDataAToW(LPWIN32_FIND_DATAA lpFindFileDataA, LPWIN32_FIND_DATAW lpFindFileDataW)
 {
 	size_t length;
 	WCHAR* unicodeFileName;
@@ -982,8 +960,7 @@ static BOOL ConvertFindDataAToW(LPWIN32_FIND_DATAA lpFindFileDataA,
 
 	CopyMemory(lpFindFileDataW->cFileName, unicodeFileName, length * sizeof(WCHAR));
 	free(unicodeFileName);
-	length = ConvertToUnicode(CP_UTF8, 0, lpFindFileDataA->cAlternateFileName,
-	                          -1, &unicodeFileName, 0);
+	length = ConvertToUnicode(CP_UTF8, 0, lpFindFileDataA->cAlternateFileName, -1, &unicodeFileName, 0);
 
 	if (length == 0)
 		return TRUE;
@@ -1000,7 +977,7 @@ HANDLE FindFirstFileW(LPCWSTR lpFileName, LPWIN32_FIND_DATAW lpFindFileData)
 {
 	LPSTR utfFileName = NULL;
 	HANDLE h;
-	LPWIN32_FIND_DATAA fd = (LPWIN32_FIND_DATAA)calloc(1, sizeof(WIN32_FIND_DATAA));
+	LPWIN32_FIND_DATAA fd = (LPWIN32_FIND_DATAA) calloc(1, sizeof(WIN32_FIND_DATAA));
 
 	if (!fd)
 	{
@@ -1071,7 +1048,7 @@ BOOL FindNextFileA(HANDLE hFindFile, LPWIN32_FIND_DATAA lpFindFileData)
 			strncpy(lpFindFileData->cFileName, pFileSearch->pDirent->d_name, MAX_PATH);
 			namelen = strnlen(lpFindFileData->cFileName, MAX_PATH);
 			pathlen = strlen(pFileSearch->lpPath);
-			fullpath = (char*)malloc(pathlen + namelen + 2);
+			fullpath = (char*) malloc(pathlen + namelen + 2);
 
 			if (fullpath == NULL)
 			{
@@ -1111,7 +1088,7 @@ BOOL FindNextFileA(HANDLE hFindFile, LPWIN32_FIND_DATAA lpFindFileData)
 
 BOOL FindNextFileW(HANDLE hFindFile, LPWIN32_FIND_DATAW lpFindFileData)
 {
-	LPWIN32_FIND_DATAA fd = (LPWIN32_FIND_DATAA)calloc(1, sizeof(WIN32_FIND_DATAA));
+	LPWIN32_FIND_DATAA fd = (LPWIN32_FIND_DATAA) calloc(1, sizeof(WIN32_FIND_DATAA));
 
 	if (!fd)
 	{
@@ -1242,8 +1219,7 @@ BOOL MoveFileExW(LPCWSTR lpExistingFileName, LPCWSTR lpNewFileName, DWORD dwFlag
 	LPSTR lpCNewFileName;
 	BOOL ret;
 
-	if (ConvertFromUnicode(CP_UTF8, 0, lpExistingFileName, -1, &lpCExistingFileName, 0, NULL,
-	                       NULL) <= 0)
+	if (ConvertFromUnicode(CP_UTF8, 0, lpExistingFileName, -1, &lpCExistingFileName, 0, NULL, NULL) <= 0)
 	{
 		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
 		return FALSE;

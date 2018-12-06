@@ -24,8 +24,8 @@
 
 #include "rdtk_button.h"
 
-int rdtk_button_draw(rdtkSurface* surface, int nXDst, int nYDst, int nWidth, int nHeight,
-		rdtkButton* button, const char* text)
+int rdtk_button_draw(rdtkSurface* surface, int nXDst, int nYDst, int nWidth, int nHeight, rdtkButton* button,
+                     const char* text)
 {
 	int offsetX;
 	int offsetY;
@@ -85,10 +85,7 @@ rdtkButton* rdtk_button_new(rdtkEngine* engine, rdtkNinePatch* ninePatch)
 	return button;
 }
 
-void rdtk_button_free(rdtkButton* button)
-{
-	free(button);
-}
+void rdtk_button_free(rdtkButton* button) { free(button); }
 
 int rdtk_button_engine_init(rdtkEngine* engine)
 {
@@ -110,4 +107,3 @@ int rdtk_button_engine_uninit(rdtkEngine* engine)
 
 	return 1;
 }
-

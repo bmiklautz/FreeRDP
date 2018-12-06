@@ -82,4 +82,3 @@ WINPR_API void IniFile_Free(wIniFile* ini);
 #endif
 
 #endif /* WINPR_UTILS_INI_H */
-

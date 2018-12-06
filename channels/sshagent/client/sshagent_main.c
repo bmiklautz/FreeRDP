@@ -95,7 +95,6 @@ struct _SSHAGENT_PLUGIN
 	rdpContext* rdpcontext;
 };
 
-
 /**
  * Function to open the connection to the sshagent
  *
@@ -119,19 +118,17 @@ static int connect_to_sshagent(const char* udspath)
 
 	strncpy(addr.sun_path, udspath, sizeof(addr.sun_path) - 1);
 
-	int rc = connect(agent_fd, (struct sockaddr*)&addr, sizeof(addr));
+	int rc = connect(agent_fd, (struct sockaddr*) &addr, sizeof(addr));
 
 	if (rc != 0)
 	{
-		WLog_ERR(TAG, "Can't connect to Unix domain socket \"%s\"!",
-		         udspath);
+		WLog_ERR(TAG, "Can't connect to Unix domain socket \"%s\"!", udspath);
 		close(agent_fd);
 		return -1;
 	}
 
 	return agent_fd;
 }
-
 
 /**
  * Entry point for thread to read from the ssh-agent socket and forward
@@ -141,16 +138,14 @@ static int connect_to_sshagent(const char* udspath)
  */
 static DWORD WINAPI sshagent_read_thread(LPVOID data)
 {
-	SSHAGENT_CHANNEL_CALLBACK* callback = (SSHAGENT_CHANNEL_CALLBACK*)data;
+	SSHAGENT_CHANNEL_CALLBACK* callback = (SSHAGENT_CHANNEL_CALLBACK*) data;
 	BYTE buffer[4096];
 	int going = 1;
 	UINT status = CHANNEL_RC_OK;
 
 	while (going)
 	{
-		int bytes_read = read(callback->agent_fd,
-		                      buffer,
-		                      sizeof(buffer));
+		int bytes_read = read(callback->agent_fd, buffer, sizeof(buffer));
 
 		if (bytes_read == 0)
 		{
@@ -161,9 +156,7 @@ static DWORD WINAPI sshagent_read_thread(LPVOID data)
 		{
 			if (errno != EINTR)
 			{
-				WLog_ERR(TAG,
-				         "Error reading from sshagent, errno=%d",
-				         errno);
+				WLog_ERR(TAG, "Error reading from sshagent, errno=%d", errno);
 				status = ERROR_READ_FAULT;
 				going = 0;
 			}
@@ -171,10 +164,7 @@ static DWORD WINAPI sshagent_read_thread(LPVOID data)
 		else
 		{
 			/* Something read: forward to virtual channel */
-			status = callback->channel->Write(callback->channel,
-			                                  bytes_read,
-			                                  buffer,
-			                                  NULL);
+			status = callback->channel->Write(callback->channel, bytes_read, buffer, NULL);
 
 			if (status != CHANNEL_RC_OK)
 			{
@@ -186,11 +176,10 @@ static DWORD WINAPI sshagent_read_thread(LPVOID data)
 	close(callback->agent_fd);
 
 	if (status != CHANNEL_RC_OK)
-		setChannelError(callback->rdpcontext, status,
-		                "sshagent_read_thread reported an error");
+		setChannelError(callback->rdpcontext, status, "sshagent_read_thread reported an error");
 
-        ExitThread(status);
-        return status;
+	ExitThread(status);
+	return status;
 }
 
 /**
@@ -210,16 +199,13 @@ static UINT sshagent_on_data_received(IWTSVirtualChannelCallback* pChannelCallba
 
 	while (bytes_to_write > 0)
 	{
-		int bytes_written = write(callback->agent_fd, pos,
-		                          bytes_to_write);
+		int bytes_written = write(callback->agent_fd, pos, bytes_to_write);
 
 		if (bytes_written < 0)
 		{
 			if (errno != EINTR)
 			{
-				WLog_ERR(TAG,
-				         "Error writing to sshagent, errno=%d",
-				         errno);
+				WLog_ERR(TAG, "Error writing to sshagent, errno=%d", errno);
 				return ERROR_WRITE_FAULT;
 			}
 		}
@@ -250,7 +236,7 @@ static UINT sshagent_on_close(IWTSVirtualChannelCallback* pChannelCallback)
 	if (WaitForSingleObject(callback->thread, INFINITE) == WAIT_FAILED)
 	{
 		UINT error = GetLastError();
-		WLog_ERR(TAG, "WaitForSingleObject failed with error %"PRIu32"!", error);
+		WLog_ERR(TAG, "WaitForSingleObject failed with error %" PRIu32 "!", error);
 		return error;
 	}
 
@@ -261,15 +247,13 @@ static UINT sshagent_on_close(IWTSVirtualChannelCallback* pChannelCallback)
 	return CHANNEL_RC_OK;
 }
 
-
 /**
  * Callback for when a new virtual channel is opened
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT sshagent_on_new_channel_connection(IWTSListenerCallback* pListenerCallback,
-        IWTSVirtualChannel* pChannel, BYTE* Data, BOOL* pbAccept,
-        IWTSVirtualChannelCallback** ppCallback)
+static UINT sshagent_on_new_channel_connection(IWTSListenerCallback* pListenerCallback, IWTSVirtualChannel* pChannel,
+                                               BYTE* Data, BOOL* pbAccept, IWTSVirtualChannelCallback** ppCallback)
 {
 	SSHAGENT_CHANNEL_CALLBACK* callback;
 	SSHAGENT_LISTENER_CALLBACK* listener_callback = (SSHAGENT_LISTENER_CALLBACK*) pListenerCallback;
@@ -283,8 +267,7 @@ static UINT sshagent_on_new_channel_connection(IWTSListenerCallback* pListenerCa
 
 	/* Now open a connection to the local ssh-agent.  Do this for each
 	 * connection to the plugin in case we mess up the agent session. */
-	callback->agent_fd
-	    = connect_to_sshagent(listener_callback->agent_uds_path);
+	callback->agent_fd = connect_to_sshagent(listener_callback->agent_uds_path);
 
 	if (callback->agent_fd == -1)
 	{
@@ -299,13 +282,7 @@ static UINT sshagent_on_new_channel_connection(IWTSListenerCallback* pListenerCa
 	callback->channel_mgr = listener_callback->channel_mgr;
 	callback->channel = pChannel;
 	callback->rdpcontext = listener_callback->rdpcontext;
-	callback->thread
-	    = CreateThread(NULL,
-	                   0,
-                           sshagent_read_thread,
-	                   (void*) callback,
-	                   0,
-	                   NULL);
+	callback->thread = CreateThread(NULL, 0, sshagent_read_thread, (void*) callback, 0, NULL);
 
 	if (!callback->thread)
 	{
@@ -327,8 +304,7 @@ static UINT sshagent_on_new_channel_connection(IWTSListenerCallback* pListenerCa
 static UINT sshagent_plugin_initialize(IWTSPlugin* pPlugin, IWTSVirtualChannelManager* pChannelMgr)
 {
 	SSHAGENT_PLUGIN* sshagent = (SSHAGENT_PLUGIN*) pPlugin;
-	sshagent->listener_callback = (SSHAGENT_LISTENER_CALLBACK*) calloc(1,
-	                              sizeof(SSHAGENT_LISTENER_CALLBACK));
+	sshagent->listener_callback = (SSHAGENT_LISTENER_CALLBACK*) calloc(1, sizeof(SSHAGENT_LISTENER_CALLBACK));
 
 	if (!sshagent->listener_callback)
 	{
@@ -350,8 +326,8 @@ static UINT sshagent_plugin_initialize(IWTSPlugin* pPlugin, IWTSVirtualChannelMa
 		return CHANNEL_RC_INITIALIZATION_ERROR;
 	}
 
-	return pChannelMgr->CreateListener(pChannelMgr, "SSHAGENT", 0,
-	                                   (IWTSListenerCallback*) sshagent->listener_callback, NULL);
+	return pChannelMgr->CreateListener(pChannelMgr, "SSHAGENT", 0, (IWTSListenerCallback*) sshagent->listener_callback,
+	                                   NULL);
 }
 
 /**
@@ -367,9 +343,9 @@ static UINT sshagent_plugin_terminated(IWTSPlugin* pPlugin)
 }
 
 #ifdef BUILTIN_CHANNELS
-#define DVCPluginEntry		sshagent_DVCPluginEntry
+#define DVCPluginEntry sshagent_DVCPluginEntry
 #else
-#define DVCPluginEntry		FREERDP_API DVCPluginEntry
+#define DVCPluginEntry FREERDP_API DVCPluginEntry
 #endif
 
 /**
@@ -397,8 +373,8 @@ UINT DVCPluginEntry(IDRDYNVC_ENTRY_POINTS* pEntryPoints)
 		sshagent->iface.Connected = NULL;
 		sshagent->iface.Disconnected = NULL;
 		sshagent->iface.Terminated = sshagent_plugin_terminated;
-		sshagent->rdpcontext = ((freerdp*)((rdpSettings*) pEntryPoints->GetRdpSettings(
-		                                       pEntryPoints))->instance)->context;
+		sshagent->rdpcontext =
+		  ((freerdp*) ((rdpSettings*) pEntryPoints->GetRdpSettings(pEntryPoints))->instance)->context;
 		status = pEntryPoints->RegisterPlugin(pEntryPoints, "sshagent", (IWTSPlugin*) sshagent);
 	}
 

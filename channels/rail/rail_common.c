@@ -24,32 +24,29 @@
 
 #include <winpr/crt.h>
 
-const char* const RAIL_ORDER_TYPE_STRINGS[] =
-{
-	"",
-	"Execute",
-	"Activate",
-	"System Parameters Update",
-	"System Command",
-	"Handshake",
-	"Notify Event",
-	"",
-	"Window Move",
-	"Local Move/Size",
-	"Min Max Info",
-	"Client Status",
-	"System Menu",
-	"Language Bar Info",
-	"Get Application ID Request",
-	"Get Application ID Response",
-	"Execute Result",
-	"",
-	"",
-	"",
-	"",
-	"",
-	""
-};
+const char* const RAIL_ORDER_TYPE_STRINGS[] = { "",
+	                                            "Execute",
+	                                            "Activate",
+	                                            "System Parameters Update",
+	                                            "System Command",
+	                                            "Handshake",
+	                                            "Notify Event",
+	                                            "",
+	                                            "Window Move",
+	                                            "Local Move/Size",
+	                                            "Min Max Info",
+	                                            "Client Status",
+	                                            "System Menu",
+	                                            "Language Bar Info",
+	                                            "Get Application ID Request",
+	                                            "Get Application ID Response",
+	                                            "Execute Result",
+	                                            "",
+	                                            "",
+	                                            "",
+	                                            "",
+	                                            "",
+	                                            "" };
 
 BOOL rail_string_to_unicode_string(const char* string, RAIL_UNICODE_STRING* unicode_string)
 {
@@ -64,7 +61,7 @@ BOOL rail_string_to_unicode_string(const char* string, RAIL_UNICODE_STRING* unic
 
 	length = ConvertToUnicode(CP_UTF8, 0, string, -1, &buffer, 0);
 
-	if ((length < 0) || ((size_t)length * sizeof(WCHAR) > UINT16_MAX))
+	if ((length < 0) || ((size_t) length * sizeof(WCHAR) > UINT16_MAX))
 	{
 		free(buffer);
 		return FALSE;

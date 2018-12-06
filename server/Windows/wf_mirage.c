@@ -26,7 +26,7 @@
 #include <freerdp/log.h>
 #define TAG SERVER_TAG("Windows.mirror")
 
-#define DEVICE_KEY_PREFIX	_T("\\Registry\\Machine\\")
+#define DEVICE_KEY_PREFIX _T("\\Registry\\Machine\\")
 /*
 This function will iterate over the loaded display devices until it finds
 the mirror device we want to load. If found, it will then copy the registry
@@ -59,8 +59,8 @@ BOOL wf_mirror_driver_find_display_device(wfInfo* wfi)
 				if (!wfi->deviceKey)
 					return FALSE;
 
-				_tcsncpy_s(wfi->deviceKey, deviceKeyLength + 1,
-				           &deviceInfo.DeviceKey[deviceKeyPrefixLength], deviceKeyLength);
+				_tcsncpy_s(wfi->deviceKey, deviceKeyLength + 1, &deviceInfo.DeviceKey[deviceKeyPrefixLength],
+				           deviceKeyLength);
 			}
 
 			_tcsncpy_s(wfi->deviceName, 32, deviceInfo.DeviceName, _tcslen(deviceInfo.DeviceName));
@@ -90,8 +90,7 @@ BOOL wf_mirror_driver_display_device_attach(wfInfo* wfi, DWORD mode)
 	DWORD dwType;
 	DWORD dwSize;
 	DWORD dwValue;
-	status = RegOpenKeyEx(HKEY_LOCAL_MACHINE, wfi->deviceKey,
-	                      0, KEY_ALL_ACCESS | KEY_WOW64_64KEY, &hKey);
+	status = RegOpenKeyEx(HKEY_LOCAL_MACHINE, wfi->deviceKey, 0, KEY_ALL_ACCESS | KEY_WOW64_64KEY, &hKey);
 
 	if (status != ERROR_SUCCESS)
 	{
@@ -104,8 +103,7 @@ BOOL wf_mirror_driver_display_device_attach(wfInfo* wfi, DWORD mode)
 	}
 
 	dwSize = sizeof(DWORD);
-	status = RegQueryValueEx(hKey, _T("Attach.ToDesktop"),
-	                         NULL, &dwType, (BYTE*) &dwValue, &dwSize);
+	status = RegQueryValueEx(hKey, _T("Attach.ToDesktop"), NULL, &dwType, (BYTE*) &dwValue, &dwSize);
 
 	if (status != ERROR_SUCCESS)
 	{
@@ -117,12 +115,11 @@ BOOL wf_mirror_driver_display_device_attach(wfInfo* wfi, DWORD mode)
 		return FALSE;
 	}
 
-	if (dwValue ^ mode) //only if we want to change modes
+	if (dwValue ^ mode) // only if we want to change modes
 	{
 		dwValue = mode;
 		dwSize = sizeof(DWORD);
-		status = RegSetValueEx(hKey, _T("Attach.ToDesktop"),
-		                       0, REG_DWORD, (BYTE*) &dwValue, dwSize);
+		status = RegSetValueEx(hKey, _T("Attach.ToDesktop"), 0, REG_DWORD, (BYTE*) &dwValue, dwSize);
 
 		if (status != ERROR_SUCCESS)
 		{
@@ -217,7 +214,7 @@ BOOL wf_mirror_driver_update(wfInfo* wfi, int mode)
 		return FALSE;
 
 	deviceMode->dmDriverExtra = 2 * sizeof(DWORD);
-	extHdr = (DWORD*)((BYTE*) &deviceMode + sizeof(DEVMODE));
+	extHdr = (DWORD*) ((BYTE*) &deviceMode + sizeof(DEVMODE));
 	extHdr[0] = dmf_devmodewext_magic_sig;
 	extHdr[1] = 0;
 	drvExtraSaved = deviceMode->dmDriverExtra;
@@ -238,8 +235,7 @@ BOOL wf_mirror_driver_update(wfInfo* wfi, int mode)
 
 	deviceMode->dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT | DM_POSITION;
 	_tcsncpy_s(deviceMode->dmDeviceName, 32, wfi->deviceName, _tcslen(wfi->deviceName));
-	disp_change_status = ChangeDisplaySettingsEx(wfi->deviceName, deviceMode, NULL, CDS_UPDATEREGISTRY,
-	                     NULL);
+	disp_change_status = ChangeDisplaySettingsEx(wfi->deviceName, deviceMode, NULL, CDS_UPDATEREGISTRY, NULL);
 	status = (disp_change_status == DISP_CHANGE_SUCCESSFUL) ? TRUE : FALSE;
 
 	if (!status)
@@ -259,15 +255,8 @@ BOOL wf_mirror_driver_map_memory(wfInfo* wfi)
 		{
 			LPVOID lpMsgBuf;
 			DWORD dw = GetLastError();
-			FormatMessage(
-			    FORMAT_MESSAGE_ALLOCATE_BUFFER |
-			    FORMAT_MESSAGE_FROM_SYSTEM |
-			    FORMAT_MESSAGE_IGNORE_INSERTS,
-			    NULL,
-			    dw,
-			    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-			    (LPTSTR) &lpMsgBuf,
-			    0, NULL);
+			FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+			              NULL, dw, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, NULL);
 			// Display the error message and exit the process
 			WLog_ERR(TAG, "CreateDC failed on device [%s] with error %lu: %s", wfi->deviceName, dw, lpMsgBuf);
 			LocalFree(lpMsgBuf);
@@ -280,8 +269,7 @@ BOOL wf_mirror_driver_map_memory(wfInfo* wfi)
 	if (!wfi->changeBuffer)
 		return FALSE;
 
-	status = ExtEscape(wfi->driverDC, dmf_esc_usm_pipe_map, 0, 0, sizeof(GETCHANGESBUF),
-	                   (LPSTR) wfi->changeBuffer);
+	status = ExtEscape(wfi->driverDC, dmf_esc_usm_pipe_map, 0, 0, sizeof(GETCHANGESBUF), (LPSTR) wfi->changeBuffer);
 
 	if (status <= 0)
 	{
@@ -297,8 +285,7 @@ BOOL wf_mirror_driver_map_memory(wfInfo* wfi)
 BOOL wf_mirror_driver_cleanup(wfInfo* wfi)
 {
 	int status;
-	status = ExtEscape(wfi->driverDC, dmf_esc_usm_pipe_unmap, sizeof(GETCHANGESBUF),
-	                   (LPSTR) wfi->changeBuffer, 0, 0);
+	status = ExtEscape(wfi->driverDC, dmf_esc_usm_pipe_unmap, sizeof(GETCHANGESBUF), (LPSTR) wfi->changeBuffer, 0, 0);
 
 	if (status <= 0)
 	{

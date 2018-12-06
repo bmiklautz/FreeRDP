@@ -29,11 +29,9 @@
 
 #define TAG SERVER_TAG("shadow.mac")
 
-
 static macShadowSubsystem* g_Subsystem = NULL;
 
-static BOOL mac_shadow_input_synchronize_event(rdpShadowSubsystem* subsystem,
-        rdpShadowClient* client, UINT32 flags)
+static BOOL mac_shadow_input_synchronize_event(rdpShadowSubsystem* subsystem, rdpShadowClient* client, UINT32 flags)
 {
 	if (!subsystem || !client)
 		return FALSE;
@@ -41,8 +39,8 @@ static BOOL mac_shadow_input_synchronize_event(rdpShadowSubsystem* subsystem,
 	return TRUE;
 }
 
-static BOOL mac_shadow_input_keyboard_event(rdpShadowSubsystem* subsystem,
-        rdpShadowClient* client, UINT16 flags, UINT16 code)
+static BOOL mac_shadow_input_keyboard_event(rdpShadowSubsystem* subsystem, rdpShadowClient* client, UINT16 flags,
+                                            UINT16 code)
 {
 	DWORD vkcode;
 	DWORD keycode;
@@ -87,8 +85,8 @@ static BOOL mac_shadow_input_keyboard_event(rdpShadowSubsystem* subsystem,
 	return TRUE;
 }
 
-static BOOL mac_shadow_input_unicode_keyboard_event(rdpShadowSubsystem*
-        subsystem, rdpShadowClient* client, UINT16 flags, UINT16 code)
+static BOOL mac_shadow_input_unicode_keyboard_event(rdpShadowSubsystem* subsystem, rdpShadowClient* client,
+                                                    UINT16 flags, UINT16 code)
 {
 	if (!subsystem || !client)
 		return FALSE;
@@ -96,10 +94,10 @@ static BOOL mac_shadow_input_unicode_keyboard_event(rdpShadowSubsystem*
 	return TRUE;
 }
 
-static BOOL mac_shadow_input_mouse_event(rdpShadowSubsystem* subsystem,
-        rdpShadowClient* client, UINT16 flags, UINT16 x, UINT16 y)
+static BOOL mac_shadow_input_mouse_event(rdpShadowSubsystem* subsystem, rdpShadowClient* client, UINT16 flags, UINT16 x,
+                                         UINT16 y)
 {
-	macShadowSubsystem* mac = (macShadowSubsystem*)subsystem;
+	macShadowSubsystem* mac = (macShadowSubsystem*) subsystem;
 	UINT32 scrollX = 0;
 	UINT32 scrollY = 0;
 	CGWheelCount wheelCount = 2;
@@ -120,19 +118,15 @@ static BOOL mac_shadow_input_mouse_event(rdpShadowSubsystem* subsystem,
 			scrollY = (flags & WheelRotationMask) / 120;
 		}
 
-		CGEventSourceRef source = CGEventSourceCreate(
-		                              kCGEventSourceStateHIDSystemState);
-		CGEventRef scroll = CGEventCreateScrollWheelEvent(source,
-		                    kCGScrollEventUnitLine,
-		                    wheelCount, scrollY, scrollX);
+		CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStateHIDSystemState);
+		CGEventRef scroll = CGEventCreateScrollWheelEvent(source, kCGScrollEventUnitLine, wheelCount, scrollY, scrollX);
 		CGEventPost(kCGHIDEventTap, scroll);
 		CFRelease(scroll);
 		CFRelease(source);
 	}
 	else
 	{
-		CGEventSourceRef source = CGEventSourceCreate(
-		                              kCGEventSourceStateHIDSystemState);
+		CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStateHIDSystemState);
 		CGEventType mouseType = kCGEventNull;
 		CGMouseButton mouseButton = kCGMouseButtonLeft;
 
@@ -147,8 +141,7 @@ static BOOL mac_shadow_input_mouse_event(rdpShadowSubsystem* subsystem,
 			else
 				mouseType = kCGEventMouseMoved;
 
-			CGEventRef move = CGEventCreateMouseEvent(source, mouseType, CGPointMake(x, y),
-			                  mouseButton);
+			CGEventRef move = CGEventCreateMouseEvent(source, mouseType, CGPointMake(x, y), mouseButton);
 			CGEventPost(kCGHIDEventTap, move);
 			CFRelease(move);
 		}
@@ -199,8 +192,7 @@ static BOOL mac_shadow_input_mouse_event(rdpShadowSubsystem* subsystem,
 			}
 		}
 
-		CGEventRef mouseEvent = CGEventCreateMouseEvent(source, mouseType,
-		                        CGPointMake(x, y), mouseButton);
+		CGEventRef mouseEvent = CGEventCreateMouseEvent(source, mouseType, CGPointMake(x, y), mouseButton);
 		CGEventPost(kCGHIDEventTap, mouseEvent);
 		CFRelease(mouseEvent);
 		CFRelease(source);
@@ -209,8 +201,8 @@ static BOOL mac_shadow_input_mouse_event(rdpShadowSubsystem* subsystem,
 	return TRUE;
 }
 
-static BOOL mac_shadow_input_extended_mouse_event(rdpShadowSubsystem* subsystem,
-        rdpShadowClient* client, UINT16 flags, UINT16 x, UINT16 y)
+static BOOL mac_shadow_input_extended_mouse_event(rdpShadowSubsystem* subsystem, rdpShadowClient* client, UINT16 flags,
+                                                  UINT16 x, UINT16 y)
 {
 	if (!subsystem || !client)
 		return FALSE;
@@ -282,8 +274,7 @@ static int mac_shadow_capture_get_dirty_region(macShadowSubsystem* subsystem)
 	const CGRect* rects;
 	RECTANGLE_16 invalidRect;
 	rdpShadowSurface* surface = subsystem->common.server->surface;
-	rects = CGDisplayStreamUpdateGetRects(subsystem->lastUpdate,
-	                                      kCGDisplayStreamUpdateDirtyRects, &numRects);
+	rects = CGDisplayStreamUpdateGetRects(subsystem->lastUpdate, kCGDisplayStreamUpdateDirtyRects, &numRects);
 
 	if (!numRects)
 		return -1;
@@ -304,16 +295,14 @@ static int mac_shadow_capture_get_dirty_region(macShadowSubsystem* subsystem)
 			invalidRect.bottom /= 2;
 		}
 
-		region16_union_rect(&(surface->invalidRegion), &(surface->invalidRegion),
-		                    &invalidRect);
+		region16_union_rect(&(surface->invalidRegion), &(surface->invalidRegion), &invalidRect);
 	}
 
 	return 0;
 }
 
-static int freerdp_image_copy_from_retina(BYTE* pDstData, DWORD DstFormat,
-        int nDstStep, int nXDst, int nYDst,
-        int nWidth, int nHeight, BYTE* pSrcData, int nSrcStep, int nXSrc, int nYSrc)
+static int freerdp_image_copy_from_retina(BYTE* pDstData, DWORD DstFormat, int nDstStep, int nXDst, int nYDst,
+                                          int nWidth, int nHeight, BYTE* pSrcData, int nSrcStep, int nXSrc, int nYSrc)
 {
 	BYTE* pSrcPixel;
 	BYTE* pDstPixel;
@@ -348,12 +337,9 @@ static int freerdp_image_copy_from_retina(BYTE* pDstData, DWORD DstFormat,
 			UINT32 R, G, B;
 			UINT32 color;
 			/* simple box filter scaling, could be improved with better algorithm */
-			B = pSrcPixel[0] + pSrcPixel[4] + pSrcPixel[nSrcStep + 0] + pSrcPixel[nSrcStep +
-			        4];
-			G = pSrcPixel[1] + pSrcPixel[5] + pSrcPixel[nSrcStep + 1] + pSrcPixel[nSrcStep +
-			        5];
-			R = pSrcPixel[2] + pSrcPixel[6] + pSrcPixel[nSrcStep + 2] + pSrcPixel[nSrcStep +
-			        6];
+			B = pSrcPixel[0] + pSrcPixel[4] + pSrcPixel[nSrcStep + 0] + pSrcPixel[nSrcStep + 4];
+			G = pSrcPixel[1] + pSrcPixel[5] + pSrcPixel[nSrcStep + 1] + pSrcPixel[nSrcStep + 5];
+			R = pSrcPixel[2] + pSrcPixel[6] + pSrcPixel[nSrcStep + 2] + pSrcPixel[nSrcStep + 6];
 			pSrcPixel += 8;
 			color = FreeRDPGetColor(DstFormat, R >> 2, G >> 2, B >> 2, 0xFF);
 			WriteColor(pDstPixel, DstFormat, color);
@@ -367,11 +353,10 @@ static int freerdp_image_copy_from_retina(BYTE* pDstData, DWORD DstFormat,
 	return 1;
 }
 
-static void (^mac_capture_stream_handler)(CGDisplayStreamFrameStatus, uint64_t,
-        IOSurfaceRef, CGDisplayStreamUpdateRef) =
-            ^(CGDisplayStreamFrameStatus status, uint64_t displayTime,
-              IOSurfaceRef frameSurface, CGDisplayStreamUpdateRef updateRef)
-{
+static void (^mac_capture_stream_handler)(CGDisplayStreamFrameStatus, uint64_t, IOSurfaceRef,
+                                          CGDisplayStreamUpdateRef) = ^(CGDisplayStreamFrameStatus status,
+                                                                        uint64_t displayTime, IOSurfaceRef frameSurface,
+                                                                        CGDisplayStreamUpdateRef updateRef) {
 	int x, y;
 	int count;
 	int width;
@@ -393,8 +378,7 @@ static void (^mac_capture_stream_handler)(CGDisplayStreamFrameStatus, uint64_t,
 	surfaceRect.top = 0;
 	surfaceRect.right = surface->width;
 	surfaceRect.bottom = surface->height;
-	region16_intersect_rect(&(surface->invalidRegion), &(surface->invalidRegion),
-	                        &surfaceRect);
+	region16_intersect_rect(&(surface->invalidRegion), &(surface->invalidRegion), &surfaceRect);
 
 	if (!region16_is_empty(&(surface->invalidRegion)))
 	{
@@ -409,14 +393,13 @@ static void (^mac_capture_stream_handler)(CGDisplayStreamFrameStatus, uint64_t,
 
 		if (subsystem->retina)
 		{
-			freerdp_image_copy_from_retina(surface->data, surface->format,
-			                               surface->scanline,
-			                               x, y, width, height, pSrcData, nSrcStep, x, y);
+			freerdp_image_copy_from_retina(surface->data, surface->format, surface->scanline, x, y, width, height,
+			                               pSrcData, nSrcStep, x, y);
 		}
 		else
 		{
-			freerdp_image_copy(surface->data, surface->format, surface->scanline,
-			                   x, y, width, height, pSrcData, PIXEL_FORMAT_BGRX32, nSrcStep, x, y, NULL, FREERDP_FLIP_NONE);
+			freerdp_image_copy(surface->data, surface->format, surface->scanline, x, y, width, height, pSrcData,
+			                   PIXEL_FORMAT_BGRX32, nSrcStep, x, y, NULL, FREERDP_FLIP_NONE);
 		}
 
 		IOSurfaceUnlock(frameSurface, kIOSurfaceLockReadOnly, NULL);
@@ -466,8 +449,7 @@ static void (^mac_capture_stream_handler)(CGDisplayStreamFrameStatus, uint64_t,
 	else
 	{
 		CGDisplayStreamUpdateRef tmpRef = subsystem->lastUpdate;
-		subsystem->lastUpdate = CGDisplayStreamUpdateCreateMergedUpdate(tmpRef,
-		                        updateRef);
+		subsystem->lastUpdate = CGDisplayStreamUpdateCreateMergedUpdate(tmpRef, updateRef);
 		CFRelease(tmpRef);
 	}
 };
@@ -482,22 +464,17 @@ static int mac_shadow_capture_init(macShadowSubsystem* subsystem)
 	subsystem->captureQueue = dispatch_queue_create("mac.shadow.capture", NULL);
 	keys[0] = (void*) kCGDisplayStreamShowCursor;
 	values[0] = (void*) kCFBooleanFalse;
-	opts = CFDictionaryCreate(kCFAllocatorDefault, (const void**) keys,
-	                          (const void**) values, 1, NULL, NULL);
-	subsystem->stream = CGDisplayStreamCreateWithDispatchQueue(displayId,
-	                    subsystem->pixelWidth, subsystem->pixelHeight,
-	                    'BGRA', opts, subsystem->captureQueue, mac_capture_stream_handler);
+	opts = CFDictionaryCreate(kCFAllocatorDefault, (const void**) keys, (const void**) values, 1, NULL, NULL);
+	subsystem->stream = CGDisplayStreamCreateWithDispatchQueue(displayId, subsystem->pixelWidth, subsystem->pixelHeight,
+	                                                           'BGRA', opts, subsystem->captureQueue,
+	                                                           mac_capture_stream_handler);
 	CFRelease(opts);
 	return 1;
 }
 
-static int mac_shadow_screen_grab(macShadowSubsystem* subsystem)
-{
-	return 1;
-}
+static int mac_shadow_screen_grab(macShadowSubsystem* subsystem) { return 1; }
 
-static int mac_shadow_subsystem_process_message(macShadowSubsystem* subsystem,
-        wMessage* message)
+static int mac_shadow_subsystem_process_message(macShadowSubsystem* subsystem, wMessage* message)
 {
 	rdpShadowServer* server = subsystem->common.server;
 	rdpShadowSurface* surface = server->surface;
@@ -506,12 +483,12 @@ static int mac_shadow_subsystem_process_message(macShadowSubsystem* subsystem,
 	{
 		case SHADOW_MSG_IN_REFRESH_REQUEST_ID:
 			EnterCriticalSection(&(surface->lock));
-			shadow_subsystem_frame_update((rdpShadowSubsystem*)subsystem);
+			shadow_subsystem_frame_update((rdpShadowSubsystem*) subsystem);
 			LeaveCriticalSection(&(surface->lock));
 			break;
 
 		default:
-			WLog_ERR(TAG, "Unknown message id: %"PRIu32"", message->id);
+			WLog_ERR(TAG, "Unknown message id: %" PRIu32 "", message->id);
 			break;
 	}
 
@@ -523,7 +500,7 @@ static int mac_shadow_subsystem_process_message(macShadowSubsystem* subsystem,
 
 static DWORD WINAPI mac_shadow_subsystem_thread(LPVOID arg)
 {
-	macShadowSubsystem* subsystem = (macShadowSubsystem*)arg;
+	macShadowSubsystem* subsystem = (macShadowSubsystem*) arg;
 	DWORD status;
 	DWORD nCount;
 	UINT64 cTime;
@@ -623,8 +600,7 @@ static int mac_shadow_subsystem_start(macShadowSubsystem* subsystem)
 
 	mac_shadow_capture_start(subsystem);
 
-	if (!(thread = CreateThread(NULL, 0, mac_shadow_subsystem_thread,
-	                            (void*) subsystem, 0, NULL)))
+	if (!(thread = CreateThread(NULL, 0, mac_shadow_subsystem_thread, (void*) subsystem, 0, NULL)))
 	{
 		WLog_ERR(TAG, "Failed to create thread");
 		return -1;

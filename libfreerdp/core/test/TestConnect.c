@@ -54,12 +54,7 @@ static int testTimeout(int port)
 {
 	DWORD start, end, diff;
 	char arg1[] = "/v:192.0.2.1:XXXXX";
-	char* argv[] =
-	{
-		"test",
-		"/v:192.0.2.1:XXXXX",
-		NULL
-	};
+	char* argv[] = { "test", "/v:192.0.2.1:XXXXX", NULL };
 	int rc;
 	_snprintf(arg1, 18, "/v:192.0.2.1:%d", port);
 	argv[1] = arg1;
@@ -91,12 +86,7 @@ struct testThreadArgs
 static DWORD WINAPI testThread(LPVOID arg)
 {
 	char arg1[] = "/v:192.0.2.1:XXXXX";
-	char* argv[] =
-	{
-		"test",
-		"/v:192.0.2.1:XXXXX",
-		NULL
-	};
+	char* argv[] = { "test", "/v:192.0.2.1:XXXXX", NULL };
 	int rc;
 	struct testThreadArgs* args = arg;
 	_snprintf(arg1, 18, "/v:192.0.2.1:%d", args->port);
@@ -125,8 +115,7 @@ static int testAbort(int port)
 	args.port = port;
 	args.arg = &instance;
 	start = GetTickCount();
-	thread = CreateThread(NULL, 0, testThread,
-	                      &args, 0, NULL);
+	thread = CreateThread(NULL, 0, testThread, &args, 0, NULL);
 
 	if (!thread)
 	{
@@ -157,7 +146,7 @@ static int testAbort(int port)
 
 	if (diff > 5000)
 	{
-		printf("%s required %"PRIu32"ms for the test\n", __FUNCTION__, diff);
+		printf("%s required %" PRIu32 "ms for the test\n", __FUNCTION__, diff);
 		return -1;
 	}
 
@@ -174,14 +163,7 @@ static int testSuccess(int port)
 	STARTUPINFOA si;
 	PROCESS_INFORMATION process;
 	char arg1[] = "/v:127.0.0.1:XXXXX";
-	char* clientArgs[] =
-	{
-		"test",
-		"/v:127.0.0.1:XXXXX",
-		"/cert-ignore",
-		"/rfx",
-		NULL
-	};
+	char* clientArgs[] = { "test", "/v:127.0.0.1:XXXXX", "/cert-ignore", "/rfx", NULL };
 	char* commandLine;
 	int commandLineLen;
 	int argc = 4;
@@ -247,8 +229,7 @@ static int testSuccess(int port)
 	memset(&si, 0, sizeof(si));
 	si.cb = sizeof(si);
 
-	if (!CreateProcessA(exe, commandLine, NULL, NULL, FALSE, 0, NULL,
-	                    wpath, &si, &process))
+	if (!CreateProcessA(exe, commandLine, NULL, NULL, FALSE, 0, NULL, wpath, &si, &process))
 	{
 		free(exe);
 		free(path);
@@ -282,7 +263,7 @@ int TestConnect(int argc, char* argv[])
 {
 	int randomPort;
 	int random;
-	winpr_RAND((BYTE*)&random, sizeof(random));
+	winpr_RAND((BYTE*) &random, sizeof(random));
 	randomPort = 3389 + (random % 200);
 
 	/* Test connect to not existing server,
@@ -302,4 +283,3 @@ int TestConnect(int argc, char* argv[])
 
 	return 0;
 }
-

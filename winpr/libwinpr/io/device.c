@@ -62,7 +62,7 @@
  * http://www.codeproject.com/Articles/9504/Driver-Development-Part-1-Introduction-to-Drivers/
  */
 
-#define DEVICE_FILE_PREFIX_PATH		"\\Device\\"
+#define DEVICE_FILE_PREFIX_PATH "\\Device\\"
 
 char* GetDeviceFileNameWithoutPrefixA(LPCSTR lpName)
 {
@@ -121,8 +121,7 @@ char* GetDeviceFileUnixDomainSocketFilePathA(LPCSTR lpName)
  * http://msdn.microsoft.com/en-us/library/windows/hardware/ff548397/
  */
 
-NTSTATUS _IoCreateDeviceEx(PDRIVER_OBJECT_EX DriverObject, ULONG DeviceExtensionSize,
-                           PUNICODE_STRING DeviceName,
+NTSTATUS _IoCreateDeviceEx(PDRIVER_OBJECT_EX DriverObject, ULONG DeviceExtensionSize, PUNICODE_STRING DeviceName,
                            DEVICE_TYPE DeviceType, ULONG DeviceCharacteristics, BOOLEAN Exclusive,
                            PDEVICE_OBJECT_EX* DeviceObject)
 {
@@ -149,8 +148,8 @@ NTSTATUS _IoCreateDeviceEx(PDRIVER_OBJECT_EX DriverObject, ULONG DeviceExtension
 	if (!pDeviceObjectEx)
 		return STATUS_NO_MEMORY;
 
-	ConvertFromUnicode(CP_UTF8, 0, DeviceName->Buffer, DeviceName->Length / 2,
-	                   &(pDeviceObjectEx->DeviceName), 0, NULL, NULL);
+	ConvertFromUnicode(CP_UTF8, 0, DeviceName->Buffer, DeviceName->Length / 2, &(pDeviceObjectEx->DeviceName), 0, NULL,
+	                   NULL);
 
 	if (!pDeviceObjectEx->DeviceName)
 	{
@@ -158,8 +157,7 @@ NTSTATUS _IoCreateDeviceEx(PDRIVER_OBJECT_EX DriverObject, ULONG DeviceExtension
 		return STATUS_NO_MEMORY;
 	}
 
-	pDeviceObjectEx->DeviceFileName = GetDeviceFileUnixDomainSocketFilePathA(
-	                                      pDeviceObjectEx->DeviceName);
+	pDeviceObjectEx->DeviceFileName = GetDeviceFileUnixDomainSocketFilePathA(pDeviceObjectEx->DeviceName);
 
 	if (!pDeviceObjectEx->DeviceFileName)
 	{
@@ -210,7 +208,7 @@ NTSTATUS _IoCreateDeviceEx(PDRIVER_OBJECT_EX DriverObject, ULONG DeviceExtension
 		}
 	}
 
-	*((ULONG_PTR*)(DeviceObject)) = (ULONG_PTR) pDeviceObjectEx;
+	*((ULONG_PTR*) (DeviceObject)) = (ULONG_PTR) pDeviceObjectEx;
 	return STATUS_SUCCESS;
 }
 
@@ -248,9 +246,6 @@ NTSTATUS _IoCreateSymbolicLinkEx(PUNICODE_STRING SymbolicLinkName, PUNICODE_STRI
  * http://msdn.microsoft.com/en-us/library/windows/hardware/ff549085/
  */
 
-NTSTATUS _IoDeleteSymbolicLinkEx(PUNICODE_STRING SymbolicLinkName)
-{
-	return STATUS_SUCCESS;
-}
+NTSTATUS _IoDeleteSymbolicLinkEx(PUNICODE_STRING SymbolicLinkName) { return STATUS_SUCCESS; }
 
 #endif

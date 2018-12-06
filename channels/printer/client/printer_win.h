@@ -28,8 +28,10 @@ rdpPrinterDriver* printer_win_get_driver(void);
 #ifdef WITH_DEBUG_WINPR
 #define DEBUG_WINPR(...) WLog_DBG(PRINTER_TAG, __VA_ARGS__)
 #else
-#define DEBUG_WINPR(...) do { } while (0)
+#define DEBUG_WINPR(...)                                                                                               \
+	do                                                                                                                 \
+	{                                                                                                                  \
+	} while (0)
 #endif
 
 #endif /* FREERDP_CHANNEL_PRINTER_CLIENT_WIN_H */
-

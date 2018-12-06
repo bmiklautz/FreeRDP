@@ -38,19 +38,13 @@
  * Gets or sets the number of elements that the ArrayList can contain.
  */
 
-int ArrayList_Capacity(wArrayList* arrayList)
-{
-	return arrayList->capacity;
-}
+int ArrayList_Capacity(wArrayList* arrayList) { return arrayList->capacity; }
 
 /**
  * Gets the number of elements actually contained in the ArrayList.
  */
 
-int ArrayList_Count(wArrayList* arrayList)
-{
-	return arrayList->size;
-}
+int ArrayList_Count(wArrayList* arrayList) { return arrayList->size; }
 
 /**
  * Gets the internal list of items contained in the ArrayList.
@@ -66,46 +60,31 @@ int ArrayList_Items(wArrayList* arrayList, ULONG_PTR** ppItems)
  * Gets a value indicating whether the ArrayList has a fixed size.
  */
 
-BOOL ArrayList_IsFixedSized(wArrayList* arrayList)
-{
-	return FALSE;
-}
+BOOL ArrayList_IsFixedSized(wArrayList* arrayList) { return FALSE; }
 
 /**
  * Gets a value indicating whether the ArrayList is read-only.
  */
 
-BOOL ArrayList_IsReadOnly(wArrayList* arrayList)
-{
-	return FALSE;
-}
+BOOL ArrayList_IsReadOnly(wArrayList* arrayList) { return FALSE; }
 
 /**
  * Gets a value indicating whether access to the ArrayList is synchronized (thread safe).
  */
 
-BOOL ArrayList_IsSynchronized(wArrayList* arrayList)
-{
-	return arrayList->synchronized;
-}
+BOOL ArrayList_IsSynchronized(wArrayList* arrayList) { return arrayList->synchronized; }
 
 /**
  * Lock access to the ArrayList
  */
 
-void ArrayList_Lock(wArrayList* arrayList)
-{
-	EnterCriticalSection(&arrayList->lock);
-}
+void ArrayList_Lock(wArrayList* arrayList) { EnterCriticalSection(&arrayList->lock); }
 
 /**
  * Unlock access to the ArrayList
  */
 
-void ArrayList_Unlock(wArrayList* arrayList)
-{
-	LeaveCriticalSection(&arrayList->lock);
-}
+void ArrayList_Unlock(wArrayList* arrayList) { LeaveCriticalSection(&arrayList->lock); }
 
 /**
  * Gets the element at the specified index.
@@ -151,7 +130,7 @@ BOOL ArrayList_Shift(wArrayList* arrayList, int index, int count)
 		{
 			void** newArray;
 			int newCapacity = arrayList->capacity * arrayList->growthFactor;
-			newArray = (void**)realloc(arrayList->array, sizeof(void*) * newCapacity);
+			newArray = (void**) realloc(arrayList->array, sizeof(void*) * newCapacity);
 
 			if (!newArray)
 				return FALSE;
@@ -243,7 +222,7 @@ int ArrayList_Add(wArrayList* arrayList, void* obj)
 	{
 		void** newArray;
 		int newCapacity = arrayList->capacity * arrayList->growthFactor;
-		newArray = (void**)realloc(arrayList->array, sizeof(void*) * newCapacity);
+		newArray = (void**) realloc(arrayList->array, sizeof(void*) * newCapacity);
 
 		if (!newArray)
 			goto out;
@@ -353,13 +332,14 @@ BOOL ArrayList_RemoveAt(wArrayList* arrayList, int index)
 }
 
 /**
- * Searches for the specified Object and returns the zero-based index of the first occurrence within the entire ArrayList.
+ * Searches for the specified Object and returns the zero-based index of the first occurrence within the entire
+ * ArrayList.
  *
- * Searches for the specified Object and returns the zero-based index of the last occurrence within the range of elements
- * in the ArrayList that extends from the first element to the specified index.
+ * Searches for the specified Object and returns the zero-based index of the last occurrence within the range of
+ * elements in the ArrayList that extends from the first element to the specified index.
  *
- * Searches for the specified Object and returns the zero-based index of the last occurrence within the range of elements
- * in the ArrayList that contains the specified number of elements and ends at the specified index.
+ * Searches for the specified Object and returns the zero-based index of the last occurrence within the range of
+ * elements in the ArrayList that contains the specified number of elements and ends at the specified index.
  */
 
 int ArrayList_IndexOf(wArrayList* arrayList, void* obj, int startIndex, int count)
@@ -395,13 +375,14 @@ int ArrayList_IndexOf(wArrayList* arrayList, void* obj, int startIndex, int coun
 }
 
 /**
- * Searches for the specified Object and returns the zero-based index of the last occurrence within the entire ArrayList.
+ * Searches for the specified Object and returns the zero-based index of the last occurrence within the entire
+ * ArrayList.
  *
- * Searches for the specified Object and returns the zero-based index of the last occurrence within the range of elements
- * in the ArrayList that extends from the first element to the specified index.
+ * Searches for the specified Object and returns the zero-based index of the last occurrence within the range of
+ * elements in the ArrayList that extends from the first element to the specified index.
  *
- * Searches for the specified Object and returns the zero-based index of the last occurrence within the range of elements
- * in the ArrayList that contains the specified number of elements and ends at the specified index.
+ * Searches for the specified Object and returns the zero-based index of the last occurrence within the range of
+ * elements in the ArrayList that contains the specified number of elements and ends at the specified index.
  */
 
 int ArrayList_LastIndexOf(wArrayList* arrayList, void* obj, int startIndex, int count)
@@ -436,10 +417,7 @@ int ArrayList_LastIndexOf(wArrayList* arrayList, void* obj, int startIndex, int 
 	return index;
 }
 
-static BOOL ArrayList_DefaultCompare(const void* objA, const void* objB)
-{
-	return objA == objB ? TRUE : FALSE;
-}
+static BOOL ArrayList_DefaultCompare(const void* objA, const void* objB) { return objA == objB ? TRUE : FALSE; }
 
 /**
  * Construction, Destruction
@@ -448,7 +426,7 @@ static BOOL ArrayList_DefaultCompare(const void* objA, const void* objB)
 wArrayList* ArrayList_New(BOOL synchronized)
 {
 	wArrayList* arrayList = NULL;
-	arrayList = (wArrayList*)calloc(1, sizeof(wArrayList));
+	arrayList = (wArrayList*) calloc(1, sizeof(wArrayList));
 
 	if (!arrayList)
 		return NULL;
@@ -457,7 +435,7 @@ wArrayList* ArrayList_New(BOOL synchronized)
 	arrayList->capacity = 32;
 	arrayList->growthFactor = 2;
 	arrayList->object.fnObjectEquals = ArrayList_DefaultCompare;
-	arrayList->array = (void**)calloc(arrayList->capacity, sizeof(void*));
+	arrayList->array = (void**) calloc(arrayList->capacity, sizeof(void*));
 
 	if (!arrayList->array)
 		goto out_free;

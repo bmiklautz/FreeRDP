@@ -44,4 +44,3 @@ FREERDP_LOCAL UINT rdpgfx_read_color32(wStream* s, RDPGFX_COLOR32* color32);
 FREERDP_LOCAL UINT rdpgfx_write_color32(wStream* s, RDPGFX_COLOR32* color32);
 
 #endif /* FREERDP_CHANNEL_RDPGFX_COMMON_H */
-

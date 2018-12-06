@@ -25,22 +25,22 @@
 
 struct _pcap_header
 {
-	UINT32 magic_number;   /* magic number */
-	UINT16 version_major;  /* major version number */
-	UINT16 version_minor;  /* minor version number */
-	INT32 thiszone;       /* GMT to local correction */
-	UINT32 sigfigs;        /* accuracy of timestamps */
-	UINT32 snaplen;        /* max length of captured packets, in octets */
-	UINT32 network;        /* data link type */
+	UINT32 magic_number; /* magic number */
+	UINT16 version_major; /* major version number */
+	UINT16 version_minor; /* minor version number */
+	INT32 thiszone; /* GMT to local correction */
+	UINT32 sigfigs; /* accuracy of timestamps */
+	UINT32 snaplen; /* max length of captured packets, in octets */
+	UINT32 network; /* data link type */
 };
 typedef struct _pcap_header pcap_header;
 
 struct _pcap_record_header
 {
-	UINT32 ts_sec;         /* timestamp seconds */
-	UINT32 ts_usec;        /* timestamp microseconds */
-	UINT32 incl_len;       /* number of octets of packet saved in file */
-	UINT32 orig_len;       /* actual length of packet */
+	UINT32 ts_sec; /* timestamp seconds */
+	UINT32 ts_usec; /* timestamp microseconds */
+	UINT32 incl_len; /* number of octets of packet saved in file */
+	UINT32 orig_len; /* actual length of packet */
 };
 typedef struct _pcap_record_header pcap_record_header;
 

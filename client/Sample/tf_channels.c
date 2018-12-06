@@ -40,7 +40,7 @@
  * @return 0 on success, otherwise a Win32 error code
  */
 static UINT tf_encomsp_participant_created(EncomspClientContext* context,
-        ENCOMSP_PARTICIPANT_CREATED_PDU* participantCreated)
+                                           ENCOMSP_PARTICIPANT_CREATED_PDU* participantCreated)
 {
 	return CHANNEL_RC_OK;
 }
@@ -64,9 +64,7 @@ static void tf_encomsp_uninit(tfContext* tf, EncomspClientContext* encomsp)
 		tf->encomsp = NULL;
 }
 
-
-void tf_OnChannelConnectedEventHandler(void* context,
-                                       ChannelConnectedEventArgs* e)
+void tf_OnChannelConnectedEventHandler(void* context, ChannelConnectedEventArgs* e)
 {
 	tfContext* tf = (tfContext*) context;
 	rdpSettings* settings;
@@ -95,8 +93,7 @@ void tf_OnChannelConnectedEventHandler(void* context,
 	}
 }
 
-void tf_OnChannelDisconnectedEventHandler(void* context,
-        ChannelDisconnectedEventArgs* e)
+void tf_OnChannelDisconnectedEventHandler(void* context, ChannelDisconnectedEventArgs* e)
 {
 	tfContext* tf = (tfContext*) context;
 	rdpSettings* settings;
@@ -111,8 +108,7 @@ void tf_OnChannelDisconnectedEventHandler(void* context,
 	}
 	else if (strcmp(e->name, RDPGFX_DVC_CHANNEL_NAME) == 0)
 	{
-		gdi_graphics_pipeline_uninit(tf->context.gdi,
-		                             (RdpgfxClientContext*) e->pInterface);
+		gdi_graphics_pipeline_uninit(tf->context.gdi, (RdpgfxClientContext*) e->pInterface);
 	}
 	else if (strcmp(e->name, RAIL_SVC_CHANNEL_NAME) == 0)
 	{

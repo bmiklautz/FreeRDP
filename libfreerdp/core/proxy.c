@@ -24,7 +24,7 @@
 #include "freerdp/settings.h"
 #include "tcp.h"
 
-#include "winpr/environment.h"	/* For GetEnvironmentVariableA */
+#include "winpr/environment.h" /* For GetEnvironmentVariableA */
 
 #define CRLF "\r\n"
 #define TAG FREERDP_TAG("core.proxy")
@@ -52,28 +52,23 @@ enum
 };
 
 /* CONN REQ replies in enum. order */
-static const char* rplstat[] =
-{
-	"succeeded",
-	"general SOCKS server failure",
-	"connection not allowed by ruleset",
-	"Network unreachable",
-	"Host unreachable",
-	"Connection refused",
-	"TTL expired",
-	"Command not supported",
-	"Address type not supported"
-};
-
-
+static const char* rplstat[] = { "succeeded",
+	                             "general SOCKS server failure",
+	                             "connection not allowed by ruleset",
+	                             "Network unreachable",
+	                             "Host unreachable",
+	                             "Connection refused",
+	                             "TTL expired",
+	                             "Command not supported",
+	                             "Address type not supported" };
 
 static BOOL http_proxy_connect(BIO* bufferedBio, const char* hostname, UINT16 port);
-static BOOL socks_proxy_connect(BIO* bufferedBio, const char* proxyUsername,
-                                const char* proxyPassword, const char* hostname, UINT16 port);
+static BOOL socks_proxy_connect(BIO* bufferedBio, const char* proxyUsername, const char* proxyPassword,
+                                const char* hostname, UINT16 port);
 void proxy_read_environment(rdpSettings* settings, char* envname);
 
-BOOL proxy_prepare(rdpSettings* settings, const char** lpPeerHostname, UINT16* lpPeerPort,
-                   const char** lpProxyUsername, const char** lpProxyPassword)
+BOOL proxy_prepare(rdpSettings* settings, const char** lpPeerHostname, UINT16* lpPeerPort, const char** lpProxyUsername,
+                   const char** lpProxyPassword)
 {
 	if (settings->ProxyType == PROXY_TYPE_IGNORE)
 		return FALSE;
@@ -116,11 +111,10 @@ static BOOL cidr4_match(const struct in_addr* addr, const struct in_addr* net, B
 	return amask == nmask;
 }
 
-static BOOL cidr6_match(const struct in6_addr* address, const struct in6_addr* network,
-                        uint8_t bits)
+static BOOL cidr6_match(const struct in6_addr* address, const struct in6_addr* network, uint8_t bits)
 {
-	const uint32_t* a = (const uint32_t*)address;
-	const uint32_t* n = (const uint32_t*)network;
+	const uint32_t* a = (const uint32_t*) address;
+	const uint32_t* n = (const uint32_t*) network;
 	size_t bits_whole, bits_incomplete;
 	bits_whole = bits >> 5;
 	bits_incomplete = bits & 0x1F;
@@ -176,7 +170,7 @@ static BOOL check_no_proxy(rdpSettings* settings, const char* no_proxy)
 
 		if (currentlen > 0)
 		{
-			WLog_DBG(TAG, "%s => %s (%"PRIdz")", settings->ServerHostname, current, currentlen);
+			WLog_DBG(TAG, "%s => %s (%" PRIdz ")", settings->ServerHostname, current, currentlen);
 
 			/* detect left and right "*" wildcard */
 			if (current[0] == '*')
@@ -291,7 +285,7 @@ void proxy_read_environment(rdpSettings* settings, char* envname)
 
 BOOL proxy_parse_uri(rdpSettings* settings, const char* uri)
 {
-	const char* hostname, *pport;
+	const char *hostname, *pport;
 	const char* protocol;
 	const char* p;
 	UINT16 port;
@@ -359,13 +353,11 @@ BOOL proxy_parse_uri(rdpSettings* settings, const char* uri)
 
 	memcpy(settings->ProxyHostname, hostname, hostnamelen);
 	settings->ProxyPort = port;
-	WLog_INFO(TAG, "Parsed proxy configuration: %s://%s:%d", protocol, settings->ProxyHostname,
-	          settings->ProxyPort);
+	WLog_INFO(TAG, "Parsed proxy configuration: %s://%s:%d", protocol, settings->ProxyHostname, settings->ProxyPort);
 	return TRUE;
 }
 
-BOOL proxy_connect(rdpSettings* settings, BIO* bufferedBio, const char* proxyUsername,
-                   const char* proxyPassword,
+BOOL proxy_connect(rdpSettings* settings, BIO* bufferedBio, const char* proxyUsername, const char* proxyPassword,
                    const char* hostname, UINT16 port)
 {
 	switch (settings->ProxyType)
@@ -427,7 +419,7 @@ static BOOL http_proxy_connect(BIO* bufferedBio, const char* hostname, UINT16 po
 			return FALSE;
 		}
 
-		status = BIO_read(bufferedBio, (BYTE*)recv_buf + resultsize, sizeof(recv_buf) - resultsize - 1);
+		status = BIO_read(bufferedBio, (BYTE*) recv_buf + resultsize, sizeof(recv_buf) - resultsize - 1);
 
 		if (status < 0)
 		{
@@ -523,8 +515,7 @@ static int recv_socks_reply(BIO* bufferedBio, BYTE* buf, int len, char* reason, 
 	return status;
 }
 
-static BOOL socks_proxy_connect(BIO* bufferedBio, const char* proxyUsername,
-                                const char* proxyPassword,
+static BOOL socks_proxy_connect(BIO* bufferedBio, const char* proxyUsername, const char* proxyPassword,
                                 const char* hostname, UINT16 port)
 {
 	int status;

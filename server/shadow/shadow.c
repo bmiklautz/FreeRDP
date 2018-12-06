@@ -112,4 +112,3 @@ fail_parse_command_line:
 fail_server_new:
 	return status;
 }
-

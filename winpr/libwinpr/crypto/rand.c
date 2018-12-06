@@ -53,7 +53,4 @@ int winpr_RAND(BYTE* output, size_t len)
 	return 0;
 }
 
-int winpr_RAND_pseudo(BYTE* output, size_t len)
-{
-	return winpr_RAND(output, len);
-}
+int winpr_RAND_pseudo(BYTE* output, size_t len) { return winpr_RAND(output, len); }

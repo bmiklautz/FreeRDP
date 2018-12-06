@@ -58,7 +58,7 @@ static int test_gdi_PtInRect(void)
 
 	rc = 0;
 fail:
-	gdi_DeleteObject((HGDIOBJECT)hRect);
+	gdi_DeleteObject((HGDIOBJECT) hRect);
 	return rc;
 }
 
@@ -120,7 +120,7 @@ int test_gdi_FillRect(void)
 				}
 				else
 				{
-					printf("actual:%08"PRIX32" expected:%08"PRIX32"\n", gdi_GetPixel(hdc, x, y), color);
+					printf("actual:%08" PRIX32 " expected:%08" PRIX32 "\n", gdi_GetPixel(hdc, x, y), color);
 					badPixels++;
 				}
 			}
@@ -148,7 +148,7 @@ int test_gdi_FillRect(void)
 fail:
 	gdi_DeleteObject((HGDIOBJECT) hBrush);
 	gdi_DeleteObject((HGDIOBJECT) hBitmap);
-	gdi_DeleteObject((HGDIOBJECT)hRect);
+	gdi_DeleteObject((HGDIOBJECT) hRect);
 	gdi_DeleteDC(hdc);
 	return rc;
 }
@@ -163,4 +163,3 @@ int TestGdiRect(int argc, char* argv[])
 
 	return 0;
 }
-

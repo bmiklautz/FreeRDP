@@ -41,7 +41,7 @@ int TestEnvironmentSetEnvironmentVariable(int argc, char* argv[])
 		return -1;
 	}
 
-	nSize = GetEnvironmentVariableA("__xx__notset_",lpBuffer, nSize);
+	nSize = GetEnvironmentVariableA("__xx__notset_", lpBuffer, nSize);
 	error = GetLastError();
 	if (0 != nSize || ERROR_ENVVAR_NOT_FOUND != error)
 	{
@@ -54,11 +54,10 @@ int TestEnvironmentSetEnvironmentVariable(int argc, char* argv[])
 	/* clear variable */
 	SetEnvironmentVariableA(TEST_NAME, NULL);
 	nSize = GetEnvironmentVariableA(TEST_VALUE, NULL, 0);
-	if ( 0 != nSize)
+	if (0 != nSize)
 	{
 		printf("SetEnvironmentVariableA failed to clear variable\n");
 		return -1;
 	}
 	return 0;
 }
-

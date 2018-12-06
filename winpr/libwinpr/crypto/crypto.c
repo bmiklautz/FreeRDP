@@ -177,8 +177,8 @@ BOOL CryptProtectMemory(LPVOID pData, DWORD cbData, DWORD dwFlags)
 	winpr_RAND(pMemBlock->salt, 8);
 	winpr_RAND(randomKey, sizeof(randomKey));
 
-	winpr_Cipher_BytesToKey(WINPR_CIPHER_AES_256_CBC, WINPR_MD_SHA1,
-			pMemBlock->salt, randomKey, sizeof(randomKey), 4, pMemBlock->key, pMemBlock->iv);
+	winpr_Cipher_BytesToKey(WINPR_CIPHER_AES_256_CBC, WINPR_MD_SHA1, pMemBlock->salt, randomKey, sizeof(randomKey), 4,
+	                        pMemBlock->key, pMemBlock->iv);
 
 	SecureZeroMemory(randomKey, sizeof(randomKey));
 
@@ -188,8 +188,7 @@ BOOL CryptProtectMemory(LPVOID pData, DWORD cbData, DWORD dwFlags)
 	if (!pCipherText)
 		goto out;
 
-	if ((enc = winpr_Cipher_New(WINPR_CIPHER_AES_256_CBC, WINPR_ENCRYPT,
-				    pMemBlock->key, pMemBlock->iv)) == NULL)
+	if ((enc = winpr_Cipher_New(WINPR_CIPHER_AES_256_CBC, WINPR_ENCRYPT, pMemBlock->key, pMemBlock->iv)) == NULL)
 		goto out;
 	if (!winpr_Cipher_Update(enc, pMemBlock->pData, pMemBlock->cbData, pCipherText, &cbOut))
 		goto out;
@@ -202,8 +201,8 @@ BOOL CryptProtectMemory(LPVOID pData, DWORD cbData, DWORD dwFlags)
 
 	return ListDictionary_Add(g_ProtectedMemoryBlocks, pData, pMemBlock);
 out:
-	free (pMemBlock);
-	free (pCipherText);
+	free(pMemBlock);
+	free(pCipherText);
 	winpr_Cipher_Free(enc);
 
 	return FALSE;
@@ -234,8 +233,7 @@ BOOL CryptUnprotectMemory(LPVOID pData, DWORD cbData, DWORD dwFlags)
 	if (!pPlainText)
 		goto out;
 
-	if ((dec = winpr_Cipher_New(WINPR_CIPHER_AES_256_CBC, WINPR_DECRYPT,
-				    pMemBlock->key, pMemBlock->iv)) == NULL)
+	if ((dec = winpr_Cipher_New(WINPR_CIPHER_AES_256_CBC, WINPR_DECRYPT, pMemBlock->key, pMemBlock->iv)) == NULL)
 		goto out;
 	if (!winpr_Cipher_Update(dec, pMemBlock->pData, pMemBlock->cbData, pPlainText, &cbOut))
 		goto out;
@@ -260,26 +258,26 @@ out:
 	return FALSE;
 }
 
-BOOL CryptProtectData(DATA_BLOB* pDataIn, LPCWSTR szDataDescr, DATA_BLOB* pOptionalEntropy,
-		PVOID pvReserved, CRYPTPROTECT_PROMPTSTRUCT* pPromptStruct, DWORD dwFlags, DATA_BLOB* pDataOut)
+BOOL CryptProtectData(DATA_BLOB* pDataIn, LPCWSTR szDataDescr, DATA_BLOB* pOptionalEntropy, PVOID pvReserved,
+                      CRYPTPROTECT_PROMPTSTRUCT* pPromptStruct, DWORD dwFlags, DATA_BLOB* pDataOut)
 {
 	return TRUE;
 }
 
-BOOL CryptUnprotectData(DATA_BLOB* pDataIn, LPWSTR* ppszDataDescr, DATA_BLOB* pOptionalEntropy,
-		PVOID pvReserved, CRYPTPROTECT_PROMPTSTRUCT* pPromptStruct, DWORD dwFlags, DATA_BLOB* pDataOut)
+BOOL CryptUnprotectData(DATA_BLOB* pDataIn, LPWSTR* ppszDataDescr, DATA_BLOB* pOptionalEntropy, PVOID pvReserved,
+                        CRYPTPROTECT_PROMPTSTRUCT* pPromptStruct, DWORD dwFlags, DATA_BLOB* pDataOut)
 {
 	return TRUE;
 }
 
-BOOL CryptStringToBinaryW(LPCWSTR pszString, DWORD cchString, DWORD dwFlags, BYTE* pbBinary,
-		DWORD* pcbBinary, DWORD* pdwSkip, DWORD* pdwFlags)
+BOOL CryptStringToBinaryW(LPCWSTR pszString, DWORD cchString, DWORD dwFlags, BYTE* pbBinary, DWORD* pcbBinary,
+                          DWORD* pdwSkip, DWORD* pdwFlags)
 {
 	return TRUE;
 }
 
-BOOL CryptStringToBinaryA(LPCSTR pszString, DWORD cchString, DWORD dwFlags, BYTE* pbBinary,
-		DWORD* pcbBinary, DWORD* pdwSkip, DWORD* pdwFlags)
+BOOL CryptStringToBinaryA(LPCSTR pszString, DWORD cchString, DWORD dwFlags, BYTE* pbBinary, DWORD* pcbBinary,
+                          DWORD* pdwSkip, DWORD* pdwFlags)
 {
 	return TRUE;
 }

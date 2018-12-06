@@ -92,8 +92,7 @@ fail:
 	return rc;
 }
 
-static UINT android_cliprdr_send_client_format_data_request(
-    CliprdrClientContext* cliprdr, UINT32 formatId)
+static UINT android_cliprdr_send_client_format_data_request(CliprdrClientContext* cliprdr, UINT32 formatId)
 {
 	UINT rc = ERROR_INVALID_PARAMETER;
 	CLIPRDR_FORMAT_DATA_REQUEST formatDataRequest;
@@ -118,8 +117,7 @@ fail:
 	return rc;
 }
 
-static UINT android_cliprdr_send_client_capabilities(CliprdrClientContext*
-        cliprdr)
+static UINT android_cliprdr_send_client_capabilities(CliprdrClientContext* cliprdr)
 {
 	CLIPRDR_CAPABILITIES capabilities;
 	CLIPRDR_GENERAL_CAPABILITY_SET generalCapabilitySet;
@@ -128,8 +126,7 @@ static UINT android_cliprdr_send_client_capabilities(CliprdrClientContext*
 		return ERROR_INVALID_PARAMETER;
 
 	capabilities.cCapabilitiesSets = 1;
-	capabilities.capabilitySets = (CLIPRDR_CAPABILITY_SET*) &
-	                              (generalCapabilitySet);
+	capabilities.capabilitySets = (CLIPRDR_CAPABILITY_SET*) &(generalCapabilitySet);
 	generalCapabilitySet.capabilitySetType = CB_CAPSTYPE_GENERAL;
 	generalCapabilitySet.capabilitySetLength = 12;
 	generalCapabilitySet.version = CB_CAPS_VERSION_2;
@@ -142,8 +139,7 @@ static UINT android_cliprdr_send_client_capabilities(CliprdrClientContext*
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT android_cliprdr_monitor_ready(CliprdrClientContext* cliprdr,
-        CLIPRDR_MONITOR_READY* monitorReady)
+static UINT android_cliprdr_monitor_ready(CliprdrClientContext* cliprdr, CLIPRDR_MONITOR_READY* monitorReady)
 {
 	UINT rc;
 	androidContext* afc;
@@ -171,8 +167,7 @@ static UINT android_cliprdr_monitor_ready(CliprdrClientContext* cliprdr,
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT android_cliprdr_server_capabilities(CliprdrClientContext* cliprdr,
-        CLIPRDR_CAPABILITIES* capabilities)
+static UINT android_cliprdr_server_capabilities(CliprdrClientContext* cliprdr, CLIPRDR_CAPABILITIES* capabilities)
 {
 	UINT32 index;
 	CLIPRDR_CAPABILITY_SET* capabilitySet;
@@ -193,8 +188,7 @@ static UINT android_cliprdr_server_capabilities(CliprdrClientContext* cliprdr,
 		if ((capabilitySet->capabilitySetType == CB_CAPSTYPE_GENERAL) &&
 		    (capabilitySet->capabilitySetLength >= CB_CAPSTYPE_GENERAL_LEN))
 		{
-			CLIPRDR_GENERAL_CAPABILITY_SET* generalCapabilitySet
-			    = (CLIPRDR_GENERAL_CAPABILITY_SET*) capabilitySet;
+			CLIPRDR_GENERAL_CAPABILITY_SET* generalCapabilitySet = (CLIPRDR_GENERAL_CAPABILITY_SET*) capabilitySet;
 			afc->clipboardCapabilities = generalCapabilitySet->generalFlags;
 			break;
 		}
@@ -208,8 +202,7 @@ static UINT android_cliprdr_server_capabilities(CliprdrClientContext* cliprdr,
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT android_cliprdr_server_format_list(CliprdrClientContext* cliprdr,
-        CLIPRDR_FORMAT_LIST* formatList)
+static UINT android_cliprdr_server_format_list(CliprdrClientContext* cliprdr, CLIPRDR_FORMAT_LIST* formatList)
 {
 	UINT rc;
 	UINT32 index;
@@ -238,8 +231,7 @@ static UINT android_cliprdr_server_format_list(CliprdrClientContext* cliprdr,
 		return CHANNEL_RC_OK;
 
 	afc->numServerFormats = formatList->numFormats;
-	afc->serverFormats = (CLIPRDR_FORMAT*) calloc(afc->numServerFormats,
-	                     sizeof(CLIPRDR_FORMAT));
+	afc->serverFormats = (CLIPRDR_FORMAT*) calloc(afc->numServerFormats, sizeof(CLIPRDR_FORMAT));
 
 	if (!afc->serverFormats)
 		return CHANNEL_RC_NO_MEMORY;
@@ -251,8 +243,7 @@ static UINT android_cliprdr_server_format_list(CliprdrClientContext* cliprdr,
 
 		if (formatList->formats[index].formatName)
 		{
-			afc->serverFormats[index].formatName = _strdup(
-			        formatList->formats[index].formatName);
+			afc->serverFormats[index].formatName = _strdup(formatList->formats[index].formatName);
 
 			if (!afc->serverFormats[index].formatName)
 				return CHANNEL_RC_NO_MEMORY;
@@ -265,16 +256,14 @@ static UINT android_cliprdr_server_format_list(CliprdrClientContext* cliprdr,
 
 		if (format->formatId == CF_UNICODETEXT)
 		{
-			if ((rc = android_cliprdr_send_client_format_data_request(cliprdr,
-			          CF_UNICODETEXT)) != CHANNEL_RC_OK)
+			if ((rc = android_cliprdr_send_client_format_data_request(cliprdr, CF_UNICODETEXT)) != CHANNEL_RC_OK)
 				return rc;
 
 			break;
 		}
 		else if (format->formatId == CF_TEXT)
 		{
-			if ((rc = android_cliprdr_send_client_format_data_request(cliprdr,
-			          CF_TEXT)) != CHANNEL_RC_OK)
+			if ((rc = android_cliprdr_send_client_format_data_request(cliprdr, CF_TEXT)) != CHANNEL_RC_OK)
 				return rc;
 
 			break;
@@ -289,9 +278,8 @@ static UINT android_cliprdr_server_format_list(CliprdrClientContext* cliprdr,
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT android_cliprdr_server_format_list_response(
-    CliprdrClientContext* cliprdr,
-    CLIPRDR_FORMAT_LIST_RESPONSE* formatListResponse)
+static UINT android_cliprdr_server_format_list_response(CliprdrClientContext* cliprdr,
+                                                        CLIPRDR_FORMAT_LIST_RESPONSE* formatListResponse)
 {
 	if (!cliprdr || !formatListResponse)
 		return ERROR_INVALID_PARAMETER;
@@ -304,9 +292,8 @@ static UINT android_cliprdr_server_format_list_response(
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT android_cliprdr_server_lock_clipboard_data(CliprdrClientContext*
-        cliprdr,
-        CLIPRDR_LOCK_CLIPBOARD_DATA* lockClipboardData)
+static UINT android_cliprdr_server_lock_clipboard_data(CliprdrClientContext* cliprdr,
+                                                       CLIPRDR_LOCK_CLIPBOARD_DATA* lockClipboardData)
 {
 	if (!cliprdr || !lockClipboardData)
 		return ERROR_INVALID_PARAMETER;
@@ -319,9 +306,8 @@ static UINT android_cliprdr_server_lock_clipboard_data(CliprdrClientContext*
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT android_cliprdr_server_unlock_clipboard_data(
-    CliprdrClientContext* cliprdr,
-    CLIPRDR_UNLOCK_CLIPBOARD_DATA* unlockClipboardData)
+static UINT android_cliprdr_server_unlock_clipboard_data(CliprdrClientContext* cliprdr,
+                                                         CLIPRDR_UNLOCK_CLIPBOARD_DATA* unlockClipboardData)
 {
 	if (!cliprdr || !unlockClipboardData)
 		return ERROR_INVALID_PARAMETER;
@@ -334,9 +320,8 @@ static UINT android_cliprdr_server_unlock_clipboard_data(
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT android_cliprdr_server_format_data_request(CliprdrClientContext*
-        cliprdr,
-        CLIPRDR_FORMAT_DATA_REQUEST* formatDataRequest)
+static UINT android_cliprdr_server_format_data_request(CliprdrClientContext* cliprdr,
+                                                       CLIPRDR_FORMAT_DATA_REQUEST* formatDataRequest)
 {
 	UINT rc;
 	BYTE* data;
@@ -377,9 +362,8 @@ static UINT android_cliprdr_server_format_data_request(CliprdrClientContext*
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT android_cliprdr_server_format_data_response(
-    CliprdrClientContext* cliprdr,
-    CLIPRDR_FORMAT_DATA_RESPONSE* formatDataResponse)
+static UINT android_cliprdr_server_format_data_response(CliprdrClientContext* cliprdr,
+                                                        CLIPRDR_FORMAT_DATA_RESPONSE* formatDataResponse)
 {
 	BYTE* data;
 	UINT32 size;
@@ -421,8 +405,7 @@ static UINT android_cliprdr_server_format_data_response(
 
 	size = formatDataResponse->dataLen;
 
-	if (!ClipboardSetData(afc->clipboard, formatId,
-	                      formatDataResponse->requestedFormatData, size))
+	if (!ClipboardSetData(afc->clipboard, formatId, formatDataResponse->requestedFormatData, size))
 		return ERROR_INTERNAL_ERROR;
 
 	SetEvent(afc->clipboardRequestEvent);
@@ -437,8 +420,7 @@ static UINT android_cliprdr_server_format_data_response(
 		attached = jni_attach_thread(&env);
 		size = strnlen(data, size);
 		jdata = jniNewStringUTF(env, data, size);
-		freerdp_callback("OnRemoteClipboardChanged", "(JLjava/lang/String;)V", (jlong)instance,
-		                 jdata);
+		freerdp_callback("OnRemoteClipboardChanged", "(JLjava/lang/String;)V", (jlong) instance, jdata);
 		(*env)->DeleteLocalRef(env, jdata);
 
 		if (attached == JNI_TRUE)
@@ -453,9 +435,8 @@ static UINT android_cliprdr_server_format_data_response(
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT android_cliprdr_server_file_contents_request(
-    CliprdrClientContext* cliprdr,
-    CLIPRDR_FILE_CONTENTS_REQUEST* fileContentsRequest)
+static UINT android_cliprdr_server_file_contents_request(CliprdrClientContext* cliprdr,
+                                                         CLIPRDR_FILE_CONTENTS_REQUEST* fileContentsRequest)
 {
 	if (!cliprdr || !fileContentsRequest)
 		return ERROR_INVALID_PARAMETER;
@@ -468,9 +449,8 @@ static UINT android_cliprdr_server_file_contents_request(
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT android_cliprdr_server_file_contents_response(
-    CliprdrClientContext* cliprdr,
-    CLIPRDR_FILE_CONTENTS_RESPONSE* fileContentsResponse)
+static UINT android_cliprdr_server_file_contents_response(CliprdrClientContext* cliprdr,
+                                                          CLIPRDR_FILE_CONTENTS_RESPONSE* fileContentsResponse)
 {
 	if (!cliprdr || !fileContentsResponse)
 		return ERROR_INVALID_PARAMETER;
@@ -504,14 +484,11 @@ BOOL android_cliprdr_init(androidContext* afc, CliprdrClientContext* cliprdr)
 	cliprdr->ServerFormatList = android_cliprdr_server_format_list;
 	cliprdr->ServerFormatListResponse = android_cliprdr_server_format_list_response;
 	cliprdr->ServerLockClipboardData = android_cliprdr_server_lock_clipboard_data;
-	cliprdr->ServerUnlockClipboardData =
-	    android_cliprdr_server_unlock_clipboard_data;
+	cliprdr->ServerUnlockClipboardData = android_cliprdr_server_unlock_clipboard_data;
 	cliprdr->ServerFormatDataRequest = android_cliprdr_server_format_data_request;
 	cliprdr->ServerFormatDataResponse = android_cliprdr_server_format_data_response;
-	cliprdr->ServerFileContentsRequest =
-	    android_cliprdr_server_file_contents_request;
-	cliprdr->ServerFileContentsResponse =
-	    android_cliprdr_server_file_contents_response;
+	cliprdr->ServerFileContentsRequest = android_cliprdr_server_file_contents_request;
+	cliprdr->ServerFileContentsResponse = android_cliprdr_server_file_contents_response;
 	return TRUE;
 }
 

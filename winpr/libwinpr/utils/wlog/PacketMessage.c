@@ -59,7 +59,7 @@ static BOOL Pcap_Read_Header(wPcap* pcap, wPcapHeader* header)
 }
 
 /* currently unused code */
-# if 0
+#if 0
 static BOOL Pcap_Read_RecordHeader(wPcap* pcap, wPcapRecordHeader* record)
 {
 	if (pcap && pcap->fp && (fread((void*) record, sizeof(wPcapRecordHeader), 1, pcap->fp) == 1))
@@ -158,7 +158,6 @@ static BOOL Pcap_GetNext_Record(wPcap* pcap, wPcapRecord* record)
 }
 #endif
 
-
 static BOOL Pcap_Write_Header(wPcap* pcap, wPcapHeader* header)
 {
 	if (pcap && pcap->fp && fwrite((void*) header, sizeof(wPcapHeader), 1, pcap->fp) == 1)
@@ -168,7 +167,7 @@ static BOOL Pcap_Write_Header(wPcap* pcap, wPcapHeader* header)
 
 static BOOL Pcap_Write_RecordHeader(wPcap* pcap, wPcapRecordHeader* record)
 {
-	if (pcap && pcap->fp && fwrite((void *) record, sizeof(wPcapRecordHeader), 1, pcap->fp) == 1)
+	if (pcap && pcap->fp && fwrite((void*) record, sizeof(wPcapRecordHeader), 1, pcap->fp) == 1)
 		return TRUE;
 	return FALSE;
 }
@@ -182,8 +181,7 @@ static BOOL Pcap_Write_RecordContent(wPcap* pcap, wPcapRecord* record)
 
 static BOOL Pcap_Write_Record(wPcap* pcap, wPcapRecord* record)
 {
-	return Pcap_Write_RecordHeader(pcap, &record->header) &&
-		Pcap_Write_RecordContent(pcap, record);
+	return Pcap_Write_RecordHeader(pcap, &record->header) && Pcap_Write_RecordContent(pcap, record);
 }
 
 wPcap* Pcap_Open(char* name, BOOL write)
@@ -193,7 +191,7 @@ wPcap* Pcap_Open(char* name, BOOL write)
 
 	if (!pcap_fp)
 	{
-		WLog_ERR(TAG,"opening pcap file");
+		WLog_ERR(TAG, "opening pcap file");
 		return NULL;
 	}
 
@@ -475,11 +473,9 @@ BOOL WLog_PacketMessage_Write(wPcap* pcap, void* data, DWORD length, DWORD flags
 	gettimeofday(&tp, 0);
 	record.header.ts_sec = tp.tv_sec;
 	record.header.ts_usec = tp.tv_usec;
-	if (!Pcap_Write_RecordHeader(pcap, &record.header) ||
-		!WLog_PacketMessage_Write_EthernetHeader(pcap, &ethernet) ||
-		!WLog_PacketMessage_Write_IPv4Header(pcap, &ipv4) ||
-		!WLog_PacketMessage_Write_TcpHeader(pcap, &tcp) ||
-		!Pcap_Write_RecordContent(pcap, &record))
+	if (!Pcap_Write_RecordHeader(pcap, &record.header) || !WLog_PacketMessage_Write_EthernetHeader(pcap, &ethernet) ||
+	    !WLog_PacketMessage_Write_IPv4Header(pcap, &ipv4) || !WLog_PacketMessage_Write_TcpHeader(pcap, &tcp) ||
+	    !Pcap_Write_RecordContent(pcap, &record))
 		return FALSE;
 	fflush(pcap->fp);
 	return TRUE;

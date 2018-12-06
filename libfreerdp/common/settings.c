@@ -137,8 +137,7 @@ int freerdp_addin_set_argument_value(ADDIN_ARGV* args, char* option, char* value
 	return 0;
 }
 
-int freerdp_addin_replace_argument_value(ADDIN_ARGV* args, char* previous, char* option,
-        char* value)
+int freerdp_addin_replace_argument_value(ADDIN_ARGV* args, char* previous, char* option, char* value)
 {
 	int i;
 	char* str;
@@ -186,8 +185,7 @@ BOOL freerdp_device_collection_add(rdpSettings* settings, RDPDR_DEVICE* device)
 		UINT32 new_size;
 		RDPDR_DEVICE** new_array;
 		new_size = settings->DeviceArraySize * 2;
-		new_array = (RDPDR_DEVICE**)
-		            realloc(settings->DeviceArray, new_size * sizeof(RDPDR_DEVICE*));
+		new_array = (RDPDR_DEVICE**) realloc(settings->DeviceArray, new_size * sizeof(RDPDR_DEVICE*));
 
 		if (!new_array)
 			return FALSE;
@@ -405,7 +403,7 @@ RDPDR_DEVICE* freerdp_device_clone(RDPDR_DEVICE* device)
 		return NULL;
 	}
 
-	WLog_ERR(TAG, "unknown device type %"PRIu32"", device->Type);
+	WLog_ERR(TAG, "unknown device type %" PRIu32 "", device->Type);
 	return NULL;
 }
 
@@ -462,8 +460,7 @@ BOOL freerdp_static_channel_collection_add(rdpSettings* settings, ADDIN_ARGV* ch
 		UINT32 new_size;
 		ADDIN_ARGV** new_array;
 		new_size = settings->StaticChannelArraySize * 2;
-		new_array = (ADDIN_ARGV**)
-		            realloc(settings->StaticChannelArray, new_size * sizeof(ADDIN_ARGV*));
+		new_array = (ADDIN_ARGV**) realloc(settings->StaticChannelArray, new_size * sizeof(ADDIN_ARGV*));
 
 		if (!new_array)
 			return FALSE;
@@ -557,8 +554,7 @@ BOOL freerdp_dynamic_channel_collection_add(rdpSettings* settings, ADDIN_ARGV* c
 	if (settings->DynamicChannelArraySize < (settings->DynamicChannelCount + 1))
 	{
 		ADDIN_ARGV** new_array;
-		new_array = realloc(settings->DynamicChannelArray,
-		                    settings->DynamicChannelArraySize * sizeof(ADDIN_ARGV*) * 2);
+		new_array = realloc(settings->DynamicChannelArray, settings->DynamicChannelArraySize * sizeof(ADDIN_ARGV*) * 2);
 
 		if (!new_array)
 			return FALSE;
@@ -683,15 +679,11 @@ void freerdp_performance_flags_make(rdpSettings* settings)
 
 void freerdp_performance_flags_split(rdpSettings* settings)
 {
-	settings->AllowFontSmoothing = (settings->PerformanceFlags & PERF_ENABLE_FONT_SMOOTHING) ? TRUE :
-	                               FALSE;
-	settings->AllowDesktopComposition = (settings->PerformanceFlags & PERF_ENABLE_DESKTOP_COMPOSITION) ?
-	                                    TRUE : FALSE;
+	settings->AllowFontSmoothing = (settings->PerformanceFlags & PERF_ENABLE_FONT_SMOOTHING) ? TRUE : FALSE;
+	settings->AllowDesktopComposition = (settings->PerformanceFlags & PERF_ENABLE_DESKTOP_COMPOSITION) ? TRUE : FALSE;
 	settings->DisableWallpaper = (settings->PerformanceFlags & PERF_DISABLE_WALLPAPER) ? TRUE : FALSE;
-	settings->DisableFullWindowDrag = (settings->PerformanceFlags & PERF_DISABLE_FULLWINDOWDRAG) ?
-	                                  TRUE : FALSE;
-	settings->DisableMenuAnims = (settings->PerformanceFlags & PERF_DISABLE_MENUANIMATIONS) ? TRUE :
-	                             FALSE;
+	settings->DisableFullWindowDrag = (settings->PerformanceFlags & PERF_DISABLE_FULLWINDOWDRAG) ? TRUE : FALSE;
+	settings->DisableMenuAnims = (settings->PerformanceFlags & PERF_DISABLE_MENUANIMATIONS) ? TRUE : FALSE;
 	settings->DisableThemes = (settings->PerformanceFlags & PERF_DISABLE_THEMING) ? TRUE : FALSE;
 }
 
@@ -731,8 +723,7 @@ void freerdp_set_gateway_usage_method(rdpSettings* settings, UINT32 GatewayUsage
 	}
 }
 
-void freerdp_update_gateway_usage_method(rdpSettings* settings, UINT32 GatewayEnabled,
-        UINT32 GatewayBypassLocal)
+void freerdp_update_gateway_usage_method(rdpSettings* settings, UINT32 GatewayEnabled, UINT32 GatewayBypassLocal)
 {
 	UINT32 GatewayUsageMethod = 0;
 
@@ -1148,10 +1139,10 @@ BOOL freerdp_get_param_bool(rdpSettings* settings, int id)
 			return settings->RedirectClipboard;
 
 		case FreeRDP_SmartcardLogon:
-			return  settings->SmartcardLogon;
+			return settings->SmartcardLogon;
 
 		default:
-			WLog_ERR(TAG,  "freerdp_get_param_bool: unknown id: %d", id);
+			WLog_ERR(TAG, "freerdp_get_param_bool: unknown id: %d", id);
 			return -1;
 	}
 }
@@ -1693,7 +1684,7 @@ int freerdp_set_param_bool(rdpSettings* settings, int id, BOOL param)
 			break;
 
 		default:
-			WLog_ERR(TAG,  "freerdp_set_param_bool: unknown id %d (param = %"PRId32")", id, param);
+			WLog_ERR(TAG, "freerdp_set_param_bool: unknown id %d (param = %" PRId32 ")", id, param);
 			return -1;
 	}
 
@@ -1713,7 +1704,7 @@ int freerdp_get_param_int(rdpSettings* settings, int id)
 			return settings->YPan;
 
 		default:
-			WLog_ERR(TAG,  "freerdp_get_param_int: unknown id: %d", id);
+			WLog_ERR(TAG, "freerdp_get_param_int: unknown id: %d", id);
 			return 0;
 	}
 }
@@ -1731,7 +1722,7 @@ int freerdp_set_param_int(rdpSettings* settings, int id, int param)
 			break;
 
 		default:
-			WLog_ERR(TAG,  "freerdp_set_param_int: unknown id %d (param = %d)", id, param);
+			WLog_ERR(TAG, "freerdp_set_param_int: unknown id %d (param = %d)", id, param);
 			return -1;
 	}
 
@@ -2003,7 +1994,7 @@ UINT32 freerdp_get_param_uint32(rdpSettings* settings, int id)
 			return settings->TlsSecLevel;
 
 		default:
-			WLog_ERR(TAG,  "freerdp_get_param_uint32: unknown id: %d", id);
+			WLog_ERR(TAG, "freerdp_get_param_uint32: unknown id: %d", id);
 			return 0;
 	}
 }
@@ -2348,7 +2339,7 @@ int freerdp_set_param_uint32(rdpSettings* settings, int id, UINT32 param)
 			settings->TlsSecLevel = param;
 
 		default:
-			WLog_ERR(TAG, "freerdp_set_param_uint32: unknown id %d (param = %"PRIu32")", id, param);
+			WLog_ERR(TAG, "freerdp_set_param_uint32: unknown id %d (param = %" PRIu32 ")", id, param);
 			return -1;
 	}
 
@@ -2379,7 +2370,7 @@ int freerdp_set_param_uint64(rdpSettings* settings, int id, UINT64 param)
 			break;
 
 		default:
-			WLog_ERR(TAG,  "freerdp_set_param_uint64: unknown id %d (param = %"PRIu64")", id, param);
+			WLog_ERR(TAG, "freerdp_set_param_uint64: unknown id %d (param = %" PRIu64 ")", id, param);
 			return -1;
 	}
 

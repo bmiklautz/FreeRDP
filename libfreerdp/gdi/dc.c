@@ -94,8 +94,7 @@ HGDI_DC gdi_CreateDC(UINT32 format)
 	hDC->hwnd->invalid->null = TRUE;
 	hDC->hwnd->count = 32;
 
-	if (!(hDC->hwnd->cinvalid = (HGDI_RGN) calloc(hDC->hwnd->count,
-	                            sizeof(GDI_RGN))))
+	if (!(hDC->hwnd->cinvalid = (HGDI_RGN) calloc(hDC->hwnd->count, sizeof(GDI_RGN))))
 		goto fail;
 
 	hDC->hwnd->ninvalid = 0;
@@ -231,7 +230,6 @@ BOOL gdi_DeleteObject(HGDIOBJECT hgdiobject)
 
 	return TRUE;
 }
-
 
 /**
  * Delete device context.\n

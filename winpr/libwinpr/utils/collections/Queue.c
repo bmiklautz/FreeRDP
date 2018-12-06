@@ -57,28 +57,19 @@ int Queue_Count(wQueue* queue)
  * Lock access to the ArrayList
  */
 
-void Queue_Lock(wQueue* queue)
-{
-	EnterCriticalSection(&queue->lock);
-}
+void Queue_Lock(wQueue* queue) { EnterCriticalSection(&queue->lock); }
 
 /**
  * Unlock access to the ArrayList
  */
 
-void Queue_Unlock(wQueue* queue)
-{
-	LeaveCriticalSection(&queue->lock);
-}
+void Queue_Unlock(wQueue* queue) { LeaveCriticalSection(&queue->lock); }
 
 /**
  * Gets an event which is set when the queue is non-empty
  */
 
-HANDLE Queue_Event(wQueue* queue)
-{
-	return queue->event;
-}
+HANDLE Queue_Event(wQueue* queue) { return queue->event; }
 
 /**
  * Methods
@@ -155,7 +146,7 @@ BOOL Queue_Enqueue(wQueue* queue, void* obj)
 		void** newArray;
 		old_capacity = queue->capacity;
 		new_capacity = queue->capacity * queue->growthFactor;
-		newArray = (void**)realloc(queue->array, sizeof(void*) * new_capacity);
+		newArray = (void**) realloc(queue->array, sizeof(void*) * new_capacity);
 
 		if (!newArray)
 		{
@@ -235,10 +226,7 @@ void* Queue_Peek(wQueue* queue)
 	return obj;
 }
 
-static BOOL default_queue_equals(const void* obj1, const void* obj2)
-{
-	return (obj1 == obj2);
-}
+static BOOL default_queue_equals(const void* obj1, const void* obj2) { return (obj1 == obj2); }
 
 /**
  * Construction, Destruction
@@ -247,7 +235,7 @@ static BOOL default_queue_equals(const void* obj1, const void* obj2)
 wQueue* Queue_New(BOOL synchronized, int capacity, int growthFactor)
 {
 	wQueue* queue = NULL;
-	queue = (wQueue*)calloc(1, sizeof(wQueue));
+	queue = (wQueue*) calloc(1, sizeof(wQueue));
 
 	if (!queue)
 		return NULL;
@@ -262,7 +250,7 @@ wQueue* Queue_New(BOOL synchronized, int capacity, int growthFactor)
 	if (growthFactor > 0)
 		queue->growthFactor = growthFactor;
 
-	queue->array = (void**)calloc(queue->capacity, sizeof(void*));
+	queue->array = (void**) calloc(queue->capacity, sizeof(void*));
 
 	if (!queue->array)
 		goto out_free;

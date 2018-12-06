@@ -4,23 +4,12 @@
 #include <winpr/cmdline.h>
 #include <winpr/strlst.h>
 
-static const char* testArgv[] =
-{
-	"mstsc.exe",
-	"+z",
-	"/w:1024",
-	"/h:768",
-	"/bpp:32",
-	"/admin",
-	"/multimon",
-	"+fonts",
-	"-wallpaper",
-	"/v:localhost:3389",
-	0
+static const char* testArgv[] = {
+	"mstsc.exe", "+z",         "/w:1024",           "/h:768", "/bpp:32", "/admin", "/multimon",
+	"+fonts",    "-wallpaper", "/v:localhost:3389", 0
 };
 
-static COMMAND_LINE_ARGUMENT_A args[] =
-{
+static COMMAND_LINE_ARGUMENT_A args[] = {
 	{ "v", COMMAND_LINE_VALUE_REQUIRED, NULL, NULL, NULL, -1, NULL, "destination server" },
 	{ "port", COMMAND_LINE_VALUE_REQUIRED, NULL, NULL, NULL, -1, NULL, "server port" },
 	{ "w", COMMAND_LINE_VALUE_REQUIRED, NULL, NULL, NULL, -1, NULL, "width" },
@@ -56,7 +45,6 @@ static COMMAND_LINE_ARGUMENT_A args[] =
 	{ NULL, 0, NULL, NULL, NULL, -1, NULL, NULL }
 };
 
-
 int TestCmdLine(int argc, char* argv[])
 {
 	int status;
@@ -65,11 +53,11 @@ int TestCmdLine(int argc, char* argv[])
 	long width = 0;
 	long height = 0;
 	COMMAND_LINE_ARGUMENT_A* arg;
-        int testArgc;
-        char** command_line;
+	int testArgc;
+	char** command_line;
 
 	flags = COMMAND_LINE_SIGIL_SLASH | COMMAND_LINE_SEPARATOR_COLON | COMMAND_LINE_SIGIL_PLUS_MINUS;
-        testArgc = string_list_length(testArgv);
+	testArgc = string_list_length(testArgv);
 	command_line = string_list_copy(testArgv);
 
 	if (!command_line)
@@ -167,10 +155,7 @@ int TestCmdLine(int argc, char* argv[])
 			continue;
 
 		printf("Argument: %s\n", arg->Name);
-		CommandLineSwitchStart(arg)
-		CommandLineSwitchCase(arg, "v")
-		{
-		}
+		CommandLineSwitchStart(arg) CommandLineSwitchCase(arg, "v") {}
 		CommandLineSwitchCase(arg, "w")
 		{
 			width = strtol(arg->Value, NULL, 0);
@@ -185,12 +170,9 @@ int TestCmdLine(int argc, char* argv[])
 			if (errno != 0)
 				goto out;
 		}
-		CommandLineSwitchDefault(arg)
-		{
-		}
+		CommandLineSwitchDefault(arg) {}
 		CommandLineSwitchEnd(arg)
-	}
-	while ((arg = CommandLineFindNextArgumentA(arg)) != NULL);
+	} while ((arg = CommandLineFindNextArgumentA(arg)) != NULL);
 
 	if ((width != 1024) || (height != 768))
 	{
@@ -200,6 +182,6 @@ int TestCmdLine(int argc, char* argv[])
 	ret = 0;
 
 out:
-    string_list_free(command_line);
-    return ret;
+	string_list_free(command_line);
+	return ret;
 }

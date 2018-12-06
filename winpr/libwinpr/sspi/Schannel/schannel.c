@@ -65,22 +65,26 @@ SCHANNEL_CREDENTIALS* schannel_CredentialsNew()
 	return credentials;
 }
 
-void schannel_CredentialsFree(SCHANNEL_CREDENTIALS* credentials)
-{
-	free(credentials);
-}
+void schannel_CredentialsFree(SCHANNEL_CREDENTIALS* credentials) { free(credentials); }
 
-static ALG_ID schannel_SupportedAlgs[] =
-{
-	CALG_AES_128, CALG_AES_256, CALG_RC4, CALG_DES, CALG_3DES,
-	CALG_MD5, CALG_SHA1, CALG_SHA_256, CALG_SHA_384, CALG_SHA_512,
-	CALG_RSA_SIGN, CALG_DH_EPHEM,
-	(ALG_CLASS_KEY_EXCHANGE | ALG_TYPE_RESERVED7 | 6), /* what is this? */
-	CALG_DSS_SIGN, CALG_ECDSA
-};
+static ALG_ID schannel_SupportedAlgs[] = { CALG_AES_128,
+	                                       CALG_AES_256,
+	                                       CALG_RC4,
+	                                       CALG_DES,
+	                                       CALG_3DES,
+	                                       CALG_MD5,
+	                                       CALG_SHA1,
+	                                       CALG_SHA_256,
+	                                       CALG_SHA_384,
+	                                       CALG_SHA_512,
+	                                       CALG_RSA_SIGN,
+	                                       CALG_DH_EPHEM,
+	                                       (ALG_CLASS_KEY_EXCHANGE | ALG_TYPE_RESERVED7 | 6), /* what is this? */
+	                                       CALG_DSS_SIGN,
+	                                       CALG_ECDSA };
 
-SECURITY_STATUS SEC_ENTRY schannel_QueryCredentialsAttributesW(PCredHandle phCredential,
-        ULONG ulAttribute, void* pBuffer)
+SECURITY_STATUS SEC_ENTRY schannel_QueryCredentialsAttributesW(PCredHandle phCredential, ULONG ulAttribute,
+                                                               void* pBuffer)
 {
 	if (ulAttribute == SECPKG_ATTR_SUPPORTED_ALGS)
 	{
@@ -107,16 +111,16 @@ SECURITY_STATUS SEC_ENTRY schannel_QueryCredentialsAttributesW(PCredHandle phCre
 	return SEC_E_UNSUPPORTED_FUNCTION;
 }
 
-SECURITY_STATUS SEC_ENTRY schannel_QueryCredentialsAttributesA(PCredHandle phCredential,
-        ULONG ulAttribute, void* pBuffer)
+SECURITY_STATUS SEC_ENTRY schannel_QueryCredentialsAttributesA(PCredHandle phCredential, ULONG ulAttribute,
+                                                               void* pBuffer)
 {
 	return schannel_QueryCredentialsAttributesW(phCredential, ulAttribute, pBuffer);
 }
 
-SECURITY_STATUS SEC_ENTRY schannel_AcquireCredentialsHandleW(SEC_WCHAR* pszPrincipal,
-        SEC_WCHAR* pszPackage,
-        ULONG fCredentialUse, void* pvLogonID, void* pAuthData, SEC_GET_KEY_FN pGetKeyFn,
-        void* pvGetKeyArgument, PCredHandle phCredential, PTimeStamp ptsExpiry)
+SECURITY_STATUS SEC_ENTRY schannel_AcquireCredentialsHandleW(SEC_WCHAR* pszPrincipal, SEC_WCHAR* pszPackage,
+                                                             ULONG fCredentialUse, void* pvLogonID, void* pAuthData,
+                                                             SEC_GET_KEY_FN pGetKeyFn, void* pvGetKeyArgument,
+                                                             PCredHandle phCredential, PTimeStamp ptsExpiry)
 {
 	SCHANNEL_CREDENTIALS* credentials;
 
@@ -148,18 +152,18 @@ SECURITY_STATUS SEC_ENTRY schannel_AcquireCredentialsHandleW(SEC_WCHAR* pszPrinc
 	return SEC_E_OK;
 }
 
-SECURITY_STATUS SEC_ENTRY schannel_AcquireCredentialsHandleA(SEC_CHAR* pszPrincipal,
-        SEC_CHAR* pszPackage,
-        ULONG fCredentialUse, void* pvLogonID, void* pAuthData, SEC_GET_KEY_FN pGetKeyFn,
-        void* pvGetKeyArgument, PCredHandle phCredential, PTimeStamp ptsExpiry)
+SECURITY_STATUS SEC_ENTRY schannel_AcquireCredentialsHandleA(SEC_CHAR* pszPrincipal, SEC_CHAR* pszPackage,
+                                                             ULONG fCredentialUse, void* pvLogonID, void* pAuthData,
+                                                             SEC_GET_KEY_FN pGetKeyFn, void* pvGetKeyArgument,
+                                                             PCredHandle phCredential, PTimeStamp ptsExpiry)
 {
 	SECURITY_STATUS status;
 	SEC_WCHAR* pszPrincipalW = NULL;
 	SEC_WCHAR* pszPackageW = NULL;
 	ConvertToUnicode(CP_UTF8, 0, pszPrincipal, -1, &pszPrincipalW, 0);
 	ConvertToUnicode(CP_UTF8, 0, pszPackage, -1, &pszPackageW, 0);
-	status = schannel_AcquireCredentialsHandleW(pszPrincipalW, pszPackageW, fCredentialUse, pvLogonID,
-	         pAuthData, pGetKeyFn, pvGetKeyArgument, phCredential, ptsExpiry);
+	status = schannel_AcquireCredentialsHandleW(pszPrincipalW, pszPackageW, fCredentialUse, pvLogonID, pAuthData,
+	                                            pGetKeyFn, pvGetKeyArgument, phCredential, ptsExpiry);
 	free(pszPrincipalW);
 	free(pszPackageW);
 	return status;
@@ -181,11 +185,12 @@ SECURITY_STATUS SEC_ENTRY schannel_FreeCredentialsHandle(PCredHandle phCredentia
 	return SEC_E_OK;
 }
 
-SECURITY_STATUS SEC_ENTRY schannel_InitializeSecurityContextW(PCredHandle phCredential,
-        PCtxtHandle phContext,
-        SEC_WCHAR* pszTargetName, ULONG fContextReq, ULONG Reserved1, ULONG TargetDataRep,
-        PSecBufferDesc pInput, ULONG Reserved2, PCtxtHandle phNewContext,
-        PSecBufferDesc pOutput, PULONG pfContextAttr, PTimeStamp ptsExpiry)
+SECURITY_STATUS SEC_ENTRY schannel_InitializeSecurityContextW(PCredHandle phCredential, PCtxtHandle phContext,
+                                                              SEC_WCHAR* pszTargetName, ULONG fContextReq,
+                                                              ULONG Reserved1, ULONG TargetDataRep,
+                                                              PSecBufferDesc pInput, ULONG Reserved2,
+                                                              PCtxtHandle phNewContext, PSecBufferDesc pOutput,
+                                                              PULONG pfContextAttr, PTimeStamp ptsExpiry)
 {
 	SECURITY_STATUS status;
 	SCHANNEL_CONTEXT* context;
@@ -211,11 +216,12 @@ SECURITY_STATUS SEC_ENTRY schannel_InitializeSecurityContextW(PCredHandle phCred
 	return status;
 }
 
-SECURITY_STATUS SEC_ENTRY schannel_InitializeSecurityContextA(PCredHandle phCredential,
-        PCtxtHandle phContext,
-        SEC_CHAR* pszTargetName, ULONG fContextReq, ULONG Reserved1, ULONG TargetDataRep,
-        PSecBufferDesc pInput, ULONG Reserved2, PCtxtHandle phNewContext,
-        PSecBufferDesc pOutput, PULONG pfContextAttr, PTimeStamp ptsExpiry)
+SECURITY_STATUS SEC_ENTRY schannel_InitializeSecurityContextA(PCredHandle phCredential, PCtxtHandle phContext,
+                                                              SEC_CHAR* pszTargetName, ULONG fContextReq,
+                                                              ULONG Reserved1, ULONG TargetDataRep,
+                                                              PSecBufferDesc pInput, ULONG Reserved2,
+                                                              PCtxtHandle phNewContext, PSecBufferDesc pOutput,
+                                                              PULONG pfContextAttr, PTimeStamp ptsExpiry)
 {
 	SECURITY_STATUS status;
 	SEC_WCHAR* pszTargetNameW = NULL;
@@ -225,16 +231,17 @@ SECURITY_STATUS SEC_ENTRY schannel_InitializeSecurityContextA(PCredHandle phCred
 		ConvertToUnicode(CP_UTF8, 0, pszTargetName, -1, &pszTargetNameW, 0);
 	}
 
-	status = schannel_InitializeSecurityContextW(phCredential, phContext, pszTargetNameW, fContextReq,
-	         Reserved1, TargetDataRep, pInput, Reserved2, phNewContext, pOutput, pfContextAttr, ptsExpiry);
+	status = schannel_InitializeSecurityContextW(phCredential, phContext, pszTargetNameW, fContextReq, Reserved1,
+	                                             TargetDataRep, pInput, Reserved2, phNewContext, pOutput, pfContextAttr,
+	                                             ptsExpiry);
 	free(pszTargetNameW);
 	return status;
 }
 
-SECURITY_STATUS SEC_ENTRY schannel_AcceptSecurityContext(PCredHandle phCredential,
-        PCtxtHandle phContext,
-        PSecBufferDesc pInput, ULONG fContextReq, ULONG TargetDataRep, PCtxtHandle phNewContext,
-        PSecBufferDesc pOutput, PULONG pfContextAttr, PTimeStamp ptsTimeStamp)
+SECURITY_STATUS SEC_ENTRY schannel_AcceptSecurityContext(PCredHandle phCredential, PCtxtHandle phContext,
+                                                         PSecBufferDesc pInput, ULONG fContextReq, ULONG TargetDataRep,
+                                                         PCtxtHandle phNewContext, PSecBufferDesc pOutput,
+                                                         PULONG pfContextAttr, PTimeStamp ptsTimeStamp)
 {
 	SECURITY_STATUS status;
 	SCHANNEL_CONTEXT* context;
@@ -269,8 +276,7 @@ SECURITY_STATUS SEC_ENTRY schannel_DeleteSecurityContext(PCtxtHandle phContext)
 	return SEC_E_OK;
 }
 
-SECURITY_STATUS SEC_ENTRY schannel_QueryContextAttributes(PCtxtHandle phContext, ULONG ulAttribute,
-        void* pBuffer)
+SECURITY_STATUS SEC_ENTRY schannel_QueryContextAttributes(PCtxtHandle phContext, ULONG ulAttribute, void* pBuffer)
 {
 	if (!phContext)
 		return SEC_E_INVALID_HANDLE;
@@ -301,20 +307,20 @@ SECURITY_STATUS SEC_ENTRY schannel_QueryContextAttributes(PCtxtHandle phContext,
 	return SEC_E_UNSUPPORTED_FUNCTION;
 }
 
-SECURITY_STATUS SEC_ENTRY schannel_MakeSignature(PCtxtHandle phContext, ULONG fQOP,
-        PSecBufferDesc pMessage, ULONG MessageSeqNo)
+SECURITY_STATUS SEC_ENTRY schannel_MakeSignature(PCtxtHandle phContext, ULONG fQOP, PSecBufferDesc pMessage,
+                                                 ULONG MessageSeqNo)
 {
 	return SEC_E_OK;
 }
 
-SECURITY_STATUS SEC_ENTRY schannel_VerifySignature(PCtxtHandle phContext, PSecBufferDesc pMessage,
-        ULONG MessageSeqNo, ULONG* pfQOP)
+SECURITY_STATUS SEC_ENTRY schannel_VerifySignature(PCtxtHandle phContext, PSecBufferDesc pMessage, ULONG MessageSeqNo,
+                                                   ULONG* pfQOP)
 {
 	return SEC_E_OK;
 }
 
-SECURITY_STATUS SEC_ENTRY schannel_EncryptMessage(PCtxtHandle phContext, ULONG fQOP,
-        PSecBufferDesc pMessage, ULONG MessageSeqNo)
+SECURITY_STATUS SEC_ENTRY schannel_EncryptMessage(PCtxtHandle phContext, ULONG fQOP, PSecBufferDesc pMessage,
+                                                  ULONG MessageSeqNo)
 {
 	SECURITY_STATUS status;
 	SCHANNEL_CONTEXT* context;
@@ -327,8 +333,8 @@ SECURITY_STATUS SEC_ENTRY schannel_EncryptMessage(PCtxtHandle phContext, ULONG f
 	return status;
 }
 
-SECURITY_STATUS SEC_ENTRY schannel_DecryptMessage(PCtxtHandle phContext, PSecBufferDesc pMessage,
-        ULONG MessageSeqNo, ULONG* pfQOP)
+SECURITY_STATUS SEC_ENTRY schannel_DecryptMessage(PCtxtHandle phContext, PSecBufferDesc pMessage, ULONG MessageSeqNo,
+                                                  ULONG* pfQOP)
 {
 	SECURITY_STATUS status;
 	SCHANNEL_CONTEXT* context;
@@ -341,8 +347,7 @@ SECURITY_STATUS SEC_ENTRY schannel_DecryptMessage(PCtxtHandle phContext, PSecBuf
 	return status;
 }
 
-const SecurityFunctionTableA SCHANNEL_SecurityFunctionTableA =
-{
+const SecurityFunctionTableA SCHANNEL_SecurityFunctionTableA = {
 	1, /* dwVersion */
 	NULL, /* EnumerateSecurityPackages */
 	schannel_QueryCredentialsAttributesA, /* QueryCredentialsAttributes */
@@ -373,8 +378,7 @@ const SecurityFunctionTableA SCHANNEL_SecurityFunctionTableA =
 	NULL, /* SetContextAttributes */
 };
 
-const SecurityFunctionTableW SCHANNEL_SecurityFunctionTableW =
-{
+const SecurityFunctionTableW SCHANNEL_SecurityFunctionTableW = {
 	1, /* dwVersion */
 	NULL, /* EnumerateSecurityPackages */
 	schannel_QueryCredentialsAttributesW, /* QueryCredentialsAttributes */
@@ -405,8 +409,7 @@ const SecurityFunctionTableW SCHANNEL_SecurityFunctionTableW =
 	NULL, /* SetContextAttributes */
 };
 
-const SecPkgInfoA SCHANNEL_SecPkgInfoA =
-{
+const SecPkgInfoA SCHANNEL_SecPkgInfoA = {
 	0x000107B3, /* fCapabilities */
 	1, /* wVersion */
 	0x000E, /* wRPCID */
@@ -417,15 +420,10 @@ const SecPkgInfoA SCHANNEL_SecPkgInfoA =
 
 WCHAR SCHANNEL_SecPkgInfoW_Name[] = { 'S', 'c', 'h', 'a', 'n', 'n', 'e', 'l', '\0' };
 
-WCHAR SCHANNEL_SecPkgInfoW_Comment[] =
-{
-	'S', 'c', 'h', 'a', 'n', 'n', 'e', 'l', ' ',
-	'S', 'e', 'c', 'u', 'r', 'i', 't', 'y', ' ',
-	'P', 'a', 'c', 'k', 'a', 'g', 'e', '\0'
-};
+WCHAR SCHANNEL_SecPkgInfoW_Comment[] = { 'S', 'c', 'h', 'a', 'n', 'n', 'e', 'l', ' ', 'S', 'e', 'c', 'u',
+	                                     'r', 'i', 't', 'y', ' ', 'P', 'a', 'c', 'k', 'a', 'g', 'e', '\0' };
 
-const SecPkgInfoW SCHANNEL_SecPkgInfoW =
-{
+const SecPkgInfoW SCHANNEL_SecPkgInfoW = {
 	0x000107B3, /* fCapabilities */
 	1, /* wVersion */
 	0x000E, /* wRPCID */

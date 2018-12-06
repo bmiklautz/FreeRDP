@@ -38,8 +38,7 @@
  * Null-terminated ANSI text with CR/LF line endings.
  */
 
-static void* clipboard_synthesize_cf_text(wClipboard* clipboard, UINT32 formatId, const void* data,
-        UINT32* pSize)
+static void* clipboard_synthesize_cf_text(wClipboard* clipboard, UINT32 formatId, const void* data, UINT32* pSize)
 {
 	int size;
 	char* pDstData = NULL;
@@ -51,9 +50,8 @@ static void* clipboard_synthesize_cf_text(wClipboard* clipboard, UINT32 formatId
 		if (*pSize > INT32_MAX)
 			return NULL;
 
-		size = (int) * pSize;
-		size = ConvertFromUnicode(CP_UTF8, 0, (WCHAR*) data,
-		                          size / 2, (CHAR**) &str, 0, NULL, NULL);
+		size = (int) *pSize;
+		size = ConvertFromUnicode(CP_UTF8, 0, (WCHAR*) data, size / 2, (CHAR**) &str, 0, NULL, NULL);
 
 		if (!str)
 			return NULL;
@@ -69,7 +67,7 @@ static void* clipboard_synthesize_cf_text(wClipboard* clipboard, UINT32 formatId
 	         (formatId == ClipboardGetFormatId(clipboard, "TEXT")) ||
 	         (formatId == ClipboardGetFormatId(clipboard, "STRING")))
 	{
-		size = (INT64) * pSize;
+		size = (INT64) *pSize;
 		pDstData = ConvertLineEndingToCRLF((const char*) data, &size);
 
 		if (!pDstData)
@@ -88,8 +86,7 @@ static void* clipboard_synthesize_cf_text(wClipboard* clipboard, UINT32 formatId
  * Null-terminated OEM text with CR/LF line endings.
  */
 
-static void* clipboard_synthesize_cf_oemtext(wClipboard* clipboard, UINT32 formatId,
-        const void* data, UINT32* pSize)
+static void* clipboard_synthesize_cf_oemtext(wClipboard* clipboard, UINT32 formatId, const void* data, UINT32* pSize)
 {
 	return clipboard_synthesize_cf_text(clipboard, formatId, data, pSize);
 }
@@ -100,8 +97,7 @@ static void* clipboard_synthesize_cf_oemtext(wClipboard* clipboard, UINT32 forma
  * System locale identifier associated with CF_TEXT
  */
 
-static void* clipboard_synthesize_cf_locale(wClipboard* clipboard, UINT32 formatId,
-        const void* data, UINT32* pSize)
+static void* clipboard_synthesize_cf_locale(wClipboard* clipboard, UINT32 formatId, const void* data, UINT32* pSize)
 {
 	UINT32* pDstData = NULL;
 	pDstData = (UINT32*) malloc(sizeof(UINT32));
@@ -119,8 +115,8 @@ static void* clipboard_synthesize_cf_locale(wClipboard* clipboard, UINT32 format
  * Null-terminated UTF-16 text with CR/LF line endings.
  */
 
-static void* clipboard_synthesize_cf_unicodetext(wClipboard* clipboard, UINT32 formatId,
-        const void* data, UINT32* pSize)
+static void* clipboard_synthesize_cf_unicodetext(wClipboard* clipboard, UINT32 formatId, const void* data,
+                                                 UINT32* pSize)
 {
 	int size;
 	int status;
@@ -136,7 +132,7 @@ static void* clipboard_synthesize_cf_unicodetext(wClipboard* clipboard, UINT32 f
 		if (!pSize || (*pSize > INT32_MAX))
 			return NULL;
 
-		size = (int) * pSize;
+		size = (int) *pSize;
 		crlfStr = ConvertLineEndingToCRLF((char*) data, &size);
 
 		if (!crlfStr)
@@ -160,17 +156,15 @@ static void* clipboard_synthesize_cf_unicodetext(wClipboard* clipboard, UINT32 f
  * Null-terminated UTF-8 string with LF line endings.
  */
 
-static void* clipboard_synthesize_utf8_string(wClipboard* clipboard, UINT32 formatId,
-        const void* data, UINT32* pSize)
+static void* clipboard_synthesize_utf8_string(wClipboard* clipboard, UINT32 formatId, const void* data, UINT32* pSize)
 {
 	INT64 size;
 	char* pDstData = NULL;
 
 	if (formatId == CF_UNICODETEXT)
 	{
-		size = (INT64) * pSize;
-		size = ConvertFromUnicode(CP_UTF8, 0, (WCHAR*) data,
-		                          size / 2, (CHAR**) &pDstData, 0, NULL, NULL);
+		size = (INT64) *pSize;
+		size = ConvertFromUnicode(CP_UTF8, 0, (WCHAR*) data, size / 2, (CHAR**) &pDstData, 0, NULL, NULL);
 
 		if (!pDstData)
 			return NULL;
@@ -184,7 +178,7 @@ static void* clipboard_synthesize_utf8_string(wClipboard* clipboard, UINT32 form
 	         (formatId == ClipboardGetFormatId(clipboard, "TEXT")) ||
 	         (formatId == ClipboardGetFormatId(clipboard, "STRING")))
 	{
-		size = (INT64) * pSize;
+		size = (INT64) *pSize;
 		pDstData = (char*) malloc(size);
 
 		if (!pDstData)
@@ -205,8 +199,7 @@ static void* clipboard_synthesize_utf8_string(wClipboard* clipboard, UINT32 form
  * BITMAPINFO structure followed by the bitmap bits.
  */
 
-static void* clipboard_synthesize_cf_dib(wClipboard* clipboard, UINT32 formatId, const void* data,
-        UINT32* pSize)
+static void* clipboard_synthesize_cf_dib(wClipboard* clipboard, UINT32 formatId, const void* data, UINT32* pSize)
 {
 	UINT32 SrcSize;
 	UINT32 DstSize;
@@ -234,7 +227,7 @@ static void* clipboard_synthesize_cf_dib(wClipboard* clipboard, UINT32 formatId,
 		if (!pDstData)
 			return NULL;
 
-		data = (void*) & ((BYTE*) data)[sizeof(BITMAPFILEHEADER)];
+		data = (void*) &((BYTE*) data)[sizeof(BITMAPFILEHEADER)];
 		CopyMemory(pDstData, data, DstSize);
 		*pSize = DstSize;
 		return pDstData;
@@ -249,8 +242,7 @@ static void* clipboard_synthesize_cf_dib(wClipboard* clipboard, UINT32 formatId,
  * BITMAPV5HEADER structure followed by the bitmap color space information and the bitmap bits.
  */
 
-static void* clipboard_synthesize_cf_dibv5(wClipboard* clipboard, UINT32 formatId, const void* data,
-        UINT32* pSize)
+static void* clipboard_synthesize_cf_dibv5(wClipboard* clipboard, UINT32 formatId, const void* data, UINT32* pSize)
 {
 	if (formatId == CF_DIB)
 	{
@@ -268,8 +260,7 @@ static void* clipboard_synthesize_cf_dibv5(wClipboard* clipboard, UINT32 formatI
  * Bitmap file format.
  */
 
-static void* clipboard_synthesize_image_bmp(wClipboard* clipboard, UINT32 formatId,
-        const void* data, UINT32* pSize)
+static void* clipboard_synthesize_image_bmp(wClipboard* clipboard, UINT32 formatId, const void* data, UINT32* pSize)
 {
 	UINT32 SrcSize;
 	UINT32 DstSize;
@@ -320,12 +311,11 @@ static void* clipboard_synthesize_image_bmp(wClipboard* clipboard, UINT32 format
  * HTML clipboard format: msdn.microsoft.com/en-us/library/windows/desktop/ms649015/
  */
 
-static void* clipboard_synthesize_html_format(wClipboard* clipboard, UINT32 formatId,
-        const void* data, UINT32* pSize)
+static void* clipboard_synthesize_html_format(wClipboard* clipboard, UINT32 formatId, const void* data, UINT32* pSize)
 {
 	char* pSrcData = NULL;
 	char* pDstData = NULL;
-	INT64 SrcSize = (INT64) * pSize;
+	INT64 SrcSize = (INT64) *pSize;
 
 	if (formatId == ClipboardGetFormatId(clipboard, "text/html"))
 	{
@@ -345,9 +335,8 @@ static void* clipboard_synthesize_html_format(wClipboard* clipboard, UINT32 form
 
 			if ((bom[0] == 0xFF) && (bom[1] == 0xFE))
 			{
-				wstr = (WCHAR*) & ((BYTE*) data)[2];
-				ConvertFromUnicode(CP_UTF8, 0, wstr,
-				                   (SrcSize - 2) / 2, &pSrcData, 0, NULL, NULL);
+				wstr = (WCHAR*) &((BYTE*) data)[2];
+				ConvertFromUnicode(CP_UTF8, 0, wstr, (SrcSize - 2) / 2, &pSrcData, 0, NULL, NULL);
 			}
 		}
 
@@ -381,7 +370,7 @@ static void* clipboard_synthesize_html_format(wClipboard* clipboard, UINT32 form
 			body = strstr(pSrcData, "<BODY");
 
 		/* StartHTML */
-		sprintf_s(num, sizeof(num), "%010"PRIuz"", strlen(pDstData));
+		sprintf_s(num, sizeof(num), "%010" PRIuz "", strlen(pDstData));
 		CopyMemory(&pDstData[23], num, 10);
 
 		if (!body)
@@ -389,11 +378,11 @@ static void* clipboard_synthesize_html_format(wClipboard* clipboard, UINT32 form
 
 		strcat(pDstData, "<!--StartFragment-->");
 		/* StartFragment */
-		sprintf_s(num, sizeof(num), "%010"PRIuz"", strlen(pDstData));
+		sprintf_s(num, sizeof(num), "%010" PRIuz "", strlen(pDstData));
 		CopyMemory(&pDstData[69], num, 10);
 		strcat(pDstData, pSrcData);
 		/* EndFragment */
-		sprintf_s(num, sizeof(num), "%010"PRIuz"", strlen(pDstData));
+		sprintf_s(num, sizeof(num), "%010" PRIuz "", strlen(pDstData));
 		CopyMemory(&pDstData[93], num, 10);
 		strcat(pDstData, "<!--EndFragment-->");
 
@@ -401,7 +390,7 @@ static void* clipboard_synthesize_html_format(wClipboard* clipboard, UINT32 form
 			strcat(pDstData, "</BODY></HTML>");
 
 		/* EndHTML */
-		sprintf_s(num, sizeof(num), "%010"PRIuz"", strlen(pDstData));
+		sprintf_s(num, sizeof(num), "%010" PRIuz "", strlen(pDstData));
 		CopyMemory(&pDstData[43], num, 10);
 		*pSize = (UINT32) strlen(pDstData) + 1;
 		free(pSrcData);
@@ -416,8 +405,7 @@ static void* clipboard_synthesize_html_format(wClipboard* clipboard, UINT32 form
  * HTML text format.
  */
 
-static void* clipboard_synthesize_text_html(wClipboard* clipboard, UINT32 formatId,
-        const void* data, UINT32* pSize)
+static void* clipboard_synthesize_text_html(wClipboard* clipboard, UINT32 formatId, const void* data, UINT32* pSize)
 {
 	long beg;
 	long end;
@@ -431,7 +419,7 @@ static void* clipboard_synthesize_text_html(wClipboard* clipboard, UINT32 format
 	if (formatId == ClipboardGetFormatId(clipboard, "HTML Format"))
 	{
 		str = (char*) data;
-		SrcSize = (INT64) * pSize;
+		SrcSize = (INT64) *pSize;
 		begStr = strstr(str, "StartHTML:");
 		endStr = strstr(str, "EndHTML:");
 
@@ -470,39 +458,27 @@ BOOL ClipboardInitSynthesizers(wClipboard* clipboard)
 	/**
 	 * CF_TEXT
 	 */
-	ClipboardRegisterSynthesizer(clipboard, CF_TEXT, CF_OEMTEXT,
-	                             clipboard_synthesize_cf_oemtext);
-	ClipboardRegisterSynthesizer(clipboard, CF_TEXT, CF_UNICODETEXT,
-	                             clipboard_synthesize_cf_unicodetext);
-	ClipboardRegisterSynthesizer(clipboard, CF_TEXT, CF_LOCALE,
-	                             clipboard_synthesize_cf_locale);
+	ClipboardRegisterSynthesizer(clipboard, CF_TEXT, CF_OEMTEXT, clipboard_synthesize_cf_oemtext);
+	ClipboardRegisterSynthesizer(clipboard, CF_TEXT, CF_UNICODETEXT, clipboard_synthesize_cf_unicodetext);
+	ClipboardRegisterSynthesizer(clipboard, CF_TEXT, CF_LOCALE, clipboard_synthesize_cf_locale);
 	altFormatId = ClipboardRegisterFormat(clipboard, "UTF8_STRING");
-	ClipboardRegisterSynthesizer(clipboard, CF_TEXT, altFormatId,
-	                             clipboard_synthesize_utf8_string);
+	ClipboardRegisterSynthesizer(clipboard, CF_TEXT, altFormatId, clipboard_synthesize_utf8_string);
 	/**
 	 * CF_OEMTEXT
 	 */
-	ClipboardRegisterSynthesizer(clipboard, CF_OEMTEXT, CF_TEXT,
-	                             clipboard_synthesize_cf_text);
-	ClipboardRegisterSynthesizer(clipboard, CF_OEMTEXT, CF_UNICODETEXT,
-	                             clipboard_synthesize_cf_unicodetext);
-	ClipboardRegisterSynthesizer(clipboard, CF_OEMTEXT, CF_LOCALE,
-	                             clipboard_synthesize_cf_locale);
+	ClipboardRegisterSynthesizer(clipboard, CF_OEMTEXT, CF_TEXT, clipboard_synthesize_cf_text);
+	ClipboardRegisterSynthesizer(clipboard, CF_OEMTEXT, CF_UNICODETEXT, clipboard_synthesize_cf_unicodetext);
+	ClipboardRegisterSynthesizer(clipboard, CF_OEMTEXT, CF_LOCALE, clipboard_synthesize_cf_locale);
 	altFormatId = ClipboardRegisterFormat(clipboard, "UTF8_STRING");
-	ClipboardRegisterSynthesizer(clipboard, CF_OEMTEXT, altFormatId,
-	                             clipboard_synthesize_utf8_string);
+	ClipboardRegisterSynthesizer(clipboard, CF_OEMTEXT, altFormatId, clipboard_synthesize_utf8_string);
 	/**
 	 * CF_UNICODETEXT
 	 */
-	ClipboardRegisterSynthesizer(clipboard, CF_UNICODETEXT, CF_TEXT,
-	                             clipboard_synthesize_cf_text);
-	ClipboardRegisterSynthesizer(clipboard, CF_UNICODETEXT, CF_OEMTEXT,
-	                             clipboard_synthesize_cf_oemtext);
-	ClipboardRegisterSynthesizer(clipboard, CF_UNICODETEXT, CF_LOCALE,
-	                             clipboard_synthesize_cf_locale);
+	ClipboardRegisterSynthesizer(clipboard, CF_UNICODETEXT, CF_TEXT, clipboard_synthesize_cf_text);
+	ClipboardRegisterSynthesizer(clipboard, CF_UNICODETEXT, CF_OEMTEXT, clipboard_synthesize_cf_oemtext);
+	ClipboardRegisterSynthesizer(clipboard, CF_UNICODETEXT, CF_LOCALE, clipboard_synthesize_cf_locale);
 	altFormatId = ClipboardRegisterFormat(clipboard, "UTF8_STRING");
-	ClipboardRegisterSynthesizer(clipboard, CF_UNICODETEXT, altFormatId,
-	                             clipboard_synthesize_utf8_string);
+	ClipboardRegisterSynthesizer(clipboard, CF_UNICODETEXT, altFormatId, clipboard_synthesize_utf8_string);
 	/**
 	 * UTF8_STRING
 	 */
@@ -510,14 +486,10 @@ BOOL ClipboardInitSynthesizers(wClipboard* clipboard)
 
 	if (formatId)
 	{
-		ClipboardRegisterSynthesizer(clipboard, formatId, CF_TEXT,
-		                             clipboard_synthesize_cf_text);
-		ClipboardRegisterSynthesizer(clipboard, formatId, CF_OEMTEXT,
-		                             clipboard_synthesize_cf_oemtext);
-		ClipboardRegisterSynthesizer(clipboard, formatId, CF_UNICODETEXT,
-		                             clipboard_synthesize_cf_unicodetext);
-		ClipboardRegisterSynthesizer(clipboard, formatId, CF_LOCALE,
-		                             clipboard_synthesize_cf_locale);
+		ClipboardRegisterSynthesizer(clipboard, formatId, CF_TEXT, clipboard_synthesize_cf_text);
+		ClipboardRegisterSynthesizer(clipboard, formatId, CF_OEMTEXT, clipboard_synthesize_cf_oemtext);
+		ClipboardRegisterSynthesizer(clipboard, formatId, CF_UNICODETEXT, clipboard_synthesize_cf_unicodetext);
+		ClipboardRegisterSynthesizer(clipboard, formatId, CF_LOCALE, clipboard_synthesize_cf_locale);
 	}
 
 	/**
@@ -527,14 +499,10 @@ BOOL ClipboardInitSynthesizers(wClipboard* clipboard)
 
 	if (formatId)
 	{
-		ClipboardRegisterSynthesizer(clipboard, formatId, CF_TEXT,
-		                             clipboard_synthesize_cf_text);
-		ClipboardRegisterSynthesizer(clipboard, formatId, CF_OEMTEXT,
-		                             clipboard_synthesize_cf_oemtext);
-		ClipboardRegisterSynthesizer(clipboard, formatId, CF_UNICODETEXT,
-		                             clipboard_synthesize_cf_unicodetext);
-		ClipboardRegisterSynthesizer(clipboard, formatId, CF_LOCALE,
-		                             clipboard_synthesize_cf_locale);
+		ClipboardRegisterSynthesizer(clipboard, formatId, CF_TEXT, clipboard_synthesize_cf_text);
+		ClipboardRegisterSynthesizer(clipboard, formatId, CF_OEMTEXT, clipboard_synthesize_cf_oemtext);
+		ClipboardRegisterSynthesizer(clipboard, formatId, CF_UNICODETEXT, clipboard_synthesize_cf_unicodetext);
+		ClipboardRegisterSynthesizer(clipboard, formatId, CF_LOCALE, clipboard_synthesize_cf_locale);
 	}
 
 	/**
@@ -544,14 +512,10 @@ BOOL ClipboardInitSynthesizers(wClipboard* clipboard)
 
 	if (formatId)
 	{
-		ClipboardRegisterSynthesizer(clipboard, formatId, CF_TEXT,
-		                             clipboard_synthesize_cf_text);
-		ClipboardRegisterSynthesizer(clipboard, formatId, CF_OEMTEXT,
-		                             clipboard_synthesize_cf_oemtext);
-		ClipboardRegisterSynthesizer(clipboard, formatId, CF_UNICODETEXT,
-		                             clipboard_synthesize_cf_unicodetext);
-		ClipboardRegisterSynthesizer(clipboard, formatId, CF_LOCALE,
-		                             clipboard_synthesize_cf_locale);
+		ClipboardRegisterSynthesizer(clipboard, formatId, CF_TEXT, clipboard_synthesize_cf_text);
+		ClipboardRegisterSynthesizer(clipboard, formatId, CF_OEMTEXT, clipboard_synthesize_cf_oemtext);
+		ClipboardRegisterSynthesizer(clipboard, formatId, CF_UNICODETEXT, clipboard_synthesize_cf_unicodetext);
+		ClipboardRegisterSynthesizer(clipboard, formatId, CF_LOCALE, clipboard_synthesize_cf_locale);
 	}
 
 	/**
@@ -561,14 +525,10 @@ BOOL ClipboardInitSynthesizers(wClipboard* clipboard)
 
 	if (formatId)
 	{
-		ClipboardRegisterSynthesizer(clipboard, formatId, CF_TEXT,
-		                             clipboard_synthesize_cf_text);
-		ClipboardRegisterSynthesizer(clipboard, formatId, CF_OEMTEXT,
-		                             clipboard_synthesize_cf_oemtext);
-		ClipboardRegisterSynthesizer(clipboard, formatId, CF_UNICODETEXT,
-		                             clipboard_synthesize_cf_unicodetext);
-		ClipboardRegisterSynthesizer(clipboard, formatId, CF_LOCALE,
-		                             clipboard_synthesize_cf_locale);
+		ClipboardRegisterSynthesizer(clipboard, formatId, CF_TEXT, clipboard_synthesize_cf_text);
+		ClipboardRegisterSynthesizer(clipboard, formatId, CF_OEMTEXT, clipboard_synthesize_cf_oemtext);
+		ClipboardRegisterSynthesizer(clipboard, formatId, CF_UNICODETEXT, clipboard_synthesize_cf_unicodetext);
+		ClipboardRegisterSynthesizer(clipboard, formatId, CF_LOCALE, clipboard_synthesize_cf_locale);
 	}
 
 	/**
@@ -577,11 +537,9 @@ BOOL ClipboardInitSynthesizers(wClipboard* clipboard)
 
 	if (formatId)
 	{
-		ClipboardRegisterSynthesizer(clipboard, CF_DIB, CF_DIBV5,
-		                             clipboard_synthesize_cf_dibv5);
+		ClipboardRegisterSynthesizer(clipboard, CF_DIB, CF_DIBV5, clipboard_synthesize_cf_dibv5);
 		altFormatId = ClipboardRegisterFormat(clipboard, "image/bmp");
-		ClipboardRegisterSynthesizer(clipboard, CF_DIB, altFormatId,
-		                             clipboard_synthesize_image_bmp);
+		ClipboardRegisterSynthesizer(clipboard, CF_DIB, altFormatId, clipboard_synthesize_image_bmp);
 	}
 
 	/**
@@ -590,11 +548,9 @@ BOOL ClipboardInitSynthesizers(wClipboard* clipboard)
 
 	if (formatId && 0)
 	{
-		ClipboardRegisterSynthesizer(clipboard, CF_DIBV5, CF_DIB,
-		                             clipboard_synthesize_cf_dib);
+		ClipboardRegisterSynthesizer(clipboard, CF_DIBV5, CF_DIB, clipboard_synthesize_cf_dib);
 		altFormatId = ClipboardRegisterFormat(clipboard, "image/bmp");
-		ClipboardRegisterSynthesizer(clipboard, CF_DIBV5, altFormatId,
-		                             clipboard_synthesize_image_bmp);
+		ClipboardRegisterSynthesizer(clipboard, CF_DIBV5, altFormatId, clipboard_synthesize_image_bmp);
 	}
 
 	/**
@@ -604,10 +560,8 @@ BOOL ClipboardInitSynthesizers(wClipboard* clipboard)
 
 	if (formatId)
 	{
-		ClipboardRegisterSynthesizer(clipboard, formatId, CF_DIB,
-		                             clipboard_synthesize_cf_dib);
-		ClipboardRegisterSynthesizer(clipboard, formatId, CF_DIBV5,
-		                             clipboard_synthesize_cf_dibv5);
+		ClipboardRegisterSynthesizer(clipboard, formatId, CF_DIB, clipboard_synthesize_cf_dib);
+		ClipboardRegisterSynthesizer(clipboard, formatId, CF_DIBV5, clipboard_synthesize_cf_dibv5);
 	}
 
 	/**
@@ -618,8 +572,7 @@ BOOL ClipboardInitSynthesizers(wClipboard* clipboard)
 	if (formatId)
 	{
 		altFormatId = ClipboardRegisterFormat(clipboard, "text/html");
-		ClipboardRegisterSynthesizer(clipboard, formatId, altFormatId,
-		                             clipboard_synthesize_text_html);
+		ClipboardRegisterSynthesizer(clipboard, formatId, altFormatId, clipboard_synthesize_text_html);
 	}
 
 	/**
@@ -630,8 +583,7 @@ BOOL ClipboardInitSynthesizers(wClipboard* clipboard)
 	if (formatId)
 	{
 		altFormatId = ClipboardRegisterFormat(clipboard, "HTML Format");
-		ClipboardRegisterSynthesizer(clipboard, formatId, altFormatId,
-		                             clipboard_synthesize_html_format);
+		ClipboardRegisterSynthesizer(clipboard, formatId, altFormatId, clipboard_synthesize_html_format);
 	}
 
 	return TRUE;

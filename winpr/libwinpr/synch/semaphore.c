@@ -53,7 +53,7 @@ static BOOL SemaphoreIsHandled(HANDLE handle)
 
 static int SemaphoreGetFd(HANDLE handle)
 {
-	WINPR_SEMAPHORE* sem = (WINPR_SEMAPHORE*)handle;
+	WINPR_SEMAPHORE* sem = (WINPR_SEMAPHORE*) handle;
 
 	if (!SemaphoreIsHandled(handle))
 		return -1;
@@ -64,7 +64,7 @@ static int SemaphoreGetFd(HANDLE handle)
 static DWORD SemaphoreCleanupHandle(HANDLE handle)
 {
 	int length;
-	WINPR_SEMAPHORE* sem = (WINPR_SEMAPHORE*)handle;
+	WINPR_SEMAPHORE* sem = (WINPR_SEMAPHORE*) handle;
 
 	if (!SemaphoreIsHandled(handle))
 		return WAIT_FAILED;
@@ -112,32 +112,29 @@ BOOL SemaphoreCloseHandle(HANDLE handle)
 	return TRUE;
 }
 
-static HANDLE_OPS ops =
-{
-	SemaphoreIsHandled,
-	SemaphoreCloseHandle,
-	SemaphoreGetFd,
-	SemaphoreCleanupHandle,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
+static HANDLE_OPS ops = { SemaphoreIsHandled,
+	                      SemaphoreCloseHandle,
+	                      SemaphoreGetFd,
+	                      SemaphoreCleanupHandle,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL };
 
-HANDLE CreateSemaphoreW(LPSECURITY_ATTRIBUTES lpSemaphoreAttributes, LONG lInitialCount,
-                        LONG lMaximumCount, LPCWSTR lpName)
+HANDLE CreateSemaphoreW(LPSECURITY_ATTRIBUTES lpSemaphoreAttributes, LONG lInitialCount, LONG lMaximumCount,
+                        LPCWSTR lpName)
 {
 	HANDLE handle;
 	WINPR_SEMAPHORE* semaphore;
@@ -184,8 +181,7 @@ HANDLE CreateSemaphoreW(LPSECURITY_ATTRIBUTES lpSemaphoreAttributes, LONG lIniti
 
 #if defined __APPLE__
 
-	if (semaphore_create(mach_task_self(), semaphore->sem, SYNC_POLICY_FIFO,
-	                     lMaximumCount) != KERN_SUCCESS)
+	if (semaphore_create(mach_task_self(), semaphore->sem, SYNC_POLICY_FIFO, lMaximumCount) != KERN_SUCCESS)
 #else
 	if (sem_init(semaphore->sem, 0, lMaximumCount) == -1)
 #endif
@@ -202,8 +198,8 @@ HANDLE CreateSemaphoreW(LPSECURITY_ATTRIBUTES lpSemaphoreAttributes, LONG lIniti
 	return handle;
 }
 
-HANDLE CreateSemaphoreA(LPSECURITY_ATTRIBUTES lpSemaphoreAttributes, LONG lInitialCount,
-                        LONG lMaximumCount, LPCSTR lpName)
+HANDLE CreateSemaphoreA(LPSECURITY_ATTRIBUTES lpSemaphoreAttributes, LONG lInitialCount, LONG lMaximumCount,
+                        LPCSTR lpName)
 {
 	return CreateSemaphoreW(lpSemaphoreAttributes, lInitialCount, lMaximumCount, NULL);
 }

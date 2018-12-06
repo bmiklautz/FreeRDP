@@ -50,145 +50,98 @@ static Reg* RegGetInstance()
 	return instance;
 }
 
-LONG RegCloseKey(HKEY hKey)
+LONG RegCloseKey(HKEY hKey) { return 0; }
+
+LONG RegCopyTreeW(HKEY hKeySrc, LPCWSTR lpSubKey, HKEY hKeyDest) { return 0; }
+
+LONG RegCopyTreeA(HKEY hKeySrc, LPCSTR lpSubKey, HKEY hKeyDest) { return 0; }
+
+LONG RegCreateKeyExW(HKEY hKey, LPCWSTR lpSubKey, DWORD Reserved, LPWSTR lpClass, DWORD dwOptions, REGSAM samDesired,
+                     LPSECURITY_ATTRIBUTES lpSecurityAttributes, PHKEY phkResult, LPDWORD lpdwDisposition)
 {
 	return 0;
 }
 
-LONG RegCopyTreeW(HKEY hKeySrc, LPCWSTR lpSubKey, HKEY hKeyDest)
+LONG RegCreateKeyExA(HKEY hKey, LPCSTR lpSubKey, DWORD Reserved, LPSTR lpClass, DWORD dwOptions, REGSAM samDesired,
+                     LPSECURITY_ATTRIBUTES lpSecurityAttributes, PHKEY phkResult, LPDWORD lpdwDisposition)
 {
 	return 0;
 }
 
-LONG RegCopyTreeA(HKEY hKeySrc, LPCSTR lpSubKey, HKEY hKeyDest)
+LONG RegDeleteKeyExW(HKEY hKey, LPCWSTR lpSubKey, REGSAM samDesired, DWORD Reserved) { return 0; }
+
+LONG RegDeleteKeyExA(HKEY hKey, LPCSTR lpSubKey, REGSAM samDesired, DWORD Reserved) { return 0; }
+
+LONG RegDeleteTreeW(HKEY hKey, LPCWSTR lpSubKey) { return 0; }
+
+LONG RegDeleteTreeA(HKEY hKey, LPCSTR lpSubKey) { return 0; }
+
+LONG RegDeleteValueW(HKEY hKey, LPCWSTR lpValueName) { return 0; }
+
+LONG RegDeleteValueA(HKEY hKey, LPCSTR lpValueName) { return 0; }
+
+LONG RegDisablePredefinedCacheEx(void) { return 0; }
+
+LONG RegEnumKeyExW(HKEY hKey, DWORD dwIndex, LPWSTR lpName, LPDWORD lpcName, LPDWORD lpReserved, LPWSTR lpClass,
+                   LPDWORD lpcClass, PFILETIME lpftLastWriteTime)
 {
 	return 0;
 }
 
-LONG RegCreateKeyExW(HKEY hKey, LPCWSTR lpSubKey, DWORD Reserved, LPWSTR lpClass, DWORD dwOptions,
-		REGSAM samDesired, LPSECURITY_ATTRIBUTES lpSecurityAttributes, PHKEY phkResult, LPDWORD lpdwDisposition)
+LONG RegEnumKeyExA(HKEY hKey, DWORD dwIndex, LPSTR lpName, LPDWORD lpcName, LPDWORD lpReserved, LPSTR lpClass,
+                   LPDWORD lpcClass, PFILETIME lpftLastWriteTime)
 {
 	return 0;
 }
 
-LONG RegCreateKeyExA(HKEY hKey, LPCSTR lpSubKey, DWORD Reserved, LPSTR lpClass, DWORD dwOptions,
-		REGSAM samDesired, LPSECURITY_ATTRIBUTES lpSecurityAttributes, PHKEY phkResult, LPDWORD lpdwDisposition)
+LONG RegEnumValueW(HKEY hKey, DWORD dwIndex, LPWSTR lpValueName, LPDWORD lpcchValueName, LPDWORD lpReserved,
+                   LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData)
 {
 	return 0;
 }
 
-LONG RegDeleteKeyExW(HKEY hKey, LPCWSTR lpSubKey, REGSAM samDesired, DWORD Reserved)
+LONG RegEnumValueA(HKEY hKey, DWORD dwIndex, LPSTR lpValueName, LPDWORD lpcchValueName, LPDWORD lpReserved,
+                   LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData)
 {
 	return 0;
 }
 
-LONG RegDeleteKeyExA(HKEY hKey, LPCSTR lpSubKey, REGSAM samDesired, DWORD Reserved)
+LONG RegFlushKey(HKEY hKey) { return 0; }
+
+LONG RegGetKeySecurity(HKEY hKey, SECURITY_INFORMATION SecurityInformation, PSECURITY_DESCRIPTOR pSecurityDescriptor,
+                       LPDWORD lpcbSecurityDescriptor)
 {
 	return 0;
 }
 
-LONG RegDeleteTreeW(HKEY hKey, LPCWSTR lpSubKey)
+LONG RegGetValueW(HKEY hkey, LPCWSTR lpSubKey, LPCWSTR lpValue, DWORD dwFlags, LPDWORD pdwType, PVOID pvData,
+                  LPDWORD pcbData)
 {
 	return 0;
 }
 
-LONG RegDeleteTreeA(HKEY hKey, LPCSTR lpSubKey)
+LONG RegGetValueA(HKEY hkey, LPCSTR lpSubKey, LPCSTR lpValue, DWORD dwFlags, LPDWORD pdwType, PVOID pvData,
+                  LPDWORD pcbData)
 {
 	return 0;
 }
 
-LONG RegDeleteValueW(HKEY hKey, LPCWSTR lpValueName)
+LONG RegLoadAppKeyW(LPCWSTR lpFile, PHKEY phkResult, REGSAM samDesired, DWORD dwOptions, DWORD Reserved) { return 0; }
+
+LONG RegLoadAppKeyA(LPCSTR lpFile, PHKEY phkResult, REGSAM samDesired, DWORD dwOptions, DWORD Reserved) { return 0; }
+
+LONG RegLoadKeyW(HKEY hKey, LPCWSTR lpSubKey, LPCWSTR lpFile) { return 0; }
+
+LONG RegLoadKeyA(HKEY hKey, LPCSTR lpSubKey, LPCSTR lpFile) { return 0; }
+
+LONG RegLoadMUIStringW(HKEY hKey, LPCWSTR pszValue, LPWSTR pszOutBuf, DWORD cbOutBuf, LPDWORD pcbData, DWORD Flags,
+                       LPCWSTR pszDirectory)
 {
 	return 0;
 }
 
-LONG RegDeleteValueA(HKEY hKey, LPCSTR lpValueName)
-{
-	return 0;
-}
-
-LONG RegDisablePredefinedCacheEx(void)
-{
-	return 0;
-}
-
-LONG RegEnumKeyExW(HKEY hKey, DWORD dwIndex, LPWSTR lpName, LPDWORD lpcName,
-		LPDWORD lpReserved, LPWSTR lpClass, LPDWORD lpcClass, PFILETIME lpftLastWriteTime)
-{
-	return 0;
-}
-
-LONG RegEnumKeyExA(HKEY hKey, DWORD dwIndex, LPSTR lpName, LPDWORD lpcName,
-		LPDWORD lpReserved, LPSTR lpClass, LPDWORD lpcClass, PFILETIME lpftLastWriteTime)
-{
-	return 0;
-}
-
-LONG RegEnumValueW(HKEY hKey, DWORD dwIndex, LPWSTR lpValueName,
-		LPDWORD lpcchValueName, LPDWORD lpReserved, LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData)
-{
-	return 0;
-}
-
-LONG RegEnumValueA(HKEY hKey, DWORD dwIndex, LPSTR lpValueName,
-		LPDWORD lpcchValueName, LPDWORD lpReserved, LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData)
-{
-	return 0;
-}
-
-LONG RegFlushKey(HKEY hKey)
-{
-	return 0;
-}
-
-LONG RegGetKeySecurity(HKEY hKey, SECURITY_INFORMATION SecurityInformation,
-		PSECURITY_DESCRIPTOR pSecurityDescriptor, LPDWORD lpcbSecurityDescriptor)
-{
-	return 0;
-}
-
-LONG RegGetValueW(HKEY hkey, LPCWSTR lpSubKey, LPCWSTR lpValue,
-		DWORD dwFlags, LPDWORD pdwType, PVOID pvData, LPDWORD pcbData)
-{
-	return 0;
-}
-
-LONG RegGetValueA(HKEY hkey, LPCSTR lpSubKey, LPCSTR lpValue,
-		DWORD dwFlags, LPDWORD pdwType, PVOID pvData, LPDWORD pcbData)
-{
-	return 0;
-}
-
-LONG RegLoadAppKeyW(LPCWSTR lpFile, PHKEY phkResult,
-		REGSAM samDesired, DWORD dwOptions, DWORD Reserved)
-{
-	return 0;
-}
-
-LONG RegLoadAppKeyA(LPCSTR lpFile, PHKEY phkResult,
-		REGSAM samDesired, DWORD dwOptions, DWORD Reserved)
-{
-	return 0;
-}
-
-LONG RegLoadKeyW(HKEY hKey, LPCWSTR lpSubKey, LPCWSTR lpFile)
-{
-	return 0;
-}
-
-LONG RegLoadKeyA(HKEY hKey, LPCSTR lpSubKey, LPCSTR lpFile)
-{
-	return 0;
-}
-
-LONG RegLoadMUIStringW(HKEY hKey, LPCWSTR pszValue, LPWSTR pszOutBuf,
-		DWORD cbOutBuf, LPDWORD pcbData, DWORD Flags, LPCWSTR pszDirectory)
-{
-	return 0;
-}
-
-LONG RegLoadMUIStringA(HKEY hKey, LPCSTR pszValue, LPSTR pszOutBuf,
-		DWORD cbOutBuf, LPDWORD pcbData, DWORD Flags, LPCSTR pszDirectory)
+LONG RegLoadMUIStringA(HKEY hKey, LPCSTR pszValue, LPSTR pszOutBuf, DWORD cbOutBuf, LPDWORD pcbData, DWORD Flags,
+                       LPCSTR pszDirectory)
 {
 	return 0;
 }
@@ -198,15 +151,9 @@ LONG RegNotifyChangeKeyValue(HKEY hKey, BOOL bWatchSubtree, DWORD dwNotifyFilter
 	return 0;
 }
 
-LONG RegOpenCurrentUser(REGSAM samDesired, PHKEY phkResult)
-{
-	return 0;
-}
+LONG RegOpenCurrentUser(REGSAM samDesired, PHKEY phkResult) { return 0; }
 
-LONG RegOpenKeyExW(HKEY hKey, LPCWSTR lpSubKey, DWORD ulOptions, REGSAM samDesired, PHKEY phkResult)
-{
-	return 0;
-}
+LONG RegOpenKeyExW(HKEY hKey, LPCWSTR lpSubKey, DWORD ulOptions, REGSAM samDesired, PHKEY phkResult) { return 0; }
 
 LONG RegOpenKeyExA(HKEY hKey, LPCSTR lpSubKey, DWORD ulOptions, REGSAM samDesired, PHKEY phkResult)
 {
@@ -236,35 +183,30 @@ LONG RegOpenKeyExA(HKEY hKey, LPCSTR lpSubKey, DWORD ulOptions, REGSAM samDesire
 	return ERROR_FILE_NOT_FOUND;
 }
 
-LONG RegOpenUserClassesRoot(HANDLE hToken, DWORD dwOptions, REGSAM samDesired, PHKEY phkResult)
+LONG RegOpenUserClassesRoot(HANDLE hToken, DWORD dwOptions, REGSAM samDesired, PHKEY phkResult) { return 0; }
+
+LONG RegQueryInfoKeyW(HKEY hKey, LPWSTR lpClass, LPDWORD lpcClass, LPDWORD lpReserved, LPDWORD lpcSubKeys,
+                      LPDWORD lpcMaxSubKeyLen, LPDWORD lpcMaxClassLen, LPDWORD lpcValues, LPDWORD lpcMaxValueNameLen,
+                      LPDWORD lpcMaxValueLen, LPDWORD lpcbSecurityDescriptor, PFILETIME lpftLastWriteTime)
 {
 	return 0;
 }
 
-LONG RegQueryInfoKeyW(HKEY hKey, LPWSTR lpClass, LPDWORD lpcClass, LPDWORD lpReserved,
-		LPDWORD lpcSubKeys, LPDWORD lpcMaxSubKeyLen, LPDWORD lpcMaxClassLen,
-		LPDWORD lpcValues, LPDWORD lpcMaxValueNameLen, LPDWORD lpcMaxValueLen,
-		LPDWORD lpcbSecurityDescriptor, PFILETIME lpftLastWriteTime)
+LONG RegQueryInfoKeyA(HKEY hKey, LPSTR lpClass, LPDWORD lpcClass, LPDWORD lpReserved, LPDWORD lpcSubKeys,
+                      LPDWORD lpcMaxSubKeyLen, LPDWORD lpcMaxClassLen, LPDWORD lpcValues, LPDWORD lpcMaxValueNameLen,
+                      LPDWORD lpcMaxValueLen, LPDWORD lpcbSecurityDescriptor, PFILETIME lpftLastWriteTime)
 {
 	return 0;
 }
 
-LONG RegQueryInfoKeyA(HKEY hKey, LPSTR lpClass, LPDWORD lpcClass, LPDWORD lpReserved,
-		LPDWORD lpcSubKeys, LPDWORD lpcMaxSubKeyLen, LPDWORD lpcMaxClassLen,
-		LPDWORD lpcValues, LPDWORD lpcMaxValueNameLen, LPDWORD lpcMaxValueLen,
-		LPDWORD lpcbSecurityDescriptor, PFILETIME lpftLastWriteTime)
-{
-	return 0;
-}
-
-LONG RegQueryValueExW(HKEY hKey, LPCWSTR lpValueName,
-		LPDWORD lpReserved, LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData)
+LONG RegQueryValueExW(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpReserved, LPDWORD lpType, LPBYTE lpData,
+                      LPDWORD lpcbData)
 {
 	return ERROR_FILE_NOT_FOUND;
 }
 
-LONG RegQueryValueExA(HKEY hKey, LPCSTR lpValueName,
-		LPDWORD lpReserved, LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData)
+LONG RegQueryValueExA(HKEY hKey, LPCSTR lpValueName, LPDWORD lpReserved, LPDWORD lpType, LPBYTE lpData,
+                      LPDWORD lpcbData)
 {
 	RegKey* key;
 	RegVal* pValue;
@@ -314,25 +256,13 @@ LONG RegQueryValueExA(HKEY hKey, LPCSTR lpValueName,
 	return ERROR_FILE_NOT_FOUND;
 }
 
-LONG RegRestoreKeyW(HKEY hKey, LPCWSTR lpFile, DWORD dwFlags)
-{
-	return 0;
-}
+LONG RegRestoreKeyW(HKEY hKey, LPCWSTR lpFile, DWORD dwFlags) { return 0; }
 
-LONG RegRestoreKeyA(HKEY hKey, LPCSTR lpFile, DWORD dwFlags)
-{
-	return 0;
-}
+LONG RegRestoreKeyA(HKEY hKey, LPCSTR lpFile, DWORD dwFlags) { return 0; }
 
-LONG RegSaveKeyExW(HKEY hKey, LPCWSTR lpFile, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD Flags)
-{
-	return 0;
-}
+LONG RegSaveKeyExW(HKEY hKey, LPCWSTR lpFile, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD Flags) { return 0; }
 
-LONG RegSaveKeyExA(HKEY hKey, LPCSTR lpFile, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD Flags)
-{
-	return 0;
-}
+LONG RegSaveKeyExA(HKEY hKey, LPCSTR lpFile, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD Flags) { return 0; }
 
 LONG RegSetKeySecurity(HKEY hKey, SECURITY_INFORMATION SecurityInformation, PSECURITY_DESCRIPTOR pSecurityDescriptor)
 {
@@ -349,14 +279,8 @@ LONG RegSetValueExA(HKEY hKey, LPCSTR lpValueName, DWORD Reserved, DWORD dwType,
 	return 0;
 }
 
-LONG RegUnLoadKeyW(HKEY hKey, LPCWSTR lpSubKey)
-{
-	return 0;
-}
+LONG RegUnLoadKeyW(HKEY hKey, LPCWSTR lpSubKey) { return 0; }
 
-LONG RegUnLoadKeyA(HKEY hKey, LPCSTR lpSubKey)
-{
-	return 0;
-}
+LONG RegUnLoadKeyA(HKEY hKey, LPCSTR lpSubKey) { return 0; }
 
 #endif

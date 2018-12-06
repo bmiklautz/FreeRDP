@@ -30,33 +30,33 @@ typedef struct rdp_input rdpInput;
 #include <winpr/collections.h>
 
 /* keyboard Flags */
-#define KBD_FLAGS_EXTENDED		0x0100
-#define KBD_FLAGS_DOWN			0x4000
-#define KBD_FLAGS_RELEASE		0x8000
+#define KBD_FLAGS_EXTENDED 0x0100
+#define KBD_FLAGS_DOWN 0x4000
+#define KBD_FLAGS_RELEASE 0x8000
 
 /* Pointer Flags */
-#define PTR_FLAGS_HWHEEL		0x0400
-#define PTR_FLAGS_WHEEL			0x0200
-#define PTR_FLAGS_WHEEL_NEGATIVE	0x0100
-#define PTR_FLAGS_MOVE			0x0800
-#define PTR_FLAGS_DOWN			0x8000
-#define PTR_FLAGS_BUTTON1		0x1000 /* left */
-#define PTR_FLAGS_BUTTON2		0x2000 /* right */
-#define PTR_FLAGS_BUTTON3		0x4000 /* middle */
-#define WheelRotationMask		0x01FF
+#define PTR_FLAGS_HWHEEL 0x0400
+#define PTR_FLAGS_WHEEL 0x0200
+#define PTR_FLAGS_WHEEL_NEGATIVE 0x0100
+#define PTR_FLAGS_MOVE 0x0800
+#define PTR_FLAGS_DOWN 0x8000
+#define PTR_FLAGS_BUTTON1 0x1000 /* left */
+#define PTR_FLAGS_BUTTON2 0x2000 /* right */
+#define PTR_FLAGS_BUTTON3 0x4000 /* middle */
+#define WheelRotationMask 0x01FF
 
 /* Extended Pointer Flags */
-#define PTR_XFLAGS_DOWN			0x8000
-#define PTR_XFLAGS_BUTTON1		0x0001
-#define PTR_XFLAGS_BUTTON2		0x0002
+#define PTR_XFLAGS_DOWN 0x8000
+#define PTR_XFLAGS_BUTTON1 0x0001
+#define PTR_XFLAGS_BUTTON2 0x0002
 
 /* Keyboard Toggle Flags */
-#define KBD_SYNC_SCROLL_LOCK		0x00000001
-#define KBD_SYNC_NUM_LOCK		0x00000002
-#define KBD_SYNC_CAPS_LOCK		0x00000004
-#define KBD_SYNC_KANA_LOCK		0x00000008
+#define KBD_SYNC_SCROLL_LOCK 0x00000001
+#define KBD_SYNC_NUM_LOCK 0x00000002
+#define KBD_SYNC_CAPS_LOCK 0x00000004
+#define KBD_SYNC_KANA_LOCK 0x00000008
 
-#define RDP_CLIENT_INPUT_PDU_HEADER_LENGTH	4
+#define RDP_CLIENT_INPUT_PDU_HEADER_LENGTH 4
 
 /* defined inside libfreerdp-core */
 typedef struct rdp_input_proxy rdpInputProxy;

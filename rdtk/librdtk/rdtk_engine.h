@@ -38,11 +38,8 @@ struct rdtk_engine
 extern "C" {
 #endif
 
-
-
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* RDTK_ENGINE_PRIVATE_H */
-

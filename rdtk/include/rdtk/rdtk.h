@@ -59,21 +59,20 @@ RDTK_EXPORT int rdtk_font_draw_text(rdtkSurface* surface, int nXDst, int nYDst, 
 /* Button */
 
 RDTK_EXPORT int rdtk_button_draw(rdtkSurface* surface, int nXDst, int nYDst, int nWidth, int nHeight,
-		rdtkButton* button, const char* text);
+                                 rdtkButton* button, const char* text);
 
 /* Label */
 
-RDTK_EXPORT int rdtk_label_draw(rdtkSurface* surface, int nXDst, int nYDst, int nWidth, int nHeight,
-		rdtkLabel* label, const char* text, int hAlign, int vAlign);
+RDTK_EXPORT int rdtk_label_draw(rdtkSurface* surface, int nXDst, int nYDst, int nWidth, int nHeight, rdtkLabel* label,
+                                const char* text, int hAlign, int vAlign);
 
 /* TextField */
 
 RDTK_EXPORT int rdtk_text_field_draw(rdtkSurface* surface, int nXDst, int nYDst, int nWidth, int nHeight,
-		rdtkTextField* textField, const char* text);
+                                     rdtkTextField* textField, const char* text);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* RDTK_H */
-

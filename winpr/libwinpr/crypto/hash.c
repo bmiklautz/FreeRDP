@@ -39,7 +39,6 @@
 #include <mbedtls/md.h>
 #endif
 
-
 /**
  * HMAC
  */
@@ -293,8 +292,8 @@ void winpr_HMAC_Free(WINPR_HMAC_CTX* ctx)
 #endif
 }
 
-BOOL winpr_HMAC(WINPR_MD_TYPE md, const BYTE* key, size_t keylen,
-                const BYTE* input, size_t ilen, BYTE* output, size_t olen)
+BOOL winpr_HMAC(WINPR_MD_TYPE md, const BYTE* key, size_t keylen, const BYTE* input, size_t ilen, BYTE* output,
+                size_t olen)
 {
 	BOOL result = FALSE;
 	WINPR_HMAC_CTX* ctx = winpr_HMAC_New();

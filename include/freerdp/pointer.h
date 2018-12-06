@@ -22,14 +22,14 @@
 
 #include <freerdp/types.h>
 
-#define PTR_MSG_TYPE_SYSTEM		0x0001
-#define PTR_MSG_TYPE_POSITION		0x0003
-#define PTR_MSG_TYPE_COLOR		0x0006
-#define PTR_MSG_TYPE_CACHED		0x0007
-#define PTR_MSG_TYPE_POINTER		0x0008
+#define PTR_MSG_TYPE_SYSTEM 0x0001
+#define PTR_MSG_TYPE_POSITION 0x0003
+#define PTR_MSG_TYPE_COLOR 0x0006
+#define PTR_MSG_TYPE_CACHED 0x0007
+#define PTR_MSG_TYPE_POINTER 0x0008
 
-#define SYSPTR_NULL			0x00000000
-#define SYSPTR_DEFAULT			0x00007F00
+#define SYSPTR_NULL 0x00000000
+#define SYSPTR_DEFAULT 0x00007F00
 
 struct _POINTER_POSITION_UPDATE
 {
@@ -71,16 +71,11 @@ struct _POINTER_CACHED_UPDATE
 };
 typedef struct _POINTER_CACHED_UPDATE POINTER_CACHED_UPDATE;
 
-typedef BOOL (*pPointerPosition)(rdpContext* context,
-                                 const POINTER_POSITION_UPDATE* pointer_position);
-typedef BOOL (*pPointerSystem)(rdpContext* context,
-                               const POINTER_SYSTEM_UPDATE* pointer_system);
-typedef BOOL (*pPointerColor)(rdpContext* context,
-                              const POINTER_COLOR_UPDATE* pointer_color);
-typedef BOOL (*pPointerNew)(rdpContext* context,
-                            const POINTER_NEW_UPDATE* pointer_new);
-typedef BOOL (*pPointerCached)(rdpContext* context,
-                               const POINTER_CACHED_UPDATE* pointer_cached);
+typedef BOOL (*pPointerPosition)(rdpContext* context, const POINTER_POSITION_UPDATE* pointer_position);
+typedef BOOL (*pPointerSystem)(rdpContext* context, const POINTER_SYSTEM_UPDATE* pointer_system);
+typedef BOOL (*pPointerColor)(rdpContext* context, const POINTER_COLOR_UPDATE* pointer_color);
+typedef BOOL (*pPointerNew)(rdpContext* context, const POINTER_NEW_UPDATE* pointer_new);
+typedef BOOL (*pPointerCached)(rdpContext* context, const POINTER_CACHED_UPDATE* pointer_cached);
 
 struct rdp_pointer_update
 {

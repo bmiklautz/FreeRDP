@@ -56,8 +56,6 @@ struct mac_shadow_subsystem
 extern "C" {
 #endif
 
-
-
 #ifdef __cplusplus
 }
 #endif

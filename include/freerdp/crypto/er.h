@@ -24,40 +24,39 @@
 #include <freerdp/api.h>
 #include <freerdp/types.h>
 
-
 #include <winpr/stream.h>
 
 /* ER type */
 
 /* Class - bits 8 and 7 */
-#define ER_CLASS_MASK		0xC0
-#define ER_CLASS_UNIV		0x00 /* 0 0 */
-#define ER_CLASS_APPL		0x40 /* 0 1 */
-#define ER_CLASS_CTXT		0x80 /* 1 0 */
-#define ER_CLASS_PRIV		0xC0 /* 1 1 */
+#define ER_CLASS_MASK 0xC0
+#define ER_CLASS_UNIV 0x00 /* 0 0 */
+#define ER_CLASS_APPL 0x40 /* 0 1 */
+#define ER_CLASS_CTXT 0x80 /* 1 0 */
+#define ER_CLASS_PRIV 0xC0 /* 1 1 */
 
 /* P/C - bit 6 */
-#define ER_PC_MASK		0x20
-#define ER_PRIMITIVE		0x00 /* 0 */
-#define ER_CONSTRUCT		0x20 /* 1 */
+#define ER_PC_MASK 0x20
+#define ER_PRIMITIVE 0x00 /* 0 */
+#define ER_CONSTRUCT 0x20 /* 1 */
 
 /* Tag - bits 5 to 1 */
-#define ER_TAG_MASK		0x1F
-#define ER_TAG_BOOLEAN		0x01
-#define ER_TAG_INTEGER		0x02
-#define ER_TAG_BIT_STRING	0x03
-#define ER_TAG_OCTET_STRING	0x04
-#define ER_TAG_OBJECT_IDENFIER	0x06
-#define ER_TAG_ENUMERATED	0x0A
-#define ER_TAG_SEQUENCE	0x10
-#define ER_TAG_SEQUENCE_OF	0x10
-#define ER_TAG_GENERAL_STRING   0x1B
+#define ER_TAG_MASK 0x1F
+#define ER_TAG_BOOLEAN 0x01
+#define ER_TAG_INTEGER 0x02
+#define ER_TAG_BIT_STRING 0x03
+#define ER_TAG_OCTET_STRING 0x04
+#define ER_TAG_OBJECT_IDENFIER 0x06
+#define ER_TAG_ENUMERATED 0x0A
+#define ER_TAG_SEQUENCE 0x10
+#define ER_TAG_SEQUENCE_OF 0x10
+#define ER_TAG_GENERAL_STRING 0x1B
 #define ER_TAG_GENERALIZED_TIME 0x18
 
-#define ER_PC(_pc)	(_pc ? ER_CONSTRUCT : ER_PRIMITIVE)
+#define ER_PC(_pc) (_pc ? ER_CONSTRUCT : ER_PRIMITIVE)
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 FREERDP_API void er_read_length(wStream* s, int* length);
@@ -91,7 +90,7 @@ FREERDP_API BOOL er_read_integer_length(wStream* s, int* length);
 FREERDP_API int er_skip_integer(INT32 value);
 
 #ifdef __cplusplus
- }
+}
 #endif
 
 #endif /* FREERDP_CRYPTO_ER_H */

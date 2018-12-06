@@ -1,5 +1,2 @@
 
-int winpr_dummy()
-{
-	return 0;
-}
+int winpr_dummy() { return 0; }

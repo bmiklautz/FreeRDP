@@ -35,39 +35,18 @@
 
 #ifndef _WIN32
 
-VOID InitializeSRWLock(PSRWLOCK SRWLock)
-{
+VOID InitializeSRWLock(PSRWLOCK SRWLock) {}
 
-}
+VOID AcquireSRWLockExclusive(PSRWLOCK SRWLock) {}
 
-VOID AcquireSRWLockExclusive(PSRWLOCK SRWLock)
-{
+VOID AcquireSRWLockShared(PSRWLOCK SRWLock) {}
 
-}
+BOOL TryAcquireSRWLockExclusive(PSRWLOCK SRWLock) { return TRUE; }
 
-VOID AcquireSRWLockShared(PSRWLOCK SRWLock)
-{
+BOOL TryAcquireSRWLockShared(PSRWLOCK SRWLock) { return TRUE; }
 
-}
+VOID ReleaseSRWLockExclusive(PSRWLOCK SRWLock) {}
 
-BOOL TryAcquireSRWLockExclusive(PSRWLOCK SRWLock)
-{
-	return TRUE;
-}
-
-BOOL TryAcquireSRWLockShared(PSRWLOCK SRWLock)
-{
-	return TRUE;
-}
-
-VOID ReleaseSRWLockExclusive(PSRWLOCK SRWLock)
-{
-
-}
-
-VOID ReleaseSRWLockShared(PSRWLOCK SRWLock)
-{
-
-}
+VOID ReleaseSRWLockShared(PSRWLOCK SRWLock) {}
 
 #endif

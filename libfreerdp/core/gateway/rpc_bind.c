@@ -38,8 +38,7 @@
 
 /* Syntax UUIDs */
 
-const p_uuid_t TSGU_UUID =
-{
+const p_uuid_t TSGU_UUID = {
 	0x44E265DD, /* time_low */
 	0x7DAF, /* time_mid */
 	0x42CD, /* time_hi_and_version */
@@ -48,8 +47,7 @@ const p_uuid_t TSGU_UUID =
 	{ 0x3C, 0xDB, 0x6E, 0x7A, 0x27, 0x29 } /* node[6] */
 };
 
-const p_uuid_t NDR_UUID =
-{
+const p_uuid_t NDR_UUID = {
 	0x8A885D04, /* time_low */
 	0x1CEB, /* time_mid */
 	0x11C9, /* time_hi_and_version */
@@ -58,8 +56,7 @@ const p_uuid_t NDR_UUID =
 	{ 0x08, 0x00, 0x2B, 0x10, 0x48, 0x60 } /* node[6] */
 };
 
-const p_uuid_t BTFN_UUID =
-{
+const p_uuid_t BTFN_UUID = {
 	0x6CB71C2C, /* time_low */
 	0x9812, /* time_mid */
 	0x4540, /* time_hi_and_version */
@@ -128,8 +125,8 @@ int rpc_send_bind_pdu(rdpRpc* rpc)
 	if (!rpc->ntlm)
 		goto fail;
 
-	if ((!settings->GatewayPassword) || (!settings->GatewayUsername)
-	    || (!strlen(settings->GatewayPassword)) || (!strlen(settings->GatewayUsername)))
+	if ((!settings->GatewayPassword) || (!settings->GatewayUsername) || (!strlen(settings->GatewayPassword)) ||
+	    (!strlen(settings->GatewayUsername)))
 	{
 		promptPassword = TRUE;
 	}
@@ -138,8 +135,8 @@ int rpc_send_bind_pdu(rdpRpc* rpc)
 	{
 		if (instance->GatewayAuthenticate)
 		{
-			BOOL proceed = instance->GatewayAuthenticate(instance,
-			               &settings->GatewayUsername, &settings->GatewayPassword, &settings->GatewayDomain);
+			BOOL proceed = instance->GatewayAuthenticate(instance, &settings->GatewayUsername,
+			                                             &settings->GatewayPassword, &settings->GatewayDomain);
 
 			if (!proceed)
 			{
@@ -194,8 +191,7 @@ int rpc_send_bind_pdu(rdpRpc* rpc)
 	bind_pdu->p_context_elem.n_context_elem = 2;
 	bind_pdu->p_context_elem.reserved = 0;
 	bind_pdu->p_context_elem.reserved2 = 0;
-	bind_pdu->p_context_elem.p_cont_elem = calloc(bind_pdu->p_context_elem.n_context_elem,
-	                                       sizeof(p_cont_elem_t));
+	bind_pdu->p_context_elem.p_cont_elem = calloc(bind_pdu->p_context_elem.n_context_elem, sizeof(p_cont_elem_t));
 
 	if (!bind_pdu->p_context_elem.p_cont_elem)
 		goto fail;

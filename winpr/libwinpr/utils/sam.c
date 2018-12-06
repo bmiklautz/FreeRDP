@@ -37,9 +37,9 @@
 #endif
 
 #ifdef _WIN32
-#define WINPR_SAM_FILE		"C:\\SAM"
+#define WINPR_SAM_FILE "C:\\SAM"
 #else
-#define WINPR_SAM_FILE		"/etc/winpr/SAM"
+#define WINPR_SAM_FILE "/etc/winpr/SAM"
 #endif
 #define TAG WINPR_TAG("utils")
 
@@ -261,8 +261,7 @@ void SamResetEntry(WINPR_SAM_ENTRY* entry)
 	ZeroMemory(entry->NtHash, sizeof(entry->NtHash));
 }
 
-WINPR_SAM_ENTRY* SamLookupUserA(WINPR_SAM* sam, LPSTR User, UINT32 UserLength, LPSTR Domain,
-                                UINT32 DomainLength)
+WINPR_SAM_ENTRY* SamLookupUserA(WINPR_SAM* sam, LPSTR User, UINT32 UserLength, LPSTR Domain, UINT32 DomainLength)
 {
 	size_t length;
 	BOOL found = FALSE;
@@ -315,8 +314,7 @@ out_fail:
 	return entry;
 }
 
-WINPR_SAM_ENTRY* SamLookupUserW(WINPR_SAM* sam, LPWSTR User, UINT32 UserLength, LPWSTR Domain,
-                                UINT32 DomainLength)
+WINPR_SAM_ENTRY* SamLookupUserW(WINPR_SAM* sam, LPWSTR User, UINT32 UserLength, LPWSTR Domain, UINT32 DomainLength)
 {
 	size_t length;
 	BOOL Found = FALSE;
@@ -361,8 +359,8 @@ WINPR_SAM_ENTRY* SamLookupUserW(WINPR_SAM* sam, LPWSTR User, UINT32 UserLength, 
 						if (!EntryDomain)
 							goto out_fail;
 
-						MultiByteToWideChar(CP_ACP, 0, entry->Domain, EntryDomainLength / 2,
-						                    (LPWSTR) EntryDomain, EntryDomainLength / 2);
+						MultiByteToWideChar(CP_ACP, 0, entry->Domain, EntryDomainLength / 2, (LPWSTR) EntryDomain,
+						                    EntryDomainLength / 2);
 
 						if (DomainLength == EntryDomainLength)
 						{
@@ -392,8 +390,8 @@ WINPR_SAM_ENTRY* SamLookupUserW(WINPR_SAM* sam, LPWSTR User, UINT32 UserLength, 
 					if (!EntryUser)
 						goto out_fail;
 
-					MultiByteToWideChar(CP_ACP, 0, entry->User, EntryUserLength / 2,
-					                    (LPWSTR) EntryUser, EntryUserLength / 2);
+					MultiByteToWideChar(CP_ACP, 0, entry->User, EntryUserLength / 2, (LPWSTR) EntryUser,
+					                    EntryUserLength / 2);
 
 					if (UserLength == EntryUserLength)
 					{

@@ -72,28 +72,19 @@ int ListDictionary_Count(wListDictionary* listDictionary)
  * Gets a value indicating whether the ListDictionary has a fixed size.
  */
 
-BOOL ListDictionary_IsFixedSized(wListDictionary* listDictionary)
-{
-	return FALSE;
-}
+BOOL ListDictionary_IsFixedSized(wListDictionary* listDictionary) { return FALSE; }
 
 /**
  * Gets a value indicating whether the ListDictionary is read-only.
  */
 
-BOOL ListDictionary_IsReadOnly(wListDictionary* listDictionary)
-{
-	return FALSE;
-}
+BOOL ListDictionary_IsReadOnly(wListDictionary* listDictionary) { return FALSE; }
 
 /**
  * Gets a value indicating whether the ListDictionary is synchronized (thread safe).
  */
 
-BOOL ListDictionary_IsSynchronized(wListDictionary* listDictionary)
-{
-	return listDictionary->synchronized;
-}
+BOOL ListDictionary_IsSynchronized(wListDictionary* listDictionary) { return listDictionary->synchronized; }
 
 /**
  * Lock access to the ListDictionary
@@ -208,7 +199,7 @@ BOOL ListDictionary_Add(wListDictionary* listDictionary, const void* key, void* 
 	if (!item)
 		goto out_error;
 
-	item->key = (void*)key;
+	item->key = (void*) key;
 	item->value = value;
 	item->next = NULL;
 
@@ -467,10 +458,7 @@ BOOL ListDictionary_SetItemValue(wListDictionary* listDictionary, const void* ke
 	return status;
 }
 
-static BOOL default_equal_function(const void* obj1, const void* obj2)
-{
-	return (obj1 == obj2);
-}
+static BOOL default_equal_function(const void* obj1, const void* obj2) { return (obj1 == obj2); }
 /**
  * Construction, Destruction
  */
@@ -505,4 +493,3 @@ void ListDictionary_Free(wListDictionary* listDictionary)
 		free(listDictionary);
 	}
 }
-

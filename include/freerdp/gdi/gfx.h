@@ -63,4 +63,3 @@ FREERDP_API void gdi_graphics_pipeline_uninit(rdpGdi* gdi, RdpgfxClientContext* 
 #endif
 
 #endif /* FREERDP_GDI_GFX_H */
-

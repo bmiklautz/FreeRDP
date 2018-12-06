@@ -23,15 +23,15 @@
 #include <freerdp/api.h>
 #include <freerdp/freerdp.h>
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
-#define FREERDP_WINDOW_STATE_NORMAL		0
-#define FREERDP_WINDOW_STATE_MINIMIZED		1
-#define FREERDP_WINDOW_STATE_MAXIMIZED		2
-#define FREERDP_WINDOW_STATE_FULLSCREEN		3
-#define FREERDP_WINDOW_STATE_ACTIVE		4
+#define FREERDP_WINDOW_STATE_NORMAL 0
+#define FREERDP_WINDOW_STATE_MINIMIZED 1
+#define FREERDP_WINDOW_STATE_MAXIMIZED 2
+#define FREERDP_WINDOW_STATE_FULLSCREEN 3
+#define FREERDP_WINDOW_STATE_ACTIVE 4
 
 DEFINE_EVENT_BEGIN(WindowStateChange)
 int state;
@@ -119,8 +119,8 @@ UINT32 width;
 UINT32 height;
 DEFINE_EVENT_END(GraphicsReset)
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 }
 #endif
 
-#endif	/* FREERDP_EVENT_H */
+#endif /* FREERDP_EVENT_H */

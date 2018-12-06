@@ -1,22 +1,22 @@
 /**
-* FreeRDP: A Remote Desktop Protocol Client
-* FreeRDP Windows Server
-*
-* Copyright 2012 Marc-Andre Moreau <marcandre.moreau@gmail.com>
-* Copyright 2012 Corey Clayton <can.of.tuna@gmail.com>
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * FreeRDP: A Remote Desktop Protocol Client
+ * FreeRDP Windows Server
+ *
+ * Copyright 2012 Marc-Andre Moreau <marcandre.moreau@gmail.com>
+ * Copyright 2012 Corey Clayton <can.of.tuna@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -62,7 +62,7 @@ DWORD WINAPI wf_update_thread(LPVOID lpParam)
 				if (wf_info_have_updates(wfi))
 				{
 					wf_update_encode(wfi);
-					//WLog_DBG(TAG, "Start of parallel sending");
+					// WLog_DBG(TAG, "Start of parallel sending");
 					index = 0;
 
 					for (peerindex = 0; peerindex < wfi->peerCount; peerindex++)
@@ -71,7 +71,7 @@ DWORD WINAPI wf_update_thread(LPVOID lpParam)
 						{
 							if (wfi->peers[index] && wfi->peers[index]->activated)
 							{
-								//WLog_DBG(TAG, "Setting event for %d of %d", index + 1, wfi->activePeerCount);
+								// WLog_DBG(TAG, "Setting event for %d of %d", index + 1, wfi->activePeerCount);
 								SetEvent(((wfPeerContext*) wfi->peers[index]->context)->updateEvent);
 							}
 						}
@@ -79,12 +79,12 @@ DWORD WINAPI wf_update_thread(LPVOID lpParam)
 
 					for (index = 0; index < wfi->activePeerCount; index++)
 					{
-						//WLog_DBG(TAG, "Waiting for %d of %d", index + 1, wfi->activePeerCount);
-						//WaitForSingleObject(wfi->updateSemaphore, INFINITE);
+						// WLog_DBG(TAG, "Waiting for %d of %d", index + 1, wfi->activePeerCount);
+						// WaitForSingleObject(wfi->updateSemaphore, INFINITE);
 						WaitForSingleObject(wfi->updateSemaphore, 1000);
 					}
 
-					//WLog_DBG(TAG, "End of parallel sending");
+					// WLog_DBG(TAG, "End of parallel sending");
 					wf_info_clear_invalid_region(wfi);
 				}
 			}
@@ -101,7 +101,7 @@ DWORD WINAPI wf_update_thread(LPVOID lpParam)
 		}
 	}
 
-	//WLog_DBG(TAG, "Exiting Update Thread");
+	// WLog_DBG(TAG, "Exiting Update Thread");
 	return 0;
 }
 
@@ -120,11 +120,10 @@ void wf_update_encode(wfInfo* wfi)
 	rect.y = 0;
 	rect.width = (UINT16) width;
 	rect.height = (UINT16) height;
-	//WLog_DBG(TAG, "x:%"PRId32" y:%"PRId32" w:%ld h:%ld", wfi->invalid.left, wfi->invalid.top, width, height);
+	// WLog_DBG(TAG, "x:%"PRId32" y:%"PRId32" w:%ld h:%ld", wfi->invalid.left, wfi->invalid.top, width, height);
 	Stream_Clear(wfi->s);
 
-	if (!(rfx_compose_message(wfi->rfx_context, wfi->s, &rect, 1,
-	                          pDataBits, width, height, stride)))
+	if (!(rfx_compose_message(wfi->rfx_context, wfi->s, &rect, 1, pDataBits, width, height, stride)))
 	{
 		return;
 	}
@@ -152,10 +151,10 @@ void wf_update_peer_send(wfInfo* wfi, wfPeerContext* context)
 		context->frame_idx = 0;
 
 	/*
-	* When a new client connects, it is possible that old frames from
-	* from a previous encoding state remain. Those frames should be discarded
-	* as they will cause an error condition in mstsc.
-	*/
+	 * When a new client connects, it is possible that old frames from
+	 * from a previous encoding state remain. Those frames should be discarded
+	 * as they will cause an error condition in mstsc.
+	 */
 
 	if ((context->frame_idx + 1) != wfi->frame_idx)
 	{
@@ -164,8 +163,7 @@ void wf_update_peer_send(wfInfo* wfi, wfPeerContext* context)
 			return;
 
 		/* This is an unexpected error condition */
-		WLog_DBG(TAG, "Unexpected Frame Index: Actual: %d Expected: %d",
-		         wfi->frame_idx, context->frame_idx + 1);
+		WLog_DBG(TAG, "Unexpected Frame Index: Actual: %d Expected: %d", wfi->frame_idx, context->frame_idx + 1);
 	}
 
 	wfi->cmd.bmp.codecID = client->settings->RemoteFxCodecId;

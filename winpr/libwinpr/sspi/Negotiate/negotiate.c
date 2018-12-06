@@ -44,8 +44,7 @@ static BOOL ErrorInitContextKerberos = FALSE;
 static BOOL ErrorInitContextKerberos = TRUE;
 #endif
 
-const SecPkgInfoA NEGOTIATE_SecPkgInfoA =
-{
+const SecPkgInfoA NEGOTIATE_SecPkgInfoA = {
 	0x00083BB3, /* fCapabilities */
 	1, /* wVersion */
 	0x0009, /* wRPCID */
@@ -56,15 +55,11 @@ const SecPkgInfoA NEGOTIATE_SecPkgInfoA =
 
 static WCHAR NEGOTIATE_SecPkgInfoW_Name[] = { 'N', 'e', 'g', 'o', 't', 'i', 'a', 't', 'e', '\0' };
 
-static WCHAR NEGOTIATE_SecPkgInfoW_Comment[] =
-{
-	'M', 'i', 'c', 'r', 'o', 's', 'o', 'f', 't', ' ',
-	'P', 'a', 'c', 'k', 'a', 'g', 'e', ' ',
-	'N', 'e', 'g', 'o', 't', 'i', 'a', 't', 'o', 'r', '\0'
-};
+static WCHAR NEGOTIATE_SecPkgInfoW_Comment[] = { 'M', 'i', 'c', 'r', 'o', 's', 'o', 'f', 't', ' ',
+	                                             'P', 'a', 'c', 'k', 'a', 'g', 'e', ' ', 'N', 'e',
+	                                             'g', 'o', 't', 'i', 'a', 't', 'o', 'r', '\0' };
 
-const SecPkgInfoW NEGOTIATE_SecPkgInfoW =
-{
+const SecPkgInfoW NEGOTIATE_SecPkgInfoW = {
 	0x00083BB3, /* fCapabilities */
 	1, /* wVersion */
 	0x0009, /* wRPCID */
@@ -104,16 +99,14 @@ static NEGOTIATE_CONTEXT* negotiate_ContextNew(void)
 	return context;
 }
 
-static void negotiate_ContextFree(NEGOTIATE_CONTEXT* context)
-{
-	free(context);
-}
+static void negotiate_ContextFree(NEGOTIATE_CONTEXT* context) { free(context); }
 
-static SECURITY_STATUS SEC_ENTRY negotiate_InitializeSecurityContextW(PCredHandle phCredential,
-        PCtxtHandle phContext,
-        SEC_WCHAR* pszTargetName, ULONG fContextReq, ULONG Reserved1, ULONG TargetDataRep,
-        PSecBufferDesc pInput, ULONG Reserved2, PCtxtHandle phNewContext,
-        PSecBufferDesc pOutput, PULONG pfContextAttr, PTimeStamp ptsExpiry)
+static SECURITY_STATUS SEC_ENTRY negotiate_InitializeSecurityContextW(PCredHandle phCredential, PCtxtHandle phContext,
+                                                                      SEC_WCHAR* pszTargetName, ULONG fContextReq,
+                                                                      ULONG Reserved1, ULONG TargetDataRep,
+                                                                      PSecBufferDesc pInput, ULONG Reserved2,
+                                                                      PCtxtHandle phNewContext, PSecBufferDesc pOutput,
+                                                                      PULONG pfContextAttr, PTimeStamp ptsExpiry)
 {
 	SECURITY_STATUS status;
 	NEGOTIATE_CONTEXT* context;
@@ -138,9 +131,9 @@ static SECURITY_STATUS SEC_ENTRY negotiate_InitializeSecurityContextW(PCredHandl
 			negotiate_SetSubPackage(context, KERBEROS_SSP_NAME);
 		}
 
-		status = context->sspiW->InitializeSecurityContextW(phCredential, &(context->SubContext),
-		         pszTargetName, fContextReq, Reserved1, TargetDataRep, pInput, Reserved2, &(context->SubContext),
-		         pOutput, pfContextAttr, ptsExpiry);
+		status = context->sspiW->InitializeSecurityContextW(phCredential, &(context->SubContext), pszTargetName,
+		                                                    fContextReq, Reserved1, TargetDataRep, pInput, Reserved2,
+		                                                    &(context->SubContext), pOutput, pfContextAttr, ptsExpiry);
 
 		if (status == SEC_E_NO_CREDENTIALS)
 		{
@@ -159,19 +152,20 @@ static SECURITY_STATUS SEC_ENTRY negotiate_InitializeSecurityContextW(PCredHandl
 			negotiate_SetSubPackage(context, NTLM_SSP_NAME);
 		}
 
-		status = context->sspiW->InitializeSecurityContextW(phCredential, &(context->SubContext),
-		         pszTargetName, fContextReq, Reserved1, TargetDataRep, pInput, Reserved2, &(context->SubContext),
-		         pOutput, pfContextAttr, ptsExpiry);
+		status = context->sspiW->InitializeSecurityContextW(phCredential, &(context->SubContext), pszTargetName,
+		                                                    fContextReq, Reserved1, TargetDataRep, pInput, Reserved2,
+		                                                    &(context->SubContext), pOutput, pfContextAttr, ptsExpiry);
 	}
 
 	return status;
 }
 
-static SECURITY_STATUS SEC_ENTRY negotiate_InitializeSecurityContextA(PCredHandle phCredential,
-        PCtxtHandle phContext,
-        SEC_CHAR* pszTargetName, ULONG fContextReq, ULONG Reserved1, ULONG TargetDataRep,
-        PSecBufferDesc pInput, ULONG Reserved2, PCtxtHandle phNewContext,
-        PSecBufferDesc pOutput, PULONG pfContextAttr, PTimeStamp ptsExpiry)
+static SECURITY_STATUS SEC_ENTRY negotiate_InitializeSecurityContextA(PCredHandle phCredential, PCtxtHandle phContext,
+                                                                      SEC_CHAR* pszTargetName, ULONG fContextReq,
+                                                                      ULONG Reserved1, ULONG TargetDataRep,
+                                                                      PSecBufferDesc pInput, ULONG Reserved2,
+                                                                      PCtxtHandle phNewContext, PSecBufferDesc pOutput,
+                                                                      PULONG pfContextAttr, PTimeStamp ptsExpiry)
 {
 	SECURITY_STATUS status;
 	NEGOTIATE_CONTEXT* context;
@@ -196,9 +190,9 @@ static SECURITY_STATUS SEC_ENTRY negotiate_InitializeSecurityContextA(PCredHandl
 			negotiate_SetSubPackage(context, KERBEROS_SSP_NAME);
 		}
 
-		status = context->sspiA->InitializeSecurityContextA(phCredential, &(context->SubContext),
-		         pszTargetName, fContextReq, Reserved1, TargetDataRep, pInput, Reserved2, &(context->SubContext),
-		         pOutput, pfContextAttr, ptsExpiry);
+		status = context->sspiA->InitializeSecurityContextA(phCredential, &(context->SubContext), pszTargetName,
+		                                                    fContextReq, Reserved1, TargetDataRep, pInput, Reserved2,
+		                                                    &(context->SubContext), pOutput, pfContextAttr, ptsExpiry);
 
 		if (status == SEC_E_NO_CREDENTIALS)
 		{
@@ -217,18 +211,19 @@ static SECURITY_STATUS SEC_ENTRY negotiate_InitializeSecurityContextA(PCredHandl
 			negotiate_SetSubPackage(context, NTLM_SSP_NAME);
 		}
 
-		status = context->sspiA->InitializeSecurityContextA(phCredential, &(context->SubContext),
-		         pszTargetName, fContextReq, Reserved1, TargetDataRep, pInput, Reserved2, &(context->SubContext),
-		         pOutput, pfContextAttr, ptsExpiry);
+		status = context->sspiA->InitializeSecurityContextA(phCredential, &(context->SubContext), pszTargetName,
+		                                                    fContextReq, Reserved1, TargetDataRep, pInput, Reserved2,
+		                                                    &(context->SubContext), pOutput, pfContextAttr, ptsExpiry);
 	}
 
 	return status;
 }
 
-static SECURITY_STATUS SEC_ENTRY negotiate_AcceptSecurityContext(PCredHandle phCredential,
-        PCtxtHandle phContext,
-        PSecBufferDesc pInput, ULONG fContextReq, ULONG TargetDataRep, PCtxtHandle phNewContext,
-        PSecBufferDesc pOutput, PULONG pfContextAttr, PTimeStamp ptsTimeStamp)
+static SECURITY_STATUS SEC_ENTRY negotiate_AcceptSecurityContext(PCredHandle phCredential, PCtxtHandle phContext,
+                                                                 PSecBufferDesc pInput, ULONG fContextReq,
+                                                                 ULONG TargetDataRep, PCtxtHandle phNewContext,
+                                                                 PSecBufferDesc pOutput, PULONG pfContextAttr,
+                                                                 PTimeStamp ptsTimeStamp)
 {
 	SECURITY_STATUS status;
 	NEGOTIATE_CONTEXT* context;
@@ -246,21 +241,19 @@ static SECURITY_STATUS SEC_ENTRY negotiate_AcceptSecurityContext(PCredHandle phC
 	}
 
 	negotiate_SetSubPackage(context, NTLM_SSP_NAME); /* server-side Kerberos not yet implemented */
-	status = context->sspiA->AcceptSecurityContext(phCredential, &(context->SubContext),
-	         pInput, fContextReq, TargetDataRep, &(context->SubContext),
-	         pOutput, pfContextAttr, ptsTimeStamp);
+	status = context->sspiA->AcceptSecurityContext(phCredential, &(context->SubContext), pInput, fContextReq,
+	                                               TargetDataRep, &(context->SubContext), pOutput, pfContextAttr,
+	                                               ptsTimeStamp);
 
 	if (status != SEC_E_OK)
 	{
-		WLog_WARN(TAG, "AcceptSecurityContext status %s [0x%08"PRIX32"]",
-		          GetSecurityStatusString(status), status);
+		WLog_WARN(TAG, "AcceptSecurityContext status %s [0x%08" PRIX32 "]", GetSecurityStatusString(status), status);
 	}
 
 	return status;
 }
 
-static SECURITY_STATUS SEC_ENTRY negotiate_CompleteAuthToken(PCtxtHandle phContext,
-        PSecBufferDesc pToken)
+static SECURITY_STATUS SEC_ENTRY negotiate_CompleteAuthToken(PCtxtHandle phContext, PSecBufferDesc pToken)
 {
 	NEGOTIATE_CONTEXT* context;
 	SECURITY_STATUS status = SEC_E_OK;
@@ -321,8 +314,8 @@ static SECURITY_STATUS SEC_ENTRY negotiate_RevertSecurityContext(PCtxtHandle phC
 	return status;
 }
 
-static SECURITY_STATUS SEC_ENTRY negotiate_QueryContextAttributesW(PCtxtHandle phContext,
-        ULONG ulAttribute, void* pBuffer)
+static SECURITY_STATUS SEC_ENTRY negotiate_QueryContextAttributesW(PCtxtHandle phContext, ULONG ulAttribute,
+                                                                   void* pBuffer)
 {
 	NEGOTIATE_CONTEXT* context;
 	SECURITY_STATUS status = SEC_E_OK;
@@ -340,8 +333,8 @@ static SECURITY_STATUS SEC_ENTRY negotiate_QueryContextAttributesW(PCtxtHandle p
 	return status;
 }
 
-static SECURITY_STATUS SEC_ENTRY negotiate_QueryContextAttributesA(PCtxtHandle phContext,
-        ULONG ulAttribute, void* pBuffer)
+static SECURITY_STATUS SEC_ENTRY negotiate_QueryContextAttributesA(PCtxtHandle phContext, ULONG ulAttribute,
+                                                                   void* pBuffer)
 {
 	NEGOTIATE_CONTEXT* context;
 	SECURITY_STATUS status = SEC_E_OK;
@@ -359,9 +352,8 @@ static SECURITY_STATUS SEC_ENTRY negotiate_QueryContextAttributesA(PCtxtHandle p
 	return status;
 }
 
-static SECURITY_STATUS SEC_ENTRY negotiate_SetContextAttributesW(PCtxtHandle phContext,
-        ULONG ulAttribute,
-        void* pBuffer, ULONG cbBuffer)
+static SECURITY_STATUS SEC_ENTRY negotiate_SetContextAttributesW(PCtxtHandle phContext, ULONG ulAttribute,
+                                                                 void* pBuffer, ULONG cbBuffer)
 {
 	NEGOTIATE_CONTEXT* context;
 	SECURITY_STATUS status = SEC_E_OK;
@@ -374,15 +366,13 @@ static SECURITY_STATUS SEC_ENTRY negotiate_SetContextAttributesW(PCtxtHandle phC
 		return SEC_E_INSUFFICIENT_MEMORY;
 
 	if (context->sspiW->SetContextAttributesW)
-		status = context->sspiW->SetContextAttributesW(&(context->SubContext), ulAttribute, pBuffer,
-		         cbBuffer);
+		status = context->sspiW->SetContextAttributesW(&(context->SubContext), ulAttribute, pBuffer, cbBuffer);
 
 	return status;
 }
 
-static SECURITY_STATUS SEC_ENTRY negotiate_SetContextAttributesA(PCtxtHandle phContext,
-        ULONG ulAttribute,
-        void* pBuffer, ULONG cbBuffer)
+static SECURITY_STATUS SEC_ENTRY negotiate_SetContextAttributesA(PCtxtHandle phContext, ULONG ulAttribute,
+                                                                 void* pBuffer, ULONG cbBuffer)
 {
 	NEGOTIATE_CONTEXT* context;
 	SECURITY_STATUS status = SEC_E_OK;
@@ -395,22 +385,21 @@ static SECURITY_STATUS SEC_ENTRY negotiate_SetContextAttributesA(PCtxtHandle phC
 		return SEC_E_INSUFFICIENT_MEMORY;
 
 	if (context->sspiA->SetContextAttributesA)
-		status = context->sspiA->SetContextAttributesA(&(context->SubContext), ulAttribute, pBuffer,
-		         cbBuffer);
+		status = context->sspiA->SetContextAttributesA(&(context->SubContext), ulAttribute, pBuffer, cbBuffer);
 
 	return status;
 }
 
-static SECURITY_STATUS SEC_ENTRY negotiate_AcquireCredentialsHandleW(SEC_WCHAR* pszPrincipal,
-        SEC_WCHAR* pszPackage,
-        ULONG fCredentialUse, void* pvLogonID, void* pAuthData, SEC_GET_KEY_FN pGetKeyFn,
-        void* pvGetKeyArgument, PCredHandle phCredential, PTimeStamp ptsExpiry)
+static SECURITY_STATUS SEC_ENTRY negotiate_AcquireCredentialsHandleW(SEC_WCHAR* pszPrincipal, SEC_WCHAR* pszPackage,
+                                                                     ULONG fCredentialUse, void* pvLogonID,
+                                                                     void* pAuthData, SEC_GET_KEY_FN pGetKeyFn,
+                                                                     void* pvGetKeyArgument, PCredHandle phCredential,
+                                                                     PTimeStamp ptsExpiry)
 {
 	SSPI_CREDENTIALS* credentials;
 	SEC_WINNT_AUTH_IDENTITY* identity;
 
-	if ((fCredentialUse != SECPKG_CRED_OUTBOUND) &&
-	    (fCredentialUse != SECPKG_CRED_INBOUND) &&
+	if ((fCredentialUse != SECPKG_CRED_OUTBOUND) && (fCredentialUse != SECPKG_CRED_INBOUND) &&
 	    (fCredentialUse != SECPKG_CRED_BOTH))
 	{
 		return SEC_E_INVALID_PARAMETER;
@@ -434,16 +423,16 @@ static SECURITY_STATUS SEC_ENTRY negotiate_AcquireCredentialsHandleW(SEC_WCHAR* 
 	return SEC_E_OK;
 }
 
-static SECURITY_STATUS SEC_ENTRY negotiate_AcquireCredentialsHandleA(SEC_CHAR* pszPrincipal,
-        SEC_CHAR* pszPackage,
-        ULONG fCredentialUse, void* pvLogonID, void* pAuthData, SEC_GET_KEY_FN pGetKeyFn,
-        void* pvGetKeyArgument, PCredHandle phCredential, PTimeStamp ptsExpiry)
+static SECURITY_STATUS SEC_ENTRY negotiate_AcquireCredentialsHandleA(SEC_CHAR* pszPrincipal, SEC_CHAR* pszPackage,
+                                                                     ULONG fCredentialUse, void* pvLogonID,
+                                                                     void* pAuthData, SEC_GET_KEY_FN pGetKeyFn,
+                                                                     void* pvGetKeyArgument, PCredHandle phCredential,
+                                                                     PTimeStamp ptsExpiry)
 {
 	SSPI_CREDENTIALS* credentials;
 	SEC_WINNT_AUTH_IDENTITY* identity;
 
-	if ((fCredentialUse != SECPKG_CRED_OUTBOUND) &&
-	    (fCredentialUse != SECPKG_CRED_INBOUND) &&
+	if ((fCredentialUse != SECPKG_CRED_OUTBOUND) && (fCredentialUse != SECPKG_CRED_INBOUND) &&
 	    (fCredentialUse != SECPKG_CRED_BOTH))
 	{
 		return SEC_E_INVALID_PARAMETER;
@@ -467,14 +456,14 @@ static SECURITY_STATUS SEC_ENTRY negotiate_AcquireCredentialsHandleA(SEC_CHAR* p
 	return SEC_E_OK;
 }
 
-static SECURITY_STATUS SEC_ENTRY negotiate_QueryCredentialsAttributesW(PCredHandle phCredential,
-        ULONG ulAttribute, void* pBuffer)
+static SECURITY_STATUS SEC_ENTRY negotiate_QueryCredentialsAttributesW(PCredHandle phCredential, ULONG ulAttribute,
+                                                                       void* pBuffer)
 {
 	return SEC_E_UNSUPPORTED_FUNCTION;
 }
 
-static SECURITY_STATUS SEC_ENTRY negotiate_QueryCredentialsAttributesA(PCredHandle phCredential,
-        ULONG ulAttribute, void* pBuffer)
+static SECURITY_STATUS SEC_ENTRY negotiate_QueryCredentialsAttributesA(PCredHandle phCredential, ULONG ulAttribute,
+                                                                       void* pBuffer)
 {
 	return SEC_E_UNSUPPORTED_FUNCTION;
 }
@@ -496,8 +485,8 @@ static SECURITY_STATUS SEC_ENTRY negotiate_FreeCredentialsHandle(PCredHandle phC
 	return SEC_E_OK;
 }
 
-static SECURITY_STATUS SEC_ENTRY negotiate_EncryptMessage(PCtxtHandle phContext, ULONG fQOP,
-        PSecBufferDesc pMessage, ULONG MessageSeqNo)
+static SECURITY_STATUS SEC_ENTRY negotiate_EncryptMessage(PCtxtHandle phContext, ULONG fQOP, PSecBufferDesc pMessage,
+                                                          ULONG MessageSeqNo)
 {
 	NEGOTIATE_CONTEXT* context;
 	SECURITY_STATUS status = SEC_E_UNSUPPORTED_FUNCTION;
@@ -509,9 +498,8 @@ static SECURITY_STATUS SEC_ENTRY negotiate_EncryptMessage(PCtxtHandle phContext,
 	return status;
 }
 
-static SECURITY_STATUS SEC_ENTRY negotiate_DecryptMessage(PCtxtHandle phContext,
-        PSecBufferDesc pMessage,
-        ULONG MessageSeqNo, ULONG* pfQOP)
+static SECURITY_STATUS SEC_ENTRY negotiate_DecryptMessage(PCtxtHandle phContext, PSecBufferDesc pMessage,
+                                                          ULONG MessageSeqNo, ULONG* pfQOP)
 {
 	NEGOTIATE_CONTEXT* context;
 	SECURITY_STATUS status = SEC_E_UNSUPPORTED_FUNCTION;
@@ -523,8 +511,8 @@ static SECURITY_STATUS SEC_ENTRY negotiate_DecryptMessage(PCtxtHandle phContext,
 	return status;
 }
 
-static SECURITY_STATUS SEC_ENTRY negotiate_MakeSignature(PCtxtHandle phContext, ULONG fQOP,
-        PSecBufferDesc pMessage, ULONG MessageSeqNo)
+static SECURITY_STATUS SEC_ENTRY negotiate_MakeSignature(PCtxtHandle phContext, ULONG fQOP, PSecBufferDesc pMessage,
+                                                         ULONG MessageSeqNo)
 {
 	NEGOTIATE_CONTEXT* context;
 	SECURITY_STATUS status = SEC_E_UNSUPPORTED_FUNCTION;
@@ -536,9 +524,8 @@ static SECURITY_STATUS SEC_ENTRY negotiate_MakeSignature(PCtxtHandle phContext, 
 	return status;
 }
 
-static SECURITY_STATUS SEC_ENTRY negotiate_VerifySignature(PCtxtHandle phContext,
-        PSecBufferDesc pMessage,
-        ULONG MessageSeqNo, ULONG* pfQOP)
+static SECURITY_STATUS SEC_ENTRY negotiate_VerifySignature(PCtxtHandle phContext, PSecBufferDesc pMessage,
+                                                           ULONG MessageSeqNo, ULONG* pfQOP)
 {
 	NEGOTIATE_CONTEXT* context;
 	SECURITY_STATUS status = SEC_E_UNSUPPORTED_FUNCTION;
@@ -550,8 +537,7 @@ static SECURITY_STATUS SEC_ENTRY negotiate_VerifySignature(PCtxtHandle phContext
 	return status;
 }
 
-const SecurityFunctionTableA NEGOTIATE_SecurityFunctionTableA =
-{
+const SecurityFunctionTableA NEGOTIATE_SecurityFunctionTableA = {
 	1, /* dwVersion */
 	NULL, /* EnumerateSecurityPackages */
 	negotiate_QueryCredentialsAttributesA, /* QueryCredentialsAttributes */
@@ -582,8 +568,7 @@ const SecurityFunctionTableA NEGOTIATE_SecurityFunctionTableA =
 	negotiate_SetContextAttributesA, /* SetContextAttributes */
 };
 
-const SecurityFunctionTableW NEGOTIATE_SecurityFunctionTableW =
-{
+const SecurityFunctionTableW NEGOTIATE_SecurityFunctionTableW = {
 	1, /* dwVersion */
 	NULL, /* EnumerateSecurityPackages */
 	negotiate_QueryCredentialsAttributesW, /* QueryCredentialsAttributes */
@@ -613,4 +598,3 @@ const SecurityFunctionTableW NEGOTIATE_SecurityFunctionTableW =
 	negotiate_DecryptMessage, /* DecryptMessage */
 	negotiate_SetContextAttributesW, /* SetContextAttributes */
 };
-

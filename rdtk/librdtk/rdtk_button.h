@@ -47,4 +47,3 @@ void rdtk_button_free(rdtkButton* button);
 #endif
 
 #endif /* RDTK_BUTTON_PRIVATE_H */
-

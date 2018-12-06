@@ -28,29 +28,29 @@
 /* BER type */
 
 /* Class - bits 8 and 7 */
-#define BER_CLASS_MASK		0xC0
-#define BER_CLASS_UNIV		0x00 /* 0 0 */
-#define BER_CLASS_APPL		0x40 /* 0 1 */
-#define BER_CLASS_CTXT		0x80 /* 1 0 */
-#define BER_CLASS_PRIV		0xC0 /* 1 1 */
+#define BER_CLASS_MASK 0xC0
+#define BER_CLASS_UNIV 0x00 /* 0 0 */
+#define BER_CLASS_APPL 0x40 /* 0 1 */
+#define BER_CLASS_CTXT 0x80 /* 1 0 */
+#define BER_CLASS_PRIV 0xC0 /* 1 1 */
 
 /* P/C - bit 6 */
-#define BER_PC_MASK		0x20
-#define BER_PRIMITIVE		0x00 /* 0 */
-#define BER_CONSTRUCT		0x20 /* 1 */
+#define BER_PC_MASK 0x20
+#define BER_PRIMITIVE 0x00 /* 0 */
+#define BER_CONSTRUCT 0x20 /* 1 */
 
 /* Tag - bits 5 to 1 */
-#define BER_TAG_MASK		0x1F
-#define BER_TAG_BOOLEAN		0x01
-#define BER_TAG_INTEGER		0x02
-#define BER_TAG_BIT_STRING	0x03
-#define BER_TAG_OCTET_STRING	0x04
-#define BER_TAG_OBJECT_IDENFIER	0x06
-#define BER_TAG_ENUMERATED	0x0A
-#define BER_TAG_SEQUENCE	0x10
-#define BER_TAG_SEQUENCE_OF	0x10
+#define BER_TAG_MASK 0x1F
+#define BER_TAG_BOOLEAN 0x01
+#define BER_TAG_INTEGER 0x02
+#define BER_TAG_BIT_STRING 0x03
+#define BER_TAG_OCTET_STRING 0x04
+#define BER_TAG_OBJECT_IDENFIER 0x06
+#define BER_TAG_ENUMERATED 0x0A
+#define BER_TAG_SEQUENCE 0x10
+#define BER_TAG_SEQUENCE_OF 0x10
 
-#define BER_PC(_pc)	(_pc ? BER_CONSTRUCT : BER_PRIMITIVE)
+#define BER_PC(_pc) (_pc ? BER_CONSTRUCT : BER_PRIMITIVE)
 
 #ifdef __cplusplus
 extern "C" {

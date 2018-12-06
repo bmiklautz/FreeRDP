@@ -71,8 +71,7 @@ static BOOL shadow_input_mouse_event(rdpInput* input, UINT16 flags, UINT16 x, UI
 		client->pointerX = x;
 		client->pointerY = y;
 
-		if ((client->pointerX == subsystem->pointerX) &&
-		    (client->pointerY == subsystem->pointerY))
+		if ((client->pointerX == subsystem->pointerX) && (client->pointerY == subsystem->pointerY))
 		{
 			flags &= ~PTR_FLAGS_MOVE;
 

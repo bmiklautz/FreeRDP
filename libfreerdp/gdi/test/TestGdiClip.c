@@ -58,8 +58,7 @@ static int test_gdi_ClipCoords(void)
 	gdi_SetClipRgn(hdc, 300, 300, 100, 100);
 	gdi_SetRgn(rgn1, 20, 20, 100, 100);
 	gdi_SetRgn(rgn2, 0, 0, 0, 0);
-	draw = gdi_ClipCoords(hdc, &(rgn1->x), &(rgn1->y), &(rgn1->w), &(rgn1->h), NULL,
-	                      NULL);
+	draw = gdi_ClipCoords(hdc, &(rgn1->x), &(rgn1->y), &(rgn1->w), &(rgn1->h), NULL, NULL);
 
 	if (draw)
 		goto fail;
@@ -68,8 +67,7 @@ static int test_gdi_ClipCoords(void)
 	gdi_SetClipRgn(hdc, 300, 300, 100, 100);
 	gdi_SetRgn(rgn1, 420, 420, 100, 100);
 	gdi_SetRgn(rgn2, 0, 0, 0, 0);
-	draw = gdi_ClipCoords(hdc, &(rgn1->x), &(rgn1->y), &(rgn1->w), &(rgn1->h), NULL,
-	                      NULL);
+	draw = gdi_ClipCoords(hdc, &(rgn1->x), &(rgn1->y), &(rgn1->w), &(rgn1->h), NULL, NULL);
 
 	if (draw)
 		goto fail;
@@ -78,8 +76,7 @@ static int test_gdi_ClipCoords(void)
 	gdi_SetClipRgn(hdc, 300, 300, 100, 100);
 	gdi_SetRgn(rgn1, 300, 20, 100, 100);
 	gdi_SetRgn(rgn2, 0, 0, 0, 0);
-	draw = gdi_ClipCoords(hdc, &(rgn1->x), &(rgn1->y), &(rgn1->w), &(rgn1->h), NULL,
-	                      NULL);
+	draw = gdi_ClipCoords(hdc, &(rgn1->x), &(rgn1->y), &(rgn1->w), &(rgn1->h), NULL, NULL);
 
 	if (draw)
 		goto fail;
@@ -88,8 +85,7 @@ static int test_gdi_ClipCoords(void)
 	gdi_SetClipRgn(hdc, 300, 300, 100, 100);
 	gdi_SetRgn(rgn1, 300, 420, 100, 100);
 	gdi_SetRgn(rgn2, 0, 0, 0, 0);
-	draw = gdi_ClipCoords(hdc, &(rgn1->x), &(rgn1->y), &(rgn1->w), &(rgn1->h), NULL,
-	                      NULL);
+	draw = gdi_ClipCoords(hdc, &(rgn1->x), &(rgn1->y), &(rgn1->w), &(rgn1->h), NULL, NULL);
 
 	if (draw)
 		goto fail;
@@ -160,9 +156,9 @@ static int test_gdi_ClipCoords(void)
 	rc = 0;
 fail:
 
-	gdi_DeleteObject((HGDIOBJECT)rgn1);
-	gdi_DeleteObject((HGDIOBJECT)rgn2);
-	gdi_DeleteObject((HGDIOBJECT)bmp);
+	gdi_DeleteObject((HGDIOBJECT) rgn1);
+	gdi_DeleteObject((HGDIOBJECT) rgn2);
+	gdi_DeleteObject((HGDIOBJECT) bmp);
 
 	gdi_DeleteDC(hdc);
 	return rc;
@@ -327,9 +323,9 @@ static int test_gdi_InvalidateRegion(void)
 	rc = 0;
 fail:
 
-	gdi_DeleteObject((HGDIOBJECT)rgn1);
-	gdi_DeleteObject((HGDIOBJECT)rgn2);
-	gdi_DeleteObject((HGDIOBJECT)bmp);
+	gdi_DeleteObject((HGDIOBJECT) rgn1);
+	gdi_DeleteObject((HGDIOBJECT) rgn2);
+	gdi_DeleteObject((HGDIOBJECT) bmp);
 
 	gdi_DeleteDC(hdc);
 	return 0;
@@ -349,4 +345,3 @@ int TestGdiClip(int argc, char* argv[])
 
 	return 0;
 }
-

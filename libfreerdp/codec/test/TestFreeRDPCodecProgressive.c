@@ -173,8 +173,7 @@ static void* test_image_memset32(UINT32* ptr, UINT32 fill, size_t length)
 	return (void*) ptr;
 }
 
-static int test_image_fill(BYTE* pDstData, int nDstStep, int nXDst, int nYDst, int nWidth,
-                           int nHeight, UINT32 color)
+static int test_image_fill(BYTE* pDstData, int nDstStep, int nXDst, int nYDst, int nWidth, int nHeight, UINT32 color)
 {
 	int y;
 	UINT32* pDstPixel;
@@ -191,8 +190,7 @@ static int test_image_fill(BYTE* pDstData, int nDstStep, int nXDst, int nYDst, i
 	return 1;
 }
 
-static int test_image_fill_quarter(BYTE* pDstData, int nDstStep, int nWidth, int nHeight,
-                                   UINT32 color, int quarter)
+static int test_image_fill_quarter(BYTE* pDstData, int nDstStep, int nWidth, int nHeight, UINT32 color, int quarter)
 {
 	int x = 0;
 	int y = 0;
@@ -234,8 +232,8 @@ static int test_image_fill_quarter(BYTE* pDstData, int nDstStep, int nWidth, int
 	return 1;
 }
 
-static int test_image_fill_unused_quarters(BYTE* pDstData, int nDstStep, int nWidth, int nHeight,
-        UINT32 color, int quarter)
+static int test_image_fill_unused_quarters(BYTE* pDstData, int nDstStep, int nWidth, int nHeight, UINT32 color,
+                                           int quarter)
 {
 	return 1;
 
@@ -311,162 +309,162 @@ static int test_progressive_load_files(char* ms_sample_path, EGFX_SAMPLE_FILE fi
 	int quarterNo = 0;
 	int passNo = 0;
 	/* image 1 */
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_0_0_025_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_0_0_025_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_0_0_050_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_0_0_050_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_0_0_075_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_0_0_075_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_0_0_100_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
-	passNo = (passNo + 1) % 4;
-	quarterNo = (quarterNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_0_1_025_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
-	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_0_1_050_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
-	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_0_1_075_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
-	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_0_1_100_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_0_0_100_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
 	quarterNo = (quarterNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_0_2_025_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_0_1_025_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_0_2_050_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_0_1_050_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_0_2_075_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_0_1_075_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_0_2_100_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_0_1_100_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
 	quarterNo = (quarterNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_0_3_025_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_0_2_025_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_0_3_050_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_0_2_050_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_0_3_075_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_0_2_075_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_0_3_100_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_0_2_100_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
+	passNo = (passNo + 1) % 4;
+	quarterNo = (quarterNo + 1) % 4;
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_0_3_025_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
+	passNo = (passNo + 1) % 4;
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_0_3_050_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
+	passNo = (passNo + 1) % 4;
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_0_3_075_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
+	passNo = (passNo + 1) % 4;
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_0_3_100_sampleimage1.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
 	imageNo++;
 	/* image 2 */
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_1_0_025_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_1_0_025_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_1_0_050_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_1_0_050_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_1_0_075_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_1_0_075_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_1_0_100_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
-	passNo = (passNo + 1) % 4;
-	quarterNo = (quarterNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_1_1_025_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
-	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_1_1_050_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
-	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_1_1_075_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
-	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_1_1_100_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_1_0_100_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
 	quarterNo = (quarterNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_1_2_025_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_1_1_025_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_1_2_050_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_1_1_050_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_1_2_075_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_1_1_075_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_1_2_100_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_1_1_100_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
 	quarterNo = (quarterNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_1_3_025_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_1_2_025_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_1_3_050_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_1_2_050_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_1_3_075_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_1_2_075_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_1_3_100_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_1_2_100_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
+	passNo = (passNo + 1) % 4;
+	quarterNo = (quarterNo + 1) % 4;
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_1_3_025_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
+	passNo = (passNo + 1) % 4;
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_1_3_050_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
+	passNo = (passNo + 1) % 4;
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_1_3_075_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
+	passNo = (passNo + 1) % 4;
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_1_3_100_sampleimage2.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
 	imageNo++;
 	/* image 3 */
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_2_0_025_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_2_0_025_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_2_0_050_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_2_0_050_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_2_0_075_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_2_0_075_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_2_0_100_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
-	passNo = (passNo + 1) % 4;
-	quarterNo = (quarterNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_2_1_025_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
-	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_2_1_050_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
-	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_2_1_075_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
-	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_2_1_100_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_2_0_100_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
 	quarterNo = (quarterNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_2_2_025_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_2_1_025_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_2_2_050_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_2_1_050_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_2_2_075_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_2_1_075_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_2_2_100_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_2_1_100_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
 	quarterNo = (quarterNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_2_3_025_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_2_2_025_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_2_3_050_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_2_2_050_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_2_3_075_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_2_2_075_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
 	passNo = (passNo + 1) % 4;
-	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(ms_sample_path,
-	        "compress/enc_2_3_100_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_2_2_100_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
+	passNo = (passNo + 1) % 4;
+	quarterNo = (quarterNo + 1) % 4;
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_2_3_025_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
+	passNo = (passNo + 1) % 4;
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_2_3_050_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
+	passNo = (passNo + 1) % 4;
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_2_3_075_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
+	passNo = (passNo + 1) % 4;
+	files[imageNo][quarterNo][passNo].buffer = test_progressive_load_file(
+	  ms_sample_path, "compress/enc_2_3_100_sampleimage3.bin", &(files[imageNo][quarterNo][passNo].size));
 
 	/* check if all test data has been loaded */
 
@@ -509,8 +507,7 @@ static BYTE* test_progressive_load_bitmap(char* path, char* file, size_t* size, 
 	buffer = image->data;
 	*size = image->height * image->scanline;
 	test_fill_image_alpha_channel(image->data, image->width, image->height, 0xFF);
-	test_image_fill_unused_quarters(image->data, image->scanline, image->width, image->height, quarter,
-	                                0xFF000000);
+	test_image_fill_unused_quarters(image->data, image->scanline, image->width, image->height, quarter, 0xFF000000);
 	winpr_image_free(image, FALSE);
 	free(filename);
 	return buffer;
@@ -522,162 +519,210 @@ static int test_progressive_load_bitmaps(char* ms_sample_path, EGFX_SAMPLE_FILE 
 	int quarterNo = 0;
 	int passNo = 0;
 	/* image 1 */
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_0_0_025_sampleimage1.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_0_0_025_sampleimage1.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_0_0_050_sampleimage1.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_0_0_050_sampleimage1.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_0_0_075_sampleimage1.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_0_0_075_sampleimage1.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_0_0_100_sampleimage1.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
-	passNo = (passNo + 1) % 4;
-	quarterNo = (quarterNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_0_1_025_sampleimage1.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
-	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_0_1_050_sampleimage1.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
-	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_0_1_075_sampleimage1.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
-	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_0_1_100_sampleimage1.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_0_0_100_sampleimage1.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
 	quarterNo = (quarterNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_0_2_025_sampleimage1.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_0_1_025_sampleimage1.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_0_2_050_sampleimage1.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_0_1_050_sampleimage1.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_0_2_075_sampleimage1.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_0_1_075_sampleimage1.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_0_2_100_sampleimage1.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_0_1_100_sampleimage1.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
 	quarterNo = (quarterNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_0_3_025_sampleimage1.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_0_2_025_sampleimage1.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_0_3_050_sampleimage1.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_0_2_050_sampleimage1.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_0_3_075_sampleimage1.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_0_2_075_sampleimage1.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_0_3_100_sampleimage1.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_0_2_100_sampleimage1.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	passNo = (passNo + 1) % 4;
+	quarterNo = (quarterNo + 1) % 4;
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_0_3_025_sampleimage1.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	passNo = (passNo + 1) % 4;
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_0_3_050_sampleimage1.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	passNo = (passNo + 1) % 4;
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_0_3_075_sampleimage1.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	passNo = (passNo + 1) % 4;
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_0_3_100_sampleimage1.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
 	imageNo++;
 	/* image 2 */
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_1_0_025_sampleimage2.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_1_0_025_sampleimage2.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_1_0_050_sampleimage2.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_1_0_050_sampleimage2.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_1_0_075_sampleimage2.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_1_0_075_sampleimage2.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_1_0_100_sampleimage2.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
-	passNo = (passNo + 1) % 4;
-	quarterNo = (quarterNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_1_1_025_sampleimage2.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
-	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_1_1_050_sampleimage2.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
-	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_1_1_075_sampleimage2.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
-	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_1_1_100_sampleimage2.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_1_0_100_sampleimage2.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
 	quarterNo = (quarterNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_1_2_025_sampleimage2.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_1_1_025_sampleimage2.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_1_2_050_sampleimage2.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_1_1_050_sampleimage2.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_1_2_075_sampleimage2.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_1_1_075_sampleimage2.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_1_2_100_sampleimage2.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_1_1_100_sampleimage2.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
 	quarterNo = (quarterNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_1_3_025_sampleimage2.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_1_2_025_sampleimage2.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_1_3_050_sampleimage2.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_1_2_050_sampleimage2.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_1_3_075_sampleimage2.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_1_2_075_sampleimage2.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_1_3_100_sampleimage2.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_1_2_100_sampleimage2.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	passNo = (passNo + 1) % 4;
+	quarterNo = (quarterNo + 1) % 4;
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_1_3_025_sampleimage2.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	passNo = (passNo + 1) % 4;
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_1_3_050_sampleimage2.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	passNo = (passNo + 1) % 4;
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_1_3_075_sampleimage2.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	passNo = (passNo + 1) % 4;
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_1_3_100_sampleimage2.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
 	imageNo++;
 	/* image 3 */
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_2_0_025_sampleimage3.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_2_0_025_sampleimage3.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_2_0_050_sampleimage3.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_2_0_050_sampleimage3.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_2_0_075_sampleimage3.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_2_0_075_sampleimage3.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_2_0_100_sampleimage3.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
-	passNo = (passNo + 1) % 4;
-	quarterNo = (quarterNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_2_1_025_sampleimage3.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
-	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_2_1_050_sampleimage3.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
-	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_2_1_075_sampleimage3.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
-	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_2_1_100_sampleimage3.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_2_0_100_sampleimage3.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
 	quarterNo = (quarterNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_2_2_025_sampleimage3.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_2_1_025_sampleimage3.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_2_2_050_sampleimage3.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_2_1_050_sampleimage3.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_2_2_075_sampleimage3.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_2_1_075_sampleimage3.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_2_2_100_sampleimage3.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_2_1_100_sampleimage3.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
 	quarterNo = (quarterNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_2_3_025_sampleimage3.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_2_2_025_sampleimage3.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_2_3_050_sampleimage3.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_2_2_050_sampleimage3.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_2_3_075_sampleimage3.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_2_2_075_sampleimage3.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 	passNo = (passNo + 1) % 4;
-	bitmaps[imageNo][quarterNo][passNo].buffer = test_progressive_load_bitmap(ms_sample_path,
-	        "decompress/dec_2_3_100_sampleimage3.bmp", &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_2_2_100_sampleimage3.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	passNo = (passNo + 1) % 4;
+	quarterNo = (quarterNo + 1) % 4;
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_2_3_025_sampleimage3.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	passNo = (passNo + 1) % 4;
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_2_3_050_sampleimage3.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	passNo = (passNo + 1) % 4;
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_2_3_075_sampleimage3.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
+	passNo = (passNo + 1) % 4;
+	bitmaps[imageNo][quarterNo][passNo].buffer =
+	  test_progressive_load_bitmap(ms_sample_path, "decompress/dec_2_3_100_sampleimage3.bmp",
+	                               &(bitmaps[imageNo][quarterNo][passNo].size), quarterNo);
 
 	/* check if all test data has been loaded */
 
@@ -742,8 +787,8 @@ static int test_progressive_decode(PROGRESSIVE_CONTEXT* progressive, EGFX_SAMPLE
 
 	for (pass = 0; pass < count; pass++)
 	{
-		status = progressive_decompress(progressive, files[pass].buffer, files[pass].size,
-		                                g_DstData, PIXEL_FORMAT_XRGB32, g_DstStep, 0, 0, NULL, 0);
+		status = progressive_decompress(progressive, files[pass].buffer, files[pass].size, g_DstData,
+		                                PIXEL_FORMAT_XRGB32, g_DstStep, 0, 0, NULL, 0);
 		printf("ProgressiveDecompress: status: %d pass: %d\n", status, pass + 1);
 		region = &(progressive->region);
 
@@ -796,8 +841,7 @@ static int test_progressive_decode(PROGRESSIVE_CONTEXT* progressive, EGFX_SAMPLE
 
 			nXSrc = nXDst - tile->x;
 			nYSrc = nYDst - tile->y;
-			freerdp_image_copy(g_DstData, PIXEL_FORMAT_XRGB32, g_DstStep,
-			                   nXDst, nYDst, nWidth, nHeight, tile->data,
+			freerdp_image_copy(g_DstData, PIXEL_FORMAT_XRGB32, g_DstStep, nXDst, nYDst, nWidth, nHeight, tile->data,
 			                   PIXEL_FORMAT_XRGB32, 64 * 4, nXSrc, nYSrc, NULL, FREERDP_FLIP_NONE);
 		}
 
@@ -811,7 +855,7 @@ static int test_progressive_decode(PROGRESSIVE_CONTEXT* progressive, EGFX_SAMPLE
 			printf("Actual, Expected (%d/%d = %.3f%%):\n", cnt, size, rate);
 		}
 
-		//WLog_Image(progressive->log, WLOG_TRACE, g_DstData, g_Width, g_Height, 32);
+		// WLog_Image(progressive->log, WLOG_TRACE, g_DstData, g_Width, g_Height, 32);
 	}
 
 	return 1;
@@ -928,7 +972,8 @@ int TestFreeRDPCodecProgressive(int argc, char* argv[])
 	SYSTEMTIME systemTime;
 	GetSystemTime(&systemTime);
 	sprintf_s(name, sizeof(name),
-	          "EGFX_PROGRESSIVE_MS_SAMPLE-%04"PRIu16"%02"PRIu16"%02"PRIu16"%02"PRIu16"%02"PRIu16"%02"PRIu16"%04"PRIu16,
+	          "EGFX_PROGRESSIVE_MS_SAMPLE-%04" PRIu16 "%02" PRIu16 "%02" PRIu16 "%02" PRIu16 "%02" PRIu16 "%02" PRIu16
+	          "%04" PRIu16,
 	          systemTime.wYear, systemTime.wMonth, systemTime.wDay, systemTime.wHour, systemTime.wMinute,
 	          systemTime.wSecond, systemTime.wMilliseconds);
 	ms_sample_path = GetKnownSubPath(KNOWN_PATH_TEMP, name);

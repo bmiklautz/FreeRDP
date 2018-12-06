@@ -31,8 +31,8 @@
 
 #define TAG FREERDP_TAG("core.gateway.ntlm")
 
-static wStream* rpc_ntlm_http_request(HttpContext* http, const char* method,
-                                      int contentLength, const SecBuffer* ntlmToken)
+static wStream* rpc_ntlm_http_request(HttpContext* http, const char* method, int contentLength,
+                                      const SecBuffer* ntlmToken)
 {
 	wStream* s = NULL;
 	HttpRequest* request = NULL;
@@ -52,15 +52,13 @@ static wStream* rpc_ntlm_http_request(HttpContext* http, const char* method,
 
 	uri = http_context_get_uri(http);
 
-	if (!http_request_set_method(request, method) ||
-	    !http_request_set_content_length(request, contentLength) ||
+	if (!http_request_set_method(request, method) || !http_request_set_content_length(request, contentLength) ||
 	    !http_request_set_uri(request, uri))
 		goto fail;
 
 	if (base64NtlmToken)
 	{
-		if (!http_request_set_auth_scheme(request, "NTLM") ||
-		    !http_request_set_auth_param(request, base64NtlmToken))
+		if (!http_request_set_auth_scheme(request, "NTLM") || !http_request_set_auth_param(request, base64NtlmToken))
 			goto fail;
 	}
 
@@ -102,8 +100,7 @@ BOOL rpc_ncacn_http_send_in_channel_request(RpcChannel* inChannel)
 	return (status > 0) ? 1 : -1;
 }
 
-BOOL rpc_ncacn_http_recv_in_channel_response(RpcChannel* inChannel,
-        HttpResponse* response)
+BOOL rpc_ncacn_http_recv_in_channel_response(RpcChannel* inChannel, HttpResponse* response)
 {
 	const char* token64 = NULL;
 	int ntlmTokenLength = 0;
@@ -143,13 +140,13 @@ BOOL rpc_ncacn_http_ntlm_init(rdpContext* context, RpcChannel* channel)
 	if (!tls || !ntlm || !instance || !settings)
 		return FALSE;
 
-	if (!settings->GatewayPassword || !settings->GatewayUsername ||
-	    !strlen(settings->GatewayPassword) || !strlen(settings->GatewayUsername))
+	if (!settings->GatewayPassword || !settings->GatewayUsername || !strlen(settings->GatewayPassword) ||
+	    !strlen(settings->GatewayUsername))
 	{
 		if (instance->GatewayAuthenticate)
 		{
 			BOOL proceed = instance->GatewayAuthenticate(instance, &settings->GatewayUsername,
-			               &settings->GatewayPassword, &settings->GatewayDomain);
+			                                             &settings->GatewayPassword, &settings->GatewayDomain);
 
 			if (!proceed)
 			{
@@ -186,8 +183,8 @@ BOOL rpc_ncacn_http_ntlm_init(rdpContext* context, RpcChannel* channel)
 		}
 	}
 
-	if (!ntlm_client_init(ntlm, TRUE, settings->GatewayUsername,
-	                      settings->GatewayDomain, settings->GatewayPassword, tls->Bindings))
+	if (!ntlm_client_init(ntlm, TRUE, settings->GatewayUsername, settings->GatewayDomain, settings->GatewayPassword,
+	                      tls->Bindings))
 	{
 		return TRUE;
 	}
@@ -209,8 +206,7 @@ void rpc_ncacn_http_ntlm_uninit(RpcChannel* channel)
 	channel->ntlm = NULL;
 }
 
-BOOL rpc_ncacn_http_send_out_channel_request(RpcChannel* outChannel,
-        BOOL replacement)
+BOOL rpc_ncacn_http_send_out_channel_request(RpcChannel* outChannel, BOOL replacement)
 {
 	BOOL rc = TRUE;
 	wStream* s;
@@ -247,8 +243,7 @@ BOOL rpc_ncacn_http_send_out_channel_request(RpcChannel* outChannel,
 	return rc;
 }
 
-BOOL rpc_ncacn_http_recv_out_channel_response(RpcChannel* outChannel,
-        HttpResponse* response)
+BOOL rpc_ncacn_http_recv_out_channel_response(RpcChannel* outChannel, HttpResponse* response)
 {
 	const char* token64 = NULL;
 	int ntlmTokenLength = 0;

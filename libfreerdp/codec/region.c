@@ -108,7 +108,7 @@ const RECTANGLE_16* region16_rects(const REGION16* region, UINT32* nbRects)
 	if (nbRects)
 		*nbRects = data->nbRects;
 
-	return (RECTANGLE_16*)(data + 1);
+	return (RECTANGLE_16*) (data + 1);
 }
 
 static INLINE RECTANGLE_16* region16_rects_noconst(REGION16* region)
@@ -119,7 +119,7 @@ static INLINE RECTANGLE_16* region16_rects_noconst(REGION16* region)
 	if (!data)
 		return NULL;
 
-	return (RECTANGLE_16*)(&data[1]);
+	return (RECTANGLE_16*) (&data[1]);
 }
 
 const RECTANGLE_16* region16_extents(const REGION16* region)
@@ -155,8 +155,9 @@ BOOL region16_is_empty(const REGION16* region)
 
 BOOL rectangles_equal(const RECTANGLE_16* r1, const RECTANGLE_16* r2)
 {
-	return ((r1->left == r2->left) && (r1->top == r2->top) &&
-	        (r1->right == r2->right) && (r1->bottom == r2->bottom)) ? TRUE : FALSE;
+	return ((r1->left == r2->left) && (r1->top == r2->top) && (r1->right == r2->right) && (r1->bottom == r2->bottom))
+	  ? TRUE
+	  : FALSE;
 }
 
 BOOL rectangles_intersects(const RECTANGLE_16* r1, const RECTANGLE_16* r2)
@@ -165,8 +166,7 @@ BOOL rectangles_intersects(const RECTANGLE_16* r1, const RECTANGLE_16* r2)
 	return rectangles_intersection(r1, r2, &tmp);
 }
 
-BOOL rectangles_intersection(const RECTANGLE_16* r1, const RECTANGLE_16* r2,
-                             RECTANGLE_16* dst)
+BOOL rectangles_intersection(const RECTANGLE_16* r1, const RECTANGLE_16* r2, RECTANGLE_16* dst)
 {
 	dst->left = MAX(r1->left, r2->left);
 	dst->right = MIN(r1->right, r2->right);
@@ -238,30 +238,27 @@ void region16_print(const REGION16* region)
 	UINT32 nbRects, i;
 	int currentBandY = -1;
 	rects = region16_rects(region, &nbRects);
-	WLog_DBG(TAG,  "nrects=%"PRIu32"", nbRects);
+	WLog_DBG(TAG, "nrects=%" PRIu32 "", nbRects);
 
 	for (i = 0; i < nbRects; i++, rects++)
 	{
 		if (rects->top != currentBandY)
 		{
 			currentBandY = rects->top;
-			WLog_DBG(TAG,  "band %d: ", currentBandY);
+			WLog_DBG(TAG, "band %d: ", currentBandY);
 		}
 
-		WLog_DBG(TAG,  "(%"PRIu16",%"PRIu16"-%"PRIu16",%"PRIu16")", rects->left, rects->top, rects->right,
+		WLog_DBG(TAG, "(%" PRIu16 ",%" PRIu16 "-%" PRIu16 ",%" PRIu16 ")", rects->left, rects->top, rects->right,
 		         rects->bottom);
 	}
 }
 
-static void region16_copy_band_with_union(RECTANGLE_16* dst,
-        const RECTANGLE_16* src, const RECTANGLE_16* end,
-        UINT16 newTop, UINT16 newBottom,
-        const RECTANGLE_16* unionRect,
-        UINT32* dstCounter,
-        const RECTANGLE_16** srcPtr, RECTANGLE_16** dstPtr)
+static void region16_copy_band_with_union(RECTANGLE_16* dst, const RECTANGLE_16* src, const RECTANGLE_16* end,
+                                          UINT16 newTop, UINT16 newBottom, const RECTANGLE_16* unionRect,
+                                          UINT32* dstCounter, const RECTANGLE_16** srcPtr, RECTANGLE_16** dstPtr)
 {
 	UINT16 refY = src->top;
-	const RECTANGLE_16* startOverlap, *endOverlap;
+	const RECTANGLE_16 *startOverlap, *endOverlap;
 
 	/* merges a band with the given rect
 	 * Input:
@@ -385,8 +382,7 @@ static BOOL band_match(const RECTANGLE_16* band1, const RECTANGLE_16* band2, REC
  * @param rect the rectangle to test
  * @return if rect is fully included in an item of the band
  */
-static BOOL rectangle_contained_in_band(const RECTANGLE_16* band, const RECTANGLE_16* endPtr,
-                                        const RECTANGLE_16* rect)
+static BOOL rectangle_contained_in_band(const RECTANGLE_16* band, const RECTANGLE_16* endPtr, const RECTANGLE_16* rect)
 {
 	UINT16 refY = band->top;
 
@@ -420,7 +416,7 @@ static BOOL region16_simplify_bands(REGION16* region)
 	 *  ====================          ====================
 	 *
 	 */
-	RECTANGLE_16* band1, *band2, *endPtr, *endBand, *tmp;
+	RECTANGLE_16 *band1, *band2, *endPtr, *endBand, *tmp;
 	int nbRects, finalNbRects;
 	int bandItems, toMove;
 	finalNbRects = nbRects = region16_n_rects(region);
@@ -464,8 +460,7 @@ static BOOL region16_simplify_bands(REGION16* region)
 		{
 			band1 = band2;
 		}
-	}
-	while (TRUE);
+	} while (TRUE);
 
 	if (finalNbRects != nbRects)
 	{
@@ -489,7 +484,7 @@ BOOL region16_union_rect(REGION16* dst, const REGION16* src, const RECTANGLE_16*
 {
 	const RECTANGLE_16* srcExtents;
 	RECTANGLE_16* dstExtents;
-	const RECTANGLE_16* currentBand, *endSrcRect, *nextBand;
+	const RECTANGLE_16 *currentBand, *endSrcRect, *nextBand;
 	REGION16_DATA* newItems = NULL;
 	RECTANGLE_16* dstRect = NULL;
 	UINT32 usedRects, srcNbRects;
@@ -522,7 +517,7 @@ BOOL region16_union_rect(REGION16* dst, const REGION16* src, const RECTANGLE_16*
 	if (!newItems)
 		return FALSE;
 
-	dstRect = (RECTANGLE_16*)(&newItems[1]);
+	dstRect = (RECTANGLE_16*) (&newItems[1]);
 	usedRects = 0;
 
 	/* adds the piece of rect that is on the top of src */
@@ -548,28 +543,25 @@ BOOL region16_union_rect(REGION16* dst, const REGION16* src, const RECTANGLE_16*
 			/* no overlap between rect and the band, rect is totally below or totally above
 			 * the current band, or rect is already covered by an item of the band.
 			 * let's copy all the rectangles from this band
-						+----+
-						|    |   rect (case 1)
-						+----+
+			            +----+
+			            |    |   rect (case 1)
+			            +----+
 
 			   =================
 			band of srcRect
 			 =================
-					+----+
-					|    |   rect (case 2)
-					+----+
+			        +----+
+			        |    |   rect (case 2)
+			        +----+
 			*/
-			region16_copy_band_with_union(dstRect,
-			                              currentBand, endSrcRect,
-			                              currentBand->top, currentBand->bottom,
-			                              NULL, &usedRects,
-			                              &nextBand, &dstRect);
+			region16_copy_band_with_union(dstRect, currentBand, endSrcRect, currentBand->top, currentBand->bottom, NULL,
+			                              &usedRects, &nextBand, &dstRect);
 			topInterBand = rect->top;
 		}
 		else
 		{
 			/* rect overlaps the band:
-					   |    |  |    |
+			           |    |  |    |
 			====^=================|    |==|    |=========================== band
 			|   top split     |    |  |    |
 			v                 | 1  |  | 2  |
@@ -579,7 +571,7 @@ BOOL region16_union_rect(REGION16* dst, const REGION16* src, const RECTANGLE_16*
 			^                         |    |  | 3  |
 			|   bottom split          |    |  |    |
 			====v=========================|    |==|    |===================
-					   |    |  |    |
+			           |    |  |    |
 
 			 possible cases:
 			 1) no top split, merge zone then a bottom split. The band will be splitted
@@ -596,11 +588,8 @@ BOOL region16_union_rect(REGION16* dst, const REGION16* src, const RECTANGLE_16*
 			/* test if we need a top split, case 3 and 4 */
 			if (rect->top > currentBand->top)
 			{
-				region16_copy_band_with_union(dstRect,
-				                              currentBand, endSrcRect,
-				                              currentBand->top, rect->top,
-				                              NULL, &usedRects,
-				                              &nextBand, &dstRect);
+				region16_copy_band_with_union(dstRect, currentBand, endSrcRect, currentBand->top, rect->top, NULL,
+				                              &usedRects, &nextBand, &dstRect);
 				mergeTop = rect->top;
 			}
 
@@ -608,20 +597,14 @@ BOOL region16_union_rect(REGION16* dst, const REGION16* src, const RECTANGLE_16*
 			if (rect->bottom < currentBand->bottom)
 				mergeBottom = rect->bottom;
 
-			region16_copy_band_with_union(dstRect,
-			                              currentBand, endSrcRect,
-			                              mergeTop, mergeBottom,
-			                              rect, &usedRects,
+			region16_copy_band_with_union(dstRect, currentBand, endSrcRect, mergeTop, mergeBottom, rect, &usedRects,
 			                              &nextBand, &dstRect);
 
 			/* test if we need a bottom split, case 1 and 4 */
 			if (rect->bottom < currentBand->bottom)
 			{
-				region16_copy_band_with_union(dstRect,
-				                              currentBand, endSrcRect,
-				                              mergeBottom, currentBand->bottom,
-				                              NULL, &usedRects,
-				                              &nextBand, &dstRect);
+				region16_copy_band_with_union(dstRect, currentBand, endSrcRect, mergeBottom, currentBand->bottom, NULL,
+				                              &usedRects, &nextBand, &dstRect);
 			}
 
 			topInterBand = currentBand->bottom;
@@ -642,8 +625,8 @@ BOOL region16_union_rect(REGION16* dst, const REGION16* src, const RECTANGLE_16*
 		 * ===============================================================
 		 *
 		 */
-		if ((nextBand < endSrcRect) && (nextBand->top != currentBand->bottom) &&
-		    (rect->bottom > currentBand->bottom) && (rect->top < nextBand->top))
+		if ((nextBand < endSrcRect) && (nextBand->top != currentBand->bottom) && (rect->bottom > currentBand->bottom) &&
+		    (rect->top < nextBand->top))
 		{
 			dstRect->right = rect->right;
 			dstRect->left = rect->left;
@@ -689,7 +672,7 @@ BOOL region16_union_rect(REGION16* dst, const REGION16* src, const RECTANGLE_16*
 
 BOOL region16_intersects_rect(const REGION16* src, const RECTANGLE_16* arg2)
 {
-	const RECTANGLE_16* rect, *endPtr, *srcExtents;
+	const RECTANGLE_16 *rect, *endPtr, *srcExtents;
 	UINT32 nbRects;
 
 	if (!src || !src->data || !arg2)
@@ -720,7 +703,7 @@ BOOL region16_intersects_rect(const REGION16* src, const RECTANGLE_16* arg2)
 BOOL region16_intersect_rect(REGION16* dst, const REGION16* src, const RECTANGLE_16* rect)
 {
 	REGION16_DATA* newItems;
-	const RECTANGLE_16* srcPtr, *endPtr, *srcExtents;
+	const RECTANGLE_16 *srcPtr, *endPtr, *srcExtents;
 	RECTANGLE_16* dstPtr;
 	UINT32 nbRects, usedRects;
 	RECTANGLE_16 common, newExtents;
@@ -752,7 +735,7 @@ BOOL region16_intersect_rect(REGION16* dst, const REGION16* src, const RECTANGLE
 	if (!newItems)
 		return FALSE;
 
-	dstPtr = (RECTANGLE_16*)(&newItems[1]);
+	dstPtr = (RECTANGLE_16*) (&newItems[1]);
 	usedRects = 0;
 	ZeroMemory(&newExtents, sizeof(newExtents));
 

@@ -24,8 +24,8 @@
 /**
  * Write a foreground/background image to a destination buffer.
  */
-static INLINE BYTE* WRITEFGBGIMAGE(BYTE* pbDest, const BYTE* pbDestEnd, UINT32 rowDelta,
-                                   BYTE bitmask, PIXEL fgPel, INT32 cBits)
+static INLINE BYTE* WRITEFGBGIMAGE(BYTE* pbDest, const BYTE* pbDestEnd, UINT32 rowDelta, BYTE bitmask, PIXEL fgPel,
+                                   INT32 cBits)
 {
 	PIXEL xorPixel;
 	BYTE mask = 0x01;
@@ -36,8 +36,7 @@ static INLINE BYTE* WRITEFGBGIMAGE(BYTE* pbDest, const BYTE* pbDestEnd, UINT32 r
 	if (!ENSURE_CAPACITY(pbDest, pbDestEnd, cBits))
 		return NULL;
 
-	UNROLL(cBits,
-	{
+	UNROLL(cBits, {
 		UINT32 data;
 		DESTREADPIXEL(xorPixel, pbDest - rowDelta);
 
@@ -57,8 +56,8 @@ static INLINE BYTE* WRITEFGBGIMAGE(BYTE* pbDest, const BYTE* pbDestEnd, UINT32 r
  * Write a foreground/background image to a destination buffer
  * for the first line of compressed data.
  */
-static INLINE BYTE* WRITEFIRSTLINEFGBGIMAGE(BYTE* pbDest, const BYTE* pbDestEnd, BYTE bitmask,
-        PIXEL fgPel, UINT32 cBits)
+static INLINE BYTE* WRITEFIRSTLINEFGBGIMAGE(BYTE* pbDest, const BYTE* pbDestEnd, BYTE bitmask, PIXEL fgPel,
+                                            UINT32 cBits)
 {
 	BYTE mask = 0x01;
 
@@ -68,14 +67,13 @@ static INLINE BYTE* WRITEFIRSTLINEFGBGIMAGE(BYTE* pbDest, const BYTE* pbDestEnd,
 	if (!ENSURE_CAPACITY(pbDest, pbDestEnd, cBits))
 		return NULL;
 
-	UNROLL(cBits,
-	{
+	UNROLL(cBits, {
 		UINT32 data;
 
 		if (bitmask & mask)
 			data = fgPel;
 		else
-			data =  BLACK_PIXEL;
+			data = BLACK_PIXEL;
 
 		DESTWRITEPIXEL(pbDest, data);
 		DESTNEXTPIXEL(pbDest);
@@ -87,9 +85,8 @@ static INLINE BYTE* WRITEFIRSTLINEFGBGIMAGE(BYTE* pbDest, const BYTE* pbDestEnd,
 /**
  * Decompress an RLE compressed bitmap.
  */
-static INLINE BOOL RLEDECOMPRESS(const BYTE* pbSrcBuffer, UINT32 cbSrcBuffer,
-                                 BYTE* pbDestBuffer,
-                                 UINT32 rowDelta, UINT32 width, UINT32 height)
+static INLINE BOOL RLEDECOMPRESS(const BYTE* pbSrcBuffer, UINT32 cbSrcBuffer, BYTE* pbDestBuffer, UINT32 rowDelta,
+                                 UINT32 width, UINT32 height)
 {
 	const BYTE* pbSrc = pbSrcBuffer;
 	const BYTE* pbEnd = pbSrcBuffer + cbSrcBuffer;
@@ -151,8 +148,7 @@ static INLINE BOOL RLEDECOMPRESS(const BYTE* pbSrcBuffer, UINT32 cbSrcBuffer,
 				if (!ENSURE_CAPACITY(pbDest, pbDestEnd, runLength))
 					return FALSE;
 
-				UNROLL(runLength,
-				{
+				UNROLL(runLength, {
 					DESTWRITEPIXEL(pbDest, BLACK_PIXEL);
 					DESTNEXTPIXEL(pbDest);
 				});
@@ -174,8 +170,7 @@ static INLINE BOOL RLEDECOMPRESS(const BYTE* pbSrcBuffer, UINT32 cbSrcBuffer,
 				if (!ENSURE_CAPACITY(pbDest, pbDestEnd, runLength))
 					return FALSE;
 
-				UNROLL(runLength,
-				{
+				UNROLL(runLength, {
 					DESTREADPIXEL(temp, pbDest - rowDelta);
 					DESTWRITEPIXEL(pbDest, temp);
 					DESTNEXTPIXEL(pbDest);
@@ -188,7 +183,7 @@ static INLINE BOOL RLEDECOMPRESS(const BYTE* pbSrcBuffer, UINT32 cbSrcBuffer,
 		}
 
 		/* For any of the other run-types a follow-on background run
-			order does not need a foreground pel inserted. */
+		    order does not need a foreground pel inserted. */
 		fInsertFgPel = FALSE;
 
 		switch (code)
@@ -212,16 +207,14 @@ static INLINE BOOL RLEDECOMPRESS(const BYTE* pbSrcBuffer, UINT32 cbSrcBuffer,
 
 				if (fFirstLine)
 				{
-					UNROLL(runLength,
-					{
+					UNROLL(runLength, {
 						DESTWRITEPIXEL(pbDest, fgPel);
 						DESTNEXTPIXEL(pbDest);
 					});
 				}
 				else
 				{
-					UNROLL(runLength,
-					{
+					UNROLL(runLength, {
 						DESTREADPIXEL(temp, pbDest - rowDelta);
 						DESTWRITEPIXEL(pbDest, temp ^ fgPel);
 						DESTNEXTPIXEL(pbDest);
@@ -243,8 +236,7 @@ static INLINE BOOL RLEDECOMPRESS(const BYTE* pbSrcBuffer, UINT32 cbSrcBuffer,
 				if (!ENSURE_CAPACITY(pbDest, pbDestEnd, runLength * 2))
 					return FALSE;
 
-				UNROLL(runLength,
-				{
+				UNROLL(runLength, {
 					DESTWRITEPIXEL(pbDest, pixelA);
 					DESTNEXTPIXEL(pbDest);
 					DESTWRITEPIXEL(pbDest, pixelB);
@@ -263,8 +255,7 @@ static INLINE BOOL RLEDECOMPRESS(const BYTE* pbSrcBuffer, UINT32 cbSrcBuffer,
 				if (!ENSURE_CAPACITY(pbDest, pbDestEnd, runLength))
 					return FALSE;
 
-				UNROLL(runLength,
-				{
+				UNROLL(runLength, {
 					DESTWRITEPIXEL(pbDest, pixelA);
 					DESTNEXTPIXEL(pbDest);
 				});
@@ -338,8 +329,7 @@ static INLINE BOOL RLEDECOMPRESS(const BYTE* pbSrcBuffer, UINT32 cbSrcBuffer,
 			case MEGA_MEGA_COLOR_IMAGE:
 				runLength = ExtractRunLength(code, pbSrc, &advance);
 				pbSrc = pbSrc + advance;
-				UNROLL(runLength,
-				{
+				UNROLL(runLength, {
 					SRCREADPIXEL(temp, pbSrc);
 					SRCNEXTPIXEL(pbSrc);
 					DESTWRITEPIXEL(pbDest, temp);

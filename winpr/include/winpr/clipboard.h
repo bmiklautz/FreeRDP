@@ -52,16 +52,13 @@ struct _wClipboardDelegate
 	void* custom;
 
 	UINT (*ClientRequestFileSize)(wClipboardDelegate*, const wClipboardFileSizeRequest*);
-	UINT (*ClipboardFileSizeSuccess)(wClipboardDelegate*, const wClipboardFileSizeRequest*,
-			UINT64 fileSize);
-	UINT (*ClipboardFileSizeFailure)(wClipboardDelegate*, const wClipboardFileSizeRequest*,
-			UINT errorCode);
+	UINT (*ClipboardFileSizeSuccess)(wClipboardDelegate*, const wClipboardFileSizeRequest*, UINT64 fileSize);
+	UINT (*ClipboardFileSizeFailure)(wClipboardDelegate*, const wClipboardFileSizeRequest*, UINT errorCode);
 
 	UINT (*ClientRequestFileRange)(wClipboardDelegate*, const wClipboardFileRangeRequest*);
-	UINT (*ClipboardFileRangeSuccess)(wClipboardDelegate*, const wClipboardFileRangeRequest*,
-			const BYTE* data, UINT32 size);
-	UINT (*ClipboardFileRangeFailure)(wClipboardDelegate*, const wClipboardFileRangeRequest*,
-			UINT errorCode);
+	UINT (*ClipboardFileRangeSuccess)
+	(wClipboardDelegate*, const wClipboardFileRangeRequest*, const BYTE* data, UINT32 size);
+	UINT (*ClipboardFileRangeFailure)(wClipboardDelegate*, const wClipboardFileRangeRequest*, UINT errorCode);
 };
 
 #ifdef __cplusplus
@@ -79,8 +76,8 @@ WINPR_API UINT32 ClipboardCountRegisteredFormats(wClipboard* clipboard);
 WINPR_API UINT32 ClipboardGetRegisteredFormatIds(wClipboard* clipboard, UINT32** ppFormatIds);
 WINPR_API UINT32 ClipboardRegisterFormat(wClipboard* clipboard, const char* name);
 
-WINPR_API BOOL ClipboardRegisterSynthesizer(wClipboard* clipboard, UINT32 formatId,
-		UINT32 syntheticId, CLIPBOARD_SYNTHESIZE_FN pfnSynthesize);
+WINPR_API BOOL ClipboardRegisterSynthesizer(wClipboard* clipboard, UINT32 formatId, UINT32 syntheticId,
+                                            CLIPBOARD_SYNTHESIZE_FN pfnSynthesize);
 
 WINPR_API UINT32 ClipboardGetFormatId(wClipboard* clipboard, const char* name);
 WINPR_API const char* ClipboardGetFormatName(wClipboard* clipboard, UINT32 formatId);
@@ -100,4 +97,3 @@ WINPR_API void ClipboardDestroy(wClipboard* clipboard);
 #endif
 
 #endif /* WINPR_CLIPBOARD_H */
-

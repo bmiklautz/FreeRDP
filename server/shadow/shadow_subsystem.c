@@ -26,10 +26,7 @@
 
 static pfnShadowSubsystemEntry pSubsystemEntry = NULL;
 
-void shadow_subsystem_set_entry(pfnShadowSubsystemEntry pEntry)
-{
-	pSubsystemEntry = pEntry;
-}
+void shadow_subsystem_set_entry(pfnShadowSubsystemEntry pEntry) { pSubsystemEntry = pEntry; }
 
 static int shadow_subsystem_load_entry_points(RDP_SHADOW_ENTRY_POINTS* pEntryPoints)
 {
@@ -105,9 +102,9 @@ fail:
 	return status;
 }
 
-static void shadow_subsystem_free_queued_message(void *obj)
+static void shadow_subsystem_free_queued_message(void* obj)
 {
-	wMessage *message = (wMessage*)obj;
+	wMessage* message = (wMessage*) obj;
 	if (message->Free)
 	{
 		message->Free(message);
@@ -184,8 +181,8 @@ UINT32 shadow_enum_monitors(MONITOR_DEF* monitors, UINT32 maxMonitors)
  * and andmask data and fill into SHADOW_MSG_OUT_POINTER_ALPHA_UPDATE
  * Caller should free the andMaskData and xorMaskData later.
  */
-int shadow_subsystem_pointer_convert_alpha_pointer_data(BYTE* pixels, BOOL premultiplied,
-		UINT32 width, UINT32 height, SHADOW_MSG_OUT_POINTER_ALPHA_UPDATE* pointerColor)
+int shadow_subsystem_pointer_convert_alpha_pointer_data(BYTE* pixels, BOOL premultiplied, UINT32 width, UINT32 height,
+                                                        SHADOW_MSG_OUT_POINTER_ALPHA_UPDATE* pointerColor)
 {
 	UINT32 x, y;
 	BYTE* pSrc8;
@@ -249,9 +246,9 @@ int shadow_subsystem_pointer_convert_alpha_pointer_data(BYTE* pixels, BOOL premu
 			{
 				if (premultiplied)
 				{
-					B = (B * 0xFF ) / A;
-					G = (G * 0xFF ) / A;
-					R = (R * 0xFF ) / A;
+					B = (B * 0xFF) / A;
+					G = (G * 0xFF) / A;
+					R = (R * 0xFF) / A;
 				}
 			}
 
@@ -259,8 +256,13 @@ int shadow_subsystem_pointer_convert_alpha_pointer_data(BYTE* pixels, BOOL premu
 			*pDst8++ = G;
 			*pDst8++ = R;
 
-			if (andPixel) *andBits |= andBit;
-			if (!(andBit >>= 1)) { andBits++; andBit = 0x80; }
+			if (andPixel)
+				*andBits |= andBit;
+			if (!(andBit >>= 1))
+			{
+				andBits++;
+				andBit = 0x80;
+			}
 		}
 	}
 

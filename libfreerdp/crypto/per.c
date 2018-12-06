@@ -93,10 +93,7 @@ BOOL per_read_choice(wStream* s, BYTE* choice)
  * @param choice index of chosen field
  */
 
-void per_write_choice(wStream* s, BYTE choice)
-{
-	Stream_Write_UINT8(s, choice);
-}
+void per_write_choice(wStream* s, BYTE choice) { Stream_Write_UINT8(s, choice); }
 
 /**
  * Read PER selection.
@@ -120,10 +117,7 @@ BOOL per_read_selection(wStream* s, BYTE* selection)
  * @param selection bit map of selected fields
  */
 
-void per_write_selection(wStream* s, BYTE selection)
-{
-	Stream_Write_UINT8(s, selection);
-}
+void per_write_selection(wStream* s, BYTE selection) { Stream_Write_UINT8(s, selection); }
 
 /**
  * Read PER number of sets.
@@ -147,10 +141,7 @@ BOOL per_read_number_of_sets(wStream* s, BYTE* number)
  * @param number number of sets
  */
 
-void per_write_number_of_sets(wStream* s, BYTE number)
-{
-	Stream_Write_UINT8(s, number);
-}
+void per_write_number_of_sets(wStream* s, BYTE number) { Stream_Write_UINT8(s, number); }
 
 /**
  * Read PER padding with zeros.
@@ -265,10 +256,7 @@ BOOL per_read_integer16(wStream* s, UINT16* integer, UINT16 min)
  * @param min minimum value
  */
 
-void per_write_integer16(wStream* s, UINT16 integer, UINT16 min)
-{
-	Stream_Write_UINT16_BE(s, integer - min);
-}
+void per_write_integer16(wStream* s, UINT16 integer, UINT16 min) { Stream_Write_UINT16_BE(s, integer - min); }
 
 /**
  * Read PER ENUMERATED.
@@ -300,10 +288,7 @@ BOOL per_read_enumerated(wStream* s, BYTE* enumerated, BYTE count)
  * @return
  */
 
-void per_write_enumerated(wStream* s, BYTE enumerated, BYTE count)
-{
-	Stream_Write_UINT8(s, enumerated);
-}
+void per_write_enumerated(wStream* s, BYTE enumerated, BYTE count) { Stream_Write_UINT8(s, enumerated); }
 
 /**
  * Read PER OBJECT_IDENTIFIER (OID).
@@ -337,9 +322,8 @@ BOOL per_read_object_identifier(wStream* s, BYTE oid[6])
 	Stream_Read_UINT8(s, a_oid[4]); /* tuple 5 */
 	Stream_Read_UINT8(s, a_oid[5]); /* tuple 6 */
 
-	if ((a_oid[0] == oid[0]) && (a_oid[1] == oid[1]) &&
-		(a_oid[2] == oid[2]) && (a_oid[3] == oid[3]) &&
-		(a_oid[4] == oid[4]) && (a_oid[5] == oid[5]))
+	if ((a_oid[0] == oid[0]) && (a_oid[1] == oid[1]) && (a_oid[2] == oid[2]) && (a_oid[3] == oid[3]) &&
+	    (a_oid[4] == oid[4]) && (a_oid[5] == oid[5]))
 	{
 		return TRUE;
 	}

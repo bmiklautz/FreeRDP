@@ -20,8 +20,7 @@
 
 #if DEFINE_UNICODE
 
-HRESULT PATH_ALLOC_COMBINE(PCWSTR pszPathIn, PCWSTR pszMore, unsigned long dwFlags,
-                           PWSTR* ppszPathOut)
+HRESULT PATH_ALLOC_COMBINE(PCWSTR pszPathIn, PCWSTR pszMore, unsigned long dwFlags, PWSTR* ppszPathOut)
 {
 #ifdef _WIN32
 	PWSTR pszPathOut;
@@ -42,7 +41,7 @@ HRESULT PATH_ALLOC_COMBINE(PCWSTR pszPathIn, PCWSTR pszMore, unsigned long dwFla
 		return E_FAIL; /* valid but not implemented, see top comment */
 
 	if (!pszPathIn)
-		return E_FAIL;  /* valid but not implemented, see top comment */
+		return E_FAIL; /* valid but not implemented, see top comment */
 
 	pszPathInLength = wcslen(pszPathIn);
 	pszMoreLength = wcslen(pszMore);
@@ -116,7 +115,7 @@ HRESULT PATH_ALLOC_COMBINE(PCSTR pszPathIn, PCSTR pszMore, unsigned long dwFlags
 		return E_FAIL; /* valid but not implemented, see top comment */
 
 	if (!pszPathIn)
-		return E_FAIL;  /* valid but not implemented, see top comment */
+		return E_FAIL; /* valid but not implemented, see top comment */
 
 	pszPathInLength = lstrlenA(pszPathIn);
 	pszMoreLength = lstrlenA(pszMore);
@@ -175,4 +174,3 @@ HRESULT PATH_ALLOC_COMBINE(PCSTR pszPathIn, PCSTR pszMore, unsigned long dwFlags
 #undef _PATH_SEPARATOR_STR
 #undef PATH_ALLOC_COMBINE
 */
-

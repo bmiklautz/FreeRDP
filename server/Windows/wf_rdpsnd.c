@@ -53,7 +53,7 @@ static void wf_peer_rdpsnd_activated(RdpsndServerContext* context)
 
 	for (i = 0; i < context->num_client_formats; i++)
 	{
-		//TODO: improve the way we agree on a format
+		// TODO: improve the way we agree on a format
 		for (j = 0; j < context->num_server_formats; j++)
 		{
 			if ((context->client_formats[i].wFormatTag == context->server_formats[j].wFormatTag) &&
@@ -150,4 +150,3 @@ BOOL wf_peer_rdpsnd_init(wfPeerContext* context)
 	wfi->snd_stop = FALSE;
 	return TRUE;
 }
-

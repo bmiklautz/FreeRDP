@@ -74,9 +74,8 @@ static void printer_cups_get_printjob_name(char* buf, int size)
 
 	tt = time(NULL);
 	t = localtime(&tt);
-	sprintf_s(buf, size - 1, "FreeRDP Print Job %d%02d%02d%02d%02d%02d",
-		t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
-		t->tm_hour, t->tm_min, t->tm_sec);
+	sprintf_s(buf, size - 1, "FreeRDP Print Job %d%02d%02d%02d%02d%02d", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
+	          t->tm_hour, t->tm_min, t->tm_sec);
 }
 
 /**
@@ -130,7 +129,6 @@ static void printer_cups_close_printjob(rdpPrintJob* printjob)
 
 		if (cupsPrintFile(printjob->printer->name, (const char*) cups_printjob->printjob_object, buf, 0, NULL) == 0)
 		{
-
 		}
 
 		unlink(cups_printjob->printjob_object);
@@ -146,7 +144,7 @@ static void printer_cups_close_printjob(rdpPrintJob* printjob)
 #endif
 
 	((rdpCupsPrinter*) printjob->printer)->printjob = NULL;
-	free(cups_printjob) ;
+	free(cups_printjob);
 }
 
 static rdpPrintJob* printer_cups_create_printjob(rdpPrinter* printer, UINT32 id)
@@ -190,8 +188,8 @@ static rdpPrintJob* printer_cups_create_printjob(rdpPrinter* printer, UINT32 id)
 
 		printer_cups_get_printjob_name(buf, sizeof(buf));
 
-		cups_printjob->printjob_id = cupsCreateJob((http_t*) cups_printjob->printjob_object,
-			printer->name, buf, 0, NULL);
+		cups_printjob->printjob_id =
+		  cupsCreateJob((http_t*) cups_printjob->printjob_object, printer->name, buf, 0, NULL);
 
 		if (!cups_printjob->printjob_id)
 		{
@@ -200,27 +198,27 @@ static rdpPrintJob* printer_cups_create_printjob(rdpPrinter* printer, UINT32 id)
 			return NULL;
 		}
 
-		cupsStartDocument((http_t*) cups_printjob->printjob_object,
-			printer->name, cups_printjob->printjob_id, buf, CUPS_FORMAT_AUTO, 1);
+		cupsStartDocument((http_t*) cups_printjob->printjob_object, printer->name, cups_printjob->printjob_id, buf,
+		                  CUPS_FORMAT_AUTO, 1);
 	}
 
 #endif
 
 	cups_printer->printjob = cups_printjob;
-	
-	return (rdpPrintJob*)cups_printjob;
+
+	return (rdpPrintJob*) cups_printjob;
 }
 
 static rdpPrintJob* printer_cups_find_printjob(rdpPrinter* printer, UINT32 id)
 {
-	rdpCupsPrinter* cups_printer = (rdpCupsPrinter*)printer;
+	rdpCupsPrinter* cups_printer = (rdpCupsPrinter*) printer;
 
 	if (cups_printer->printjob == NULL)
 		return NULL;
 	if (cups_printer->printjob->printjob.id != id)
 		return NULL;
 
-	return (rdpPrintJob*)cups_printer->printjob;
+	return (rdpPrintJob*) cups_printer->printjob;
 }
 
 static void printer_cups_free_printer(rdpPrinter* printer)
@@ -235,8 +233,8 @@ static void printer_cups_free_printer(rdpPrinter* printer)
 	free(printer);
 }
 
-static rdpPrinter* printer_cups_new_printer(rdpCupsPrinterDriver* cups_driver,
-	const char* name, const char* driverName, BOOL is_default)
+static rdpPrinter* printer_cups_new_printer(rdpCupsPrinterDriver* cups_driver, const char* name, const char* driverName,
+                                            BOOL is_default)
 {
 	rdpCupsPrinter* cups_printer;
 
@@ -275,8 +273,8 @@ static rdpPrinter** printer_cups_enum_printers(rdpPrinterDriver* driver)
 {
 	rdpPrinter** printers;
 	int num_printers;
-	cups_dest_t *dests;
-	cups_dest_t *dest;
+	cups_dest_t* dests;
+	cups_dest_t* dest;
 	int num_dests;
 	int i;
 
@@ -291,8 +289,8 @@ static rdpPrinter** printer_cups_enum_printers(rdpPrinterDriver* driver)
 	{
 		if (dest->instance == NULL)
 		{
-			printers[num_printers++] = printer_cups_new_printer((rdpCupsPrinterDriver*) driver,
-				dest->name, NULL, dest->is_default);
+			printers[num_printers++] =
+			  printer_cups_new_printer((rdpCupsPrinterDriver*) driver, dest->name, NULL, dest->is_default);
 		}
 	}
 	cupsFreeDests(num_dests, dests);
@@ -300,13 +298,11 @@ static rdpPrinter** printer_cups_enum_printers(rdpPrinterDriver* driver)
 	return printers;
 }
 
-static rdpPrinter* printer_cups_get_printer(rdpPrinterDriver* driver,
-        const char* name, const char* driverName)
+static rdpPrinter* printer_cups_get_printer(rdpPrinterDriver* driver, const char* name, const char* driverName)
 {
 	rdpCupsPrinterDriver* cups_driver = (rdpCupsPrinterDriver*) driver;
 
-	return printer_cups_new_printer(cups_driver, name, driverName,
-            cups_driver->id_sequence == 1 ? TRUE : FALSE);
+	return printer_cups_new_printer(cups_driver, name, driverName, cups_driver->id_sequence == 1 ? TRUE : FALSE);
 }
 
 static rdpCupsPrinterDriver* cups_driver = NULL;
@@ -328,4 +324,3 @@ rdpPrinterDriver* printer_cups_get_driver(void)
 
 	return (rdpPrinterDriver*) cups_driver;
 }
-

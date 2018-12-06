@@ -30,9 +30,9 @@
 #include <stdint.h>
 #include <limits.h>
 
-#define WINPR_ALIGNED_MEM_SIGNATURE		0x0BA0BAB
+#define WINPR_ALIGNED_MEM_SIGNATURE 0x0BA0BAB
 
-#define WINPR_ALIGNED_MEM_STRUCT_FROM_PTR(_memptr) \
+#define WINPR_ALIGNED_MEM_STRUCT_FROM_PTR(_memptr)                                                                     \
 	(WINPR_ALIGNED_MEM*) (((size_t)(((BYTE*) _memptr) - sizeof(WINPR_ALIGNED_MEM))));
 
 #include <stdlib.h>
@@ -56,10 +56,7 @@ struct winpr_aligned_mem
 };
 typedef struct winpr_aligned_mem WINPR_ALIGNED_MEM;
 
-void* _aligned_malloc(size_t size, size_t alignment)
-{
-	return _aligned_offset_malloc(size, alignment, 0);
-}
+void* _aligned_malloc(size_t size, size_t alignment) { return _aligned_offset_malloc(size, alignment, 0); }
 
 void* _aligned_realloc(void* memblock, size_t size, size_t alignment)
 {
@@ -106,16 +103,15 @@ void* _aligned_offset_malloc(size_t size, size_t alignment, size_t offset)
 	if (!base)
 		return NULL;
 
-	basesize = (uintptr_t)base;
+	basesize = (uintptr_t) base;
 
-	if ((offset > UINTPTR_MAX) || (header > UINTPTR_MAX - offset) ||
-	    (basesize > UINTPTR_MAX - header - offset))
+	if ((offset > UINTPTR_MAX) || (header > UINTPTR_MAX - offset) || (basesize > UINTPTR_MAX - header - offset))
 	{
 		free(base);
 		return NULL;
 	}
 
-	memblock = (void*)(((basesize + header + offset) & ~(alignment - 1)) - offset);
+	memblock = (void*) (((basesize + header + offset) & ~(alignment - 1)) - offset);
 	pMem = WINPR_ALIGNED_MEM_STRUCT_FROM_PTR(memblock);
 	pMem->sig = WINPR_ALIGNED_MEM_SIGNATURE;
 	pMem->base_addr = base;
@@ -159,8 +155,7 @@ void* _aligned_offset_realloc(void* memblock, size_t size, size_t alignment, siz
 	return newMemblock;
 }
 
-void* _aligned_offset_recalloc(void* memblock, size_t num, size_t size, size_t alignment,
-                               size_t offset)
+void* _aligned_offset_recalloc(void* memblock, size_t num, size_t size, size_t alignment, size_t offset)
 {
 	void* newMemblock;
 	WINPR_ALIGNED_MEM* pMem;

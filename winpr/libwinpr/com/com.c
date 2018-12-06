@@ -111,14 +111,8 @@
 
 #ifndef _WIN32
 
-HRESULT CoInitializeEx(LPVOID pvReserved, DWORD dwCoInit)
-{
-	return S_OK;
-}
+HRESULT CoInitializeEx(LPVOID pvReserved, DWORD dwCoInit) { return S_OK; }
 
-void CoUninitialize(void)
-{
-
-}
+void CoUninitialize(void) {}
 
 #endif

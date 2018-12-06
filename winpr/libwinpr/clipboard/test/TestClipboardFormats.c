@@ -28,7 +28,7 @@ int TestClipboardFormats(int argc, char* argv[])
 	{
 		UINT32 formatId = pFormatIds[index];
 		formatName = ClipboardGetFormatName(clipboard, formatId);
-		fprintf(stderr, "Format: 0x%08"PRIX32" %s\n", formatId, formatName);
+		fprintf(stderr, "Format: 0x%08" PRIX32 " %s\n", formatId, formatName);
 	}
 
 	free(pFormatIds);
@@ -48,9 +48,8 @@ int TestClipboardFormats(int argc, char* argv[])
 		}
 
 		SrcSize = (UINT32)(strlen(pSrcData) + 1);
-		bSuccess = ClipboardSetData(clipboard, utf8StringFormatId, pSrcData,
-		                            SrcSize);
-		fprintf(stderr, "ClipboardSetData: %"PRId32"\n", bSuccess);
+		bSuccess = ClipboardSetData(clipboard, utf8StringFormatId, pSrcData, SrcSize);
+		fprintf(stderr, "ClipboardSetData: %" PRId32 "\n", bSuccess);
 		DstSize = 0;
 		pDstData = (char*) ClipboardGetData(clipboard, utf8StringFormatId, &DstSize);
 		fprintf(stderr, "ClipboardGetData: %s\n", pDstData);
@@ -78,11 +77,10 @@ int TestClipboardFormats(int argc, char* argv[])
 	{
 		UINT32 formatId = pFormatIds[index];
 		formatName = ClipboardGetFormatName(clipboard, formatId);
-		fprintf(stderr, "Format: 0x%08"PRIX32" %s\n", formatId, formatName);
+		fprintf(stderr, "Format: 0x%08" PRIX32 " %s\n", formatId, formatName);
 	}
 
 	free(pFormatIds);
 	ClipboardDestroy(clipboard);
 	return 0;
 }
-

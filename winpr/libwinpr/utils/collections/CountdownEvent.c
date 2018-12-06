@@ -42,19 +42,13 @@
  * Gets the number of remaining signals required to set the event.
  */
 
-DWORD CountdownEvent_CurrentCount(wCountdownEvent* countdown)
-{
-	return countdown->count;
-}
+DWORD CountdownEvent_CurrentCount(wCountdownEvent* countdown) { return countdown->count; }
 
 /**
  * Gets the numbers of signals initially required to set the event.
  */
 
-DWORD CountdownEvent_InitialCount(wCountdownEvent* countdown)
-{
-	return countdown->initialCount;
-}
+DWORD CountdownEvent_InitialCount(wCountdownEvent* countdown) { return countdown->initialCount; }
 
 /**
  * Determines whether the event is set.
@@ -74,10 +68,7 @@ BOOL CountdownEvent_IsSet(wCountdownEvent* countdown)
  * Gets a WaitHandle that is used to wait for the event to be set.
  */
 
-HANDLE CountdownEvent_WaitHandle(wCountdownEvent* countdown)
-{
-	return countdown->event;
-}
+HANDLE CountdownEvent_WaitHandle(wCountdownEvent* countdown) { return countdown->event; }
 
 /**
  * Methods
@@ -139,10 +130,7 @@ BOOL CountdownEvent_Signal(wCountdownEvent* countdown, DWORD signalCount)
  * Resets the InitialCount property to a specified value.
  */
 
-void CountdownEvent_Reset(wCountdownEvent* countdown, DWORD count)
-{
-	countdown->initialCount = count;
-}
+void CountdownEvent_Reset(wCountdownEvent* countdown, DWORD count) { countdown->initialCount = count; }
 
 /**
  * Construction, Destruction

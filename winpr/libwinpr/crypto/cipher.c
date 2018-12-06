@@ -90,10 +90,7 @@ WINPR_RC4_CTX* winpr_RC4_New_Allow_FIPS(const BYTE* key, size_t keylen)
 	return winpr_RC4_New_Internal(key, keylen, TRUE);
 }
 
-WINPR_RC4_CTX* winpr_RC4_New(const BYTE* key, size_t keylen)
-{
-	return winpr_RC4_New_Internal(key, keylen, FALSE);
-}
+WINPR_RC4_CTX* winpr_RC4_New(const BYTE* key, size_t keylen) { return winpr_RC4_New_Internal(key, keylen, FALSE); }
 
 BOOL winpr_RC4_Update(WINPR_RC4_CTX* ctx, size_t length, const BYTE* input, BYTE* output)
 {
@@ -613,11 +610,10 @@ WINPR_CIPHER_CTX* winpr_Cipher_New(int cipher, int op, const BYTE* key, const BY
 	return ctx;
 }
 
-BOOL winpr_Cipher_Update(WINPR_CIPHER_CTX* ctx, const BYTE* input, size_t ilen, BYTE* output,
-                         size_t* olen)
+BOOL winpr_Cipher_Update(WINPR_CIPHER_CTX* ctx, const BYTE* input, size_t ilen, BYTE* output, size_t* olen)
 {
 #if defined(WITH_OPENSSL)
-	int outl = (int) * olen;
+	int outl = (int) *olen;
 
 	if (EVP_CipherUpdate((EVP_CIPHER_CTX*) ctx, output, &outl, input, ilen) == 1)
 	{
@@ -637,7 +633,7 @@ BOOL winpr_Cipher_Update(WINPR_CIPHER_CTX* ctx, const BYTE* input, size_t ilen, 
 BOOL winpr_Cipher_Final(WINPR_CIPHER_CTX* ctx, BYTE* output, size_t* olen)
 {
 #if defined(WITH_OPENSSL)
-	int outl = (int) * olen;
+	int outl = (int) *olen;
 
 	if (EVP_CipherFinal_ex((EVP_CIPHER_CTX*) ctx, output, &outl) == 1)
 	{
@@ -667,13 +663,12 @@ void winpr_Cipher_Free(WINPR_CIPHER_CTX* ctx)
 #endif
 }
 
-
 /**
  * Key Generation
  */
 
-int winpr_Cipher_BytesToKey(int cipher, int md, const BYTE* salt, const BYTE* data, int datal,
-                            int count, BYTE* key, BYTE* iv)
+int winpr_Cipher_BytesToKey(int cipher, int md, const BYTE* salt, const BYTE* data, int datal, int count, BYTE* key,
+                            BYTE* iv)
 {
 	/**
 	 * Key and IV generation compatible with OpenSSL EVP_BytesToKey():

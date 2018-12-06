@@ -25,14 +25,13 @@
 #include <X11/extensions/randr.h>
 
 #if (RANDR_MAJOR * 100 + RANDR_MINOR) >= 105
-#	define USABLE_XRANDR
+#define USABLE_XRANDR
 #endif
 
 #endif
 
 #include "xf_disp.h"
 #include "xf_monitor.h"
-
 
 #define TAG CLIENT_TAG("x11disp")
 #define RESIZE_MIN_DELAY 200 /* minimum delay in ms between two resizes */
@@ -121,8 +120,7 @@ static BOOL xf_disp_sendResize(xfDispContext* xfDisp)
 
 	if (xfc->fullscreen && (settings->MonitorCount > 0))
 	{
-		if (xf_disp_sendLayout(xfDisp->disp, settings->MonitorDefArray,
-		                       settings->MonitorCount) != CHANNEL_RC_OK)
+		if (xf_disp_sendLayout(xfDisp->disp, settings->MonitorDefArray, settings->MonitorCount) != CHANNEL_RC_OK)
 			return FALSE;
 	}
 	else
@@ -138,8 +136,7 @@ static BOOL xf_disp_sendResize(xfDispContext* xfDisp)
 		layout.PhysicalWidth = xfDisp->targetWidth;
 		layout.PhysicalHeight = xfDisp->targetHeight;
 
-		if (IFCALLRESULT(CHANNEL_RC_OK, xfDisp->disp->SendMonitorLayout, xfDisp->disp, 1,
-		                 &layout) != CHANNEL_RC_OK)
+		if (IFCALLRESULT(CHANNEL_RC_OK, xfDisp->disp->SendMonitorLayout, xfDisp->disp, 1, &layout) != CHANNEL_RC_OK)
 			return FALSE;
 	}
 
@@ -165,15 +162,14 @@ static BOOL xf_disp_set_window_resizable(xfDispContext* xfDisp)
 	return TRUE;
 }
 
-static BOOL xf_disp_check_context(void* context, xfContext** ppXfc, xfDispContext** ppXfDisp,
-                                  rdpSettings** ppSettings)
+static BOOL xf_disp_check_context(void* context, xfContext** ppXfc, xfDispContext** ppXfDisp, rdpSettings** ppSettings)
 {
 	xfContext* xfc;
 
 	if (!context)
 		return FALSE;
 
-	xfc = (xfContext*)context;
+	xfc = (xfContext*) context;
 
 	if (!(xfc->xfDisp))
 		return FALSE;
@@ -291,7 +287,7 @@ UINT xf_disp_sendLayout(DispClientContext* disp, rdpMonitor* monitors, int nmoni
 	UINT ret = CHANNEL_RC_OK;
 	DISPLAY_CONTROL_MONITOR_LAYOUT* layouts;
 	int i;
-	xfDispContext* xfDisp = (xfDispContext*)disp->custom;
+	xfDispContext* xfDisp = (xfDispContext*) disp->custom;
 	rdpSettings* settings = xfDisp->xfc->context.settings;
 	layouts = calloc(nmonitors, sizeof(DISPLAY_CONTROL_MONITOR_LAYOUT));
 
@@ -374,8 +370,7 @@ BOOL xf_disp_handle_xevent(xfContext* xfc, XEvent* event)
 
 #endif
 	xf_detect_monitors(xfc, &maxWidth, &maxHeight);
-	return xf_disp_sendLayout(xfDisp->disp, settings->MonitorDefArray,
-	                          settings->MonitorCount) == CHANNEL_RC_OK;
+	return xf_disp_sendLayout(xfDisp->disp, settings->MonitorDefArray, settings->MonitorCount) == CHANNEL_RC_OK;
 }
 
 BOOL xf_disp_handle_configureNotify(xfContext* xfc, int width, int height)
@@ -395,14 +390,15 @@ BOOL xf_disp_handle_configureNotify(xfContext* xfc, int width, int height)
 	return xf_disp_sendResize(xfDisp);
 }
 
-static UINT xf_DisplayControlCaps(DispClientContext* disp, UINT32 maxNumMonitors,
-                                  UINT32 maxMonitorAreaFactorA, UINT32 maxMonitorAreaFactorB)
+static UINT xf_DisplayControlCaps(DispClientContext* disp, UINT32 maxNumMonitors, UINT32 maxMonitorAreaFactorA,
+                                  UINT32 maxMonitorAreaFactorB)
 {
 	/* we're called only if dynamic resolution update is activated */
-	xfDispContext* xfDisp = (xfDispContext*)disp->custom;
+	xfDispContext* xfDisp = (xfDispContext*) disp->custom;
 	rdpSettings* settings = xfDisp->xfc->context.settings;
 	WLog_DBG(TAG,
-	         "DisplayControlCapsPdu: MaxNumMonitors: %"PRIu32" MaxMonitorAreaFactorA: %"PRIu32" MaxMonitorAreaFactorB: %"PRIu32"",
+	         "DisplayControlCapsPdu: MaxNumMonitors: %" PRIu32 " MaxMonitorAreaFactorA: %" PRIu32
+	         " MaxMonitorAreaFactorB: %" PRIu32 "",
 	         maxNumMonitors, maxMonitorAreaFactorA, maxMonitorAreaFactorB);
 	xfDisp->activated = TRUE;
 
@@ -436,8 +432,7 @@ BOOL xf_disp_init(xfDispContext* xfDisp, DispClientContext* disp)
 		if (settings->Fullscreen)
 		{
 			/* ask X11 to notify us of screen changes */
-			XRRSelectInput(xfDisp->xfc->display, DefaultRootWindow(xfDisp->xfc->display),
-			               RRScreenChangeNotifyMask);
+			XRRSelectInput(xfDisp->xfc->display, DefaultRootWindow(xfDisp->xfc->display), RRScreenChangeNotifyMask);
 		}
 
 #endif

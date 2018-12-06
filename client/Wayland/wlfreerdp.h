@@ -32,7 +32,6 @@
 
 typedef struct wlf_context wlfContext;
 
-
 struct wlf_context
 {
 	rdpContext context;
@@ -51,4 +50,3 @@ struct wlf_context
 };
 
 #endif /* FREERDP_CLIENT_WAYLAND_FREERDP_H */
-

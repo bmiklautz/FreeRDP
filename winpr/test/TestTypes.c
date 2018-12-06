@@ -20,7 +20,7 @@
 #include <winpr/crt.h>
 #include <winpr/error.h>
 
-BOOL TestSucceededFailedMacros(HRESULT hr, char *sym, BOOL isSuccess)
+BOOL TestSucceededFailedMacros(HRESULT hr, char* sym, BOOL isSuccess)
 {
 	BOOL rv = TRUE;
 
@@ -53,12 +53,12 @@ int TestTypes(int argc, char* argv[])
 	BOOL ok = TRUE;
 	HRESULT hr;
 
-	if (S_OK != (HRESULT)0L)
+	if (S_OK != (HRESULT) 0L)
 	{
 		printf("Error: S_OK should be 0\n");
 		goto err;
 	}
-	if (S_FALSE != (HRESULT)1L)
+	if (S_FALSE != (HRESULT) 1L)
 	{
 		printf("Error: S_FALSE should be 1\n");
 		goto err;
@@ -106,7 +106,8 @@ int TestTypes(int argc, char* argv[])
 	hr = HRESULT_FROM_WIN32(WSAECANCELLED);
 	ok &= TestSucceededFailedMacros(hr, "HRESULT_FROM_WIN32(WSAECANCELLED)", FALSE);
 
-	if (ok) {
+	if (ok)
+	{
 		printf("Test completed successfully\n");
 		return 0;
 	}

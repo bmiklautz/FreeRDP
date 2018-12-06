@@ -168,18 +168,14 @@ typedef BOOL (*pSuppressOutput)(rdpContext* context, BYTE allow, const RECTANGLE
 typedef BOOL (*pRemoteMonitors)(rdpContext* context, UINT32 count, const MONITOR_DEF* monitors);
 
 typedef BOOL (*pSurfaceCommand)(rdpContext* context, wStream* s);
-typedef BOOL (*pSurfaceBits)(rdpContext* context,
-                             const SURFACE_BITS_COMMAND* surfaceBitsCommand);
-typedef BOOL (*pSurfaceFrameMarker)(rdpContext* context,
-                                    const SURFACE_FRAME_MARKER* surfaceFrameMarker);
-typedef BOOL (*pSurfaceFrameBits)(rdpContext* context,
-                                  const SURFACE_BITS_COMMAND* cmd, BOOL first,
-                                  BOOL last, UINT32 frameId);
+typedef BOOL (*pSurfaceBits)(rdpContext* context, const SURFACE_BITS_COMMAND* surfaceBitsCommand);
+typedef BOOL (*pSurfaceFrameMarker)(rdpContext* context, const SURFACE_FRAME_MARKER* surfaceFrameMarker);
+typedef BOOL (*pSurfaceFrameBits)(rdpContext* context, const SURFACE_BITS_COMMAND* cmd, BOOL first, BOOL last,
+                                  UINT32 frameId);
 typedef BOOL (*pSurfaceFrameAcknowledge)(rdpContext* context, UINT32 frameId);
 
 typedef BOOL (*pSaveSessionInfo)(rdpContext* context, UINT32 type, void* data);
-typedef BOOL (*pSetKeyboardImeStatus)(rdpContext* context, UINT16 imeId, UINT32 imeState,
-                                      UINT32 imeConvMode);
+typedef BOOL (*pSetKeyboardImeStatus)(rdpContext* context, UINT16 imeId, UINT32 imeState, UINT32 imeConvMode);
 
 struct rdp_update
 {

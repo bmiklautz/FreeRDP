@@ -47,18 +47,14 @@ static UINT mf_peer_audin_opening(audin_server_context* context)
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT mf_peer_audin_open_result(audin_server_context* context, UINT32 result)
-{
-	return CHANNEL_RC_OK;
-}
+static UINT mf_peer_audin_open_result(audin_server_context* context, UINT32 result) { return CHANNEL_RC_OK; }
 
 /**
  * Function description
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT mf_peer_audin_receive_samples(audin_server_context* context, const void* buf,
-        int nframes)
+static UINT mf_peer_audin_receive_samples(audin_server_context* context, const void* buf, int nframes)
 {
 	return CHANNEL_RC_OK;
 }

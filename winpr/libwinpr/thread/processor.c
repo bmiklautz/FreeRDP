@@ -35,10 +35,6 @@
 
 #ifndef _WIN32
 
-DWORD GetCurrentProcessorNumber(VOID)
-{
-	return 0;
-}
+DWORD GetCurrentProcessorNumber(VOID) { return 0; }
 
 #endif
-

@@ -819,11 +819,11 @@ const char* gdi_rop_to_string(UINT32 code)
 }
 
 /**
-* Create a new solid brush.\n
-* @msdn{dd183518}
-* @param crColor brush color
-* @return new brush
-*/
+ * Create a new solid brush.\n
+ * @msdn{dd183518}
+ * @param crColor brush color
+ * @return new brush
+ */
 HGDI_BRUSH gdi_CreateSolidBrush(UINT32 crColor)
 {
 	HGDI_BRUSH hBrush = (HGDI_BRUSH) calloc(1, sizeof(GDI_BRUSH));
@@ -837,11 +837,11 @@ HGDI_BRUSH gdi_CreateSolidBrush(UINT32 crColor)
 	return hBrush;
 }
 /**
-* Create a new pattern brush.\n
-* @msdn{dd183508}
-* @param hbmp pattern bitmap
-* @return new brush
-*/
+ * Create a new pattern brush.\n
+ * @msdn{dd183508}
+ * @param hbmp pattern bitmap
+ * @return new brush
+ */
 HGDI_BRUSH gdi_CreatePatternBrush(HGDI_BITMAP hbmp)
 {
 	HGDI_BRUSH hBrush = (HGDI_BRUSH) calloc(1, sizeof(GDI_BRUSH));
@@ -866,4 +866,3 @@ HGDI_BRUSH gdi_CreateHatchBrush(HGDI_BITMAP hbmp)
 	hBrush->pattern = hbmp;
 	return hBrush;
 }
-

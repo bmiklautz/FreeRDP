@@ -12,19 +12,16 @@
 //#define REFTIMES_PER_SEC  10000000
 //#define REFTIMES_PER_MILLISEC  10000
 
-#define REFTIMES_PER_SEC  100000
-#define REFTIMES_PER_MILLISEC  100
+#define REFTIMES_PER_SEC 100000
+#define REFTIMES_PER_MILLISEC 100
 
 //#define REFTIMES_PER_SEC  50000
 //#define REFTIMES_PER_MILLISEC  50
 
-
-DEFINE_GUID(CLSID_MMDeviceEnumerator, 0xBCDE0395, 0xE52F, 0x467C,
-	    0x8E, 0x3D, 0xC4, 0x57, 0x92, 0x91, 0x69, 0x2E);
-DEFINE_GUID(IID_IMMDeviceEnumerator, 0xA95664D2, 0x9614, 0x4F35,
-	    0xA7, 0x46, 0xDE, 0x8D, 0xB6, 0x36, 0x17, 0xE6);
-DEFINE_GUID(IID_IAudioClient, 0x1cb9ad4c, 0xdbfa, 0x4c32, 0xb1,0x78, 0xc2,0xf5,0x68,0xa7,0x03,0xb2);
-DEFINE_GUID(IID_IAudioCaptureClient, 0xc8adbd64, 0xe71e, 0x48a0, 0xa4,0xde, 0x18,0x5c,0x39,0x5c,0xd3,0x17);
+DEFINE_GUID(CLSID_MMDeviceEnumerator, 0xBCDE0395, 0xE52F, 0x467C, 0x8E, 0x3D, 0xC4, 0x57, 0x92, 0x91, 0x69, 0x2E);
+DEFINE_GUID(IID_IMMDeviceEnumerator, 0xA95664D2, 0x9614, 0x4F35, 0xA7, 0x46, 0xDE, 0x8D, 0xB6, 0x36, 0x17, 0xE6);
+DEFINE_GUID(IID_IAudioClient, 0x1cb9ad4c, 0xdbfa, 0x4c32, 0xb1, 0x78, 0xc2, 0xf5, 0x68, 0xa7, 0x03, 0xb2);
+DEFINE_GUID(IID_IAudioCaptureClient, 0xc8adbd64, 0xe71e, 0x48a0, 0xa4, 0xde, 0x18, 0x5c, 0x39, 0x5c, 0xd3, 0x17);
 
 LPWSTR devStr = NULL;
 wfPeerContext* latestPeer = NULL;
@@ -37,7 +34,7 @@ int wf_rdpsnd_set_latest_peer(wfPeerContext* peer)
 
 int wf_wasapi_activate(RdpsndServerContext* context)
 {
-	wchar_t * pattern = L"Stereo Mix";
+	wchar_t* pattern = L"Stereo Mix";
 	HANDLE hThread;
 
 	wf_wasapi_get_device_string(pattern, &devStr);
@@ -59,18 +56,18 @@ int wf_wasapi_activate(RdpsndServerContext* context)
 	return 0;
 }
 
-int wf_wasapi_get_device_string(LPWSTR pattern, LPWSTR * deviceStr)
+int wf_wasapi_get_device_string(LPWSTR pattern, LPWSTR* deviceStr)
 {
 	HRESULT hr;
-	IMMDeviceEnumerator *pEnumerator = NULL;
-	IMMDeviceCollection *pCollection = NULL;
-	IMMDevice *pEndpoint = NULL;
-	IPropertyStore *pProps = NULL;
+	IMMDeviceEnumerator* pEnumerator = NULL;
+	IMMDeviceCollection* pCollection = NULL;
+	IMMDevice* pEndpoint = NULL;
+	IPropertyStore* pProps = NULL;
 	LPWSTR pwszID = NULL;
 	unsigned int count, i;
 
 	CoInitialize(NULL);
-	hr = CoCreateInstance(&CLSID_MMDeviceEnumerator, NULL, CLSCTX_ALL, &IID_IMMDeviceEnumerator, (void **) &pEnumerator);
+	hr = CoCreateInstance(&CLSID_MMDeviceEnumerator, NULL, CLSCTX_ALL, &IID_IMMDeviceEnumerator, (void**) &pEnumerator);
 	if (FAILED(hr))
 	{
 		WLog_ERR(TAG, "Failed to cocreate device enumerator");
@@ -78,7 +75,7 @@ int wf_wasapi_get_device_string(LPWSTR pattern, LPWSTR * deviceStr)
 	}
 
 	hr = pEnumerator->lpVtbl->EnumAudioEndpoints(pEnumerator, eCapture, DEVICE_STATE_ACTIVE, &pCollection);
-	if ( FAILED(hr) )
+	if (FAILED(hr))
 	{
 		WLog_ERR(TAG, "Failed to create endpoint collection");
 		exit(1);
@@ -99,44 +96,44 @@ int wf_wasapi_get_device_string(LPWSTR pattern, LPWSTR * deviceStr)
 		PropVariantInit(&nameVar);
 
 		hr = pCollection->lpVtbl->Item(pCollection, i, &pEndpoint);
-		if ( FAILED(hr) )
+		if (FAILED(hr))
 		{
 			WLog_ERR(TAG, "Failed to get endpoint %u", i);
 			exit(1);
 		}
 
 		hr = pEndpoint->lpVtbl->GetId(pEndpoint, &pwszID);
-		if ( FAILED(hr) )
+		if (FAILED(hr))
 		{
 			WLog_ERR(TAG, "Failed to get endpoint ID");
 			exit(1);
 		}
 
 		hr = pEndpoint->lpVtbl->OpenPropertyStore(pEndpoint, STGM_READ, &pProps);
-		if ( FAILED(hr) )
+		if (FAILED(hr))
 		{
 			WLog_ERR(TAG, "Failed to open property store");
 			exit(1);
 		}
 
 		hr = pProps->lpVtbl->GetValue(pProps, &PKEY_Device_FriendlyName, &nameVar);
-		if ( FAILED(hr) )
+		if (FAILED(hr))
 		{
 			WLog_ERR(TAG, "Failed to get device friendly name");
 			exit(1);
 		}
 
-		//do this a more reliable way
+		// do this a more reliable way
 		if (wcscmp(pattern, nameVar.pwszVal) < 0)
 		{
 			unsigned int devStrLen;
 			WLog_INFO(TAG, "Using sound ouput endpoint: [%s] (%s)", nameVar.pwszVal, pwszID);
-			//WLog_INFO(TAG, "matched %d characters", wcscmp(pattern, nameVar.pwszVal);
+			// WLog_INFO(TAG, "matched %d characters", wcscmp(pattern, nameVar.pwszVal);
 			devStrLen = wcslen(pwszID);
 			*deviceStr = (LPWSTR) calloc(devStrLen + 1, 2);
 			if (!deviceStr)
 				return -1;
-			wcscpy_s(*deviceStr, devStrLen+1, pwszID);
+			wcscpy_s(*deviceStr, devStrLen + 1, pwszID);
 		}
 		CoTaskMemFree(pwszID);
 		pwszID = NULL;
@@ -147,7 +144,6 @@ int wf_wasapi_get_device_string(LPWSTR pattern, LPWSTR * deviceStr)
 
 		pEndpoint->lpVtbl->Release(pEndpoint);
 		pEndpoint = NULL;
-
 	}
 
 	pCollection->lpVtbl->Release(pCollection);
@@ -162,11 +158,11 @@ int wf_wasapi_get_device_string(LPWSTR pattern, LPWSTR * deviceStr)
 
 static DWORD WINAPI wf_rdpsnd_wasapi_thread(LPVOID lpParam)
 {
-	IMMDeviceEnumerator *pEnumerator = NULL;
-	IMMDevice *pDevice = NULL;
-	IAudioClient *pAudioClient = NULL;
-	IAudioCaptureClient *pCaptureClient = NULL;
-	WAVEFORMATEX *pwfx = NULL;
+	IMMDeviceEnumerator* pEnumerator = NULL;
+	IMMDevice* pDevice = NULL;
+	IAudioClient* pAudioClient = NULL;
+	IAudioCaptureClient* pCaptureClient = NULL;
+	WAVEFORMATEX* pwfx = NULL;
 	HRESULT hr;
 	REFERENCE_TIME hnsRequestedDuration = REFTIMES_PER_SEC;
 	REFERENCE_TIME hnsActualDuration;
@@ -174,16 +170,16 @@ static DWORD WINAPI wf_rdpsnd_wasapi_thread(LPVOID lpParam)
 	UINT32 numFramesAvailable;
 	UINT32 packetLength = 0;
 	UINT32 dCount = 0;
-	BYTE *pData;
+	BYTE* pData;
 
 	wfPeerContext* context;
 	wfInfo* wfi;
 
 	wfi = wf_info_get_instance();
-	context = (wfPeerContext*)lpParam;
+	context = (wfPeerContext*) lpParam;
 
 	CoInitialize(NULL);
-	hr = CoCreateInstance(&CLSID_MMDeviceEnumerator, NULL, CLSCTX_ALL, &IID_IMMDeviceEnumerator, (void **) &pEnumerator);
+	hr = CoCreateInstance(&CLSID_MMDeviceEnumerator, NULL, CLSCTX_ALL, &IID_IMMDeviceEnumerator, (void**) &pEnumerator);
 	if (FAILED(hr))
 	{
 		WLog_ERR(TAG, "Failed to cocreate device enumerator");
@@ -197,7 +193,7 @@ static DWORD WINAPI wf_rdpsnd_wasapi_thread(LPVOID lpParam)
 		exit(1);
 	}
 
-	hr = pDevice->lpVtbl->Activate(pDevice, &IID_IAudioClient, CLSCTX_ALL, NULL, (void **)&pAudioClient);
+	hr = pDevice->lpVtbl->Activate(pDevice, &IID_IAudioClient, CLSCTX_ALL, NULL, (void**) &pAudioClient);
 	if (FAILED(hr))
 	{
 		WLog_ERR(TAG, "Failed to activate audio client");
@@ -219,9 +215,8 @@ static DWORD WINAPI wf_rdpsnd_wasapi_thread(LPVOID lpParam)
 	pwfx->wBitsPerSample = wfi->agreed_format->wBitsPerSample;
 	pwfx->cbSize = wfi->agreed_format->cbSize;
 
-	hr = pAudioClient->lpVtbl->Initialize(
-		pAudioClient, AUDCLNT_SHAREMODE_SHARED, 0,
-		hnsRequestedDuration, 0, pwfx, NULL);
+	hr =
+	  pAudioClient->lpVtbl->Initialize(pAudioClient, AUDCLNT_SHAREMODE_SHARED, 0, hnsRequestedDuration, 0, pwfx, NULL);
 
 	if (FAILED(hr))
 	{
@@ -236,14 +231,14 @@ static DWORD WINAPI wf_rdpsnd_wasapi_thread(LPVOID lpParam)
 		exit(1);
 	}
 
-	hr = pAudioClient->lpVtbl->GetService(pAudioClient, &IID_IAudioCaptureClient, (void **) &pCaptureClient);
+	hr = pAudioClient->lpVtbl->GetService(pAudioClient, &IID_IAudioCaptureClient, (void**) &pCaptureClient);
 	if (FAILED(hr))
 	{
 		WLog_ERR(TAG, "Failed to get the capture client");
 		exit(1);
 	}
 
-	hnsActualDuration = (UINT32)REFTIMES_PER_SEC * bufferFrameCount / pwfx->nSamplesPerSec;
+	hnsActualDuration = (UINT32) REFTIMES_PER_SEC * bufferFrameCount / pwfx->nSamplesPerSec;
 
 	hr = pAudioClient->lpVtbl->Start(pAudioClient);
 	if (FAILED(hr))
@@ -258,7 +253,7 @@ static DWORD WINAPI wf_rdpsnd_wasapi_thread(LPVOID lpParam)
 	{
 		DWORD flags;
 
-		Sleep(hnsActualDuration/REFTIMES_PER_MILLISEC/2);
+		Sleep(hnsActualDuration / REFTIMES_PER_MILLISEC / 2);
 
 		hr = pCaptureClient->lpVtbl->GetNextPacketSize(pCaptureClient, &packetLength);
 		if (FAILED(hr))
@@ -276,8 +271,8 @@ static DWORD WINAPI wf_rdpsnd_wasapi_thread(LPVOID lpParam)
 				exit(1);
 			}
 
-			//Here we are writing the audio data
-			//not sure if this flag is ever set by the system; msdn is not clear about it
+			// Here we are writing the audio data
+			// not sure if this flag is ever set by the system; msdn is not clear about it
 			if (!(flags & AUDCLNT_BUFFERFLAGS_SILENT))
 				context->rdpsnd->SendSamples(context->rdpsnd, pData, packetLength, (UINT16)(GetTickCount() & 0xffff));
 

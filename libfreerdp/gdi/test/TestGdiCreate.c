@@ -13,24 +13,13 @@
 #include "brush.h"
 #include "drawing.h"
 
-static const UINT32 colorFormatList[] =
-{
-	PIXEL_FORMAT_RGB15,
-	PIXEL_FORMAT_BGR15,
-	PIXEL_FORMAT_RGB16,
-	PIXEL_FORMAT_BGR16,
-	PIXEL_FORMAT_RGB24,
-	PIXEL_FORMAT_BGR24,
-	PIXEL_FORMAT_ARGB32,
-	PIXEL_FORMAT_ABGR32,
-	PIXEL_FORMAT_XRGB32,
-	PIXEL_FORMAT_XBGR32,
-	PIXEL_FORMAT_RGBX32,
-	PIXEL_FORMAT_BGRX32
+static const UINT32 colorFormatList[] = { PIXEL_FORMAT_RGB15,  PIXEL_FORMAT_BGR15,  PIXEL_FORMAT_RGB16,
+	                                      PIXEL_FORMAT_BGR16,  PIXEL_FORMAT_RGB24,  PIXEL_FORMAT_BGR24,
+	                                      PIXEL_FORMAT_ARGB32, PIXEL_FORMAT_ABGR32, PIXEL_FORMAT_XRGB32,
+	                                      PIXEL_FORMAT_XBGR32, PIXEL_FORMAT_RGBX32, PIXEL_FORMAT_BGRX32
 
 };
-static const UINT32 colorFormatCount = sizeof(colorFormatList) / sizeof(
-        colorFormatList[0]);
+static const UINT32 colorFormatCount = sizeof(colorFormatList) / sizeof(colorFormatList[0]);
 
 static int test_gdi_GetDC(void)
 {
@@ -189,8 +178,7 @@ static int test_gdi_CreatePen(void)
 {
 	int rc = -1;
 	const UINT32 format = PIXEL_FORMAT_RGBA32;
-	HGDI_PEN hPen = gdi_CreatePen(GDI_PS_SOLID, 8, 0xAABBCCDD,
-	                              format, NULL);
+	HGDI_PEN hPen = gdi_CreatePen(GDI_PS_SOLID, 8, 0xAABBCCDD, format, NULL);
 
 	if (!hPen)
 	{
@@ -375,8 +363,7 @@ static BOOL test_gdi_GetPixel(void)
 			{
 				UINT32 pixel;
 				const UINT32 color = FreeRDPGetColor(hBitmap->format, rand(), rand(), rand(), rand());
-				WriteColor(&hBitmap->data[i * hBitmap->scanline + j * bpp], hBitmap->format,
-				           color);
+				WriteColor(&hBitmap->data[i * hBitmap->scanline + j * bpp], hBitmap->format, color);
 				pixel = gdi_GetPixel(hdc, j, i);
 
 				if (pixel != color)
@@ -428,8 +415,7 @@ static BOOL test_gdi_SetPixel(void)
 				UINT32 pixel;
 				const UINT32 color = FreeRDPGetColor(hBitmap->format, rand(), rand(), rand(), rand());
 				gdi_SetPixel(hdc, j, i, color);
-				pixel = ReadColor(&hBitmap->data[i * hBitmap->scanline + j * bpp],
-				                  hBitmap->format);
+				pixel = ReadColor(&hBitmap->data[i * hBitmap->scanline + j * bpp], hBitmap->format);
 
 				if (pixel != color)
 				{
@@ -521,7 +507,7 @@ static int test_gdi_MoveToEx(void)
 fail:
 
 	if (hPen)
-		gdi_DeleteObject((HGDIOBJECT)hPen);
+		gdi_DeleteObject((HGDIOBJECT) hPen);
 
 	free(prevPoint);
 	gdi_DeleteDC(hdc);
@@ -597,4 +583,3 @@ int TestGdiCreate(int argc, char* argv[])
 
 	return 0;
 }
-

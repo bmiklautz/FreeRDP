@@ -25,11 +25,11 @@ LPSTR tr_esc_str(LPCSTR arg, bool format)
 	ds = s + 1;
 
 	if (s)
-		tmp = (LPSTR)realloc(tmp, ds * sizeof(CHAR));
+		tmp = (LPSTR) realloc(tmp, ds * sizeof(CHAR));
 
 	if (NULL == tmp)
 	{
-		fprintf(stderr,  "Could not allocate string buffer.\n");
+		fprintf(stderr, "Could not allocate string buffer.\n");
 		exit(-2);
 	}
 
@@ -43,11 +43,11 @@ LPSTR tr_esc_str(LPCSTR arg, bool format)
 			case '<':
 				len = format ? 13 : 4;
 				ds += len - 1;
-				tmp = (LPSTR)realloc(tmp, ds * sizeof(CHAR));
+				tmp = (LPSTR) realloc(tmp, ds * sizeof(CHAR));
 
 				if (NULL == tmp)
 				{
-					fprintf(stderr,  "Could not reallocate string buffer.\n");
+					fprintf(stderr, "Could not reallocate string buffer.\n");
 					exit(-3);
 				}
 
@@ -64,11 +64,11 @@ LPSTR tr_esc_str(LPCSTR arg, bool format)
 			case '>':
 				len = format ? 14 : 4;
 				ds += len - 1;
-				tmp = (LPSTR)realloc(tmp, ds * sizeof(CHAR));
+				tmp = (LPSTR) realloc(tmp, ds * sizeof(CHAR));
 
 				if (NULL == tmp)
 				{
-					fprintf(stderr,  "Could not reallocate string buffer.\n");
+					fprintf(stderr, "Could not reallocate string buffer.\n");
 					exit(-4);
 				}
 
@@ -84,11 +84,11 @@ LPSTR tr_esc_str(LPCSTR arg, bool format)
 
 			case '\'':
 				ds += 5;
-				tmp = (LPSTR)realloc(tmp, ds * sizeof(CHAR));
+				tmp = (LPSTR) realloc(tmp, ds * sizeof(CHAR));
 
 				if (NULL == tmp)
 				{
-					fprintf(stderr,  "Could not reallocate string buffer.\n");
+					fprintf(stderr, "Could not reallocate string buffer.\n");
 					exit(-5);
 				}
 
@@ -102,11 +102,11 @@ LPSTR tr_esc_str(LPCSTR arg, bool format)
 
 			case '"':
 				ds += 5;
-				tmp = (LPSTR)realloc(tmp, ds * sizeof(CHAR));
+				tmp = (LPSTR) realloc(tmp, ds * sizeof(CHAR));
 
 				if (NULL == tmp)
 				{
-					fprintf(stderr,  "Could not reallocate string buffer.\n");
+					fprintf(stderr, "Could not reallocate string buffer.\n");
 					exit(-6);
 				}
 
@@ -120,11 +120,11 @@ LPSTR tr_esc_str(LPCSTR arg, bool format)
 
 			case '&':
 				ds += 4;
-				tmp = (LPSTR)realloc(tmp, ds * sizeof(CHAR));
+				tmp = (LPSTR) realloc(tmp, ds * sizeof(CHAR));
 
 				if (NULL == tmp)
 				{
-					fprintf(stderr,  "Could not reallocate string buffer.\n");
+					fprintf(stderr, "Could not reallocate string buffer.\n");
 					exit(-7);
 				}
 
@@ -158,7 +158,7 @@ int main(int argc, char* argv[])
 
 	if (NULL == fp)
 	{
-		fprintf(stderr,  "Could not open '%s' for writing.\n", fname);
+		fprintf(stderr, "Could not open '%s' for writing.\n", fname);
 		return -1;
 	}
 
@@ -171,7 +171,7 @@ int main(int argc, char* argv[])
 	 * compatible XML */
 	if (elements < 2)
 	{
-		fprintf(stderr,  "The argument array 'args' is empty, writing an empty file.\n");
+		fprintf(stderr, "The argument array 'args' is empty, writing an empty file.\n");
 		elements = 1;
 	}
 
@@ -213,8 +213,7 @@ int main(int argc, char* argv[])
 
 			free(name);
 			name = alias;
-		}
-		while (alias);
+		} while (alias);
 
 		if (text)
 		{
@@ -248,4 +247,3 @@ int main(int argc, char* argv[])
 	fclose(fp);
 	return 0;
 }
-

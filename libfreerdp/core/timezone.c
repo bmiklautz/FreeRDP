@@ -65,10 +65,10 @@ void rdp_write_system_time(wStream* s, SYSTEMTIME* system_time)
 	Stream_Write_UINT16(s, system_time->wMinute); /* wMinute */
 	Stream_Write_UINT16(s, system_time->wSecond); /* wSecond */
 	Stream_Write_UINT16(s, system_time->wMilliseconds); /* wMilliseconds */
-	DEBUG_TIMEZONE("Time: y=%"PRIu16",m=%"PRIu16",dow=%"PRIu16",d=%"PRIu16", %02"PRIu16":%02"PRIu16":%02"PRIu16".%03"PRIu16"",
-	               system_time->wYear, system_time->wMonth, system_time->wDayOfWeek,
-	               system_time->wDay, system_time->wHour, system_time->wMinute,
-	               system_time->wSecond, system_time->wMilliseconds);
+	DEBUG_TIMEZONE("Time: y=%" PRIu16 ",m=%" PRIu16 ",dow=%" PRIu16 ",d=%" PRIu16 ", %02" PRIu16 ":%02" PRIu16
+	               ":%02" PRIu16 ".%03" PRIu16 "",
+	               system_time->wYear, system_time->wMonth, system_time->wDayOfWeek, system_time->wDay,
+	               system_time->wHour, system_time->wMinute, system_time->wSecond, system_time->wMilliseconds);
 }
 
 /**
@@ -128,7 +128,7 @@ BOOL rdp_write_client_time_zone(wStream* s, rdpSettings* settings)
 	/* StandardDate */
 	rdp_write_system_time(s, &tz->StandardDate);
 #ifdef WITH_DEBUG_TIMEZONE
-	WLog_DBG(TIMEZONE_TAG, "bias=%"PRId32"", tz->Bias);
+	WLog_DBG(TIMEZONE_TAG, "bias=%" PRId32 "", tz->Bias);
 	WLog_DBG(TIMEZONE_TAG, "StandardName:");
 	winpr_HexDump(TIMEZONE_TAG, WLOG_DEBUG, (const BYTE*) tz->StandardName, sizeof(tz->StandardName));
 	WLog_DBG(TIMEZONE_TAG, "DaylightName:");
@@ -137,7 +137,7 @@ BOOL rdp_write_client_time_zone(wStream* s, rdpSettings* settings)
 	/* Note that StandardBias is ignored if no valid standardDate is provided. */
 	/* StandardBias */
 	Stream_Write_UINT32(s, tz->StandardBias);
-	DEBUG_TIMEZONE("StandardBias=%"PRId32"", tz->StandardBias);
+	DEBUG_TIMEZONE("StandardBias=%" PRId32 "", tz->StandardBias);
 	/* daylightName (64 bytes) */
 	Stream_Write(s, tz->DaylightName, sizeof(tz->DaylightName));
 	/* DaylightDate */
@@ -145,7 +145,6 @@ BOOL rdp_write_client_time_zone(wStream* s, rdpSettings* settings)
 	/* Note that DaylightBias is ignored if no valid daylightDate is provided. */
 	/* DaylightBias */
 	Stream_Write_UINT32(s, tz->DaylightBias);
-	DEBUG_TIMEZONE("DaylightBias=%"PRId32"", tz->DaylightBias);
+	DEBUG_TIMEZONE("DaylightBias=%" PRId32 "", tz->DaylightBias);
 	return TRUE;
 }
-

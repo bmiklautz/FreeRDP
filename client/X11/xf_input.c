@@ -88,7 +88,6 @@ const char* xf_input_get_class_string(int class)
 	return "XIUnknownClass";
 }
 
-
 int xf_input_init(xfContext* xfc, Window window)
 {
 	int i, j;
@@ -153,9 +152,8 @@ int xf_input_init(xfContext* xfc, Window window)
 
 			if (xfc->context.settings->MultiTouchInput)
 			{
-				WLog_INFO(TAG, "%s (%d) \"%s\" id: %d",
-				          xf_input_get_class_string(class->type),
-				          class->type, dev->name, dev->deviceid);
+				WLog_INFO(TAG, "%s (%d) \"%s\" id: %d", xf_input_get_class_string(class->type), class->type, dev->name,
+				          dev->deviceid);
 			}
 
 			evmasks[nmasks].mask = masks[nmasks];
@@ -168,9 +166,9 @@ int xf_input_init(xfContext* xfc, Window window)
 			{
 				if (xfc->context.settings->MultiTouchInput)
 				{
-					WLog_INFO(TAG, "%s %s touch device (id: %d, mode: %d), supporting %d touches.",
-					          dev->name, (t->mode == XIDirectTouch) ? "direct" : "dependent",
-					          dev->deviceid, t->mode, t->num_touches);
+					WLog_INFO(TAG, "%s %s touch device (id: %d, mode: %d), supporting %d touches.", dev->name,
+					          (t->mode == XIDirectTouch) ? "direct" : "dependent", dev->deviceid, t->mode,
+					          t->num_touches);
 				}
 
 				XISetMask(masks[nmasks], XI_TouchBegin);
@@ -181,12 +179,9 @@ int xf_input_init(xfContext* xfc, Window window)
 
 			if (xfc->use_xinput)
 			{
-				if (!touch && (class->type == XIButtonClass)
-				    && strcmp(dev->name, "Virtual core pointer"))
+				if (!touch && (class->type == XIButtonClass) && strcmp(dev->name, "Virtual core pointer"))
 				{
-					WLog_INFO(TAG, "%s button device (id: %d, mode: %d)",
-					          dev->name,
-					          dev->deviceid, t->mode);
+					WLog_INFO(TAG, "%s button device (id: %d, mode: %d)", dev->name, dev->deviceid, t->mode);
 					XISetMask(masks[nmasks], XI_ButtonPress);
 					XISetMask(masks[nmasks], XI_ButtonRelease);
 					XISetMask(masks[nmasks], XI_Motion);
@@ -209,11 +204,8 @@ static BOOL xf_input_is_duplicate(XGenericEventCookie* cookie)
 	XIDeviceEvent* event;
 	event = cookie->data;
 
-	if ((lastEvent.time == event->time) &&
-	    (lastEvType == cookie->evtype) &&
-	    (lastEvent.detail == event->detail) &&
-	    (lastEvent.event_x == event->event_x) &&
-	    (lastEvent.event_y == event->event_y))
+	if ((lastEvent.time == event->time) && (lastEvType == cookie->evtype) && (lastEvent.detail == event->detail) &&
+	    (lastEvent.event_x == event->event_x) && (lastEvent.event_y == event->event_y))
 	{
 		return TRUE;
 	}
@@ -333,8 +325,7 @@ static void xf_input_detect_pinch(xfContext* xfc)
 	}
 
 	/* first calculate the distance */
-	dist = sqrt(pow(contacts[1].pos_x - contacts[0].last_x, 2.0) +
-	            pow(contacts[1].pos_y - contacts[0].last_y, 2.0));
+	dist = sqrt(pow(contacts[1].pos_x - contacts[0].last_x, 2.0) + pow(contacts[1].pos_y - contacts[0].last_y, 2.0));
 
 	/* if this is the first 2pt touch */
 	if (firstDist <= 0)
@@ -581,18 +572,18 @@ static int xf_input_event(xfContext* xfc, XIDeviceEvent* event, int evtype)
 	switch (evtype)
 	{
 		case XI_ButtonPress:
-			xf_generic_ButtonPress(xfc, (int) event->event_x, (int) event->event_y,
-			                       event->detail, event->event, xfc->remote_app);
+			xf_generic_ButtonPress(xfc, (int) event->event_x, (int) event->event_y, event->detail, event->event,
+			                       xfc->remote_app);
 			break;
 
 		case XI_ButtonRelease:
-			xf_generic_ButtonRelease(xfc, (int) event->event_x, (int) event->event_y,
-			                         event->detail, event->event, xfc->remote_app);
+			xf_generic_ButtonRelease(xfc, (int) event->event_x, (int) event->event_y, event->detail, event->event,
+			                         xfc->remote_app);
 			break;
 
 		case XI_Motion:
-			xf_generic_MotionNotify(xfc, (int) event->event_x, (int) event->event_y,
-			                        event->detail, event->event, xfc->remote_app);
+			xf_generic_MotionNotify(xfc, (int) event->event_x, (int) event->event_y, event->detail, event->event,
+			                        xfc->remote_app);
 			break;
 	}
 
@@ -632,10 +623,7 @@ static int xf_input_handle_event_remote(xfContext* xfc, XEvent* event)
 
 #else
 
-int xf_input_init(xfContext* xfc, Window window)
-{
-	return 0;
-}
+int xf_input_init(xfContext* xfc, Window window) { return 0; }
 
 #endif
 

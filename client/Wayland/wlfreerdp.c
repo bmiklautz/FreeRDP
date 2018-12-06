@@ -69,7 +69,6 @@ static BOOL wl_begin_paint(rdpContext* context)
 	return TRUE;
 }
 
-
 static BOOL wl_end_paint(rdpContext* context)
 {
 	rdpGdi* gdi;
@@ -99,10 +98,10 @@ static BOOL wl_end_paint(rdpContext* context)
 
 	for (i = 0; i < h; i++)
 	{
-		memcpy(data + ((i + y) * (gdi->width * GetBytesPerPixel(
-		                              gdi->dstFormat))) + x * GetBytesPerPixel(gdi->dstFormat),
-		       gdi->primary_buffer + ((i + y) * (gdi->width * GetBytesPerPixel(
-		                                  gdi->dstFormat))) + x * GetBytesPerPixel(gdi->dstFormat),
+		memcpy(data + ((i + y) * (gdi->width * GetBytesPerPixel(gdi->dstFormat))) +
+		         x * GetBytesPerPixel(gdi->dstFormat),
+		       gdi->primary_buffer + ((i + y) * (gdi->width * GetBytesPerPixel(gdi->dstFormat))) +
+		         x * GetBytesPerPixel(gdi->dstFormat),
 		       w * GetBytesPerPixel(gdi->dstFormat));
 	}
 
@@ -112,7 +111,6 @@ static BOOL wl_end_paint(rdpContext* context)
 	context_w->haveDamage = TRUE;
 	return wl_update_content(context_w);
 }
-
 
 static BOOL wl_pre_connect(freerdp* instance)
 {
@@ -132,10 +130,8 @@ static BOOL wl_pre_connect(freerdp* instance)
 
 	settings->OsMajorType = OSMAJORTYPE_UNIX;
 	settings->OsMinorType = OSMINORTYPE_NATIVE_WAYLAND;
-	PubSub_SubscribeChannelConnected(instance->context->pubSub,
-	                                 wlf_OnChannelConnectedEventHandler);
-	PubSub_SubscribeChannelDisconnected(instance->context->pubSub,
-	                                    wlf_OnChannelDisconnectedEventHandler);
+	PubSub_SubscribeChannelConnected(instance->context->pubSub, wlf_OnChannelConnectedEventHandler);
+	PubSub_SubscribeChannelDisconnected(instance->context->pubSub, wlf_OnChannelDisconnectedEventHandler);
 
 	if (settings->Fullscreen)
 	{
@@ -153,8 +149,7 @@ static BOOL wl_pre_connect(freerdp* instance)
 		}
 	}
 
-	if (!freerdp_client_load_addins(instance->context->channels,
-	                                instance->settings))
+	if (!freerdp_client_load_addins(instance->context->channels, instance->settings))
 		return FALSE;
 
 	return TRUE;
@@ -178,8 +173,7 @@ static BOOL wl_post_connect(freerdp* instance)
 		return FALSE;
 
 	context = (wlfContext*) instance->context;
-	context->window = window = UwacCreateWindowShm(context->display, gdi->width,
-	                           gdi->height, WL_SHM_FORMAT_XRGB8888);
+	context->window = window = UwacCreateWindowShm(context->display, gdi->width, gdi->height, WL_SHM_FORMAT_XRGB8888);
 
 	if (!window)
 		return FALSE;
@@ -189,8 +183,7 @@ static BOOL wl_post_connect(freerdp* instance)
 	UwacWindowSetOpaqueRegion(context->window, 0, 0, gdi->width, gdi->height);
 	instance->update->BeginPaint = wl_begin_paint;
 	instance->update->EndPaint = wl_end_paint;
-	memcpy(UwacWindowGetDrawingBuffer(context->window), gdi->primary_buffer,
-	       gdi->width * gdi->height * 4);
+	memcpy(UwacWindowGetDrawingBuffer(context->window), gdi->primary_buffer, gdi->width * gdi->height * 4);
 	UwacWindowAddDamage(context->window, 0, 0, gdi->width, gdi->height);
 	context->haveDamage = TRUE;
 	freerdp_keyboard_init(instance->context->settings->KeyboardLayout);
@@ -234,7 +227,7 @@ static BOOL handle_uwac_events(freerdp* instance, UwacDisplay* display)
 				if (!instance)
 					continue;
 
-				context = (wlfContext*)instance->context;
+				context = (wlfContext*) instance->context;
 				context->waitingFrameDone = FALSE;
 
 				if (context->haveDamage && !wl_update_content(context))
@@ -296,7 +289,7 @@ static int wlfreerdp_run(freerdp* instance)
 	if (!instance)
 		return -1;
 
-	context = (wlfContext*)instance->context;
+	context = (wlfContext*) instance->context;
 
 	if (!context)
 		return -1;
@@ -355,9 +348,7 @@ static BOOL wlf_client_global_init(void)
 	return TRUE;
 }
 
-static void wlf_client_global_uninit(void)
-{
-}
+static void wlf_client_global_uninit(void) {}
 
 static int wlf_logon_error_info(freerdp* instance, UINT32 data, UINT32 type)
 {
@@ -394,15 +385,13 @@ static BOOL wlf_client_new(freerdp* instance, rdpContext* context)
 	if (!wfl->display || (status != UWAC_SUCCESS))
 		return FALSE;
 
-	wfl->displayHandle = CreateFileDescriptorEvent(NULL, FALSE, FALSE,
-	                     UwacDisplayGetFd(wfl->display), WINPR_FD_READ);
+	wfl->displayHandle = CreateFileDescriptorEvent(NULL, FALSE, FALSE, UwacDisplayGetFd(wfl->display), WINPR_FD_READ);
 
 	if (!wfl->displayHandle)
 		return FALSE;
 
 	return TRUE;
 }
-
 
 static void wlf_client_free(freerdp* instance, rdpContext* context)
 {
@@ -418,15 +407,9 @@ static void wlf_client_free(freerdp* instance, rdpContext* context)
 		CloseHandle(wlf->displayHandle);
 }
 
-static int wfl_client_start(rdpContext* context)
-{
-	return 0;
-}
+static int wfl_client_start(rdpContext* context) { return 0; }
 
-static int wfl_client_stop(rdpContext* context)
-{
-	return 0;
-}
+static int wfl_client_stop(rdpContext* context) { return 0; }
 
 static int RdpClientEntry(RDP_CLIENT_ENTRY_POINTS* pEntryPoints)
 {
@@ -455,10 +438,8 @@ int main(int argc, char* argv[])
 	if (!context)
 		goto fail;
 
-	status = freerdp_client_settings_parse_command_line(context->settings, argc,
-	         argv, FALSE);
-	status = freerdp_client_settings_command_line_status_print(context->settings,
-	         status, argc, argv);
+	status = freerdp_client_settings_parse_command_line(context->settings, argc, argv, FALSE);
+	status = freerdp_client_settings_command_line_status_print(context->settings, status, argc, argv);
 
 	if (status)
 		return 0;

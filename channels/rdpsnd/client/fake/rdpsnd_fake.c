@@ -41,19 +41,11 @@ struct rdpsnd_fake_plugin
 	rdpsndDevicePlugin device;
 };
 
-static BOOL rdpsnd_fake_open(rdpsndDevicePlugin* device, const AUDIO_FORMAT* format, UINT32 latency)
-{
-	return TRUE;
-}
+static BOOL rdpsnd_fake_open(rdpsndDevicePlugin* device, const AUDIO_FORMAT* format, UINT32 latency) { return TRUE; }
 
-static void rdpsnd_fake_close(rdpsndDevicePlugin* device)
-{
-}
+static void rdpsnd_fake_close(rdpsndDevicePlugin* device) {}
 
-static BOOL rdpsnd_fake_set_volume(rdpsndDevicePlugin* device, UINT32 value)
-{
-	return TRUE;
-}
+static BOOL rdpsnd_fake_set_volume(rdpsndDevicePlugin* device, UINT32 value) { return TRUE; }
 
 static void rdpsnd_fake_free(rdpsndDevicePlugin* device)
 {
@@ -65,30 +57,15 @@ static void rdpsnd_fake_free(rdpsndDevicePlugin* device)
 	free(fake);
 }
 
-static BOOL rdpsnd_fake_format_supported(rdpsndDevicePlugin* device, const AUDIO_FORMAT* format)
-{
-	return TRUE;
-}
+static BOOL rdpsnd_fake_format_supported(rdpsndDevicePlugin* device, const AUDIO_FORMAT* format) { return TRUE; }
 
-static BOOL rdpsnd_fake_set_format(rdpsndDevicePlugin* device, const AUDIO_FORMAT* format,
-                                   int latency)
-{
-	return TRUE;
-}
+static BOOL rdpsnd_fake_set_format(rdpsndDevicePlugin* device, const AUDIO_FORMAT* format, int latency) { return TRUE; }
 
-static UINT rdpsnd_fake_play(rdpsndDevicePlugin* device, const BYTE* data, size_t size)
-{
-	return CHANNEL_RC_OK;
-}
+static UINT rdpsnd_fake_play(rdpsndDevicePlugin* device, const BYTE* data, size_t size) { return CHANNEL_RC_OK; }
 
-static void rdpsnd_fake_start(rdpsndDevicePlugin* device)
-{
-}
+static void rdpsnd_fake_start(rdpsndDevicePlugin* device) {}
 
-static COMMAND_LINE_ARGUMENT_A rdpsnd_fake_args[] =
-{
-	{ NULL, 0, NULL, NULL, NULL, -1, NULL, NULL }
-};
+static COMMAND_LINE_ARGUMENT_A rdpsnd_fake_args[] = { { NULL, 0, NULL, NULL, NULL, -1, NULL, NULL } };
 
 /**
  * Function description
@@ -101,8 +78,7 @@ static UINT rdpsnd_fake_parse_addin_args(rdpsndFakePlugin* fake, ADDIN_ARGV* arg
 	DWORD flags;
 	COMMAND_LINE_ARGUMENT_A* arg;
 	flags = COMMAND_LINE_SIGIL_NONE | COMMAND_LINE_SEPARATOR_COLON | COMMAND_LINE_IGN_UNKNOWN_KEYWORD;
-	status = CommandLineParseArgumentsA(args->argc, args->argv,
-	                                    rdpsnd_fake_args, flags, fake, NULL, NULL);
+	status = CommandLineParseArgumentsA(args->argc, args->argv, rdpsnd_fake_args, flags, fake, NULL, NULL);
 
 	if (status < 0)
 		return ERROR_INVALID_DATA;
@@ -114,18 +90,16 @@ static UINT rdpsnd_fake_parse_addin_args(rdpsndFakePlugin* fake, ADDIN_ARGV* arg
 		if (!(arg->Flags & COMMAND_LINE_VALUE_PRESENT))
 			continue;
 
-		CommandLineSwitchStart(arg)
-		CommandLineSwitchEnd(arg)
-	}
-	while ((arg = CommandLineFindNextArgumentA(arg)) != NULL);
+		CommandLineSwitchStart(arg) CommandLineSwitchEnd(arg)
+	} while ((arg = CommandLineFindNextArgumentA(arg)) != NULL);
 
 	return CHANNEL_RC_OK;
 }
 
 #ifdef BUILTIN_CHANNELS
-#define freerdp_rdpsnd_client_subsystem_entry	fake_freerdp_rdpsnd_client_subsystem_entry
+#define freerdp_rdpsnd_client_subsystem_entry fake_freerdp_rdpsnd_client_subsystem_entry
 #else
-#define freerdp_rdpsnd_client_subsystem_entry	FREERDP_API freerdp_rdpsnd_client_subsystem_entry
+#define freerdp_rdpsnd_client_subsystem_entry FREERDP_API freerdp_rdpsnd_client_subsystem_entry
 #endif
 
 /**

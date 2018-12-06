@@ -26,24 +26,12 @@
 
 #ifdef WINPR_THREAD_POOL
 
-PTP_WAIT winpr_CreateThreadpoolWait(PTP_WAIT_CALLBACK pfnwa, PVOID pv, PTP_CALLBACK_ENVIRON pcbe)
-{
-	return NULL;
-}
+PTP_WAIT winpr_CreateThreadpoolWait(PTP_WAIT_CALLBACK pfnwa, PVOID pv, PTP_CALLBACK_ENVIRON pcbe) { return NULL; }
 
-VOID winpr_CloseThreadpoolWait(PTP_WAIT pwa)
-{
+VOID winpr_CloseThreadpoolWait(PTP_WAIT pwa) {}
 
-}
+VOID winpr_SetThreadpoolWait(PTP_WAIT pwa, HANDLE h, PFILETIME pftTimeout) {}
 
-VOID winpr_SetThreadpoolWait(PTP_WAIT pwa, HANDLE h, PFILETIME pftTimeout)
-{
-
-}
-
-VOID winpr_WaitForThreadpoolWaitCallbacks(PTP_WAIT pwa, BOOL fCancelPendingCallbacks)
-{
-
-}
+VOID winpr_WaitForThreadpoolWaitCallbacks(PTP_WAIT pwa, BOOL fCancelPendingCallbacks) {}
 
 #endif

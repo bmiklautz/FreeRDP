@@ -57,20 +57,19 @@
  * two less significant bits of the first byte.
  */
 
-static const char* const FASTPATH_UPDATETYPE_STRINGS[] =
-{
-	"Orders",									/* 0x0 */
-	"Bitmap",									/* 0x1 */
-	"Palette",								/* 0x2 */
-	"Synchronize",						/* 0x3 */
-	"Surface Commands",				/* 0x4 */
-	"System Pointer Hidden",	/* 0x5 */
-	"System Pointer Default",	/* 0x6 */
-	"???",										/* 0x7 */
-	"Pointer Position",				/* 0x8 */
-	"Color Pointer",					/* 0x9 */
-	"Cached Pointer",					/* 0xA */
-	"New Pointer",						/* 0xB */
+static const char* const FASTPATH_UPDATETYPE_STRINGS[] = {
+	"Orders", /* 0x0 */
+	"Bitmap", /* 0x1 */
+	"Palette", /* 0x2 */
+	"Synchronize", /* 0x3 */
+	"Surface Commands", /* 0x4 */
+	"System Pointer Hidden", /* 0x5 */
+	"System Pointer Default", /* 0x6 */
+	"???", /* 0x7 */
+	"Pointer Position", /* 0x8 */
+	"Color Pointer", /* 0x9 */
+	"Cached Pointer", /* 0xA */
+	"New Pointer", /* 0xB */
 };
 
 static const char* fastpath_update_to_string(UINT8 update)
@@ -127,8 +126,7 @@ UINT16 fastpath_read_header(rdpFastPath* fastpath, wStream* s)
 	return length;
 }
 
-static BOOL fastpath_read_update_header(wStream* s, BYTE* updateCode, BYTE* fragmentation,
-                                        BYTE* compression)
+static BOOL fastpath_read_update_header(wStream* s, BYTE* updateCode, BYTE* fragmentation, BYTE* compression)
 {
 	BYTE updateHeader;
 
@@ -179,9 +177,7 @@ static UINT32 fastpath_get_update_header_size(FASTPATH_UPDATE_HEADER* fpUpdateHe
 	return (fpUpdateHeader->compression) ? 4 : 3;
 }
 
-static BOOL fastpath_write_update_pdu_header(wStream* s,
-        FASTPATH_UPDATE_PDU_HEADER* fpUpdatePduHeader,
-        rdpRdp* rdp)
+static BOOL fastpath_write_update_pdu_header(wStream* s, FASTPATH_UPDATE_PDU_HEADER* fpUpdatePduHeader, rdpRdp* rdp)
 {
 	if (!s || !fpUpdatePduHeader || !rdp)
 		return FALSE;
@@ -215,8 +211,7 @@ static BOOL fastpath_write_update_pdu_header(wStream* s,
 	return FALSE;
 }
 
-static UINT32 fastpath_get_update_pdu_header_size(FASTPATH_UPDATE_PDU_HEADER* fpUpdatePduHeader,
-        rdpRdp* rdp)
+static UINT32 fastpath_get_update_pdu_header_size(FASTPATH_UPDATE_PDU_HEADER* fpUpdatePduHeader, rdpRdp* rdp)
 {
 	UINT32 size = 3; /* fpUpdatePduHeader + length1 + length2 */
 
@@ -322,28 +317,28 @@ static BOOL fastpath_recv_update_common(rdpFastPath* fastpath, wStream* s)
 	switch (updateType)
 	{
 		case UPDATE_TYPE_BITMAP:
-			{
-				BITMAP_UPDATE* bitmap_update = update_read_bitmap_update(update, s);
+		{
+			BITMAP_UPDATE* bitmap_update = update_read_bitmap_update(update, s);
 
-				if (!bitmap_update)
-					return FALSE;
+			if (!bitmap_update)
+				return FALSE;
 
-				rc = IFCALLRESULT(FALSE, update->BitmapUpdate, context, bitmap_update);
-				free_bitmap_update(context, bitmap_update);
-			}
-			break;
+			rc = IFCALLRESULT(FALSE, update->BitmapUpdate, context, bitmap_update);
+			free_bitmap_update(context, bitmap_update);
+		}
+		break;
 
 		case UPDATE_TYPE_PALETTE:
-			{
-				PALETTE_UPDATE* palette_update = update_read_palette(update, s);
+		{
+			PALETTE_UPDATE* palette_update = update_read_palette(update, s);
 
-				if (!palette_update)
-					return FALSE;
+			if (!palette_update)
+				return FALSE;
 
-				rc = IFCALLRESULT(FALSE, update->Palette, context, palette_update);
-				free_palette_update(context, palette_update);
-			}
-			break;
+			rc = IFCALLRESULT(FALSE, update->Palette, context, palette_update);
+			free_palette_update(context, palette_update);
+		}
+		break;
 
 		default:
 			break;
@@ -379,8 +374,8 @@ static int fastpath_recv_update(rdpFastPath* fastpath, BYTE updateCode, wStream*
 	context = update->context;
 	pointer = update->pointer;
 #ifdef WITH_DEBUG_RDP
-	DEBUG_RDP("recv Fast-Path %s Update (0x%02"PRIX8"), length:%"PRIuz"",
-	          fastpath_update_to_string(updateCode), updateCode, Stream_GetRemainingLength(s));
+	DEBUG_RDP("recv Fast-Path %s Update (0x%02" PRIX8 "), length:%" PRIuz "", fastpath_update_to_string(updateCode),
+	          updateCode, Stream_GetRemainingLength(s));
 #endif
 
 	switch (updateCode)
@@ -396,7 +391,7 @@ static int fastpath_recv_update(rdpFastPath* fastpath, BYTE updateCode, wStream*
 
 		case FASTPATH_UPDATETYPE_SYNCHRONIZE:
 			if (!fastpath_recv_update_synchronize(fastpath, s))
-				WLog_ERR(TAG,  "fastpath_recv_update_synchronize failure but we continue");
+				WLog_ERR(TAG, "fastpath_recv_update_synchronize failure but we continue");
 			else
 				rc = IFCALLRESULT(TRUE, update->Synchronize, context);
 
@@ -408,68 +403,68 @@ static int fastpath_recv_update(rdpFastPath* fastpath, BYTE updateCode, wStream*
 			break;
 
 		case FASTPATH_UPDATETYPE_PTR_NULL:
-			{
-				POINTER_SYSTEM_UPDATE pointer_system;
-				pointer_system.type = SYSPTR_NULL;
-				rc = IFCALLRESULT(FALSE, pointer->PointerSystem, context, &pointer_system);
-			}
-			break;
+		{
+			POINTER_SYSTEM_UPDATE pointer_system;
+			pointer_system.type = SYSPTR_NULL;
+			rc = IFCALLRESULT(FALSE, pointer->PointerSystem, context, &pointer_system);
+		}
+		break;
 
 		case FASTPATH_UPDATETYPE_PTR_DEFAULT:
-			{
-				POINTER_SYSTEM_UPDATE pointer_system;
-				pointer_system.type = SYSPTR_DEFAULT;
-				rc = IFCALLRESULT(FALSE, pointer->PointerSystem, context, &pointer_system);
-			}
-			break;
+		{
+			POINTER_SYSTEM_UPDATE pointer_system;
+			pointer_system.type = SYSPTR_DEFAULT;
+			rc = IFCALLRESULT(FALSE, pointer->PointerSystem, context, &pointer_system);
+		}
+		break;
 
 		case FASTPATH_UPDATETYPE_PTR_POSITION:
-			{
-				POINTER_POSITION_UPDATE* pointer_position = update_read_pointer_position(update, s);
+		{
+			POINTER_POSITION_UPDATE* pointer_position = update_read_pointer_position(update, s);
 
-				if (pointer_position)
-				{
-					rc = IFCALLRESULT(FALSE, pointer->PointerPosition, context, pointer_position);
-					free_pointer_position_update(context, pointer_position);
-				}
+			if (pointer_position)
+			{
+				rc = IFCALLRESULT(FALSE, pointer->PointerPosition, context, pointer_position);
+				free_pointer_position_update(context, pointer_position);
 			}
-			break;
+		}
+		break;
 
 		case FASTPATH_UPDATETYPE_COLOR:
-			{
-				POINTER_COLOR_UPDATE* pointer_color = update_read_pointer_color(update, s, 24);
+		{
+			POINTER_COLOR_UPDATE* pointer_color = update_read_pointer_color(update, s, 24);
 
-				if (pointer_color)
-				{
-					rc = IFCALLRESULT(FALSE, pointer->PointerColor, context, pointer_color);
-					free_pointer_color_update(context, pointer_color);
-				}
+			if (pointer_color)
+			{
+				rc = IFCALLRESULT(FALSE, pointer->PointerColor, context, pointer_color);
+				free_pointer_color_update(context, pointer_color);
 			}
-			break;
+		}
+		break;
 
 		case FASTPATH_UPDATETYPE_CACHED:
-			{
-				POINTER_CACHED_UPDATE* pointer_cached = update_read_pointer_cached(update, s);
+		{
+			POINTER_CACHED_UPDATE* pointer_cached = update_read_pointer_cached(update, s);
 
-				if (pointer_cached)
-				{
-					rc = IFCALLRESULT(FALSE, pointer->PointerCached, context, pointer_cached);
-					free_pointer_cached_update(context, pointer_cached);
-				}
+			if (pointer_cached)
+			{
+				rc = IFCALLRESULT(FALSE, pointer->PointerCached, context, pointer_cached);
+				free_pointer_cached_update(context, pointer_cached);
 			}
-			break;
+		}
+		break;
 
 		case FASTPATH_UPDATETYPE_POINTER:
-			{
-				POINTER_NEW_UPDATE* pointer_new = update_read_pointer_new(update, s);
+		{
+			POINTER_NEW_UPDATE* pointer_new = update_read_pointer_new(update, s);
 
-				if (pointer_new)
-				{
-					rc = IFCALLRESULT(FALSE, pointer->PointerNew, context, pointer_new);
-					free_pointer_new_update(context, pointer_new);
-				}
+			if (pointer_new)
+			{
+				rc = IFCALLRESULT(FALSE, pointer->PointerNew, context, pointer_new);
+				free_pointer_new_update(context, pointer_new);
 			}
-			break;
+		}
+		break;
 
 		default:
 			break;
@@ -477,8 +472,8 @@ static int fastpath_recv_update(rdpFastPath* fastpath, BYTE updateCode, wStream*
 
 	if (!rc)
 	{
-		WLog_ERR(TAG, "Fastpath update %s [%"PRIx8"] failed, status %d",
-		         fastpath_update_to_string(updateCode), updateCode, status);
+		WLog_ERR(TAG, "Fastpath update %s [%" PRIx8 "] failed, status %d", fastpath_update_to_string(updateCode),
+		         updateCode, status);
 		return -1;
 	}
 
@@ -537,8 +532,7 @@ static int fastpath_recv_update_data(rdpFastPath* fastpath, wStream* s)
 		return -1;
 	}
 
-	bulkStatus = bulk_decompress(rdp->bulk, Stream_Pointer(s), size, &pDstData, &DstSize,
-	                             compressionFlags);
+	bulkStatus = bulk_decompress(rdp->bulk, Stream_Pointer(s), size, &pDstData, &DstSize, compressionFlags);
 	Stream_Seek(s, size);
 
 	if (bulkStatus < 0)
@@ -577,8 +571,8 @@ static int fastpath_recv_update_data(rdpFastPath* fastpath, wStream* s)
 
 		if (totalSize > transport->settings->MultifragMaxRequestSize)
 		{
-			WLog_ERR(TAG, "Total size (%"PRIuz") exceeds MultifragMaxRequestSize (%"PRIu32")",
-			         totalSize, transport->settings->MultifragMaxRequestSize);
+			WLog_ERR(TAG, "Total size (%" PRIuz ") exceeds MultifragMaxRequestSize (%" PRIu32 ")", totalSize,
+			         transport->settings->MultifragMaxRequestSize);
 			goto out_fail;
 		}
 
@@ -774,8 +768,7 @@ static BOOL fastpath_recv_input_event_unicode(rdpFastPath* fastpath, wStream* s,
 	else
 		flags |= KBD_FLAGS_DOWN;
 
-	return IFCALLRESULT(FALSE, fastpath->rdp->input->UnicodeKeyboardEvent, fastpath->rdp->input, flags,
-	                    unicodeCode);
+	return IFCALLRESULT(FALSE, fastpath->rdp->input->UnicodeKeyboardEvent, fastpath->rdp->input, flags, unicodeCode);
 }
 
 static BOOL fastpath_recv_input_event(rdpFastPath* fastpath, wStream* s)
@@ -822,7 +815,7 @@ static BOOL fastpath_recv_input_event(rdpFastPath* fastpath, wStream* s)
 			break;
 
 		default:
-			WLog_ERR(TAG, "Unknown eventCode %"PRIu8"", eventCode);
+			WLog_ERR(TAG, "Unknown eventCode %" PRIu8 "", eventCode);
 			break;
 	}
 
@@ -993,8 +986,8 @@ BOOL fastpath_send_multiple_input_pdu(rdpFastPath* fastpath, wStream* s, int iNu
 			BOOL status;
 
 			if (rdp->sec_flags & SEC_SECURE_CHECKSUM)
-				status = security_salted_mac_signature(rdp, fpInputEvents, fpInputEvents_length, TRUE,
-				                                       Stream_Pointer(s));
+				status =
+				  security_salted_mac_signature(rdp, fpInputEvents, fpInputEvents_length, TRUE, Stream_Pointer(s));
 			else
 				status = security_mac_signature(rdp, fpInputEvents, fpInputEvents_length, Stream_Pointer(s));
 
@@ -1041,8 +1034,7 @@ wStream* fastpath_update_pdu_init_new(rdpFastPath* fastpath)
 	return s;
 }
 
-BOOL fastpath_send_update_pdu(rdpFastPath* fastpath, BYTE updateCode, wStream* s,
-                              BOOL skipCompression)
+BOOL fastpath_send_update_pdu(rdpFastPath* fastpath, BYTE updateCode, wStream* s, BOOL skipCompression)
 {
 	int fragment;
 	UINT16 maxLength;
@@ -1090,8 +1082,7 @@ BOOL fastpath_send_update_pdu(rdpFastPath* fastpath, BYTE updateCode, wStream* s
 	/* check if the client's fast path pdu buffer is large enough */
 	if (totalLength > settings->MultifragMaxRequestSize)
 	{
-		WLog_ERR(TAG,
-		         "fast path update size (%"PRIu32") exceeds the client's maximum request size (%"PRIu32")",
+		WLog_ERR(TAG, "fast path update size (%" PRIu32 ") exceeds the client's maximum request size (%" PRIu32 ")",
 		         totalLength, settings->MultifragMaxRequestSize);
 		return FALSE;
 	}

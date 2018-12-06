@@ -29,191 +29,153 @@
 
 #define TAG FREERDP_TAG("core.gateway.rpc")
 
-static const RPC_FAULT_CODE RPC_FAULT_CODES[] =
-{
-	DEFINE_RPC_FAULT_CODE(nca_s_fault_object_not_found)
-	DEFINE_RPC_FAULT_CODE(nca_s_fault_cancel)
-	DEFINE_RPC_FAULT_CODE(nca_s_fault_addr_error)
-	DEFINE_RPC_FAULT_CODE(nca_s_fault_context_mismatch)
-	DEFINE_RPC_FAULT_CODE(nca_s_fault_fp_div_zero)
-	DEFINE_RPC_FAULT_CODE(nca_s_fault_fp_error)
-	DEFINE_RPC_FAULT_CODE(nca_s_fault_fp_overflow)
-	DEFINE_RPC_FAULT_CODE(nca_s_fault_fp_underflow)
-	DEFINE_RPC_FAULT_CODE(nca_s_fault_ill_inst)
-	DEFINE_RPC_FAULT_CODE(nca_s_fault_int_div_by_zero)
-	DEFINE_RPC_FAULT_CODE(nca_s_fault_int_overflow)
-	DEFINE_RPC_FAULT_CODE(nca_s_fault_invalid_bound)
-	DEFINE_RPC_FAULT_CODE(nca_s_fault_invalid_tag)
-	DEFINE_RPC_FAULT_CODE(nca_s_fault_pipe_closed)
-	DEFINE_RPC_FAULT_CODE(nca_s_fault_pipe_comm_error)
-	DEFINE_RPC_FAULT_CODE(nca_s_fault_pipe_discipline)
-	DEFINE_RPC_FAULT_CODE(nca_s_fault_pipe_empty)
-	DEFINE_RPC_FAULT_CODE(nca_s_fault_pipe_memory)
-	DEFINE_RPC_FAULT_CODE(nca_s_fault_pipe_order)
-	DEFINE_RPC_FAULT_CODE(nca_s_fault_remote_no_memory)
-	DEFINE_RPC_FAULT_CODE(nca_s_fault_user_defined)
-	DEFINE_RPC_FAULT_CODE(nca_s_fault_tx_open_failed)
-	DEFINE_RPC_FAULT_CODE(nca_s_fault_codeset_conv_error)
-	DEFINE_RPC_FAULT_CODE(nca_s_fault_no_client_stub)
-	DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_STRING_BINDING)
-	DEFINE_RPC_FAULT_CODE(RPC_S_WRONG_KIND_OF_BINDING)
-	DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_BINDING)
-	DEFINE_RPC_FAULT_CODE(RPC_S_PROTSEQ_NOT_SUPPORTED)
-	DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_RPC_PROTSEQ)
-	DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_STRING_UUID)
-	DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_ENDPOINT_FORMAT)
-	DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_NET_ADDR)
-	DEFINE_RPC_FAULT_CODE(RPC_S_NO_ENDPOINT_FOUND)
-	DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_TIMEOUT)
-	DEFINE_RPC_FAULT_CODE(RPC_S_OBJECT_NOT_FOUND)
-	DEFINE_RPC_FAULT_CODE(RPC_S_ALREADY_REGISTERED)
-	DEFINE_RPC_FAULT_CODE(RPC_S_TYPE_ALREADY_REGISTERED)
-	DEFINE_RPC_FAULT_CODE(RPC_S_ALREADY_LISTENING)
-	DEFINE_RPC_FAULT_CODE(RPC_S_NO_PROTSEQS_REGISTERED)
-	DEFINE_RPC_FAULT_CODE(RPC_S_NOT_LISTENING)
-	DEFINE_RPC_FAULT_CODE(RPC_S_UNKNOWN_MGR_TYPE)
-	DEFINE_RPC_FAULT_CODE(RPC_S_UNKNOWN_IF)
-	DEFINE_RPC_FAULT_CODE(RPC_S_NO_BINDINGS)
-	DEFINE_RPC_FAULT_CODE(RPC_S_NO_PROTSEQS)
-	DEFINE_RPC_FAULT_CODE(RPC_S_CANT_CREATE_ENDPOINT)
-	DEFINE_RPC_FAULT_CODE(RPC_S_OUT_OF_RESOURCES)
-	DEFINE_RPC_FAULT_CODE(RPC_S_SERVER_UNAVAILABLE)
-	DEFINE_RPC_FAULT_CODE(RPC_S_SERVER_TOO_BUSY)
-	DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_NETWORK_OPTIONS)
-	DEFINE_RPC_FAULT_CODE(RPC_S_NO_CALL_ACTIVE)
-	DEFINE_RPC_FAULT_CODE(RPC_S_CALL_FAILED)
-	DEFINE_RPC_FAULT_CODE(RPC_S_CALL_FAILED_DNE)
-	DEFINE_RPC_FAULT_CODE(RPC_S_PROTOCOL_ERROR)
-	DEFINE_RPC_FAULT_CODE(RPC_S_PROXY_ACCESS_DENIED)
-	DEFINE_RPC_FAULT_CODE(RPC_S_UNSUPPORTED_TRANS_SYN)
-	DEFINE_RPC_FAULT_CODE(RPC_S_UNSUPPORTED_TYPE)
-	DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_TAG)
-	DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_BOUND)
-	DEFINE_RPC_FAULT_CODE(RPC_S_NO_ENTRY_NAME)
-	DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_NAME_SYNTAX)
-	DEFINE_RPC_FAULT_CODE(RPC_S_UNSUPPORTED_NAME_SYNTAX)
-	DEFINE_RPC_FAULT_CODE(RPC_S_UUID_NO_ADDRESS)
-	DEFINE_RPC_FAULT_CODE(RPC_S_DUPLICATE_ENDPOINT)
-	DEFINE_RPC_FAULT_CODE(RPC_S_UNKNOWN_AUTHN_TYPE)
-	DEFINE_RPC_FAULT_CODE(RPC_S_MAX_CALLS_TOO_SMALL)
-	DEFINE_RPC_FAULT_CODE(RPC_S_STRING_TOO_LONG)
-	DEFINE_RPC_FAULT_CODE(RPC_S_PROTSEQ_NOT_FOUND)
-	DEFINE_RPC_FAULT_CODE(RPC_S_PROCNUM_OUT_OF_RANGE)
-	DEFINE_RPC_FAULT_CODE(RPC_S_BINDING_HAS_NO_AUTH)
-	DEFINE_RPC_FAULT_CODE(RPC_S_UNKNOWN_AUTHN_SERVICE)
-	DEFINE_RPC_FAULT_CODE(RPC_S_UNKNOWN_AUTHN_LEVEL)
-	DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_AUTH_IDENTITY)
-	DEFINE_RPC_FAULT_CODE(RPC_S_UNKNOWN_AUTHZ_SERVICE)
-	DEFINE_RPC_FAULT_CODE(EPT_S_INVALID_ENTRY)
-	DEFINE_RPC_FAULT_CODE(EPT_S_CANT_PERFORM_OP)
-	DEFINE_RPC_FAULT_CODE(EPT_S_NOT_REGISTERED)
-	DEFINE_RPC_FAULT_CODE(RPC_S_NOTHING_TO_EXPORT)
-	DEFINE_RPC_FAULT_CODE(RPC_S_INCOMPLETE_NAME)
-	DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_VERS_OPTION)
-	DEFINE_RPC_FAULT_CODE(RPC_S_NO_MORE_MEMBERS)
-	DEFINE_RPC_FAULT_CODE(RPC_S_NOT_ALL_OBJS_UNEXPORTED)
-	DEFINE_RPC_FAULT_CODE(RPC_S_INTERFACE_NOT_FOUND)
-	DEFINE_RPC_FAULT_CODE(RPC_S_ENTRY_ALREADY_EXISTS)
-	DEFINE_RPC_FAULT_CODE(RPC_S_ENTRY_NOT_FOUND)
-	DEFINE_RPC_FAULT_CODE(RPC_S_NAME_SERVICE_UNAVAILABLE)
-	DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_NAF_ID)
-	DEFINE_RPC_FAULT_CODE(RPC_S_CANNOT_SUPPORT)
-	DEFINE_RPC_FAULT_CODE(RPC_S_NO_CONTEXT_AVAILABLE)
-	DEFINE_RPC_FAULT_CODE(RPC_S_INTERNAL_ERROR)
-	DEFINE_RPC_FAULT_CODE(RPC_S_ZERO_DIVIDE)
-	DEFINE_RPC_FAULT_CODE(RPC_S_ADDRESS_ERROR)
-	DEFINE_RPC_FAULT_CODE(RPC_S_FP_DIV_ZERO)
-	DEFINE_RPC_FAULT_CODE(RPC_S_FP_UNDERFLOW)
-	DEFINE_RPC_FAULT_CODE(RPC_S_FP_OVERFLOW)
-	DEFINE_RPC_FAULT_CODE(RPC_X_NO_MORE_ENTRIES)
-	DEFINE_RPC_FAULT_CODE(RPC_X_SS_CHAR_TRANS_OPEN_FAIL)
-	DEFINE_RPC_FAULT_CODE(RPC_X_SS_CHAR_TRANS_SHORT_FILE)
-	DEFINE_RPC_FAULT_CODE(RPC_X_SS_IN_NULL_CONTEXT)
-	DEFINE_RPC_FAULT_CODE(RPC_X_SS_CONTEXT_DAMAGED)
-	DEFINE_RPC_FAULT_CODE(RPC_X_SS_HANDLES_MISMATCH)
-	DEFINE_RPC_FAULT_CODE(RPC_X_SS_CANNOT_GET_CALL_HANDLE)
-	DEFINE_RPC_FAULT_CODE(RPC_X_NULL_REF_POINTER)
-	DEFINE_RPC_FAULT_CODE(RPC_X_ENUM_VALUE_OUT_OF_RANGE)
-	DEFINE_RPC_FAULT_CODE(RPC_X_BYTE_COUNT_TOO_SMALL)
-	DEFINE_RPC_FAULT_CODE(RPC_X_BAD_STUB_DATA)
-	DEFINE_RPC_FAULT_CODE(RPC_S_NO_INTERFACES)
-	DEFINE_RPC_FAULT_CODE(RPC_S_CALL_CANCELLED)
-	DEFINE_RPC_FAULT_CODE(RPC_S_BINDING_INCOMPLETE)
-	DEFINE_RPC_FAULT_CODE(RPC_S_COMM_FAILURE)
-	DEFINE_RPC_FAULT_CODE(RPC_S_UNSUPPORTED_AUTHN_LEVEL)
-	DEFINE_RPC_FAULT_CODE(RPC_S_NO_PRINC_NAME)
-	DEFINE_RPC_FAULT_CODE(RPC_S_NOT_RPC_ERROR)
-	DEFINE_RPC_FAULT_CODE(RPC_S_UUID_LOCAL_ONLY)
-	DEFINE_RPC_FAULT_CODE(RPC_S_SEC_PKG_ERROR)
-	DEFINE_RPC_FAULT_CODE(RPC_S_NOT_CANCELLED)
-	DEFINE_RPC_FAULT_CODE(RPC_X_INVALID_ES_ACTION)
-	DEFINE_RPC_FAULT_CODE(RPC_X_WRONG_ES_VERSION)
-	DEFINE_RPC_FAULT_CODE(RPC_X_WRONG_STUB_VERSION)
-	DEFINE_RPC_FAULT_CODE(RPC_X_INVALID_PIPE_OBJECT)
-	DEFINE_RPC_FAULT_CODE(RPC_X_WRONG_PIPE_ORDER)
-	DEFINE_RPC_FAULT_CODE(RPC_X_WRONG_PIPE_VERSION)
-	DEFINE_RPC_FAULT_CODE(RPC_S_COOKIE_AUTH_FAILED)
-	DEFINE_RPC_FAULT_CODE(RPC_S_GROUP_MEMBER_NOT_FOUND)
-	DEFINE_RPC_FAULT_CODE(EPT_S_CANT_CREATE)
-	DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_OBJECT)
-	{
-		0, NULL
-	}
+static const RPC_FAULT_CODE RPC_FAULT_CODES[] = {
+	DEFINE_RPC_FAULT_CODE(nca_s_fault_object_not_found) DEFINE_RPC_FAULT_CODE(nca_s_fault_cancel) DEFINE_RPC_FAULT_CODE(
+	  nca_s_fault_addr_error) DEFINE_RPC_FAULT_CODE(nca_s_fault_context_mismatch)
+	  DEFINE_RPC_FAULT_CODE(nca_s_fault_fp_div_zero) DEFINE_RPC_FAULT_CODE(nca_s_fault_fp_error) DEFINE_RPC_FAULT_CODE(
+	    nca_s_fault_fp_overflow) DEFINE_RPC_FAULT_CODE(nca_s_fault_fp_underflow)
+	    DEFINE_RPC_FAULT_CODE(nca_s_fault_ill_inst) DEFINE_RPC_FAULT_CODE(
+	      nca_s_fault_int_div_by_zero) DEFINE_RPC_FAULT_CODE(nca_s_fault_int_overflow)
+	      DEFINE_RPC_FAULT_CODE(nca_s_fault_invalid_bound) DEFINE_RPC_FAULT_CODE(
+	        nca_s_fault_invalid_tag) DEFINE_RPC_FAULT_CODE(nca_s_fault_pipe_closed)
+	        DEFINE_RPC_FAULT_CODE(nca_s_fault_pipe_comm_error) DEFINE_RPC_FAULT_CODE(
+	          nca_s_fault_pipe_discipline) DEFINE_RPC_FAULT_CODE(nca_s_fault_pipe_empty)
+	          DEFINE_RPC_FAULT_CODE(nca_s_fault_pipe_memory) DEFINE_RPC_FAULT_CODE(
+	            nca_s_fault_pipe_order) DEFINE_RPC_FAULT_CODE(nca_s_fault_remote_no_memory)
+	            DEFINE_RPC_FAULT_CODE(nca_s_fault_user_defined) DEFINE_RPC_FAULT_CODE(
+	              nca_s_fault_tx_open_failed) DEFINE_RPC_FAULT_CODE(nca_s_fault_codeset_conv_error)
+	              DEFINE_RPC_FAULT_CODE(nca_s_fault_no_client_stub) DEFINE_RPC_FAULT_CODE(
+	                RPC_S_INVALID_STRING_BINDING) DEFINE_RPC_FAULT_CODE(RPC_S_WRONG_KIND_OF_BINDING)
+	                DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_BINDING) DEFINE_RPC_FAULT_CODE(
+	                  RPC_S_PROTSEQ_NOT_SUPPORTED) DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_RPC_PROTSEQ)
+	                  DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_STRING_UUID) DEFINE_RPC_FAULT_CODE(
+	                    RPC_S_INVALID_ENDPOINT_FORMAT) DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_NET_ADDR)
+	                    DEFINE_RPC_FAULT_CODE(RPC_S_NO_ENDPOINT_FOUND) DEFINE_RPC_FAULT_CODE(
+	                      RPC_S_INVALID_TIMEOUT) DEFINE_RPC_FAULT_CODE(RPC_S_OBJECT_NOT_FOUND)
+	                      DEFINE_RPC_FAULT_CODE(RPC_S_ALREADY_REGISTERED) DEFINE_RPC_FAULT_CODE(
+	                        RPC_S_TYPE_ALREADY_REGISTERED) DEFINE_RPC_FAULT_CODE(RPC_S_ALREADY_LISTENING)
+	                        DEFINE_RPC_FAULT_CODE(RPC_S_NO_PROTSEQS_REGISTERED) DEFINE_RPC_FAULT_CODE(
+	                          RPC_S_NOT_LISTENING) DEFINE_RPC_FAULT_CODE(RPC_S_UNKNOWN_MGR_TYPE)
+	                          DEFINE_RPC_FAULT_CODE(RPC_S_UNKNOWN_IF) DEFINE_RPC_FAULT_CODE(
+	                            RPC_S_NO_BINDINGS) DEFINE_RPC_FAULT_CODE(RPC_S_NO_PROTSEQS)
+	                            DEFINE_RPC_FAULT_CODE(RPC_S_CANT_CREATE_ENDPOINT) DEFINE_RPC_FAULT_CODE(
+	                              RPC_S_OUT_OF_RESOURCES) DEFINE_RPC_FAULT_CODE(RPC_S_SERVER_UNAVAILABLE)
+	                              DEFINE_RPC_FAULT_CODE(RPC_S_SERVER_TOO_BUSY) DEFINE_RPC_FAULT_CODE(
+	                                RPC_S_INVALID_NETWORK_OPTIONS) DEFINE_RPC_FAULT_CODE(RPC_S_NO_CALL_ACTIVE)
+	                                DEFINE_RPC_FAULT_CODE(RPC_S_CALL_FAILED) DEFINE_RPC_FAULT_CODE(
+	                                  RPC_S_CALL_FAILED_DNE) DEFINE_RPC_FAULT_CODE(RPC_S_PROTOCOL_ERROR)
+	                                  DEFINE_RPC_FAULT_CODE(RPC_S_PROXY_ACCESS_DENIED) DEFINE_RPC_FAULT_CODE(
+	                                    RPC_S_UNSUPPORTED_TRANS_SYN) DEFINE_RPC_FAULT_CODE(RPC_S_UNSUPPORTED_TYPE)
+	                                    DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_TAG) DEFINE_RPC_FAULT_CODE(
+	                                      RPC_S_INVALID_BOUND) DEFINE_RPC_FAULT_CODE(RPC_S_NO_ENTRY_NAME)
+	                                      DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_NAME_SYNTAX) DEFINE_RPC_FAULT_CODE(
+	                                        RPC_S_UNSUPPORTED_NAME_SYNTAX) DEFINE_RPC_FAULT_CODE(RPC_S_UUID_NO_ADDRESS)
+	                                        DEFINE_RPC_FAULT_CODE(RPC_S_DUPLICATE_ENDPOINT) DEFINE_RPC_FAULT_CODE(
+	                                          RPC_S_UNKNOWN_AUTHN_TYPE) DEFINE_RPC_FAULT_CODE(RPC_S_MAX_CALLS_TOO_SMALL)
+	                                          DEFINE_RPC_FAULT_CODE(RPC_S_STRING_TOO_LONG) DEFINE_RPC_FAULT_CODE(
+	                                            RPC_S_PROTSEQ_NOT_FOUND) DEFINE_RPC_FAULT_CODE(RPC_S_PROCNUM_OUT_OF_RANGE)
+	                                            DEFINE_RPC_FAULT_CODE(RPC_S_BINDING_HAS_NO_AUTH) DEFINE_RPC_FAULT_CODE(
+	                                              RPC_S_UNKNOWN_AUTHN_SERVICE) DEFINE_RPC_FAULT_CODE(RPC_S_UNKNOWN_AUTHN_LEVEL)
+	                                              DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_AUTH_IDENTITY) DEFINE_RPC_FAULT_CODE(
+	                                                RPC_S_UNKNOWN_AUTHZ_SERVICE) DEFINE_RPC_FAULT_CODE(EPT_S_INVALID_ENTRY)
+	                                                DEFINE_RPC_FAULT_CODE(
+	                                                  EPT_S_CANT_PERFORM_OP) DEFINE_RPC_FAULT_CODE(EPT_S_NOT_REGISTERED)
+	                                                  DEFINE_RPC_FAULT_CODE(
+	                                                    RPC_S_NOTHING_TO_EXPORT) DEFINE_RPC_FAULT_CODE(RPC_S_INCOMPLETE_NAME)
+	                                                    DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_VERS_OPTION) DEFINE_RPC_FAULT_CODE(
+	                                                      RPC_S_NO_MORE_MEMBERS) DEFINE_RPC_FAULT_CODE(RPC_S_NOT_ALL_OBJS_UNEXPORTED)
+	                                                      DEFINE_RPC_FAULT_CODE(RPC_S_INTERFACE_NOT_FOUND) DEFINE_RPC_FAULT_CODE(
+	                                                        RPC_S_ENTRY_ALREADY_EXISTS) DEFINE_RPC_FAULT_CODE(RPC_S_ENTRY_NOT_FOUND)
+	                                                        DEFINE_RPC_FAULT_CODE(RPC_S_NAME_SERVICE_UNAVAILABLE) DEFINE_RPC_FAULT_CODE(
+	                                                          RPC_S_INVALID_NAF_ID) DEFINE_RPC_FAULT_CODE(RPC_S_CANNOT_SUPPORT)
+	                                                          DEFINE_RPC_FAULT_CODE(RPC_S_NO_CONTEXT_AVAILABLE) DEFINE_RPC_FAULT_CODE(
+	                                                            RPC_S_INTERNAL_ERROR) DEFINE_RPC_FAULT_CODE(RPC_S_ZERO_DIVIDE)
+	                                                            DEFINE_RPC_FAULT_CODE(
+	                                                              RPC_S_ADDRESS_ERROR) DEFINE_RPC_FAULT_CODE(RPC_S_FP_DIV_ZERO)
+	                                                              DEFINE_RPC_FAULT_CODE(
+	                                                                RPC_S_FP_UNDERFLOW) DEFINE_RPC_FAULT_CODE(RPC_S_FP_OVERFLOW)
+	                                                                DEFINE_RPC_FAULT_CODE(
+	                                                                  RPC_X_NO_MORE_ENTRIES) DEFINE_RPC_FAULT_CODE(RPC_X_SS_CHAR_TRANS_OPEN_FAIL)
+	                                                                  DEFINE_RPC_FAULT_CODE(RPC_X_SS_CHAR_TRANS_SHORT_FILE) DEFINE_RPC_FAULT_CODE(
+	                                                                    RPC_X_SS_IN_NULL_CONTEXT) DEFINE_RPC_FAULT_CODE(RPC_X_SS_CONTEXT_DAMAGED)
+	                                                                    DEFINE_RPC_FAULT_CODE(RPC_X_SS_HANDLES_MISMATCH) DEFINE_RPC_FAULT_CODE(
+	                                                                      RPC_X_SS_CANNOT_GET_CALL_HANDLE)
+	                                                                      DEFINE_RPC_FAULT_CODE(RPC_X_NULL_REF_POINTER) DEFINE_RPC_FAULT_CODE(
+	                                                                        RPC_X_ENUM_VALUE_OUT_OF_RANGE)
+	                                                                        DEFINE_RPC_FAULT_CODE(RPC_X_BYTE_COUNT_TOO_SMALL) DEFINE_RPC_FAULT_CODE(
+	                                                                          RPC_X_BAD_STUB_DATA) DEFINE_RPC_FAULT_CODE(RPC_S_NO_INTERFACES)
+	                                                                          DEFINE_RPC_FAULT_CODE(RPC_S_CALL_CANCELLED) DEFINE_RPC_FAULT_CODE(
+	                                                                            RPC_S_BINDING_INCOMPLETE)
+	                                                                            DEFINE_RPC_FAULT_CODE(RPC_S_COMM_FAILURE) DEFINE_RPC_FAULT_CODE(
+	                                                                              RPC_S_UNSUPPORTED_AUTHN_LEVEL)
+	                                                                              DEFINE_RPC_FAULT_CODE(
+	                                                                                RPC_S_NO_PRINC_NAME)
+	                                                                                DEFINE_RPC_FAULT_CODE(
+	                                                                                  RPC_S_NOT_RPC_ERROR)
+	                                                                                  DEFINE_RPC_FAULT_CODE(
+	                                                                                    RPC_S_UUID_LOCAL_ONLY)
+	                                                                                    DEFINE_RPC_FAULT_CODE(
+	                                                                                      RPC_S_SEC_PKG_ERROR)
+	                                                                                      DEFINE_RPC_FAULT_CODE(
+	                                                                                        RPC_S_NOT_CANCELLED)
+	                                                                                        DEFINE_RPC_FAULT_CODE(
+	                                                                                          RPC_X_INVALID_ES_ACTION)
+	                                                                                          DEFINE_RPC_FAULT_CODE(
+	                                                                                            RPC_X_WRONG_ES_VERSION)
+	                                                                                            DEFINE_RPC_FAULT_CODE(
+	                                                                                              RPC_X_WRONG_STUB_VERSION)
+	                                                                                              DEFINE_RPC_FAULT_CODE(
+	                                                                                                RPC_X_INVALID_PIPE_OBJECT)
+	                                                                                                DEFINE_RPC_FAULT_CODE(
+	                                                                                                  RPC_X_WRONG_PIPE_ORDER)
+	                                                                                                  DEFINE_RPC_FAULT_CODE(
+	                                                                                                    RPC_X_WRONG_PIPE_VERSION)
+	                                                                                                    DEFINE_RPC_FAULT_CODE(
+	                                                                                                      RPC_S_COOKIE_AUTH_FAILED)
+	                                                                                                      DEFINE_RPC_FAULT_CODE(
+	                                                                                                        RPC_S_GROUP_MEMBER_NOT_FOUND)
+	                                                                                                        DEFINE_RPC_FAULT_CODE(
+	                                                                                                          EPT_S_CANT_CREATE)
+	                                                                                                          DEFINE_RPC_FAULT_CODE(
+	                                                                                                            RPC_S_INVALID_OBJECT) {
+	                                                                                                            0,
+	                                                                                                            NULL }
 };
 
-static const RPC_FAULT_CODE RPC_TSG_FAULT_CODES[] =
-{
-	DEFINE_RPC_FAULT_CODE(RPC_S_OK)
-	DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_ARG)
-	DEFINE_RPC_FAULT_CODE(RPC_S_OUT_OF_MEMORY)
-	DEFINE_RPC_FAULT_CODE(RPC_S_OUT_OF_THREADS)
-	DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_LEVEL)
-	DEFINE_RPC_FAULT_CODE(RPC_S_BUFFER_TOO_SMALL)
-	DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_SECURITY_DESC)
-	DEFINE_RPC_FAULT_CODE(RPC_S_ACCESS_DENIED)
-	DEFINE_RPC_FAULT_CODE(RPC_S_SERVER_OUT_OF_MEMORY)
-	DEFINE_RPC_FAULT_CODE(RPC_S_ASYNC_CALL_PENDING)
-	DEFINE_RPC_FAULT_CODE(RPC_S_UNKNOWN_PRINCIPAL)
-	DEFINE_RPC_FAULT_CODE(RPC_S_TIMEOUT)
-	DEFINE_RPC_FAULT_CODE(RPC_X_NO_MEMORY)
-	DEFINE_RPC_FAULT_CODE(RPC_X_INVALID_BOUND)
-	DEFINE_RPC_FAULT_CODE(RPC_X_INVALID_TAG)
-	DEFINE_RPC_FAULT_CODE(RPC_X_ENUM_VALUE_TOO_LARGE)
-	DEFINE_RPC_FAULT_CODE(RPC_X_SS_CONTEXT_MISMATCH)
-	DEFINE_RPC_FAULT_CODE(RPC_X_INVALID_BUFFER)
-	DEFINE_RPC_FAULT_CODE(RPC_X_PIPE_APP_MEMORY)
-	DEFINE_RPC_FAULT_CODE(RPC_X_INVALID_PIPE_OPERATION)
-	DEFINE_RPC_FAULT_CODE(ERROR_ONLY_IF_CONNECTED)
-	DEFINE_RPC_FAULT_CODE(ERROR_GRACEFUL_DISCONNECT)
-	DEFINE_RPC_FAULT_CODE(ERROR_OPERATION_ABORTED)
-	DEFINE_RPC_FAULT_CODE(ERROR_BAD_ARGUMENTS)
-	DEFINE_RPC_FAULT_CODE(E_PROXY_INTERNALERROR)
-	DEFINE_RPC_FAULT_CODE(E_PROXY_RAP_ACCESSDENIED)
-	DEFINE_RPC_FAULT_CODE(E_PROXY_NAP_ACCESSDENIED)
-	DEFINE_RPC_FAULT_CODE(E_PROXY_TS_CONNECTFAILED)
-	DEFINE_RPC_FAULT_CODE(E_PROXY_ALREADYDISCONNECTED)
-	DEFINE_RPC_FAULT_CODE(E_PROXY_QUARANTINE_ACCESSDENIED)
-	DEFINE_RPC_FAULT_CODE(E_PROXY_NOCERTAVAILABLE)
-	DEFINE_RPC_FAULT_CODE(E_PROXY_COOKIE_BADPACKET)
-	DEFINE_RPC_FAULT_CODE(E_PROXY_COOKIE_AUTHENTICATION_ACCESS_DENIED)
-	DEFINE_RPC_FAULT_CODE(E_PROXY_UNSUPPORTED_AUTHENTICATION_METHOD)
-	DEFINE_RPC_FAULT_CODE(E_PROXY_CAPABILITYMISMATCH)
-	DEFINE_RPC_FAULT_CODE(HRESULT_CODE(E_PROXY_NOTSUPPORTED))
-	DEFINE_RPC_FAULT_CODE(HRESULT_CODE(E_PROXY_TS_CONNECTFAILED))
-	DEFINE_RPC_FAULT_CODE(HRESULT_CODE(E_PROXY_MAXCONNECTIONSREACHED))
-	DEFINE_RPC_FAULT_CODE(HRESULT_CODE(E_PROXY_INTERNALERROR))
-	DEFINE_RPC_FAULT_CODE(HRESULT_CODE(E_PROXY_SESSIONTIMEOUT))
-	DEFINE_RPC_FAULT_CODE(HRESULT_CODE(E_PROXY_REAUTH_AUTHN_FAILED))
-	DEFINE_RPC_FAULT_CODE(HRESULT_CODE(E_PROXY_REAUTH_CAP_FAILED))
-	DEFINE_RPC_FAULT_CODE(HRESULT_CODE(E_PROXY_REAUTH_RAP_FAILED))
-	DEFINE_RPC_FAULT_CODE(HRESULT_CODE(E_PROXY_SDR_NOT_SUPPORTED_BY_TS))
-	DEFINE_RPC_FAULT_CODE(HRESULT_CODE(E_PROXY_REAUTH_NAP_FAILED))
-	DEFINE_RPC_FAULT_CODE(HRESULT_CODE(E_PROXY_CONNECTIONABORTED))
-	DEFINE_RPC_FAULT_CODE(HRESULT_CODE(E_PROXY_NOCERTAVAILABLE))
-	DEFINE_RPC_FAULT_CODE(__HRESULT_FROM_WIN32(RPC_S_CALL_CANCELLED))
-	{
-		0, NULL
-	}
+static const RPC_FAULT_CODE RPC_TSG_FAULT_CODES[] = {
+	DEFINE_RPC_FAULT_CODE(RPC_S_OK) DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_ARG) DEFINE_RPC_FAULT_CODE(RPC_S_OUT_OF_MEMORY)
+	  DEFINE_RPC_FAULT_CODE(RPC_S_OUT_OF_THREADS) DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_LEVEL) DEFINE_RPC_FAULT_CODE(
+	    RPC_S_BUFFER_TOO_SMALL) DEFINE_RPC_FAULT_CODE(RPC_S_INVALID_SECURITY_DESC)
+	    DEFINE_RPC_FAULT_CODE(RPC_S_ACCESS_DENIED) DEFINE_RPC_FAULT_CODE(RPC_S_SERVER_OUT_OF_MEMORY)
+	      DEFINE_RPC_FAULT_CODE(RPC_S_ASYNC_CALL_PENDING) DEFINE_RPC_FAULT_CODE(
+	        RPC_S_UNKNOWN_PRINCIPAL) DEFINE_RPC_FAULT_CODE(RPC_S_TIMEOUT) DEFINE_RPC_FAULT_CODE(RPC_X_NO_MEMORY)
+	        DEFINE_RPC_FAULT_CODE(RPC_X_INVALID_BOUND) DEFINE_RPC_FAULT_CODE(RPC_X_INVALID_TAG) DEFINE_RPC_FAULT_CODE(
+	          RPC_X_ENUM_VALUE_TOO_LARGE) DEFINE_RPC_FAULT_CODE(RPC_X_SS_CONTEXT_MISMATCH)
+	          DEFINE_RPC_FAULT_CODE(RPC_X_INVALID_BUFFER) DEFINE_RPC_FAULT_CODE(RPC_X_PIPE_APP_MEMORY)
+	            DEFINE_RPC_FAULT_CODE(RPC_X_INVALID_PIPE_OPERATION) DEFINE_RPC_FAULT_CODE(ERROR_ONLY_IF_CONNECTED)
+	              DEFINE_RPC_FAULT_CODE(ERROR_GRACEFUL_DISCONNECT) DEFINE_RPC_FAULT_CODE(ERROR_OPERATION_ABORTED)
+	                DEFINE_RPC_FAULT_CODE(ERROR_BAD_ARGUMENTS) DEFINE_RPC_FAULT_CODE(E_PROXY_INTERNALERROR)
+	                  DEFINE_RPC_FAULT_CODE(E_PROXY_RAP_ACCESSDENIED) DEFINE_RPC_FAULT_CODE(E_PROXY_NAP_ACCESSDENIED)
+	                    DEFINE_RPC_FAULT_CODE(E_PROXY_TS_CONNECTFAILED) DEFINE_RPC_FAULT_CODE(
+	                      E_PROXY_ALREADYDISCONNECTED) DEFINE_RPC_FAULT_CODE(E_PROXY_QUARANTINE_ACCESSDENIED)
+	                      DEFINE_RPC_FAULT_CODE(E_PROXY_NOCERTAVAILABLE) DEFINE_RPC_FAULT_CODE(E_PROXY_COOKIE_BADPACKET)
+	                        DEFINE_RPC_FAULT_CODE(E_PROXY_COOKIE_AUTHENTICATION_ACCESS_DENIED)
+	                          DEFINE_RPC_FAULT_CODE(E_PROXY_UNSUPPORTED_AUTHENTICATION_METHOD)
+	                            DEFINE_RPC_FAULT_CODE(E_PROXY_CAPABILITYMISMATCH)
+	                              DEFINE_RPC_FAULT_CODE(HRESULT_CODE(E_PROXY_NOTSUPPORTED))
+	                                DEFINE_RPC_FAULT_CODE(HRESULT_CODE(E_PROXY_TS_CONNECTFAILED))
+	                                  DEFINE_RPC_FAULT_CODE(HRESULT_CODE(E_PROXY_MAXCONNECTIONSREACHED))
+	                                    DEFINE_RPC_FAULT_CODE(HRESULT_CODE(E_PROXY_INTERNALERROR))
+	                                      DEFINE_RPC_FAULT_CODE(HRESULT_CODE(E_PROXY_SESSIONTIMEOUT))
+	                                        DEFINE_RPC_FAULT_CODE(HRESULT_CODE(E_PROXY_REAUTH_AUTHN_FAILED))
+	                                          DEFINE_RPC_FAULT_CODE(HRESULT_CODE(E_PROXY_REAUTH_CAP_FAILED))
+	                                            DEFINE_RPC_FAULT_CODE(HRESULT_CODE(E_PROXY_REAUTH_RAP_FAILED))
+	                                              DEFINE_RPC_FAULT_CODE(HRESULT_CODE(E_PROXY_SDR_NOT_SUPPORTED_BY_TS))
+	                                                DEFINE_RPC_FAULT_CODE(HRESULT_CODE(E_PROXY_REAUTH_NAP_FAILED))
+	                                                  DEFINE_RPC_FAULT_CODE(HRESULT_CODE(E_PROXY_CONNECTIONABORTED))
+	                                                    DEFINE_RPC_FAULT_CODE(HRESULT_CODE(E_PROXY_NOCERTAVAILABLE))
+	                                                      DEFINE_RPC_FAULT_CODE(
+	                                                        __HRESULT_FROM_WIN32(RPC_S_CALL_CANCELLED)) { 0, NULL }
 };
 
 /**
@@ -370,7 +332,7 @@ const char* rpc_error_to_string(UINT32 code)
 	{
 		if (RPC_FAULT_CODES[index].code == code)
 		{
-			sprintf_s(buffer, ARRAYSIZE(buffer), "%s [0x%08"PRIX32"]", RPC_FAULT_CODES[index].name, code);
+			sprintf_s(buffer, ARRAYSIZE(buffer), "%s [0x%08" PRIX32 "]", RPC_FAULT_CODES[index].name, code);
 			goto out;
 		}
 	}
@@ -379,20 +341,19 @@ const char* rpc_error_to_string(UINT32 code)
 	{
 		if (RPC_TSG_FAULT_CODES[index].code == code)
 		{
-			sprintf_s(buffer, ARRAYSIZE(buffer), "%s [0x%08"PRIX32"]", RPC_TSG_FAULT_CODES[index].name, code);
+			sprintf_s(buffer, ARRAYSIZE(buffer), "%s [0x%08" PRIX32 "]", RPC_TSG_FAULT_CODES[index].name, code);
 			goto out;
 		}
 	}
 
-	sprintf_s(buffer, ARRAYSIZE(buffer), "%s [0x%08"PRIX32"]", "UNKNOWN", code);
+	sprintf_s(buffer, ARRAYSIZE(buffer), "%s [0x%08" PRIX32 "]", "UNKNOWN", code);
 out:
 	return buffer;
 }
 
-
 int rpc_recv_fault_pdu(UINT32 status)
 {
 	UINT32 code = rpc_map_status_code_to_win32_error_code(status);
-	WLog_ERR(TAG,  "RPC Fault PDU: status=%s", rpc_error_to_string(code));
+	WLog_ERR(TAG, "RPC Fault PDU: status=%s", rpc_error_to_string(code));
 	return 0;
 }

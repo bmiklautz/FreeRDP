@@ -26,8 +26,7 @@
 #include <freerdp/gdi/gfx.h>
 #include <uwac/uwac.h>
 
-BOOL wlf_handle_pointer_enter(freerdp* instance,
-                              UwacPointerEnterLeaveEvent* ev);
+BOOL wlf_handle_pointer_enter(freerdp* instance, UwacPointerEnterLeaveEvent* ev);
 BOOL wlf_handle_pointer_motion(freerdp* instance, UwacPointerMotionEvent* ev);
 BOOL wlf_handle_pointer_buttons(freerdp* instance, UwacPointerButtonEvent* ev);
 BOOL wlf_handle_pointer_axis(freerdp* instance, UwacPointerAxisEvent* ev);

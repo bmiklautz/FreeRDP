@@ -39,19 +39,17 @@
 
 #include "rfx_encode.h"
 
-#define MINMAX(_v,_l,_h) ((_v) < (_l) ? (_l) : ((_v) > (_h) ? (_h) : (_v)))
+#define MINMAX(_v, _l, _h) ((_v) < (_l) ? (_l) : ((_v) > (_h) ? (_h) : (_v)))
 
-static void rfx_encode_format_rgb(const BYTE* rgb_data, int width, int height,
-                                  int rowstride,
-                                  UINT32 pixel_format, const BYTE* palette, INT16* r_buf, INT16* g_buf,
-                                  INT16* b_buf)
+static void rfx_encode_format_rgb(const BYTE* rgb_data, int width, int height, int rowstride, UINT32 pixel_format,
+                                  const BYTE* palette, INT16* r_buf, INT16* g_buf, INT16* b_buf)
 {
 	int x, y;
 	int x_exceed;
 	int y_exceed;
 	const BYTE* src;
 	INT16 r, g, b;
-	INT16* r_last, *g_last, *b_last;
+	INT16 *r_last, *g_last, *b_last;
 	x_exceed = 64 - width;
 	y_exceed = 64 - height;
 
@@ -232,9 +230,8 @@ static void rfx_encode_format_rgb(const BYTE* rgb_data, int width, int height,
 
 /* rfx_encode_rgb_to_ycbcr code now resides in the primitives library. */
 
-static void rfx_encode_component(RFX_CONTEXT* context,
-                                 const UINT32* quantization_values,
-                                 INT16* data, BYTE* buffer, int buffer_size, int* size)
+static void rfx_encode_component(RFX_CONTEXT* context, const UINT32* quantization_values, INT16* data, BYTE* buffer,
+                                 int buffer_size, int* size)
 {
 	INT16* dwt_buffer;
 	dwt_buffer = BufferPool_Take(context->priv->BufferPool, -1); /* dwt_buffer */
@@ -260,7 +257,7 @@ void rfx_encode_rgb(RFX_CONTEXT* context, RFX_TILE* tile)
 	BYTE* pBuffer;
 	INT16* pSrcDst[3];
 	int YLen, CbLen, CrLen;
-	UINT32* YQuant, *CbQuant, *CrQuant;
+	UINT32 *YQuant, *CbQuant, *CrQuant;
 	primitives_t* prims = primitives_get();
 	static const prim_size_t roi_64x64 = { 64, 64 };
 
@@ -271,20 +268,16 @@ void rfx_encode_rgb(RFX_CONTEXT* context, RFX_TILE* tile)
 	YQuant = context->quants + (tile->quantIdxY * 10);
 	CbQuant = context->quants + (tile->quantIdxCb * 10);
 	CrQuant = context->quants + (tile->quantIdxCr * 10);
-	pSrcDst[0] = (INT16*)((BYTE*)(&pBuffer[((8192 + 32) * 0) +
-	                                       16])); /* y_r_buffer */
-	pSrcDst[1] = (INT16*)((BYTE*)(&pBuffer[((8192 + 32) * 1) +
-	                                       16])); /* cb_g_buffer */
-	pSrcDst[2] = (INT16*)((BYTE*)(&pBuffer[((8192 + 32) * 2) +
-	                                       16])); /* cr_b_buffer */
+	pSrcDst[0] = (INT16*) ((BYTE*) (&pBuffer[((8192 + 32) * 0) + 16])); /* y_r_buffer */
+	pSrcDst[1] = (INT16*) ((BYTE*) (&pBuffer[((8192 + 32) * 1) + 16])); /* cb_g_buffer */
+	pSrcDst[2] = (INT16*) ((BYTE*) (&pBuffer[((8192 + 32) * 2) + 16])); /* cr_b_buffer */
 	PROFILER_ENTER(context->priv->prof_rfx_encode_rgb)
 	PROFILER_ENTER(context->priv->prof_rfx_encode_format_rgb)
-	rfx_encode_format_rgb(tile->data, tile->width, tile->height, tile->scanline,
-	                      context->pixel_format, context->palette, pSrcDst[0], pSrcDst[1], pSrcDst[2]);
+	rfx_encode_format_rgb(tile->data, tile->width, tile->height, tile->scanline, context->pixel_format,
+	                      context->palette, pSrcDst[0], pSrcDst[1], pSrcDst[2]);
 	PROFILER_EXIT(context->priv->prof_rfx_encode_format_rgb)
 	PROFILER_ENTER(context->priv->prof_rfx_rgb_to_ycbcr)
-	prims->RGBToYCbCr_16s16s_P3P3((const INT16**) pSrcDst, 64 * sizeof(INT16),
-	                              pSrcDst, 64 * sizeof(INT16), &roi_64x64);
+	prims->RGBToYCbCr_16s16s_P3P3((const INT16**) pSrcDst, 64 * sizeof(INT16), pSrcDst, 64 * sizeof(INT16), &roi_64x64);
 	PROFILER_EXIT(context->priv->prof_rfx_rgb_to_ycbcr)
 	/**
 	 * We need to clear the buffers as the RLGR encoder expects it to be initialized to zero.

@@ -39,12 +39,9 @@ static primitives_t* generic = NULL;
 
 #ifdef WITH_SSE2
 /* ------------------------------------------------------------------------- */
-static pstatus_t ssse3_YCoCgRToRGB_8u_AC4R_invert(
-    const BYTE* pSrc, UINT32 srcStep,
-    BYTE* pDst, UINT32 DstFormat, UINT32 dstStep,
-    UINT32 width, UINT32 height,
-    UINT8 shift,
-    BOOL withAlpha)
+static pstatus_t ssse3_YCoCgRToRGB_8u_AC4R_invert(const BYTE* pSrc, UINT32 srcStep, BYTE* pDst, UINT32 DstFormat,
+                                                  UINT32 dstStep, UINT32 width, UINT32 height, UINT8 shift,
+                                                  BOOL withAlpha)
 {
 	const BYTE* sptr = pSrc;
 	BYTE* dptr = (BYTE*) pDst;
@@ -69,9 +66,7 @@ static pstatus_t ssse3_YCoCgRToRGB_8u_AC4R_invert(
 	if ((width < 8) || (ULONG_PTR) dptr & 0x03)
 	{
 		/* Too small, or we'll never hit a 16-byte boundary.  Punt. */
-		return generic->YCoCgToRGB_8u_AC4R(
-		           pSrc, srcStep, pDst, DstFormat, dstStep,
-		           width, height, shift, withAlpha);
+		return generic->YCoCgToRGB_8u_AC4R(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift, withAlpha);
 	}
 
 	for (h = 0; h < height; h++)
@@ -85,11 +80,10 @@ static pstatus_t ssse3_YCoCgRToRGB_8u_AC4R_invert(
 			pstatus_t status;
 			UINT32 startup = (16 - ((ULONG_PTR) dptr & 0x0f)) / 4;
 
-			if (startup > width) startup = width;
+			if (startup > width)
+				startup = width;
 
-			status = generic->YCoCgToRGB_8u_AC4R(
-			             sptr, srcStep, dptr, DstFormat, dstStep,
-			             startup, 1, shift, withAlpha);
+			status = generic->YCoCgToRGB_8u_AC4R(sptr, srcStep, dptr, DstFormat, dstStep, startup, 1, shift, withAlpha);
 
 			if (status != PRIMITIVES_SUCCESS)
 				return status;
@@ -137,8 +131,10 @@ static pstatus_t ssse3_YCoCgRToRGB_8u_AC4R_invert(
 			/* R5 = a7a6a5a4 a3a2a1a0 y7y6y5y4 y3y2y1y0 */
 			/* R6 = o7o6o5o4 o3o2o1o0 g7g6g5g4 g3g2g1g0 */
 			/* Save alphas aside */
-			if (withAlpha) R7 = _mm_unpackhi_epi64(R5, R5);
-			else R7 = _mm_set1_epi32(0xFFFFFFFFU);
+			if (withAlpha)
+				R7 = _mm_unpackhi_epi64(R5, R5);
+			else
+				R7 = _mm_set1_epi32(0xFFFFFFFFU);
 
 			/* R7 = a7a6a5a4 a3a2a1a0 a7a6a5a4 a3a2a1a0 */
 			/* Expand Y's from 8-bit unsigned to 16-bit signed. */
@@ -202,9 +198,7 @@ static pstatus_t ssse3_YCoCgRToRGB_8u_AC4R_invert(
 		if (w > 0)
 		{
 			pstatus_t status;
-			status = generic->YCoCgToRGB_8u_AC4R(
-			             sptr, srcStep, dptr, DstFormat, dstStep,
-			             w, 1, shift, withAlpha);
+			status = generic->YCoCgToRGB_8u_AC4R(sptr, srcStep, dptr, DstFormat, dstStep, w, 1, shift, withAlpha);
 
 			if (status != PRIMITIVES_SUCCESS)
 				return status;
@@ -221,12 +215,9 @@ static pstatus_t ssse3_YCoCgRToRGB_8u_AC4R_invert(
 }
 
 /* ------------------------------------------------------------------------- */
-static pstatus_t ssse3_YCoCgRToRGB_8u_AC4R_no_invert(
-    const BYTE* pSrc, UINT32 srcStep,
-    BYTE* pDst, UINT32 DstFormat, UINT32 dstStep,
-    UINT32 width, UINT32 height,
-    UINT8 shift,
-    BOOL withAlpha)
+static pstatus_t ssse3_YCoCgRToRGB_8u_AC4R_no_invert(const BYTE* pSrc, UINT32 srcStep, BYTE* pDst, UINT32 DstFormat,
+                                                     UINT32 dstStep, UINT32 width, UINT32 height, UINT8 shift,
+                                                     BOOL withAlpha)
 {
 	const BYTE* sptr = pSrc;
 	BYTE* dptr = (BYTE*) pDst;
@@ -251,9 +242,7 @@ static pstatus_t ssse3_YCoCgRToRGB_8u_AC4R_no_invert(
 	if ((width < 8) || (ULONG_PTR) dptr & 0x03)
 	{
 		/* Too small, or we'll never hit a 16-byte boundary.  Punt. */
-		return generic->YCoCgToRGB_8u_AC4R(
-		           pSrc, srcStep, pDst, DstFormat, dstStep,
-		           width, height, shift, withAlpha);
+		return generic->YCoCgToRGB_8u_AC4R(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift, withAlpha);
 	}
 
 	for (h = 0; h < height; h++)
@@ -267,11 +256,10 @@ static pstatus_t ssse3_YCoCgRToRGB_8u_AC4R_no_invert(
 			pstatus_t status;
 			UINT32 startup = (16 - ((ULONG_PTR) dptr & 0x0f)) / 4;
 
-			if (startup > width) startup = width;
+			if (startup > width)
+				startup = width;
 
-			status = generic->YCoCgToRGB_8u_AC4R(
-			             sptr, srcStep, dptr, DstFormat,
-			             dstStep, startup, 1, shift, withAlpha);
+			status = generic->YCoCgToRGB_8u_AC4R(sptr, srcStep, dptr, DstFormat, dstStep, startup, 1, shift, withAlpha);
 
 			if (status != PRIMITIVES_SUCCESS)
 				return status;
@@ -319,8 +307,10 @@ static pstatus_t ssse3_YCoCgRToRGB_8u_AC4R_no_invert(
 			/* R5 = a7a6a5a4 a3a2a1a0 y7y6y5y4 y3y2y1y0 */
 			/* R6 = o7o6o5o4 o3o2o1o0 g7g6g5g4 g3g2g1g0 */
 			/* Save alphas aside */
-			if (withAlpha) R7 = _mm_unpackhi_epi64(R5, R5);
-			else R7 = _mm_set1_epi32(0xFFFFFFFFU);
+			if (withAlpha)
+				R7 = _mm_unpackhi_epi64(R5, R5);
+			else
+				R7 = _mm_set1_epi32(0xFFFFFFFFU);
 
 			/* R7 = a7a6a5a4 a3a2a1a0 a7a6a5a4 a3a2a1a0 */
 			/* Expand Y's from 8-bit unsigned to 16-bit signed. */
@@ -388,9 +378,7 @@ static pstatus_t ssse3_YCoCgRToRGB_8u_AC4R_no_invert(
 		if (w > 0)
 		{
 			pstatus_t status;
-			status = generic->YCoCgToRGB_8u_AC4R(
-			             sptr, srcStep, dptr, DstFormat, dstStep,
-			             w, 1, shift, withAlpha);
+			status = generic->YCoCgToRGB_8u_AC4R(sptr, srcStep, dptr, DstFormat, dstStep, w, 1, shift, withAlpha);
 
 			if (status != PRIMITIVES_SUCCESS)
 				return status;
@@ -409,45 +397,37 @@ static pstatus_t ssse3_YCoCgRToRGB_8u_AC4R_no_invert(
 
 #ifdef WITH_SSE2
 /* ------------------------------------------------------------------------- */
-static pstatus_t ssse3_YCoCgRToRGB_8u_AC4R(
-    const BYTE* pSrc, INT32 srcStep,
-    BYTE* pDst, UINT32 DstFormat, INT32 dstStep,
-    UINT32 width, UINT32 height,
-    UINT8 shift,
-    BOOL withAlpha)
+static pstatus_t ssse3_YCoCgRToRGB_8u_AC4R(const BYTE* pSrc, INT32 srcStep, BYTE* pDst, UINT32 DstFormat, INT32 dstStep,
+                                           UINT32 width, UINT32 height, UINT8 shift, BOOL withAlpha)
 {
 	switch (DstFormat)
 	{
 		case PIXEL_FORMAT_BGRX32:
 		case PIXEL_FORMAT_BGRA32:
-			return ssse3_YCoCgRToRGB_8u_AC4R_no_invert(
-			           pSrc, srcStep, pDst, DstFormat, dstStep,
-			           width, height, shift, withAlpha);
+			return ssse3_YCoCgRToRGB_8u_AC4R_no_invert(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift,
+			                                           withAlpha);
 
 		case PIXEL_FORMAT_RGBX32:
 		case PIXEL_FORMAT_RGBA32:
-			return ssse3_YCoCgRToRGB_8u_AC4R_invert(
-			           pSrc, srcStep, pDst, DstFormat, dstStep,
-			           width, height, shift, withAlpha);
+			return ssse3_YCoCgRToRGB_8u_AC4R_invert(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift,
+			                                        withAlpha);
 
 		default:
-			return generic->YCoCgToRGB_8u_AC4R(pSrc, srcStep, pDst, DstFormat,
-			                                   dstStep, width, height, shift, withAlpha);
+			return generic->YCoCgToRGB_8u_AC4R(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift,
+			                                   withAlpha);
 	}
 }
 #elif defined(WITH_NEON)
 
-static pstatus_t neon_YCoCgToRGB_8u_X(
-    const BYTE* pSrc, INT32 srcStep,
-    BYTE* pDst, UINT32 DstFormat, INT32 dstStep,
-    UINT32 width, UINT32 height,
-    UINT8 shift, BYTE rPos, BYTE gPos, BYTE bPos, BYTE aPos, BOOL alpha)
+static pstatus_t neon_YCoCgToRGB_8u_X(const BYTE* pSrc, INT32 srcStep, BYTE* pDst, UINT32 DstFormat, INT32 dstStep,
+                                      UINT32 width, UINT32 height, UINT8 shift, BYTE rPos, BYTE gPos, BYTE bPos,
+                                      BYTE aPos, BOOL alpha)
 {
 	UINT32 y;
 	BYTE* dptr = pDst;
 	const BYTE* sptr = pSrc;
 	const DWORD formatSize = GetBytesPerPixel(DstFormat);
-	const int8_t cll = shift - 1;  /* -1 builds in the /2's */
+	const int8_t cll = shift - 1; /* -1 builds in the /2's */
 	const UINT32 srcPad = srcStep - (width * 4);
 	const UINT32 dstPad = dstStep - (width * formatSize);
 	const UINT32 pad = width % 8;
@@ -466,11 +446,11 @@ static pstatus_t neon_YCoCgToRGB_8u_X(
 			const int8x8_t CoRaw = vreinterpret_s8_u8(vshl_u8(raw.val[1], cllv));
 			const int16x8_t Cg = vmovl_s8(CgRaw);
 			const int16x8_t Co = vmovl_s8(CoRaw);
-			const int16x8_t Y = vreinterpretq_s16_u16(vmovl_u8(raw.val[2]));	/* UINT8 -> INT16 */
-			const int16x8_t T  = vsubq_s16(Y, Cg);
-			const int16x8_t R  = vaddq_s16(T, Co);
-			const int16x8_t G  = vaddq_s16(Y, Cg);
-			const int16x8_t B  = vsubq_s16(T, Co);
+			const int16x8_t Y = vreinterpretq_s16_u16(vmovl_u8(raw.val[2])); /* UINT8 -> INT16 */
+			const int16x8_t T = vsubq_s16(Y, Cg);
+			const int16x8_t R = vaddq_s16(T, Co);
+			const int16x8_t G = vaddq_s16(Y, Cg);
+			const int16x8_t B = vsubq_s16(T, Co);
 			uint8x8x4_t bgrx;
 			bgrx.val[bPos] = vqmovun_s16(B);
 			bgrx.val[gPos] = vqmovun_s16(G);
@@ -491,11 +471,11 @@ static pstatus_t neon_YCoCgToRGB_8u_X(
 			/* Note: shifts must be done before sign-conversion. */
 			const INT16 Cg = (INT16)((INT8)((*sptr++) << cll));
 			const INT16 Co = (INT16)((INT8)((*sptr++) << cll));
-			const INT16 Y = (INT16)(*sptr++);	/* UINT8->INT16 */
-			const INT16 T  = Y - Cg;
-			const INT16 R  = T + Co;
-			const INT16 G  = Y + Cg;
-			const INT16 B  = T - Co;
+			const INT16 Y = (INT16)(*sptr++); /* UINT8->INT16 */
+			const INT16 T = Y - Cg;
+			const INT16 R = T + Co;
+			const INT16 G = Y + Cg;
+			const INT16 B = T - Co;
 			BYTE bgra[4];
 			bgra[bPos] = CLIP(B);
 			bgra[gPos] = CLIP(G);
@@ -517,46 +497,42 @@ static pstatus_t neon_YCoCgToRGB_8u_X(
 
 	return PRIMITIVES_SUCCESS;
 }
-static pstatus_t neon_YCoCgToRGB_8u_AC4R(
-    const BYTE* pSrc, INT32 srcStep,
-    BYTE* pDst, UINT32 DstFormat, INT32 dstStep,
-    UINT32 width, UINT32 height,
-    UINT8 shift,
-    BOOL withAlpha)
+static pstatus_t neon_YCoCgToRGB_8u_AC4R(const BYTE* pSrc, INT32 srcStep, BYTE* pDst, UINT32 DstFormat, INT32 dstStep,
+                                         UINT32 width, UINT32 height, UINT8 shift, BOOL withAlpha)
 {
 	switch (DstFormat)
 	{
 		case PIXEL_FORMAT_BGRA32:
-			return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift, 2, 1, 0,
-			                            3, withAlpha);
+			return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift, 2, 1, 0, 3,
+			                            withAlpha);
 
 		case PIXEL_FORMAT_BGRX32:
-			return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift, 2, 1, 0,
-			                            3, withAlpha);
+			return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift, 2, 1, 0, 3,
+			                            withAlpha);
 
 		case PIXEL_FORMAT_RGBA32:
-			return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift, 0, 1, 2,
-			                            3, withAlpha);
+			return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift, 0, 1, 2, 3,
+			                            withAlpha);
 
 		case PIXEL_FORMAT_RGBX32:
-			return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift, 0, 1, 2,
-			                            3, withAlpha);
+			return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift, 0, 1, 2, 3,
+			                            withAlpha);
 
 		case PIXEL_FORMAT_ARGB32:
-			return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift, 1, 2, 3,
-			                            0, withAlpha);
+			return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift, 1, 2, 3, 0,
+			                            withAlpha);
 
 		case PIXEL_FORMAT_XRGB32:
-			return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift, 1, 2, 3,
-			                            0, withAlpha);
+			return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift, 1, 2, 3, 0,
+			                            withAlpha);
 
 		case PIXEL_FORMAT_ABGR32:
-			return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift, 3, 2, 1,
-			                            0, withAlpha);
+			return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift, 3, 2, 1, 0,
+			                            withAlpha);
 
 		case PIXEL_FORMAT_XBGR32:
-			return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift, 3, 2, 1,
-			                            0, withAlpha);
+			return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift, 3, 2, 1, 0,
+			                            withAlpha);
 
 		default:
 			return generic->YCoCgToRGB_8u_AC4R(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift,
@@ -576,8 +552,7 @@ void primitives_init_YCoCg_opt(primitives_t* prims)
 	 */
 #if defined(WITH_SSE2)
 
-	if (IsProcessorFeaturePresentEx(PF_EX_SSSE3)
-	    && IsProcessorFeaturePresent(PF_SSE3_INSTRUCTIONS_AVAILABLE))
+	if (IsProcessorFeaturePresentEx(PF_EX_SSSE3) && IsProcessorFeaturePresent(PF_SSE3_INSTRUCTIONS_AVAILABLE))
 	{
 		prims->YCoCgToRGB_8u_AC4R = ssse3_YCoCgRToRGB_8u_AC4R;
 	}

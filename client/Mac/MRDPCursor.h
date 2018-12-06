@@ -21,14 +21,13 @@
 
 #include "freerdp/graphics.h"
 
-@interface MRDPCursor : NSObject
-{
+@interface MRDPCursor : NSObject {
 @public
-	rdpPointer* pointer;
-	BYTE* cursor_data;
-	NSBitmapImageRep* bmiRep;
-	NSCursor* nsCursor;
-	NSImage* nsImage;
+	rdpPointer *pointer;
+	BYTE *cursor_data;
+	NSBitmapImageRep *bmiRep;
+	NSCursor *nsCursor;
+	NSImage *nsImage;
 }
 
 @end

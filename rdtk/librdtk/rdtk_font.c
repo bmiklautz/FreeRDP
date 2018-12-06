@@ -33,8 +33,7 @@
 
 #include "rdtk_font.h"
 
-static int rdtk_font_draw_glyph(rdtkSurface* surface, int nXDst, int nYDst, rdtkFont* font,
-                                rdtkGlyph* glyph)
+static int rdtk_font_draw_glyph(rdtkSurface* surface, int nXDst, int nYDst, rdtkFont* font, rdtkGlyph* glyph)
 {
 	int x, y;
 	int nXSrc;
@@ -104,8 +103,7 @@ static int rdtk_font_draw_glyph(rdtkSurface* surface, int nXDst, int nYDst, rdtk
 	return 1;
 }
 
-int rdtk_font_draw_text(rdtkSurface* surface, int nXDst, int nYDst, rdtkFont* font,
-                        const char* text)
+int rdtk_font_draw_text(rdtkSurface* surface, int nXDst, int nYDst, rdtkFont* font, const char* text)
 {
 	int index;
 	int length;
@@ -359,7 +357,7 @@ static int rdtk_font_parse_descriptor_buffer(rdtkFont* font, BYTE* buffer, int s
 		return -1;
 
 	p = q + 1;
-	//printf("size: %d family: %s height: %d style: %s\n",
+	// printf("size: %d family: %s height: %d style: %s\n",
 	//		font->size, font->family, font->height, font->style);
 	beg = p;
 	count = 0;
@@ -657,8 +655,8 @@ cleanup:
 
 	return NULL;
 }
-static rdtkFont* rdtk_embedded_font_new(rdtkEngine* engine, BYTE* imageData, int imageSize,
-                                        BYTE* descriptorData, int descriptorSize)
+static rdtkFont* rdtk_embedded_font_new(rdtkEngine* engine, BYTE* imageData, int imageSize, BYTE* descriptorData,
+                                        int descriptorSize)
 {
 	int size;
 	int status;
@@ -730,8 +728,7 @@ int rdtk_font_engine_init(rdtkEngine* engine)
 		BYTE* imageData = NULL;
 		BYTE* descriptorData = NULL;
 		imageSize = rdtk_get_embedded_resource_file("source_serif_pro_regular_12.png", &imageData);
-		descriptorSize = rdtk_get_embedded_resource_file("source_serif_pro_regular_12.xml",
-		                 &descriptorData);
+		descriptorSize = rdtk_get_embedded_resource_file("source_serif_pro_regular_12.xml", &descriptorData);
 
 		if ((imageSize < 0) || (descriptorSize < 0))
 			return -1;

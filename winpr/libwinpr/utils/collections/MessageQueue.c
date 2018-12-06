@@ -39,19 +39,13 @@
  * Gets an event which is set when the queue is non-empty
  */
 
-HANDLE MessageQueue_Event(wMessageQueue* queue)
-{
-	return queue->event;
-}
+HANDLE MessageQueue_Event(wMessageQueue* queue) { return queue->event; }
 
 /**
  * Gets the queue size
  */
 
-int MessageQueue_Size(wMessageQueue* queue)
-{
-	return queue->size;
-}
+int MessageQueue_Size(wMessageQueue* queue) { return queue->size; }
 
 /**
  * Methods
@@ -188,7 +182,7 @@ int MessageQueue_Peek(wMessageQueue* queue, wMessage* message, BOOL remove)
  * Construction, Destruction
  */
 
-wMessageQueue* MessageQueue_New(const wObject *callback)
+wMessageQueue* MessageQueue_New(const wObject* callback)
 {
 	wMessageQueue* queue = NULL;
 
@@ -236,15 +230,15 @@ void MessageQueue_Free(wMessageQueue* queue)
 	free(queue);
 }
 
-int MessageQueue_Clear(wMessageQueue *queue)
+int MessageQueue_Clear(wMessageQueue* queue)
 {
 	int status = 0;
 
 	EnterCriticalSection(&queue->lock);
 
-	while(queue->size > 0)
+	while (queue->size > 0)
 	{
-		wMessage *msg = &(queue->array[queue->head]);
+		wMessage* msg = &(queue->array[queue->head]);
 
 		/* Free resources of message. */
 		if (queue->object.fnObjectUninit)
@@ -263,4 +257,3 @@ int MessageQueue_Clear(wMessageQueue *queue)
 
 	return status;
 }
-

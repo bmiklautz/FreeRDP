@@ -25,4 +25,3 @@
 rdpPrinterDriver* printer_cups_get_driver(void);
 
 #endif /* FREERDP_CHANNEL_PRINTER_CLIENT_CUPS_H */
-

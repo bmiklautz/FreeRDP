@@ -19,37 +19,37 @@
 
 #include <freerdp/crypto/crypto.h>
 
-struct Encode64test {
-	const char *input;
+struct Encode64test
+{
+	const char* input;
 	int len;
-	const char *output;
+	const char* output;
 };
 
 struct Encode64test encodeTests[] = {
-		{"\x00", 			1, "AA=="},
-		{"\x00\x00", 		2, "AAA="},
-		{"\x00\x00\x00", 	3, "AAAA"},
-		{"0123456",			7, "MDEyMzQ1Ng=="},
-		{"90123456",		8, "OTAxMjM0NTY="},
-		{"890123456",		9, "ODkwMTIzNDU2"},
-		{"7890123456",		10, "Nzg5MDEyMzQ1Ng=="},
+	{ "\x00", 1, "AA==" },
+	{ "\x00\x00", 2, "AAA=" },
+	{ "\x00\x00\x00", 3, "AAAA" },
+	{ "0123456", 7, "MDEyMzQ1Ng==" },
+	{ "90123456", 8, "OTAxMjM0NTY=" },
+	{ "890123456", 9, "ODkwMTIzNDU2" },
+	{ "7890123456", 10, "Nzg5MDEyMzQ1Ng==" },
 
-		{NULL, -1, NULL},  /*  /!\ last one  /!\ */
+	{ NULL, -1, NULL }, /*  /!\ last one  /!\ */
 };
-
 
 int TestBase64(int argc, char* argv[])
 {
 	int i, testNb = 0;
 	int outLen;
-	BYTE *decoded;
+	BYTE* decoded;
 
 	testNb++;
 	fprintf(stderr, "%d:encode base64...", testNb);
 
 	for (i = 0; encodeTests[i].input; i++)
 	{
-		char *encoded = crypto_base64_encode((const BYTE *)encodeTests[i].input, encodeTests[i].len);
+		char* encoded = crypto_base64_encode((const BYTE*) encodeTests[i].input, encodeTests[i].len);
 
 		if (strcmp(encodeTests[i].output, encoded))
 		{
@@ -100,7 +100,6 @@ int TestBase64(int argc, char* argv[])
 		return -1;
 	}
 	fprintf(stderr, "ok\n");
-
 
 	return 0;
 }

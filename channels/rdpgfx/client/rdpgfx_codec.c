@@ -39,8 +39,7 @@
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT rdpgfx_read_h264_metablock(RDPGFX_PLUGIN* gfx, wStream* s,
-                                       RDPGFX_H264_METABLOCK* meta)
+static UINT rdpgfx_read_h264_metablock(RDPGFX_PLUGIN* gfx, wStream* s, RDPGFX_H264_METABLOCK* meta)
 {
 	UINT32 index;
 	RECTANGLE_16* regionRect;
@@ -72,8 +71,8 @@ static UINT rdpgfx_read_h264_metablock(RDPGFX_PLUGIN* gfx, wStream* s,
 		goto error_out;
 	}
 
-	meta->quantQualityVals = (RDPGFX_H264_QUANT_QUALITY*) calloc(meta->numRegionRects, sizeof(
-	                             RDPGFX_H264_QUANT_QUALITY));
+	meta->quantQualityVals =
+	  (RDPGFX_H264_QUANT_QUALITY*) calloc(meta->numRegionRects, sizeof(RDPGFX_H264_QUANT_QUALITY));
 
 	if (!meta->quantQualityVals)
 	{
@@ -82,7 +81,7 @@ static UINT rdpgfx_read_h264_metablock(RDPGFX_PLUGIN* gfx, wStream* s,
 		goto error_out;
 	}
 
-	WLog_DBG(TAG, "H264_METABLOCK: numRegionRects: %"PRIu32"", meta->numRegionRects);
+	WLog_DBG(TAG, "H264_METABLOCK: numRegionRects: %" PRIu32 "", meta->numRegionRects);
 
 	for (index = 0; index < meta->numRegionRects; index++)
 	{
@@ -90,12 +89,12 @@ static UINT rdpgfx_read_h264_metablock(RDPGFX_PLUGIN* gfx, wStream* s,
 
 		if ((error = rdpgfx_read_rect16(s, regionRect)))
 		{
-			WLog_ERR(TAG, "rdpgfx_read_rect16 failed with error %"PRIu32"!", error);
+			WLog_ERR(TAG, "rdpgfx_read_rect16 failed with error %" PRIu32 "!", error);
 			goto error_out;
 		}
 
 		WLog_DBG(TAG,
-		         "regionRects[%"PRIu32"]: left: %"PRIu16" top: %"PRIu16" right: %"PRIu16" bottom: %"PRIu16"",
+		         "regionRects[%" PRIu32 "]: left: %" PRIu16 " top: %" PRIu16 " right: %" PRIu16 " bottom: %" PRIu16 "",
 		         index, regionRect->left, regionRect->top, regionRect->right, regionRect->bottom);
 	}
 
@@ -115,7 +114,7 @@ static UINT rdpgfx_read_h264_metablock(RDPGFX_PLUGIN* gfx, wStream* s,
 		quantQualityVal->r = (quantQualityVal->qpVal >> 6) & 1;
 		quantQualityVal->p = (quantQualityVal->qpVal >> 7) & 1;
 		WLog_DBG(TAG,
-		         "quantQualityVals[%"PRIu32"]: qp: %"PRIu8" r: %"PRIu8" p: %"PRIu8" qualityVal: %"PRIu8"",
+		         "quantQualityVals[%" PRIu32 "]: qp: %" PRIu8 " r: %" PRIu8 " p: %" PRIu8 " qualityVal: %" PRIu8 "",
 		         index, quantQualityVal->qp, quantQualityVal->r, quantQualityVal->p, quantQualityVal->qualityVal);
 	}
 
@@ -150,7 +149,7 @@ static UINT rdpgfx_decode_AVC420(RDPGFX_PLUGIN* gfx, RDPGFX_SURFACE_COMMAND* cmd
 	if ((error = rdpgfx_read_h264_metablock(gfx, s, &(h264.meta))))
 	{
 		Stream_Free(s, FALSE);
-		WLog_ERR(TAG, "rdpgfx_read_h264_metablock failed with error %"PRIu32"!", error);
+		WLog_ERR(TAG, "rdpgfx_read_h264_metablock failed with error %" PRIu32 "!", error);
 		return error;
 	}
 
@@ -164,7 +163,7 @@ static UINT rdpgfx_decode_AVC420(RDPGFX_PLUGIN* gfx, RDPGFX_SURFACE_COMMAND* cmd
 		IFCALLRET(context->SurfaceCommand, error, context, cmd);
 
 		if (error)
-			WLog_ERR(TAG, "context->SurfaceCommand failed with error %"PRIu32"", error);
+			WLog_ERR(TAG, "context->SurfaceCommand failed with error %" PRIu32 "", error);
 	}
 
 	free(h264.meta.regionRects);
@@ -213,7 +212,7 @@ static UINT rdpgfx_decode_AVC444(RDPGFX_PLUGIN* gfx, RDPGFX_SURFACE_COMMAND* cmd
 
 	if ((error = rdpgfx_read_h264_metablock(gfx, s, &(h264.bitstream[0].meta))))
 	{
-		WLog_ERR(TAG, "rdpgfx_read_h264_metablock failed with error %"PRIu32"!", error);
+		WLog_ERR(TAG, "rdpgfx_read_h264_metablock failed with error %" PRIu32 "!", error);
 		goto fail;
 	}
 
@@ -235,7 +234,7 @@ static UINT rdpgfx_decode_AVC444(RDPGFX_PLUGIN* gfx, RDPGFX_SURFACE_COMMAND* cmd
 
 		if ((error = rdpgfx_read_h264_metablock(gfx, s, &(h264.bitstream[1].meta))))
 		{
-			WLog_ERR(TAG, "rdpgfx_read_h264_metablock failed with error %"PRIu32"!", error);
+			WLog_ERR(TAG, "rdpgfx_read_h264_metablock failed with error %" PRIu32 "!", error);
 			goto fail;
 		}
 
@@ -255,7 +254,7 @@ static UINT rdpgfx_decode_AVC444(RDPGFX_PLUGIN* gfx, RDPGFX_SURFACE_COMMAND* cmd
 		IFCALLRET(context->SurfaceCommand, error, context, cmd);
 
 		if (error)
-			WLog_ERR(TAG, "context->SurfaceCommand failed with error %"PRIu32"", error);
+			WLog_ERR(TAG, "context->SurfaceCommand failed with error %" PRIu32 "", error);
 	}
 
 fail:
@@ -282,14 +281,14 @@ UINT rdpgfx_decode(RDPGFX_PLUGIN* gfx, RDPGFX_SURFACE_COMMAND* cmd)
 	{
 		case RDPGFX_CODECID_AVC420:
 			if ((error = rdpgfx_decode_AVC420(gfx, cmd)))
-				WLog_ERR(TAG, "rdpgfx_decode_AVC420 failed with error %"PRIu32"", error);
+				WLog_ERR(TAG, "rdpgfx_decode_AVC420 failed with error %" PRIu32 "", error);
 
 			break;
 
 		case RDPGFX_CODECID_AVC444:
 		case RDPGFX_CODECID_AVC444v2:
 			if ((error = rdpgfx_decode_AVC444(gfx, cmd)))
-				WLog_ERR(TAG, "rdpgfx_decode_AVC444 failed with error %"PRIu32"", error);
+				WLog_ERR(TAG, "rdpgfx_decode_AVC444 failed with error %" PRIu32 "", error);
 
 			break;
 
@@ -299,7 +298,7 @@ UINT rdpgfx_decode(RDPGFX_PLUGIN* gfx, RDPGFX_SURFACE_COMMAND* cmd)
 				IFCALLRET(context->SurfaceCommand, error, context, cmd);
 
 				if (error)
-					WLog_ERR(TAG, "context->SurfaceCommand failed with error %"PRIu32"", error);
+					WLog_ERR(TAG, "context->SurfaceCommand failed with error %" PRIu32 "", error);
 			}
 
 			break;

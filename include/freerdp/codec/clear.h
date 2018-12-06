@@ -32,14 +32,12 @@ typedef struct _CLEAR_CONTEXT CLEAR_CONTEXT;
 extern "C" {
 #endif
 
-FREERDP_API int clear_compress(CLEAR_CONTEXT* clear, const BYTE* pSrcData,
-                               UINT32 SrcSize, BYTE** ppDstData, UINT32* pDstSize);
+FREERDP_API int clear_compress(CLEAR_CONTEXT* clear, const BYTE* pSrcData, UINT32 SrcSize, BYTE** ppDstData,
+                               UINT32* pDstSize);
 
-FREERDP_API INT32 clear_decompress(CLEAR_CONTEXT* clear, const BYTE* pSrcData,
-                                   UINT32 SrcSize, UINT32 nWidth, UINT32 nHeight,
-                                   BYTE* pDstData, UINT32 DstFormat, UINT32 nDstStep,
-                                   UINT32 nXDst, UINT32 nYDst, UINT32 nDstWidth, UINT32 nDstHeight,
-                                   const gdiPalette* palette);
+FREERDP_API INT32 clear_decompress(CLEAR_CONTEXT* clear, const BYTE* pSrcData, UINT32 SrcSize, UINT32 nWidth,
+                                   UINT32 nHeight, BYTE* pDstData, UINT32 DstFormat, UINT32 nDstStep, UINT32 nXDst,
+                                   UINT32 nYDst, UINT32 nDstWidth, UINT32 nDstHeight, const gdiPalette* palette);
 
 FREERDP_API BOOL clear_context_reset(CLEAR_CONTEXT* clear);
 
@@ -51,4 +49,3 @@ FREERDP_API void clear_context_free(CLEAR_CONTEXT* clear);
 #endif
 
 #endif /* FREERDP_CODEC_CLEAR_H */
-

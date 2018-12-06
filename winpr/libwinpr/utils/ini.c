@@ -216,7 +216,7 @@ wIniFileSection* IniFile_Section_New(const char* name)
 
 	section->nKeys = 0;
 	section->cKeys = 64;
-	section->keys = (wIniFileKey**) calloc(section->cKeys,  sizeof(wIniFileKey*));
+	section->keys = (wIniFileKey**) calloc(section->cKeys, sizeof(wIniFileKey*));
 
 	if (!section->keys)
 	{
@@ -313,8 +313,7 @@ wIniFileKey* IniFile_GetKey(wIniFile* ini, wIniFileSection* section, const char*
 	return key;
 }
 
-wIniFileKey* IniFile_AddKey(wIniFile* ini, wIniFileSection* section, const char* name,
-                            const char* value)
+wIniFileKey* IniFile_AddKey(wIniFile* ini, wIniFileSection* section, const char* name, const char* value)
 {
 	wIniFileKey* key;
 
@@ -365,7 +364,7 @@ int IniFile_Load(wIniFile* ini)
 	char* name;
 	char* value;
 	char* separator;
-	char* beg, *end;
+	char *beg, *end;
 	wIniFileSection* section = NULL;
 
 	while (IniFile_Load_HasNextLine(ini))
@@ -479,7 +478,7 @@ char** IniFile_GetSectionNames(wIniFile* ini, int* count)
 	if (!sectionNames)
 		return NULL;
 
-	p = (char*) & ((BYTE*) sectionNames)[sizeof(char*) * ini->nSections];
+	p = (char*) &((BYTE*) sectionNames)[sizeof(char*) * ini->nSections];
 
 	for (index = 0; index < ini->nSections; index++)
 	{
@@ -523,7 +522,7 @@ char** IniFile_GetSectionKeyNames(wIniFile* ini, const char* section, int* count
 	if (!keyNames)
 		return NULL;
 
-	p = (char*) & ((BYTE*) keyNames)[sizeof(char*) * pSection->nKeys];
+	p = (char*) &((BYTE*) keyNames)[sizeof(char*) * pSection->nKeys];
 
 	for (index = 0; index < pSection->nKeys; index++)
 	{
@@ -577,8 +576,7 @@ int IniFile_GetKeyValueInt(wIniFile* ini, const char* section, const char* key)
 	return value;
 }
 
-int IniFile_SetKeyValueString(wIniFile* ini, const char* section, const char* key,
-                              const char* value)
+int IniFile_SetKeyValueString(wIniFile* ini, const char* section, const char* key, const char* value)
 {
 	wIniFileKey* pKey = NULL;
 	wIniFileSection* pSection = NULL;

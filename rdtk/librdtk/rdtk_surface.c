@@ -24,8 +24,7 @@
 
 int rdtk_surface_fill(rdtkSurface* surface, int x, int y, int width, int height, UINT32 color)
 {
-	freerdp_image_fill(surface->data, PIXEL_FORMAT_XRGB32,
-			surface->scanline, x, y, width, height, color);
+	freerdp_image_fill(surface->data, PIXEL_FORMAT_XRGB32, surface->scanline, x, y, width, height, color);
 
 	return 1;
 }
@@ -82,4 +81,3 @@ void rdtk_surface_free(rdtkSurface* surface)
 
 	free(surface);
 }
-

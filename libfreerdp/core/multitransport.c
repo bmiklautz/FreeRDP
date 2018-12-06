@@ -41,12 +41,6 @@ int rdp_recv_multitransport_packet(rdpRdp* rdp, wStream* s)
 	return 0;
 }
 
-rdpMultitransport* multitransport_new(void)
-{
-	return (rdpMultitransport*)calloc(1, sizeof(rdpMultitransport));
-}
+rdpMultitransport* multitransport_new(void) { return (rdpMultitransport*) calloc(1, sizeof(rdpMultitransport)); }
 
-void multitransport_free(rdpMultitransport* multitransport)
-{
-	free(multitransport);
-}
+void multitransport_free(rdpMultitransport* multitransport) { free(multitransport); }

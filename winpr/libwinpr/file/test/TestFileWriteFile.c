@@ -4,7 +4,4 @@
 #include <winpr/file.h>
 #include <winpr/windows.h>
 
-int TestFileWriteFile(int argc, char* argv[])
-{
-	return 0;
-}
+int TestFileWriteFile(int argc, char* argv[]) { return 0; }

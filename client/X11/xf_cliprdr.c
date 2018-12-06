@@ -45,7 +45,7 @@
 
 #define TAG CLIENT_TAG("x11")
 
-#define MAX_CLIPBOARD_FORMATS	255
+#define MAX_CLIPBOARD_FORMATS 255
 
 struct xf_cliprdr_format
 {
@@ -132,17 +132,15 @@ static void xf_cliprdr_check_owner(xfClipboard* clipboard)
 static BOOL xf_cliprdr_is_self_owned(xfClipboard* clipboard)
 {
 	xfContext* xfc = clipboard->xfc;
-	return XGetSelectionOwner(xfc->display,
-	                          clipboard->clipboard_atom) == xfc->drawable;
+	return XGetSelectionOwner(xfc->display, clipboard->clipboard_atom) == xfc->drawable;
 }
 
-static void xf_cliprdr_set_raw_transfer_enabled(xfClipboard* clipboard,
-        BOOL enabled)
+static void xf_cliprdr_set_raw_transfer_enabled(xfClipboard* clipboard, BOOL enabled)
 {
 	UINT32 data = enabled;
 	xfContext* xfc = clipboard->xfc;
-	XChangeProperty(xfc->display, xfc->drawable, clipboard->raw_transfer_atom,
-	                XA_INTEGER, 32, PropModeReplace, (BYTE*) &data, 1);
+	XChangeProperty(xfc->display, xfc->drawable, clipboard->raw_transfer_atom, XA_INTEGER, 32, PropModeReplace,
+	                (BYTE*) &data, 1);
 }
 
 static BOOL xf_cliprdr_is_raw_transfer_available(xfClipboard* clipboard)
@@ -160,9 +158,8 @@ static BOOL xf_cliprdr_is_raw_transfer_available(xfClipboard* clipboard)
 
 	if (owner != None)
 	{
-		result = XGetWindowProperty(xfc->display, owner,
-		                            clipboard->raw_transfer_atom, 0, 4, 0, XA_INTEGER,
-		                            &type, &format, &length, &bytes_left, (BYTE**) &data);
+		result = XGetWindowProperty(xfc->display, owner, clipboard->raw_transfer_atom, 0, 4, 0, XA_INTEGER, &type,
+		                            &format, &length, &bytes_left, (BYTE**) &data);
 	}
 
 	if (data)
@@ -180,14 +177,12 @@ static BOOL xf_cliprdr_is_raw_transfer_available(xfClipboard* clipboard)
 	return is_enabled ? TRUE : FALSE;
 }
 
-static BOOL xf_cliprdr_formats_equal(const CLIPRDR_FORMAT* server,
-                                     const xfCliprdrFormat* client)
+static BOOL xf_cliprdr_formats_equal(const CLIPRDR_FORMAT* server, const xfCliprdrFormat* client)
 {
 	if (server->formatName && client->formatName)
 	{
 		/* The server may be using short format names while we store them in full form. */
-		return (0 == strncmp(server->formatName, client->formatName,
-		                     strlen(server->formatName)));
+		return (0 == strncmp(server->formatName, client->formatName, strlen(server->formatName)));
 	}
 
 	if (!server->formatName && !client->formatName)
@@ -198,8 +193,7 @@ static BOOL xf_cliprdr_formats_equal(const CLIPRDR_FORMAT* server,
 	return FALSE;
 }
 
-static xfCliprdrFormat* xf_cliprdr_get_client_format_by_id(
-    xfClipboard* clipboard, UINT32 formatId)
+static xfCliprdrFormat* xf_cliprdr_get_client_format_by_id(xfClipboard* clipboard, UINT32 formatId)
 {
 	int index;
 	xfCliprdrFormat* format;
@@ -215,8 +209,7 @@ static xfCliprdrFormat* xf_cliprdr_get_client_format_by_id(
 	return NULL;
 }
 
-static xfCliprdrFormat* xf_cliprdr_get_client_format_by_atom(
-    xfClipboard* clipboard, Atom atom)
+static xfCliprdrFormat* xf_cliprdr_get_client_format_by_atom(xfClipboard* clipboard, Atom atom)
 {
 	int i;
 	xfCliprdrFormat* format;
@@ -232,8 +225,7 @@ static xfCliprdrFormat* xf_cliprdr_get_client_format_by_atom(
 	return NULL;
 }
 
-static CLIPRDR_FORMAT* xf_cliprdr_get_server_format_by_atom(
-    xfClipboard* clipboard, Atom atom)
+static CLIPRDR_FORMAT* xf_cliprdr_get_server_format_by_atom(xfClipboard* clipboard, Atom atom)
 {
 	int i, j;
 	xfCliprdrFormat* client_format;
@@ -263,14 +255,12 @@ static CLIPRDR_FORMAT* xf_cliprdr_get_server_format_by_atom(
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT xf_cliprdr_send_data_request(xfClipboard* clipboard,
-        UINT32 formatId)
+static UINT xf_cliprdr_send_data_request(xfClipboard* clipboard, UINT32 formatId)
 {
 	CLIPRDR_FORMAT_DATA_REQUEST request;
 	ZeroMemory(&request, sizeof(CLIPRDR_FORMAT_DATA_REQUEST));
 	request.requestedFormatId = formatId;
-	return clipboard->context->ClientFormatDataRequest(clipboard->context,
-	        &request);
+	return clipboard->context->ClientFormatDataRequest(clipboard->context, &request);
 }
 
 /**
@@ -278,16 +268,14 @@ static UINT xf_cliprdr_send_data_request(xfClipboard* clipboard,
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT xf_cliprdr_send_data_response(xfClipboard* clipboard, BYTE* data,
-        int size)
+static UINT xf_cliprdr_send_data_response(xfClipboard* clipboard, BYTE* data, int size)
 {
 	CLIPRDR_FORMAT_DATA_RESPONSE response;
 	ZeroMemory(&response, sizeof(CLIPRDR_FORMAT_DATA_RESPONSE));
 	response.msgFlags = (data) ? CB_RESPONSE_OK : CB_RESPONSE_FAIL;
 	response.dataLen = size;
 	response.requestedFormatData = data;
-	return clipboard->context->ClientFormatDataResponse(clipboard->context,
-	        &response);
+	return clipboard->context->ClientFormatDataResponse(clipboard->context, &response);
 }
 
 static wStream* xf_cliprdr_serialize_server_format_list(xfClipboard* clipboard)
@@ -304,8 +292,7 @@ static wStream* xf_cliprdr_serialize_server_format_list(xfClipboard* clipboard)
 	}
 
 	/* If present, the last format is always synthetic CF_RAW. Do not include it. */
-	formatCount = (clipboard->numServerFormats > 0) ? clipboard->numServerFormats -
-	              1 : 0;
+	formatCount = (clipboard->numServerFormats > 0) ? clipboard->numServerFormats - 1 : 0;
 	Stream_Write_UINT32(s, formatCount);
 
 	for (i = 0; i < formatCount; i++)
@@ -334,8 +321,7 @@ error:
 	return NULL;
 }
 
-static CLIPRDR_FORMAT* xf_cliprdr_parse_server_format_list(BYTE* data,
-        size_t length, UINT32* numFormats)
+static CLIPRDR_FORMAT* xf_cliprdr_parse_server_format_list(BYTE* data, size_t length, UINT32* numFormats)
 {
 	UINT32 i;
 	wStream* s = NULL;
@@ -357,7 +343,7 @@ static CLIPRDR_FORMAT* xf_cliprdr_parse_server_format_list(BYTE* data,
 
 	if (*numFormats > MAX_CLIPBOARD_FORMATS)
 	{
-		WLog_ERR(TAG, "unexpectedly large number of formats: %"PRIu32"", *numFormats);
+		WLog_ERR(TAG, "unexpectedly large number of formats: %" PRIu32 "", *numFormats);
 		goto error;
 	}
 
@@ -384,8 +370,7 @@ static CLIPRDR_FORMAT* xf_cliprdr_parse_server_format_list(BYTE* data,
 
 		if (formatNameLength == Stream_GetRemainingLength(s))
 		{
-			WLog_ERR(TAG, "missing terminating null byte, %"PRIuz" bytes left to read",
-			         formatNameLength);
+			WLog_ERR(TAG, "missing terminating null byte, %" PRIuz " bytes left to read", formatNameLength);
 			goto error;
 		}
 
@@ -414,8 +399,7 @@ static void xf_cliprdr_free_formats(CLIPRDR_FORMAT* formats, UINT32 numFormats)
 	free(formats);
 }
 
-static CLIPRDR_FORMAT* xf_cliprdr_get_raw_server_formats(xfClipboard* clipboard,
-        UINT32* numFormats)
+static CLIPRDR_FORMAT* xf_cliprdr_get_raw_server_formats(xfClipboard* clipboard, UINT32* numFormats)
 {
 	Atom type = None;
 	int format = 0;
@@ -425,22 +409,17 @@ static CLIPRDR_FORMAT* xf_cliprdr_get_raw_server_formats(xfClipboard* clipboard,
 	CLIPRDR_FORMAT* formats = NULL;
 	xfContext* xfc = clipboard->xfc;
 	*numFormats = 0;
-	XGetWindowProperty(xfc->display, clipboard->owner,
-	                   clipboard->raw_format_list_atom,
-	                   0, 4096, False, clipboard->raw_format_list_atom, &type, &format,
-	                   &length, &remaining, &data);
+	XGetWindowProperty(xfc->display, clipboard->owner, clipboard->raw_format_list_atom, 0, 4096, False,
+	                   clipboard->raw_format_list_atom, &type, &format, &length, &remaining, &data);
 
-	if (data && length > 0 && format == 8
-	    && type == clipboard->raw_format_list_atom)
+	if (data && length > 0 && format == 8 && type == clipboard->raw_format_list_atom)
 	{
 		formats = xf_cliprdr_parse_server_format_list(data, length, numFormats);
 	}
 	else
 	{
-		WLog_ERR(TAG,
-		         "failed to retrieve raw format list: data=%p, length=%lu, format=%d, type=%lu (expected=%lu)",
-		         (void*) data, length, format, (unsigned long) type,
-		         (unsigned long) clipboard->raw_format_list_atom);
+		WLog_ERR(TAG, "failed to retrieve raw format list: data=%p, length=%lu, format=%d, type=%lu (expected=%lu)",
+		         (void*) data, length, format, (unsigned long) type, (unsigned long) clipboard->raw_format_list_atom);
 	}
 
 	if (data)
@@ -449,8 +428,7 @@ static CLIPRDR_FORMAT* xf_cliprdr_get_raw_server_formats(xfClipboard* clipboard,
 	return formats;
 }
 
-static CLIPRDR_FORMAT* xf_cliprdr_get_formats_from_targets(
-    xfClipboard* clipboard, UINT32* numFormats)
+static CLIPRDR_FORMAT* xf_cliprdr_get_formats_from_targets(xfClipboard* clipboard, UINT32* numFormats)
 {
 	int i;
 	Atom atom;
@@ -462,8 +440,8 @@ static CLIPRDR_FORMAT* xf_cliprdr_get_formats_from_targets(
 	CLIPRDR_FORMAT* formats = NULL;
 	xfContext* xfc = clipboard->xfc;
 	*numFormats = 0;
-	XGetWindowProperty(xfc->display, xfc->drawable, clipboard->property_atom,
-	                   0, 200, 0, XA_ATOM, &atom, &format_property, &length, &bytes_left, &data);
+	XGetWindowProperty(xfc->display, xfc->drawable, clipboard->property_atom, 0, 200, 0, XA_ATOM, &atom,
+	                   &format_property, &length, &bytes_left, &data);
 
 	if (length > 0)
 	{
@@ -501,8 +479,7 @@ out:
 	return formats;
 }
 
-static CLIPRDR_FORMAT* xf_cliprdr_get_client_formats(xfClipboard* clipboard,
-        UINT32* numFormats)
+static CLIPRDR_FORMAT* xf_cliprdr_get_client_formats(xfClipboard* clipboard, UINT32* numFormats)
 {
 	CLIPRDR_FORMAT* formats = NULL;
 	*numFormats = 0;
@@ -529,9 +506,8 @@ static void xf_cliprdr_provide_server_format_list(xfClipboard* clipboard)
 
 	if (formats)
 	{
-		XChangeProperty(xfc->display, xfc->drawable, clipboard->raw_format_list_atom,
-		                clipboard->raw_format_list_atom, 8, PropModeReplace,
-		                Stream_Buffer(formats), Stream_Length(formats));
+		XChangeProperty(xfc->display, xfc->drawable, clipboard->raw_format_list_atom, clipboard->raw_format_list_atom,
+		                8, PropModeReplace, Stream_Buffer(formats), Stream_Length(formats));
 	}
 	else
 	{
@@ -555,8 +531,7 @@ static void xf_cliprdr_get_requested_targets(xfClipboard* clipboard)
 	xf_cliprdr_free_formats(formats, numFormats);
 }
 
-static void xf_cliprdr_process_requested_data(xfClipboard* clipboard,
-        BOOL hasData, BYTE* data, int size)
+static void xf_cliprdr_process_requested_data(xfClipboard* clipboard, BOOL hasData, BYTE* data, int size)
 {
 	BOOL bSuccess;
 	UINT32 SrcSize;
@@ -569,8 +544,7 @@ static void xf_cliprdr_process_requested_data(xfClipboard* clipboard,
 	if (clipboard->incr_starts && hasData)
 		return;
 
-	format = xf_cliprdr_get_client_format_by_id(clipboard,
-	         clipboard->requestedFormatId);
+	format = xf_cliprdr_get_client_format_by_id(clipboard, clipboard->requestedFormatId);
 
 	if (!hasData || !data || !format)
 	{
@@ -633,8 +607,7 @@ static void xf_cliprdr_process_requested_data(xfClipboard* clipboard,
 	 * We check for "FileGroupDescriptorW" format being registered (i.e., nonzero) in order
 	 * to not process CF_RAW as a file list in case WinPR does not support file transfers.
 	 */
-	if (dstFormatId &&
-	    (dstFormatId == ClipboardGetFormatId(clipboard->system, "FileGroupDescriptorW")))
+	if (dstFormatId && (dstFormatId == ClipboardGetFormatId(clipboard->system, "FileGroupDescriptorW")))
 	{
 		UINT error = NO_ERROR;
 		FILEDESCRIPTOR* file_array = (FILEDESCRIPTOR*) pDstData;
@@ -664,8 +637,7 @@ static BOOL xf_cliprdr_get_requested_data(xfClipboard* clipboard, Atom target)
 	unsigned long bytes_left;
 	xfCliprdrFormat* format;
 	xfContext* xfc = clipboard->xfc;
-	format = xf_cliprdr_get_client_format_by_id(clipboard,
-	         clipboard->requestedFormatId);
+	format = xf_cliprdr_get_client_format_by_id(clipboard, clipboard->requestedFormatId);
 
 	if (!format || (format->atom != target))
 	{
@@ -673,9 +645,8 @@ static BOOL xf_cliprdr_get_requested_data(xfClipboard* clipboard, Atom target)
 		return FALSE;
 	}
 
-	XGetWindowProperty(xfc->display, xfc->drawable,
-	                   clipboard->property_atom, 0, 0, 0, target,
-	                   &type, &format_property, &length, &bytes_left, &data);
+	XGetWindowProperty(xfc->display, xfc->drawable, clipboard->property_atom, 0, 0, 0, target, &type, &format_property,
+	                   &length, &bytes_left, &data);
 
 	if (data)
 	{
@@ -711,23 +682,20 @@ static BOOL xf_cliprdr_get_requested_data(xfClipboard* clipboard, Atom target)
 			clipboard->incr_starts = 0;
 			has_data = TRUE;
 		}
-		else if (XGetWindowProperty(xfc->display, xfc->drawable,
-		                            clipboard->property_atom, 0, bytes_left, 0, target,
+		else if (XGetWindowProperty(xfc->display, xfc->drawable, clipboard->property_atom, 0, bytes_left, 0, target,
 		                            &type, &format_property, &length, &dummy, &data) == Success)
 		{
 			if (clipboard->incr_starts)
 			{
 				BYTE* new_data;
 				bytes_left = length * format_property / 8;
-				new_data = (BYTE*) realloc(clipboard->incr_data,
-				                           clipboard->incr_data_length + bytes_left);
+				new_data = (BYTE*) realloc(clipboard->incr_data, clipboard->incr_data_length + bytes_left);
 
 				if (!new_data)
 					return FALSE;
 
 				clipboard->incr_data = new_data;
-				CopyMemory(clipboard->incr_data + clipboard->incr_data_length, data,
-				           bytes_left);
+				CopyMemory(clipboard->incr_data + clipboard->incr_data_length, data, bytes_left);
 				clipboard->incr_data_length += bytes_left;
 				XFree(data);
 				data = NULL;
@@ -771,27 +739,23 @@ static void xf_cliprdr_provide_targets(xfClipboard* clipboard, XEvent* respond)
 
 	if (respond->xselection.property != None)
 	{
-		XChangeProperty(xfc->display, respond->xselection.requestor,
-		                respond->xselection.property, XA_ATOM, 32, PropModeReplace,
-		                (BYTE*) clipboard->targets, clipboard->numTargets);
+		XChangeProperty(xfc->display, respond->xselection.requestor, respond->xselection.property, XA_ATOM, 32,
+		                PropModeReplace, (BYTE*) clipboard->targets, clipboard->numTargets);
 	}
 }
 
-static void xf_cliprdr_provide_data(xfClipboard* clipboard, XEvent* respond,
-                                    BYTE* data, UINT32 size)
+static void xf_cliprdr_provide_data(xfClipboard* clipboard, XEvent* respond, BYTE* data, UINT32 size)
 {
 	xfContext* xfc = clipboard->xfc;
 
 	if (respond->xselection.property != None)
 	{
-		XChangeProperty(xfc->display, respond->xselection.requestor,
-		                respond->xselection.property, respond->xselection.target,
-		                8, PropModeReplace, data, size);
+		XChangeProperty(xfc->display, respond->xselection.requestor, respond->xselection.property,
+		                respond->xselection.target, 8, PropModeReplace, data, size);
 	}
 }
 
-static BOOL xf_cliprdr_process_selection_notify(xfClipboard* clipboard,
-        XEvent* xevent)
+static BOOL xf_cliprdr_process_selection_notify(xfClipboard* clipboard, XEvent* xevent)
 {
 	if (xevent->xselection.target == clipboard->targets[1])
 	{
@@ -831,8 +795,7 @@ static void xf_cliprdr_clear_cached_data(xfClipboard* clipboard)
 	clipboard->data_raw_length = 0;
 }
 
-static BOOL xf_cliprdr_process_selection_request(xfClipboard* clipboard,
-        XEvent* xevent)
+static BOOL xf_cliprdr_process_selection_request(xfClipboard* clipboard, XEvent* xevent)
 {
 	int fmt;
 	Atom type;
@@ -871,8 +834,7 @@ static BOOL xf_cliprdr_process_selection_request(xfClipboard* clipboard,
 	{
 		/* TODO */
 	}
-	else if (xevent->xselectionrequest.target ==
-	         clipboard->targets[1]) /* TARGETS */
+	else if (xevent->xselectionrequest.target == clipboard->targets[1]) /* TARGETS */
 	{
 		/* Someone else requests our available formats */
 		respond->xselection.property = xevent->xselectionrequest.property;
@@ -880,8 +842,7 @@ static BOOL xf_cliprdr_process_selection_request(xfClipboard* clipboard,
 	}
 	else
 	{
-		format = xf_cliprdr_get_server_format_by_atom(clipboard,
-		         xevent->xselectionrequest.target);
+		format = xf_cliprdr_get_server_format_by_atom(clipboard, xevent->xselectionrequest.target);
 
 		if (format && (xevent->xselectionrequest.requestor != xfc->drawable))
 		{
@@ -891,9 +852,8 @@ static BOOL xf_cliprdr_process_selection_request(xfClipboard* clipboard,
 
 			if (formatId == CF_RAW)
 			{
-				if (XGetWindowProperty(xfc->display, xevent->xselectionrequest.requestor,
-				                       clipboard->property_atom, 0, 4, 0, XA_INTEGER,
-				                       &type, &fmt, &length, &bytes_left, &data) != Success)
+				if (XGetWindowProperty(xfc->display, xevent->xselectionrequest.requestor, clipboard->property_atom, 0,
+				                       4, 0, XA_INTEGER, &type, &fmt, &length, &bytes_left, &data) != Success)
 				{
 				}
 
@@ -907,15 +867,13 @@ static BOOL xf_cliprdr_process_selection_request(xfClipboard* clipboard,
 
 			/* We can compare format names by pointer value here as they are both
 			 * taken from the same clipboard->serverFormats array */
-			matchingFormat = (formatId == clipboard->data_format_id)
-			                 && (formatName == clipboard->data_format_name);
+			matchingFormat = (formatId == clipboard->data_format_id) && (formatName == clipboard->data_format_name);
 
 			if (matchingFormat && (clipboard->data != 0) && !rawTransfer)
 			{
 				/* Cached converted clipboard data available. Send it now */
 				respond->xselection.property = xevent->xselectionrequest.property;
-				xf_cliprdr_provide_data(clipboard, respond, clipboard->data,
-				                        clipboard->data_length);
+				xf_cliprdr_provide_data(clipboard, respond, clipboard->data, clipboard->data_length);
 			}
 			else if (matchingFormat && (clipboard->data_raw != 0) && rawTransfer)
 			{
@@ -955,8 +913,7 @@ static BOOL xf_cliprdr_process_selection_request(xfClipboard* clipboard,
 	return TRUE;
 }
 
-static BOOL xf_cliprdr_process_selection_clear(xfClipboard* clipboard,
-        XEvent* xevent)
+static BOOL xf_cliprdr_process_selection_clear(xfClipboard* clipboard, XEvent* xevent)
 {
 	xfContext* xfc = clipboard->xfc;
 
@@ -967,8 +924,7 @@ static BOOL xf_cliprdr_process_selection_clear(xfClipboard* clipboard,
 	return TRUE;
 }
 
-static BOOL xf_cliprdr_process_property_notify(xfClipboard* clipboard,
-        XEvent* xevent)
+static BOOL xf_cliprdr_process_property_notify(xfClipboard* clipboard, XEvent* xevent)
 {
 	xfCliprdrFormat* format;
 	xfContext* xfc = NULL;
@@ -985,11 +941,10 @@ static BOOL xf_cliprdr_process_property_notify(xfClipboard* clipboard,
 	{
 		xf_cliprdr_send_client_format_list(clipboard);
 	}
-	else if ((xevent->xproperty.window == xfc->drawable) &&
-	         (xevent->xproperty.state == PropertyNewValue) && clipboard->incr_starts)
+	else if ((xevent->xproperty.window == xfc->drawable) && (xevent->xproperty.state == PropertyNewValue) &&
+	         clipboard->incr_starts)
 	{
-		format = xf_cliprdr_get_client_format_by_id(clipboard,
-		         clipboard->requestedFormatId);
+		format = xf_cliprdr_get_client_format_by_id(clipboard, clipboard->requestedFormatId);
 
 		if (format)
 			xf_cliprdr_get_requested_data(clipboard, format->atom);
@@ -1012,8 +967,7 @@ void xf_cliprdr_handle_xevent(xfContext* xfc, XEvent* event)
 
 #ifdef WITH_XFIXES
 
-	if (clipboard->xfixes_supported
-	    && event->type == XFixesSelectionNotify + clipboard->xfixes_event_base)
+	if (clipboard->xfixes_supported && event->type == XFixesSelectionNotify + clipboard->xfixes_event_base)
 	{
 		XFixesSelectionNotifyEvent* se = (XFixesSelectionNotifyEvent*) event;
 
@@ -1072,19 +1026,16 @@ static UINT xf_cliprdr_send_client_capabilities(xfClipboard* clipboard)
 	CLIPRDR_CAPABILITIES capabilities;
 	CLIPRDR_GENERAL_CAPABILITY_SET generalCapabilitySet;
 	capabilities.cCapabilitiesSets = 1;
-	capabilities.capabilitySets = (CLIPRDR_CAPABILITY_SET*) &
-	                              (generalCapabilitySet);
+	capabilities.capabilitySets = (CLIPRDR_CAPABILITY_SET*) &(generalCapabilitySet);
 	generalCapabilitySet.capabilitySetType = CB_CAPSTYPE_GENERAL;
 	generalCapabilitySet.capabilitySetLength = 12;
 	generalCapabilitySet.version = CB_CAPS_VERSION_2;
 	generalCapabilitySet.generalFlags = CB_USE_LONG_FORMAT_NAMES;
 
 	if (clipboard->streams_supported && clipboard->file_formats_registered)
-		generalCapabilitySet.generalFlags |=
-		    CB_STREAM_FILECLIP_ENABLED | CB_FILECLIP_NO_FILE_PATHS;
+		generalCapabilitySet.generalFlags |= CB_STREAM_FILECLIP_ENABLED | CB_FILECLIP_NO_FILE_PATHS;
 
-	return clipboard->context->ClientCapabilities(clipboard->context,
-	        &capabilities);
+	return clipboard->context->ClientCapabilities(clipboard->context, &capabilities);
 }
 
 /**
@@ -1106,7 +1057,7 @@ static UINT xf_cliprdr_send_client_format_list(xfClipboard* clipboard)
 	{
 		if (!(formats = (CLIPRDR_FORMAT*) calloc(numFormats, sizeof(CLIPRDR_FORMAT))))
 		{
-			WLog_ERR(TAG, "failed to allocate %"PRIu32" CLIPRDR_FORMAT structs", numFormats);
+			WLog_ERR(TAG, "failed to allocate %" PRIu32 " CLIPRDR_FORMAT structs", numFormats);
 			return CHANNEL_RC_NO_MEMORY;
 		}
 	}
@@ -1126,8 +1077,8 @@ static UINT xf_cliprdr_send_client_format_list(xfClipboard* clipboard)
 	if (clipboard->owner && clipboard->owner != xfc->drawable)
 	{
 		/* Request the owner for TARGETS, and wait for SelectionNotify event */
-		XConvertSelection(xfc->display, clipboard->clipboard_atom,
-		                  clipboard->targets[1], clipboard->property_atom, xfc->drawable, CurrentTime);
+		XConvertSelection(xfc->display, clipboard->clipboard_atom, clipboard->targets[1], clipboard->property_atom,
+		                  xfc->drawable, CurrentTime);
 	}
 
 	return ret;
@@ -1138,15 +1089,13 @@ static UINT xf_cliprdr_send_client_format_list(xfClipboard* clipboard)
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT xf_cliprdr_send_client_format_list_response(xfClipboard* clipboard,
-        BOOL status)
+static UINT xf_cliprdr_send_client_format_list_response(xfClipboard* clipboard, BOOL status)
 {
 	CLIPRDR_FORMAT_LIST_RESPONSE formatListResponse;
 	formatListResponse.msgType = CB_FORMAT_LIST_RESPONSE;
 	formatListResponse.msgFlags = status ? CB_RESPONSE_OK : CB_RESPONSE_FAIL;
 	formatListResponse.dataLen = 0;
-	return clipboard->context->ClientFormatListResponse(clipboard->context,
-	        &formatListResponse);
+	return clipboard->context->ClientFormatListResponse(clipboard->context, &formatListResponse);
 }
 
 /**
@@ -1154,8 +1103,7 @@ static UINT xf_cliprdr_send_client_format_list_response(xfClipboard* clipboard,
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT xf_cliprdr_monitor_ready(CliprdrClientContext* context,
-                                     CLIPRDR_MONITOR_READY* monitorReady)
+static UINT xf_cliprdr_monitor_ready(CliprdrClientContext* context, CLIPRDR_MONITOR_READY* monitorReady)
 {
 	xfClipboard* clipboard = (xfClipboard*) context->custom;
 	UINT ret;
@@ -1175,8 +1123,7 @@ static UINT xf_cliprdr_monitor_ready(CliprdrClientContext* context,
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT xf_cliprdr_server_capabilities(CliprdrClientContext* context,
-        CLIPRDR_CAPABILITIES* capabilities)
+static UINT xf_cliprdr_server_capabilities(CliprdrClientContext* context, CLIPRDR_CAPABILITIES* capabilities)
 {
 	UINT32 i;
 	const CLIPRDR_CAPABILITY_SET* caps;
@@ -1210,8 +1157,7 @@ static UINT xf_cliprdr_server_capabilities(CliprdrClientContext* context,
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT xf_cliprdr_server_format_list(CliprdrClientContext* context,
-        CLIPRDR_FORMAT_LIST* formatList)
+static UINT xf_cliprdr_server_format_list(CliprdrClientContext* context, CLIPRDR_FORMAT_LIST* formatList)
 {
 	UINT32 i;
 	int j;
@@ -1234,11 +1180,9 @@ static UINT xf_cliprdr_server_format_list(CliprdrClientContext* context,
 
 	clipboard->numServerFormats = formatList->numFormats + 1; /* +1 for CF_RAW */
 
-	if (!(clipboard->serverFormats = (CLIPRDR_FORMAT*) calloc(
-	                                     clipboard->numServerFormats, sizeof(CLIPRDR_FORMAT))))
+	if (!(clipboard->serverFormats = (CLIPRDR_FORMAT*) calloc(clipboard->numServerFormats, sizeof(CLIPRDR_FORMAT))))
 	{
-		WLog_ERR(TAG, "failed to allocate %d CLIPRDR_FORMAT structs",
-		         clipboard->numServerFormats);
+		WLog_ERR(TAG, "failed to allocate %d CLIPRDR_FORMAT structs", clipboard->numServerFormats);
 		return CHANNEL_RC_NO_MEMORY;
 	}
 
@@ -1289,8 +1233,7 @@ static UINT xf_cliprdr_server_format_list(CliprdrClientContext* context,
 	}
 
 	ret = xf_cliprdr_send_client_format_list_response(clipboard, TRUE);
-	XSetSelectionOwner(xfc->display, clipboard->clipboard_atom, xfc->drawable,
-	                   CurrentTime);
+	XSetSelectionOwner(xfc->display, clipboard->clipboard_atom, xfc->drawable, CurrentTime);
 	XFlush(xfc->display);
 	return ret;
 }
@@ -1300,10 +1243,10 @@ static UINT xf_cliprdr_server_format_list(CliprdrClientContext* context,
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT xf_cliprdr_server_format_list_response(CliprdrClientContext*
-        context, CLIPRDR_FORMAT_LIST_RESPONSE* formatListResponse)
+static UINT xf_cliprdr_server_format_list_response(CliprdrClientContext* context,
+                                                   CLIPRDR_FORMAT_LIST_RESPONSE* formatListResponse)
 {
-	//xfClipboard* clipboard = (xfClipboard*) context->custom;
+	// xfClipboard* clipboard = (xfClipboard*) context->custom;
 	return CHANNEL_RC_OK;
 }
 
@@ -1313,7 +1256,7 @@ static UINT xf_cliprdr_server_format_list_response(CliprdrClientContext*
  * @return 0 on success, otherwise a Win32 error code
  */
 static UINT xf_cliprdr_server_format_data_request(CliprdrClientContext* context,
-        CLIPRDR_FORMAT_DATA_REQUEST* formatDataRequest)
+                                                  CLIPRDR_FORMAT_DATA_REQUEST* formatDataRequest)
 {
 	BOOL rawTransfer;
 	xfCliprdrFormat* format = NULL;
@@ -1325,8 +1268,8 @@ static UINT xf_cliprdr_server_format_data_request(CliprdrClientContext* context,
 	if (rawTransfer)
 	{
 		format = xf_cliprdr_get_client_format_by_id(clipboard, CF_RAW);
-		XChangeProperty(xfc->display, xfc->drawable, clipboard->property_atom,
-		                XA_INTEGER, 32, PropModeReplace, (BYTE*) &formatId, 1);
+		XChangeProperty(xfc->display, xfc->drawable, clipboard->property_atom, XA_INTEGER, 32, PropModeReplace,
+		                (BYTE*) &formatId, 1);
 	}
 	else
 		format = xf_cliprdr_get_client_format_by_id(clipboard, formatId);
@@ -1335,8 +1278,8 @@ static UINT xf_cliprdr_server_format_data_request(CliprdrClientContext* context,
 		return xf_cliprdr_send_data_response(clipboard, NULL, 0);
 
 	clipboard->requestedFormatId = rawTransfer ? CF_RAW : formatId;
-	XConvertSelection(xfc->display, clipboard->clipboard_atom,
-	                  format->atom, clipboard->property_atom, xfc->drawable, CurrentTime);
+	XConvertSelection(xfc->display, clipboard->clipboard_atom, format->atom, clipboard->property_atom, xfc->drawable,
+	                  CurrentTime);
 	XFlush(xfc->display);
 	/* After this point, we expect a SelectionNotify event from the clipboard owner. */
 	return CHANNEL_RC_OK;
@@ -1347,8 +1290,8 @@ static UINT xf_cliprdr_server_format_data_request(CliprdrClientContext* context,
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT xf_cliprdr_server_format_data_response(CliprdrClientContext*
-        context, CLIPRDR_FORMAT_DATA_RESPONSE* formatDataResponse)
+static UINT xf_cliprdr_server_format_data_response(CliprdrClientContext* context,
+                                                   CLIPRDR_FORMAT_DATA_RESPONSE* formatDataResponse)
 {
 	BOOL bSuccess;
 	BYTE* pDstData;
@@ -1462,12 +1405,11 @@ static UINT xf_cliprdr_server_format_data_response(CliprdrClientContext*
 	}
 	else
 	{
-		WLog_WARN(TAG, "failed to allocate %"PRIu32" bytes for a copy of raw clipboard data", size);
+		WLog_WARN(TAG, "failed to allocate %" PRIu32 " bytes for a copy of raw clipboard data", size);
 	}
 
 	xf_cliprdr_provide_data(clipboard, clipboard->respond, pDstData, DstSize);
-	XSendEvent(xfc->display, clipboard->respond->xselection.requestor, 0, 0,
-	           clipboard->respond);
+	XSendEvent(xfc->display, clipboard->respond->xselection.requestor, 0, 0, clipboard->respond);
 	XFlush(xfc->display);
 	free(clipboard->respond);
 	clipboard->respond = NULL;
@@ -1475,7 +1417,7 @@ static UINT xf_cliprdr_server_format_data_response(CliprdrClientContext*
 }
 
 static UINT xf_cliprdr_server_file_size_request(xfClipboard* clipboard,
-        const CLIPRDR_FILE_CONTENTS_REQUEST* fileContentsRequest)
+                                                const CLIPRDR_FILE_CONTENTS_REQUEST* fileContentsRequest)
 {
 	wClipboardFileSizeRequest request;
 	ZeroMemory(&request, sizeof(request));
@@ -1484,15 +1426,14 @@ static UINT xf_cliprdr_server_file_size_request(xfClipboard* clipboard,
 
 	if (fileContentsRequest->cbRequested != sizeof(UINT64))
 	{
-		WLog_WARN(TAG, "unexpected FILECONTENTS_SIZE request: %"PRIu32" bytes",
-		          fileContentsRequest->cbRequested);
+		WLog_WARN(TAG, "unexpected FILECONTENTS_SIZE request: %" PRIu32 " bytes", fileContentsRequest->cbRequested);
 	}
 
 	return clipboard->delegate->ClientRequestFileSize(clipboard->delegate, &request);
 }
 
 static UINT xf_cliprdr_server_file_range_request(xfClipboard* clipboard,
-        const CLIPRDR_FILE_CONTENTS_REQUEST* fileContentsRequest)
+                                                 const CLIPRDR_FILE_CONTENTS_REQUEST* fileContentsRequest)
 {
 	wClipboardFileRangeRequest request;
 	ZeroMemory(&request, sizeof(request));
@@ -1505,7 +1446,7 @@ static UINT xf_cliprdr_server_file_range_request(xfClipboard* clipboard,
 }
 
 static UINT xf_cliprdr_send_file_contents_failure(CliprdrClientContext* context,
-        const CLIPRDR_FILE_CONTENTS_REQUEST* fileContentsRequest)
+                                                  const CLIPRDR_FILE_CONTENTS_REQUEST* fileContentsRequest)
 {
 	CLIPRDR_FILE_CONTENTS_RESPONSE response;
 	ZeroMemory(&response, sizeof(response));
@@ -1516,7 +1457,7 @@ static UINT xf_cliprdr_send_file_contents_failure(CliprdrClientContext* context,
 }
 
 static UINT xf_cliprdr_server_file_contents_request(CliprdrClientContext* context,
-        CLIPRDR_FILE_CONTENTS_REQUEST* fileContentsRequest)
+                                                    CLIPRDR_FILE_CONTENTS_REQUEST* fileContentsRequest)
 {
 	UINT error = NO_ERROR;
 	xfClipboard* clipboard = context->custom;
@@ -1548,7 +1489,7 @@ static UINT xf_cliprdr_server_file_contents_request(CliprdrClientContext* contex
 }
 
 static UINT xf_cliprdr_clipboard_file_size_success(wClipboardDelegate* delegate,
-        const wClipboardFileSizeRequest* request, UINT64 fileSize)
+                                                   const wClipboardFileSizeRequest* request, UINT64 fileSize)
 {
 	CLIPRDR_FILE_CONTENTS_RESPONSE response;
 	xfClipboard* clipboard = delegate->custom;
@@ -1562,7 +1503,7 @@ static UINT xf_cliprdr_clipboard_file_size_success(wClipboardDelegate* delegate,
 }
 
 static UINT xf_cliprdr_clipboard_file_size_failure(wClipboardDelegate* delegate,
-        const wClipboardFileSizeRequest* request, UINT errorCode)
+                                                   const wClipboardFileSizeRequest* request, UINT errorCode)
 {
 	CLIPRDR_FILE_CONTENTS_RESPONSE response;
 	xfClipboard* clipboard = delegate->custom;
@@ -1574,7 +1515,8 @@ static UINT xf_cliprdr_clipboard_file_size_failure(wClipboardDelegate* delegate,
 }
 
 static UINT xf_cliprdr_clipboard_file_range_success(wClipboardDelegate* delegate,
-        const wClipboardFileRangeRequest* request, const BYTE* data, UINT32 size)
+                                                    const wClipboardFileRangeRequest* request, const BYTE* data,
+                                                    UINT32 size)
 {
 	CLIPRDR_FILE_CONTENTS_RESPONSE response;
 	xfClipboard* clipboard = delegate->custom;
@@ -1588,7 +1530,7 @@ static UINT xf_cliprdr_clipboard_file_range_success(wClipboardDelegate* delegate
 }
 
 static UINT xf_cliprdr_clipboard_file_range_failure(wClipboardDelegate* delegate,
-        const wClipboardFileRangeRequest* request, UINT errorCode)
+                                                    const wClipboardFileRangeRequest* request, UINT errorCode)
 {
 	CLIPRDR_FILE_CONTENTS_RESPONSE response;
 	xfClipboard* clipboard = delegate->custom;
@@ -1628,21 +1570,19 @@ xfClipboard* xf_clipboard_new(xfContext* xfc)
 
 	clipboard->property_atom = XInternAtom(xfc->display, "_FREERDP_CLIPRDR", FALSE);
 	clipboard->raw_transfer_atom = XInternAtom(xfc->display, "_FREERDP_CLIPRDR_RAW", FALSE);
-	clipboard->raw_format_list_atom =
-	    XInternAtom(xfc->display, "_FREERDP_CLIPRDR_FORMATS", FALSE);
+	clipboard->raw_format_list_atom = XInternAtom(xfc->display, "_FREERDP_CLIPRDR_FORMATS", FALSE);
 	xf_cliprdr_set_raw_transfer_enabled(clipboard, TRUE);
 	XSelectInput(xfc->display, clipboard->root_window, PropertyChangeMask);
 #ifdef WITH_XFIXES
 
-	if (XFixesQueryExtension(xfc->display, &clipboard->xfixes_event_base,
-	                         &clipboard->xfixes_error_base))
+	if (XFixesQueryExtension(xfc->display, &clipboard->xfixes_event_base, &clipboard->xfixes_error_base))
 	{
 		int xfmajor, xfminor;
 
 		if (XFixesQueryVersion(xfc->display, &xfmajor, &xfminor))
 		{
-			XFixesSelectSelectionInput(xfc->display, clipboard->root_window,
-			                           clipboard->clipboard_atom, XFixesSetSelectionOwnerNotifyMask);
+			XFixesSelectSelectionInput(xfc->display, clipboard->root_window, clipboard->clipboard_atom,
+			                           XFixesSetSelectionOwnerNotifyMask);
 			clipboard->xfixes_supported = TRUE;
 		}
 		else
@@ -1656,8 +1596,7 @@ xfClipboard* xf_clipboard_new(xfContext* xfc)
 	}
 
 #else
-	WLog_ERR(TAG,
-	         "Warning: Using clipboard redirection without XFIXES extension is strongly discouraged!");
+	WLog_ERR(TAG, "Warning: Using clipboard redirection without XFIXES extension is strongly discouraged!");
 #endif
 	clipboard->clientFormats[n].atom = XInternAtom(xfc->display, "_FREERDP_RAW", False);
 	clipboard->clientFormats[n].formatId = CF_RAW;

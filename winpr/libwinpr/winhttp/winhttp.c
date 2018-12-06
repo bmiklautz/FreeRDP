@@ -25,7 +25,7 @@
 
 /**
  * winhttp.dll:
- * 
+ *
  * WinHttpAddRequestHeaders
  * WinHttpAutoProxySvcMain
  * WinHttpCheckPlatform
@@ -69,15 +69,9 @@
 
 #ifndef _WIN32
 
-BOOL WinHttpTimeFromSystemTime(const SYSTEMTIME* pst, LPWSTR pwszTime)
-{
-	return TRUE;
-}
+BOOL WinHttpTimeFromSystemTime(const SYSTEMTIME* pst, LPWSTR pwszTime) { return TRUE; }
 
-BOOL WinHttpTimeToSystemTime(LPCWSTR pwszTime, SYSTEMTIME* pst)
-{
-	return TRUE;
-}
+BOOL WinHttpTimeToSystemTime(LPCWSTR pwszTime, SYSTEMTIME* pst) { return TRUE; }
 
 BOOL WinHttpCrackUrl(LPCWSTR pwszUrl, DWORD dwUrlLength, DWORD dwFlags, LPURL_COMPONENTS lpUrlComponents)
 {
@@ -89,30 +83,18 @@ BOOL WinHttpCreateUrl(LPURL_COMPONENTS lpUrlComponents, DWORD dwFlags, LPWSTR pw
 	return TRUE;
 }
 
-BOOL WinHttpCheckPlatform(void)
-{
-	return TRUE;
-}
+BOOL WinHttpCheckPlatform(void) { return TRUE; }
 
-BOOL WinHttpGetDefaultProxyConfiguration(WINHTTP_PROXY_INFO* pProxyInfo)
-{
-	return TRUE;
-}
+BOOL WinHttpGetDefaultProxyConfiguration(WINHTTP_PROXY_INFO* pProxyInfo) { return TRUE; }
 
-BOOL WinHttpSetDefaultProxyConfiguration(WINHTTP_PROXY_INFO* pProxyInfo)
-{
-	return TRUE;
-}
+BOOL WinHttpSetDefaultProxyConfiguration(WINHTTP_PROXY_INFO* pProxyInfo) { return TRUE; }
 
 HINTERNET WinHttpOpen(LPCWSTR pszAgentW, DWORD dwAccessType, LPCWSTR pszProxyW, LPCWSTR pszProxyBypassW, DWORD dwFlags)
 {
 	return NULL;
 }
 
-BOOL WinHttpCloseHandle(HINTERNET hInternet)
-{
-	return TRUE;
-}
+BOOL WinHttpCloseHandle(HINTERNET hInternet) { return TRUE; }
 
 HINTERNET WinHttpConnect(HINTERNET hSession, LPCWSTR pswzServerName, INTERNET_PORT nServerPort, DWORD dwReserved)
 {
@@ -124,45 +106,38 @@ BOOL WinHttpReadData(HINTERNET hRequest, LPVOID lpBuffer, DWORD dwNumberOfBytesT
 	return TRUE;
 }
 
-BOOL WinHttpWriteData(HINTERNET hRequest, LPCVOID lpBuffer, DWORD dwNumberOfBytesToWrite, LPDWORD lpdwNumberOfBytesWritten)
+BOOL WinHttpWriteData(HINTERNET hRequest, LPCVOID lpBuffer, DWORD dwNumberOfBytesToWrite,
+                      LPDWORD lpdwNumberOfBytesWritten)
 {
 	return TRUE;
 }
 
-BOOL WinHttpQueryDataAvailable(HINTERNET hRequest, LPDWORD lpdwNumberOfBytesAvailable)
+BOOL WinHttpQueryDataAvailable(HINTERNET hRequest, LPDWORD lpdwNumberOfBytesAvailable) { return TRUE; }
+
+BOOL WinHttpQueryOption(HINTERNET hInternet, DWORD dwOption, LPVOID lpBuffer, LPDWORD lpdwBufferLength) { return TRUE; }
+
+BOOL WinHttpSetOption(HINTERNET hInternet, DWORD dwOption, LPVOID lpBuffer, DWORD dwBufferLength) { return TRUE; }
+
+BOOL WinHttpSetTimeouts(HINTERNET hInternet, int nResolveTimeout, int nConnectTimeout, int nSendTimeout,
+                        int nReceiveTimeout)
 {
 	return TRUE;
 }
 
-BOOL WinHttpQueryOption(HINTERNET hInternet, DWORD dwOption, LPVOID lpBuffer, LPDWORD lpdwBufferLength)
-{
-	return TRUE;
-}
-
-BOOL WinHttpSetOption(HINTERNET hInternet, DWORD dwOption, LPVOID lpBuffer, DWORD dwBufferLength)
-{
-	return TRUE;
-}
-
-BOOL WinHttpSetTimeouts(HINTERNET hInternet, int nResolveTimeout, int nConnectTimeout, int nSendTimeout, int nReceiveTimeout)
-{
-	return TRUE;
-}
-
-DWORD WinHttpIsHostInProxyBypassList(const WINHTTP_PROXY_INFO* pProxyInfo, PCWSTR pwszHost,
-		INTERNET_SCHEME tScheme, INTERNET_PORT nPort, BOOL* pfIsInBypassList)
+DWORD WinHttpIsHostInProxyBypassList(const WINHTTP_PROXY_INFO* pProxyInfo, PCWSTR pwszHost, INTERNET_SCHEME tScheme,
+                                     INTERNET_PORT nPort, BOOL* pfIsInBypassList)
 {
 	return 0;
 }
 
-WINHTTP_STATUS_CALLBACK WinHttpSetStatusCallback(HINTERNET hInternet,
-		WINHTTP_STATUS_CALLBACK lpfnInternetCallback, DWORD dwNotificationFlags, DWORD_PTR dwReserved)
+WINHTTP_STATUS_CALLBACK WinHttpSetStatusCallback(HINTERNET hInternet, WINHTTP_STATUS_CALLBACK lpfnInternetCallback,
+                                                 DWORD dwNotificationFlags, DWORD_PTR dwReserved)
 {
 	return NULL;
 }
 
-HINTERNET WinHttpOpenRequest(HINTERNET hConnect, LPCWSTR pwszVerb, LPCWSTR pwszObjectName,
-		LPCWSTR pwszVersion, LPCWSTR pwszReferrer, LPCWSTR* ppwszAcceptTypes, DWORD dwFlags)
+HINTERNET WinHttpOpenRequest(HINTERNET hConnect, LPCWSTR pwszVerb, LPCWSTR pwszObjectName, LPCWSTR pwszVersion,
+                             LPCWSTR pwszReferrer, LPCWSTR* ppwszAcceptTypes, DWORD dwFlags)
 {
 	return NULL;
 }
@@ -172,53 +147,42 @@ BOOL WinHttpAddRequestHeaders(HINTERNET hRequest, LPCWSTR pwszHeaders, DWORD dwH
 	return TRUE;
 }
 
-BOOL WinHttpSendRequest(HINTERNET hRequest, LPCWSTR lpszHeaders, DWORD dwHeadersLength,
-		LPVOID lpOptional, DWORD dwOptionalLength, DWORD dwTotalLength, DWORD_PTR dwContext)
+BOOL WinHttpSendRequest(HINTERNET hRequest, LPCWSTR lpszHeaders, DWORD dwHeadersLength, LPVOID lpOptional,
+                        DWORD dwOptionalLength, DWORD dwTotalLength, DWORD_PTR dwContext)
 {
 	return TRUE;
 }
 
-BOOL WinHttpSetCredentials(HINTERNET hRequest, DWORD AuthTargets, DWORD AuthScheme,
-		LPCWSTR pwszUserName, LPCWSTR pwszPassword, LPVOID pAuthParams)
+BOOL WinHttpSetCredentials(HINTERNET hRequest, DWORD AuthTargets, DWORD AuthScheme, LPCWSTR pwszUserName,
+                           LPCWSTR pwszPassword, LPVOID pAuthParams)
 {
 	return TRUE;
 }
 
-BOOL WinHttpQueryAuthSchemes(HINTERNET hRequest, LPDWORD lpdwSupportedSchemes, LPDWORD lpdwFirstScheme, LPDWORD pdwAuthTarget)
+BOOL WinHttpQueryAuthSchemes(HINTERNET hRequest, LPDWORD lpdwSupportedSchemes, LPDWORD lpdwFirstScheme,
+                             LPDWORD pdwAuthTarget)
 {
 	return TRUE;
 }
 
-BOOL WinHttpQueryAuthParams(HINTERNET hRequest, DWORD AuthScheme, LPVOID* pAuthParams)
+BOOL WinHttpQueryAuthParams(HINTERNET hRequest, DWORD AuthScheme, LPVOID* pAuthParams) { return TRUE; }
+
+BOOL WinHttpReceiveResponse(HINTERNET hRequest, LPVOID lpReserved) { return TRUE; }
+
+BOOL WinHttpQueryHeaders(HINTERNET hRequest, DWORD dwInfoLevel, LPCWSTR pwszName, LPVOID lpBuffer,
+                         LPDWORD lpdwBufferLength, LPDWORD lpdwIndex)
 {
 	return TRUE;
 }
 
-BOOL WinHttpReceiveResponse(HINTERNET hRequest, LPVOID lpReserved)
+BOOL WinHttpDetectAutoProxyConfigUrl(DWORD dwAutoDetectFlags, LPWSTR* ppwstrAutoConfigUrl) { return TRUE; }
+
+BOOL WinHttpGetProxyForUrl(HINTERNET hSession, LPCWSTR lpcwszUrl, WINHTTP_AUTOPROXY_OPTIONS* pAutoProxyOptions,
+                           WINHTTP_PROXY_INFO* pProxyInfo)
 {
 	return TRUE;
 }
 
-BOOL WinHttpQueryHeaders(HINTERNET hRequest, DWORD dwInfoLevel, LPCWSTR pwszName,
-		LPVOID lpBuffer, LPDWORD lpdwBufferLength, LPDWORD lpdwIndex)
-{
-	return TRUE;
-}
-
-BOOL WinHttpDetectAutoProxyConfigUrl(DWORD dwAutoDetectFlags, LPWSTR* ppwstrAutoConfigUrl)
-{
-	return TRUE;
-}
-
-BOOL WinHttpGetProxyForUrl(HINTERNET hSession, LPCWSTR lpcwszUrl,
-		WINHTTP_AUTOPROXY_OPTIONS* pAutoProxyOptions, WINHTTP_PROXY_INFO* pProxyInfo)
-{
-	return TRUE;
-}
-
-BOOL WinHttpGetIEProxyConfigForCurrentUser(WINHTTP_CURRENT_USER_IE_PROXY_CONFIG* pProxyConfig)
-{
-	return TRUE;
-}
+BOOL WinHttpGetIEProxyConfigForCurrentUser(WINHTTP_CURRENT_USER_IE_PROXY_CONFIG* pProxyConfig) { return TRUE; }
 
 #endif

@@ -149,8 +149,7 @@ int winpr_bitmap_write(const char* filename, BYTE* data, int width, int height, 
 
 	Stream_SealLength(s);
 
-	if (fwrite(Stream_Buffer(s), Stream_Length(s), 1, fp) != 1 ||
-	    fwrite((void*) data, bi.biSizeImage, 1, fp) != 1)
+	if (fwrite(Stream_Buffer(s), Stream_Length(s), 1, fp) != 1 || fwrite((void*) data, bi.biSizeImage, 1, fp) != 1)
 		goto fail;
 
 	ret = 1;
@@ -166,8 +165,7 @@ int winpr_image_write(wImage* image, const char* filename)
 
 	if (image->type == WINPR_IMAGE_BITMAP)
 	{
-		status = winpr_bitmap_write(filename, image->data, image->width, image->height,
-		                            image->bitsPerPixel);
+		status = winpr_bitmap_write(filename, image->data, image->width, image->height, image->bitsPerPixel);
 	}
 	else
 	{
@@ -414,8 +412,8 @@ int winpr_image_read(wImage* image, const char* filename)
 		image->type = WINPR_IMAGE_BITMAP;
 		status = winpr_image_bitmap_read_fp(image, fp);
 	}
-	else if ((sig[0] == 0x89) && (sig[1] == 'P') && (sig[2] == 'N') && (sig[3] == 'G') &&
-	         (sig[4] == '\r') && (sig[5] == '\n') && (sig[6] == 0x1A) && (sig[7] == '\n'))
+	else if ((sig[0] == 0x89) && (sig[1] == 'P') && (sig[2] == 'N') && (sig[3] == 'G') && (sig[4] == '\r') &&
+	         (sig[5] == '\n') && (sig[6] == 0x1A) && (sig[7] == '\n'))
 	{
 		image->type = WINPR_IMAGE_PNG;
 		status = winpr_image_png_read_fp(image, fp);
@@ -440,8 +438,8 @@ int winpr_image_read_buffer(wImage* image, BYTE* buffer, int size)
 		image->type = WINPR_IMAGE_BITMAP;
 		status = winpr_image_bitmap_read_buffer(image, buffer, size);
 	}
-	else if ((sig[0] == 0x89) && (sig[1] == 'P') && (sig[2] == 'N') && (sig[3] == 'G') &&
-	         (sig[4] == '\r') && (sig[5] == '\n') && (sig[6] == 0x1A) && (sig[7] == '\n'))
+	else if ((sig[0] == 0x89) && (sig[1] == 'P') && (sig[2] == 'N') && (sig[3] == 'G') && (sig[4] == '\r') &&
+	         (sig[5] == '\n') && (sig[6] == 0x1A) && (sig[7] == '\n'))
 	{
 		image->type = WINPR_IMAGE_PNG;
 		status = winpr_image_png_read_buffer(image, buffer, size);

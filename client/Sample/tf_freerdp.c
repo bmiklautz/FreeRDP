@@ -71,8 +71,7 @@ static BOOL tf_end_paint(rdpContext* context)
 }
 
 /* This function is called to output a System BEEP */
-static BOOL tf_play_sound(rdpContext* context,
-                          const PLAY_SOUND_UPDATE* play_sound)
+static BOOL tf_play_sound(rdpContext* context, const PLAY_SOUND_UPDATE* play_sound)
 {
 	/* TODO: Implement */
 	return TRUE;
@@ -86,14 +85,13 @@ static BOOL tf_keyboard_set_indicators(rdpContext* context, UINT16 led_flags)
 }
 
 /* This function is called to set the IME state */
-static BOOL tf_keyboard_set_ime_status(rdpContext* context, UINT16 imeId, UINT32 imeState,
-                                       UINT32 imeConvMode)
+static BOOL tf_keyboard_set_ime_status(rdpContext* context, UINT16 imeId, UINT32 imeState, UINT32 imeConvMode)
 {
 	if (!context)
 		return FALSE;
 
 	WLog_WARN(TAG,
-	          "KeyboardSetImeStatus(unitId=%04"PRIx16", imeState=%08"PRIx32", imeConvMode=%08"PRIx32") ignored",
+	          "KeyboardSetImeStatus(unitId=%04" PRIx16 ", imeState=%08" PRIx32 ", imeConvMode=%08" PRIx32 ") ignored",
 	          imeId, imeState, imeConvMode);
 	return TRUE;
 }
@@ -112,15 +110,12 @@ static BOOL tf_pre_connect(freerdp* instance)
 	 * callbacks or deactiveate certain features. */
 	/* Register the channel listeners.
 	 * They are required to set up / tear down channels if they are loaded. */
-	PubSub_SubscribeChannelConnected(instance->context->pubSub,
-	                                 tf_OnChannelConnectedEventHandler);
-	PubSub_SubscribeChannelDisconnected(instance->context->pubSub,
-	                                    tf_OnChannelDisconnectedEventHandler);
+	PubSub_SubscribeChannelConnected(instance->context->pubSub, tf_OnChannelConnectedEventHandler);
+	PubSub_SubscribeChannelDisconnected(instance->context->pubSub, tf_OnChannelDisconnectedEventHandler);
 
 	/* Load all required plugins / channels / libraries specified by current
 	 * settings. */
-	if (!freerdp_client_load_addins(instance->context->channels,
-	                                instance->settings))
+	if (!freerdp_client_load_addins(instance->context->channels, instance->settings))
 		return FALSE;
 
 	/* TODO: Any code your client requires */
@@ -162,10 +157,8 @@ static void tf_post_disconnect(freerdp* instance)
 		return;
 
 	context = (tfContext*) instance->context;
-	PubSub_UnsubscribeChannelConnected(instance->context->pubSub,
-	                                   tf_OnChannelConnectedEventHandler);
-	PubSub_UnsubscribeChannelDisconnected(instance->context->pubSub,
-	                                      tf_OnChannelDisconnectedEventHandler);
+	PubSub_UnsubscribeChannelConnected(instance->context->pubSub, tf_OnChannelConnectedEventHandler);
+	PubSub_UnsubscribeChannelDisconnected(instance->context->pubSub, tf_OnChannelDisconnectedEventHandler);
 	gdi_free(instance);
 	/* TODO : Clean up custom stuff */
 }
@@ -175,7 +168,7 @@ static void tf_post_disconnect(freerdp* instance)
  * after the connection ends. */
 static DWORD WINAPI tf_client_thread_proc(LPVOID arg)
 {
-	freerdp* instance = (freerdp*)arg;
+	freerdp* instance = (freerdp*) arg;
 	DWORD nCount;
 	DWORD status;
 	HANDLE handles[64];
@@ -200,8 +193,7 @@ static DWORD WINAPI tf_client_thread_proc(LPVOID arg)
 
 		if (status == WAIT_FAILED)
 		{
-			WLog_ERR(TAG, "%s: WaitForMultipleObjects failed with %"PRIu32"", __FUNCTION__,
-			         status);
+			WLog_ERR(TAG, "%s: WaitForMultipleObjects failed with %" PRIu32 "", __FUNCTION__, status);
 			break;
 		}
 
@@ -230,9 +222,7 @@ static BOOL tf_client_global_init(void)
 }
 
 /* Optional global tear down */
-static void tf_client_global_uninit(void)
-{
-}
+static void tf_client_global_uninit(void) {}
 
 static int tf_logon_error_info(freerdp* instance, UINT32 data, UINT32 type)
 {
@@ -266,7 +256,6 @@ static BOOL tf_client_new(freerdp* instance, rdpContext* context)
 	/* TODO: Client display set up */
 	return TRUE;
 }
-
 
 static void tf_client_free(freerdp* instance, rdpContext* context)
 {
@@ -317,10 +306,8 @@ int main(int argc, char* argv[])
 	if (!context)
 		goto fail;
 
-	status = freerdp_client_settings_parse_command_line(context->settings, argc,
-	         argv, FALSE);
-	status = freerdp_client_settings_command_line_status_print(context->settings,
-	         status, argc, argv);
+	status = freerdp_client_settings_parse_command_line(context->settings, argc, argv, FALSE);
+	status = freerdp_client_settings_command_line_status_print(context->settings, status, argc, argv);
 
 	if (status)
 		return 0;

@@ -40,42 +40,31 @@ struct mydata_decomp
 };
 
 /*****************************************************************************/
-static void my_init_source(j_decompress_ptr cinfo)
-{
-}
+static void my_init_source(j_decompress_ptr cinfo) {}
 
 /*****************************************************************************/
 static boolean my_fill_input_buffer(j_decompress_ptr cinfo)
 {
 	struct mydata_decomp* md;
 
-	md = (struct mydata_decomp*)(cinfo->client_data);
-	cinfo->src->next_input_byte = (unsigned char*)(md->data);
+	md = (struct mydata_decomp*) (cinfo->client_data);
+	cinfo->src->next_input_byte = (unsigned char*) (md->data);
 	cinfo->src->bytes_in_buffer = md->data_bytes;
 	return 1;
 }
 
 /*****************************************************************************/
-static void my_skip_input_data(j_decompress_ptr cinfo, long num_bytes)
-{
-}
+static void my_skip_input_data(j_decompress_ptr cinfo, long num_bytes) {}
 
 /*****************************************************************************/
-static boolean my_resync_to_restart(j_decompress_ptr cinfo, int desired)
-{
-	return 1;
-}
+static boolean my_resync_to_restart(j_decompress_ptr cinfo, int desired) { return 1; }
 
 /*****************************************************************************/
-static void my_term_source(j_decompress_ptr cinfo)
-{
-}
+static void my_term_source(j_decompress_ptr cinfo) {}
 
 /*****************************************************************************/
-static int
-do_decompress(char* comp_data, int comp_data_bytes,
-              int* width, int* height, int* bpp,
-              char* decomp_data, int* decomp_data_bytes)
+static int do_decompress(char* comp_data, int comp_data_bytes, int* width, int* height, int* bpp, char* decomp_data,
+                         int* decomp_data_bytes)
 {
 	struct jpeg_decompress_struct cinfo;
 	struct jpeg_error_mgr jerr;
@@ -110,14 +99,13 @@ do_decompress(char* comp_data, int comp_data_bytes,
 
 	jpeg_start_decompress(&cinfo);
 
-	while(cinfo.output_scanline < cinfo.image_height)
+	while (cinfo.output_scanline < cinfo.image_height)
 	{
 		row_pointer[0] = (JSAMPROW) decomp_data;
 		jpeg_read_scanlines(&cinfo, row_pointer, 1);
 		decomp_data += cinfo.image_width * cinfo.num_components;
 	}
-	*decomp_data_bytes = cinfo.output_width *
-			cinfo.output_height * cinfo.num_components;
+	*decomp_data_bytes = cinfo.output_width * cinfo.output_height * cinfo.num_components;
 	jpeg_finish_decompress(&cinfo);
 	jpeg_destroy_decompress(&cinfo);
 	return 0;
@@ -135,9 +123,7 @@ BOOL jpeg_decompress(BYTE* input, BYTE* output, int width, int height, int size,
 	{
 		return 0;
 	}
-	if (do_decompress((char*)input, size,
-			&lwidth, &lheight, &lbpp,
-			(char*)output, &ldecomp_data_bytes) != 0)
+	if (do_decompress((char*) input, size, &lwidth, &lheight, &lbpp, (char*) output, &ldecomp_data_bytes) != 0)
 	{
 		return 0;
 	}
@@ -150,9 +136,6 @@ BOOL jpeg_decompress(BYTE* input, BYTE* output, int width, int height, int size,
 
 #else
 
-BOOL jpeg_decompress(BYTE* input, BYTE* output, int width, int height, int size, int bpp)
-{
-	return 0;
-}
+BOOL jpeg_decompress(BYTE* input, BYTE* output, int width, int height, int size, int bpp) { return 0; }
 
 #endif

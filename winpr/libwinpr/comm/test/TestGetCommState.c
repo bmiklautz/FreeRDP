@@ -38,7 +38,6 @@ static BOOL test_generic(HANDLE hComm)
 		return FALSE;
 	}
 
-
 	ZeroMemory(&dcb, sizeof(DCB));
 	dcb.DCBlength = sizeof(DCB) / 2; /* improper value */
 	result = GetCommState(hComm, &dcb);
@@ -57,7 +56,7 @@ static BOOL test_generic(HANDLE hComm)
 		return FALSE;
 	}
 
-	pDcb = (DCB*)calloc(2, sizeof(DCB));
+	pDcb = (DCB*) calloc(2, sizeof(DCB));
 	if (!pDcb)
 		return FALSE;
 	pDcb->DCBlength = sizeof(DCB) * 2;
@@ -92,9 +91,7 @@ int TestGetCommState(int argc, char* argv[])
 		return EXIT_FAILURE;
 	}
 
-	hComm = CreateFileA("COM1",
-			GENERIC_READ | GENERIC_WRITE,
-			0, NULL, OPEN_EXISTING, 0, NULL);
+	hComm = CreateFileA("COM1", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
 
 	if (hComm == INVALID_HANDLE_VALUE)
 	{

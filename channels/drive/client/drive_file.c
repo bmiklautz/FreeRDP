@@ -46,9 +46,19 @@
 #include "drive_file.h"
 
 #ifdef WITH_DEBUG_RDPDR
-#define DEBUG_WSTR(msg, wstr) do { LPSTR lpstr; ConvertFromUnicode(CP_UTF8, 0, wstr, -1, &lpstr, 0, NULL, NULL); WLog_DBG(TAG, msg, lpstr); free(lpstr); } while (0)
+#define DEBUG_WSTR(msg, wstr)                                                                                          \
+	do                                                                                                                 \
+	{                                                                                                                  \
+		LPSTR lpstr;                                                                                                   \
+		ConvertFromUnicode(CP_UTF8, 0, wstr, -1, &lpstr, 0, NULL, NULL);                                               \
+		WLog_DBG(TAG, msg, lpstr);                                                                                     \
+		free(lpstr);                                                                                                   \
+	} while (0)
 #else
-#define DEBUG_WSTR(msg, wstr) do { } while (0)
+#define DEBUG_WSTR(msg, wstr)                                                                                          \
+	do                                                                                                                 \
+	{                                                                                                                  \
+	} while (0)
 #endif
 
 static void drive_file_fix_path(WCHAR* path)
@@ -79,8 +89,7 @@ static void drive_file_fix_path(WCHAR* path)
 		path[length - 1] = L'\0';
 }
 
-static WCHAR* drive_file_combine_fullpath(const WCHAR* base_path, const WCHAR* path,
-        UINT32 PathLength)
+static WCHAR* drive_file_combine_fullpath(const WCHAR* base_path, const WCHAR* path, UINT32 PathLength)
 {
 	WCHAR* fullpath;
 	UINT32 base_path_length;
@@ -89,7 +98,7 @@ static WCHAR* drive_file_combine_fullpath(const WCHAR* base_path, const WCHAR* p
 		return NULL;
 
 	base_path_length = _wcslen(base_path) * 2;
-	fullpath = (WCHAR*)calloc(1, base_path_length + PathLength + sizeof(WCHAR));
+	fullpath = (WCHAR*) calloc(1, base_path_length + PathLength + sizeof(WCHAR));
 
 	if (!fullpath)
 	{
@@ -98,7 +107,7 @@ static WCHAR* drive_file_combine_fullpath(const WCHAR* base_path, const WCHAR* p
 	}
 
 	CopyMemory(fullpath, base_path, base_path_length);
-	CopyMemory((char*)fullpath + base_path_length, path, PathLength);
+	CopyMemory((char*) fullpath + base_path_length, path, PathLength);
 	drive_file_fix_path(fullpath);
 	return fullpath;
 }
@@ -117,7 +126,7 @@ static BOOL drive_file_remove_dir(const WCHAR* path)
 		return FALSE;
 
 	base_path_length = _wcslen(path) * 2;
-	path_slash = (WCHAR*)calloc(1, base_path_length + sizeof(WCHAR) * 3);
+	path_slash = (WCHAR*) calloc(1, base_path_length + sizeof(WCHAR) * 3);
 
 	if (!path_slash)
 	{
@@ -142,8 +151,8 @@ static BOOL drive_file_remove_dir(const WCHAR* path)
 	{
 		len = _wcslen(findFileData.cFileName);
 
-		if ((len == 1 && findFileData.cFileName[0] == L'.') || (len == 2 &&
-		        findFileData.cFileName[0] == L'.' && findFileData.cFileName[1] == L'.'))
+		if ((len == 1 && findFileData.cFileName[0] == L'.') ||
+		    (len == 2 && findFileData.cFileName[0] == L'.' && findFileData.cFileName[1] == L'.'))
 		{
 			continue;
 		}
@@ -164,8 +173,7 @@ static BOOL drive_file_remove_dir(const WCHAR* path)
 
 		if (!ret)
 			break;
-	}
-	while (ret && FindNextFileW(dir, &findFileData) != 0);
+	} while (ret && FindNextFileW(dir, &findFileData) != 0);
 
 	FindClose(dir);
 
@@ -257,15 +265,18 @@ static BOOL drive_file_init(DRIVE_FILE* file)
 	{
 		switch (file->CreateDisposition)
 		{
-			case FILE_SUPERSEDE: /* If the file already exists, replace it with the given file. If it does not, create the given file. */
+			case FILE_SUPERSEDE: /* If the file already exists, replace it with the given file. If it does not, create
+			                        the given file. */
 				CreateDisposition = CREATE_ALWAYS;
 				break;
 
-			case FILE_OPEN: /* If the file already exists, open it instead of creating a new file. If it does not, fail the request and do not create a new file. */
+			case FILE_OPEN: /* If the file already exists, open it instead of creating a new file. If it does not, fail
+			                   the request and do not create a new file. */
 				CreateDisposition = OPEN_EXISTING;
 				break;
 
-			case FILE_CREATE: /* If the file already exists, fail the request and do not create or open the given file. If it does not, create the given file. */
+			case FILE_CREATE: /* If the file already exists, fail the request and do not create or open the given file.
+			                     If it does not, create the given file. */
 				CreateDisposition = CREATE_NEW;
 				break;
 
@@ -273,11 +284,13 @@ static BOOL drive_file_init(DRIVE_FILE* file)
 				CreateDisposition = OPEN_ALWAYS;
 				break;
 
-			case FILE_OVERWRITE: /* If the file already exists, open it and overwrite it. If it does not, fail the request. */
+			case FILE_OVERWRITE: /* If the file already exists, open it and overwrite it. If it does not, fail the
+			                        request. */
 				CreateDisposition = TRUNCATE_EXISTING;
 				break;
 
-			case FILE_OVERWRITE_IF: /* If the file already exists, open it and overwrite it. If it does not, create the given file. */
+			case FILE_OVERWRITE_IF: /* If the file already exists, open it and overwrite it. If it does not, create the
+			                           given file. */
 				CreateDisposition = CREATE_ALWAYS;
 				break;
 
@@ -288,9 +301,8 @@ static BOOL drive_file_init(DRIVE_FILE* file)
 #ifndef WIN32
 		file->SharedAccess = 0;
 #endif
-		file->file_handle = CreateFileW(file->fullpath, file->DesiredAccess,
-		                                file->SharedAccess, NULL, CreateDisposition,
-		                                file->FileAttributes, NULL);
+		file->file_handle = CreateFileW(file->fullpath, file->DesiredAccess, file->SharedAccess, NULL,
+		                                CreateDisposition, file->FileAttributes, NULL);
 	}
 
 	if (file->file_handle == INVALID_HANDLE_VALUE)
@@ -302,9 +314,9 @@ static BOOL drive_file_init(DRIVE_FILE* file)
 		{
 #ifdef WIN32
 			LPSTR messageBuffer = NULL;
-			size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
-			                             FORMAT_MESSAGE_IGNORE_INSERTS,
-			                             NULL, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&messageBuffer, 0, NULL);
+			size_t size = FormatMessageA(
+			  FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL,
+			  errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR) &messageBuffer, 0, NULL);
 			WLog_ERR(TAG, "Error in drive_file_init: %s %s", messageBuffer, file->fullpath);
 			/* Free the buffer. */
 			LocalFree(messageBuffer);
@@ -316,8 +328,8 @@ static BOOL drive_file_init(DRIVE_FILE* file)
 }
 
 DRIVE_FILE* drive_file_new(const WCHAR* base_path, const WCHAR* path, UINT32 PathLength, UINT32 id,
-                           UINT32 DesiredAccess, UINT32 CreateDisposition,
-                           UINT32 CreateOptions, UINT32 FileAttributes, UINT32 SharedAccess)
+                           UINT32 DesiredAccess, UINT32 CreateDisposition, UINT32 CreateOptions, UINT32 FileAttributes,
+                           UINT32 SharedAccess)
 {
 	DRIVE_FILE* file;
 
@@ -485,8 +497,8 @@ BOOL drive_file_query_information(DRIVE_FILE* file, UINT32 FsInformationClass, w
 			Stream_Write_UINT32(output, fileAttributes.nFileSizeHigh); /* EndOfFile */
 			Stream_Write_UINT32(output, 0); /* NumberOfLinks */
 			Stream_Write_UINT8(output, file->delete_pending ? 1 : 0); /* DeletePending */
-			Stream_Write_UINT8(output, fileAttributes.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ? TRUE :
-			                   FALSE); /* Directory */
+			Stream_Write_UINT8(
+			  output, fileAttributes.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ? TRUE : FALSE); /* Directory */
 			/* Reserved(2), MUST NOT be added! */
 			break;
 
@@ -512,8 +524,7 @@ out_fail:
 	return FALSE;
 }
 
-BOOL drive_file_set_information(DRIVE_FILE* file, UINT32 FsInformationClass, UINT32 Length,
-                                wStream* input)
+BOOL drive_file_set_information(DRIVE_FILE* file, UINT32 FsInformationClass, UINT32 Length, wStream* input)
 {
 	INT64 size;
 	WCHAR* fullpath;
@@ -555,7 +566,7 @@ BOOL drive_file_set_information(DRIVE_FILE* file, UINT32 FsInformationClass, UIN
 
 			if (file->file_handle == INVALID_HANDLE_VALUE)
 			{
-				WLog_ERR(TAG, "Unable to set file time %s (%"PRId32")", file->fullpath, GetLastError());
+				WLog_ERR(TAG, "Unable to set file time %s (%" PRId32 ")", file->fullpath, GetLastError());
 				return FALSE;
 			}
 
@@ -610,14 +621,14 @@ BOOL drive_file_set_information(DRIVE_FILE* file, UINT32 FsInformationClass, UIN
 
 			if (file->file_handle == INVALID_HANDLE_VALUE)
 			{
-				WLog_ERR(TAG, "Unable to truncate %s to %"PRId64" (%"PRId32")", file->fullpath, size,
+				WLog_ERR(TAG, "Unable to truncate %s to %" PRId64 " (%" PRId32 ")", file->fullpath, size,
 				         GetLastError());
 				return FALSE;
 			}
 
 			if (!SetFilePointerEx(file->file_handle, liSize, NULL, FILE_BEGIN))
 			{
-				WLog_ERR(TAG, "Unable to truncate %s to %d (%"PRId32")", file->fullpath, size, GetLastError());
+				WLog_ERR(TAG, "Unable to truncate %s to %d (%" PRId32 ")", file->fullpath, size, GetLastError());
 				return FALSE;
 			}
 
@@ -625,7 +636,7 @@ BOOL drive_file_set_information(DRIVE_FILE* file, UINT32 FsInformationClass, UIN
 
 			if (SetEndOfFile(file->file_handle) == 0)
 			{
-				WLog_ERR(TAG, "Unable to truncate %s to %d (%"PRId32")", file->fullpath, size, GetLastError());
+				WLog_ERR(TAG, "Unable to truncate %s to %d (%" PRId32 ")", file->fullpath, size, GetLastError());
 				return FALSE;
 			}
 
@@ -675,8 +686,7 @@ BOOL drive_file_set_information(DRIVE_FILE* file, UINT32 FsInformationClass, UIN
 			if (Stream_GetRemainingLength(input) < FileNameLength)
 				return FALSE;
 
-			fullpath = drive_file_combine_fullpath(file->basepath, (WCHAR*)Stream_Pointer(input),
-			                                       FileNameLength);
+			fullpath = drive_file_combine_fullpath(file->basepath, (WCHAR*) Stream_Pointer(input), FileNameLength);
 
 			if (!fullpath)
 			{
@@ -719,8 +729,8 @@ BOOL drive_file_set_information(DRIVE_FILE* file, UINT32 FsInformationClass, UIN
 	return TRUE;
 }
 
-BOOL drive_file_query_directory(DRIVE_FILE* file, UINT32 FsInformationClass, BYTE InitialQuery,
-                                const WCHAR* path, UINT32 PathLength, wStream* output)
+BOOL drive_file_query_directory(DRIVE_FILE* file, UINT32 FsInformationClass, BYTE InitialQuery, const WCHAR* path,
+                                UINT32 PathLength, wStream* output)
 {
 	size_t length;
 	WCHAR* ent_path;

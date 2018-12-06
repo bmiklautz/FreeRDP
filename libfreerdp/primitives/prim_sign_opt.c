@@ -32,10 +32,7 @@ static primitives_t* generic = NULL;
 
 #ifdef WITH_SSE2
 /* ------------------------------------------------------------------------- */
-static pstatus_t ssse3_sign_16s(
-    const INT16* pSrc,
-    INT16* pDst,
-    UINT32 len)
+static pstatus_t ssse3_sign_16s(const INT16* pSrc, INT16* pDst, UINT32 len)
 {
 	const INT16* sptr = (const INT16*) pSrc;
 	INT16* dptr = (INT16*) pDst;
@@ -58,12 +55,13 @@ static pstatus_t ssse3_sign_16s(
 		INT16 src = *sptr++;
 		*dptr++ = (src < 0) ? (-1) : ((src > 0) ? 1 : 0);
 
-		if (--len == 0) return PRIMITIVES_SUCCESS;
+		if (--len == 0)
+			return PRIMITIVES_SUCCESS;
 	}
 
 	/* Do 32-short chunks using 8 XMM registers. */
-	count = len >> 5;	/* / 32  */
-	len -= count << 5;	/* * 32 */
+	count = len >> 5; /* / 32  */
+	len -= count << 5; /* * 32 */
 
 	if ((ULONG_PTR) sptr & 0x0f)
 	{
@@ -164,12 +162,10 @@ void primitives_init_sign_opt(primitives_t* prims)
 	/* I didn't spot an IPP version of this. */
 #if defined(WITH_SSE2)
 
-	if (IsProcessorFeaturePresentEx(PF_EX_SSSE3)
-	    && IsProcessorFeaturePresent(PF_SSE3_INSTRUCTIONS_AVAILABLE))
+	if (IsProcessorFeaturePresentEx(PF_EX_SSSE3) && IsProcessorFeaturePresent(PF_SSE3_INSTRUCTIONS_AVAILABLE))
 	{
-		prims->sign_16s  = ssse3_sign_16s;
+		prims->sign_16s = ssse3_sign_16s;
 	}
 
 #endif
 }
-
