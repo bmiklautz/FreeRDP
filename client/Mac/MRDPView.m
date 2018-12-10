@@ -317,7 +317,9 @@ DWORD mac_client_thread(void* param)
 - (void) setCursor: (NSCursor*) cursor
 {
 	self->currentCursor = cursor;
-	[[self window] invalidateCursorRectsForView:self];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[self window] invalidateCursorRectsForView:self];
+    });
 }
 
 - (void) resetCursorRects
@@ -785,8 +787,7 @@ DWORD fixKeyCode(DWORD keyCode, unichar keyChar, enum APPLE_KEYBOARD_TYPE type)
 
 - (void) pause
 {
-	dispatch_async(dispatch_get_main_queue(), ^
-	{
+	dispatch_async(dispatch_get_main_queue(), ^{
 		[self->pasteboard_timer invalidate];
 	});
 	NSArray* trackingAreas = self.trackingAreas;
@@ -799,16 +800,16 @@ DWORD fixKeyCode(DWORD keyCode, unichar keyChar, enum APPLE_KEYBOARD_TYPE type)
 
 - (void)resume
 {
-	dispatch_async(dispatch_get_main_queue(), ^
-	{
-		self->pasteboard_timer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(onPasteboardTimerFired:) userInfo:nil repeats:YES];
-	});
-	NSTrackingArea* trackingArea = [[NSTrackingArea alloc] initWithRect:[self
+	dispatch_async(dispatch_get_main_queue(), ^{
+        self->pasteboard_timer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(onPasteboardTimerFired:) userInfo:nil repeats:YES];
+
+        NSTrackingArea* trackingArea = [[NSTrackingArea alloc] initWithRect:[self
 	                                                       visibleRect] options:NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved |
 	                                                       NSTrackingCursorUpdate | NSTrackingEnabledDuringMouseDrag |
 	                                                       NSTrackingActiveWhenFirstResponder owner:self userInfo:nil];
-	[self addTrackingArea:trackingArea];
-	[trackingArea release];
+        [self addTrackingArea:trackingArea];
+        [trackingArea release];
+    });
 }
 
 - (void) setScrollOffset:(int)xOffset y:(int)yOffset w:(int)width h:(int)height
@@ -922,8 +923,7 @@ BOOL mac_post_connect(freerdp* instance)
 	/* setup pasteboard (aka clipboard) for copy operations (write only) */
 	view->pasteboard_wr = [NSPasteboard generalPasteboard];
 	/* setup pasteboard for read operations */
-	dispatch_async(dispatch_get_main_queue(), ^
-	{
+	dispatch_async(dispatch_get_main_queue(), ^{
 		view->pasteboard_rd = [NSPasteboard generalPasteboard];
 		view->pasteboard_changecount = -1;
 	});
@@ -955,9 +955,11 @@ BOOL mac_authenticate(freerdp* instance, char** username, char** password,
 		dialog.domain = [NSString stringWithCString:*domain encoding:
 		                          NSUTF8StringEncoding];
 
-	[dialog performSelectorOnMainThread:@selector(runModal:) withObject:[view
-	        window] waitUntilDone:TRUE];
-	BOOL ok = dialog.modalCode;
+
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        [dialog performSelectorOnMainThread:@selector(runModal:) withObject:[view window] waitUntilDone:TRUE];
+    });
+BOOL ok = dialog.modalCode;
 
 	if (ok)
 	{
@@ -1217,7 +1219,9 @@ BOOL mac_end_paint(rdpContext* context)
 	}
 
 	windows_to_apple_cords(mfc->view, &newDrawRect);
-	[view setNeedsDisplayInRect:newDrawRect];
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        [view setNeedsDisplayInRect:newDrawRect];
+    });
 	gdi->primary->hdc->hwnd->ninvalid = 0;
 	return TRUE;
 }
@@ -1321,7 +1325,9 @@ void input_activity_cb(freerdp* instance)
 
 void windows_to_apple_cords(MRDPView* view, NSRect* r)
 {
-	r->origin.y = [view frame].size.height - (r->origin.y + r->size.height);
+    dispatch_sync(dispatch_get_main_queue(), ^{
+                   r->origin.y = [view frame].size.height - (r->origin.y + r->size.height);
+    });
 }
 
 void sync_keyboard_state(freerdp* instance)
