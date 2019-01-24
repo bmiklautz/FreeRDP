@@ -1119,6 +1119,11 @@ static LONG smartcard_StatusA_Decode(SMARTCARD_DEVICE* smartcard, SMARTCARD_OPER
 	if ((status = smartcard_unpack_status_call(smartcard, irp->input, call)))
 		WLog_ERR(TAG, "smartcard_unpack_status_call failed with error %"PRId32"", status);
 
+	/*
+	 * cbAtrLen is unused and should be ignored upon receipt according to MS-RDPESC 2.2.2.18
+	 * set it to the maximum value possible
+	 */
+	call->cbAtrLen = 32;
 	smartcard_trace_status_call(smartcard, call, FALSE);
 	operation->hContext = smartcard_scard_context_native_from_redir(smartcard, &(call->hContext));
 	operation->hCard = smartcard_scard_handle_native_from_redir(smartcard, &(call->hCard));
@@ -1130,13 +1135,11 @@ static LONG smartcard_StatusA_Call(SMARTCARD_DEVICE* smartcard, SMARTCARD_OPERAT
 	LONG status;
 	Status_Return ret = { 0 };
 	DWORD cchReaderLen = 0;
-	DWORD cbAtrLen = 0;
 	LPSTR mszReaderNames = NULL;
 	IRP* irp = operation->irp;
 	Status_Call* call = operation->call;
 	ZeroMemory(ret.pbAtr, 32);
-	call->cbAtrLen = 32;
-	cbAtrLen = call->cbAtrLen;
+	ret.cbAtrLen = 32;
 
 	if (call->fmszReaderNamesIsNULL)
 		cchReaderLen = 0;
@@ -1146,7 +1149,7 @@ static LONG smartcard_StatusA_Call(SMARTCARD_DEVICE* smartcard, SMARTCARD_OPERAT
 	status = ret.ReturnCode = SCardStatusA(operation->hCard,
 	                                       call->fmszReaderNamesIsNULL ? NULL : (LPSTR) &mszReaderNames,
 	                                       &cchReaderLen, &ret.dwState, &ret.dwProtocol,
-	                                       cbAtrLen ? (BYTE*) &ret.pbAtr : NULL, &cbAtrLen);
+	                                       &ret.pbAtr, &ret.cbAtrLen);
 
 	if (status == SCARD_S_SUCCESS)
 	{
@@ -1155,8 +1158,12 @@ static LONG smartcard_StatusA_Call(SMARTCARD_DEVICE* smartcard, SMARTCARD_OPERAT
 
 		ret.cBytes = cchReaderLen;
 
-		if (call->cbAtrLen)
-			ret.cbAtrLen = cbAtrLen;
+		if (ret.cbAtrLen > 32)
+		{
+			WLog_WARN(TAG, "smartcard_StatusA_Call cbAtrLen > 32 (%"PRId32")", ret.cbAtrLen);
+			ret.cbAtrLen = 32;
+		}
+
 	}
 
 	smartcard_trace_status_return(smartcard, &ret, FALSE);
@@ -1188,6 +1195,11 @@ static LONG smartcard_StatusW_Decode(SMARTCARD_DEVICE* smartcard, SMARTCARD_OPER
 	if ((status = smartcard_unpack_status_call(smartcard, irp->input, call)))
 		WLog_ERR(TAG, "smartcard_unpack_status_call failed with error %"PRId32"", status);
 
+	/*
+	 * cbAtrLen is unused and should be ignored upon receipt according to MS-RDPESC 2.2.2.18
+	 * set it to the maximum value possible
+	 */
+	call->cbAtrLen = 32;
 	smartcard_trace_status_call(smartcard, call, TRUE);
 	operation->hContext = smartcard_scard_context_native_from_redir(smartcard, &(call->hContext));
 	operation->hCard = smartcard_scard_handle_native_from_redir(smartcard, &(call->hCard));
@@ -1204,19 +1216,16 @@ static LONG smartcard_StatusW_Call(SMARTCARD_DEVICE* smartcard, SMARTCARD_OPERAT
 	Status_Call* call = operation->call;
 	DWORD cbAtrLen;
 
-	if (call->cbAtrLen > 32)
-		call->cbAtrLen = 32;
-
 	if (call->fmszReaderNamesIsNULL)
 		cchReaderLen = 0;
 	else
 		cchReaderLen = SCARD_AUTOALLOCATE;
 
-	cbAtrLen = call->cbAtrLen;
+	ret.cbAtrLen = 32;
 	ZeroMemory(ret.pbAtr, 32);
 	status = ret.ReturnCode = SCardStatusW(operation->hCard,
 	                                       call->fmszReaderNamesIsNULL ? NULL : (LPWSTR) &mszReaderNames,
-	                                       &cchReaderLen, &ret.dwState, &ret.dwProtocol, (BYTE*) &ret.pbAtr, &cbAtrLen);
+	                                       &cchReaderLen, &ret.dwState, &ret.dwProtocol, (BYTE*) &ret.pbAtr, &ret.cbAtrLen);
 
 	if (status == SCARD_S_SUCCESS)
 	{
@@ -1231,8 +1240,11 @@ static LONG smartcard_StatusW_Call(SMARTCARD_DEVICE* smartcard, SMARTCARD_OPERAT
 		ret.cBytes = cchReaderLen;
 #endif
 
-		if (call->cbAtrLen)
-			ret.cbAtrLen = cbAtrLen;
+		if (ret.cbAtrLen > 32)
+		{
+			WLog_WARN(TAG, "smartcard_StatusW_Call cbAtrLen > 32 (%"PRId32")", ret.cbAtrLen);
+			ret.cbAtrLen = 32;
+		}
 	}
 
 	smartcard_trace_status_return(smartcard, &ret, TRUE);
@@ -1404,7 +1416,7 @@ static LONG smartcard_GetAttrib_Call(SMARTCARD_DEVICE* smartcard, SMARTCARD_OPER
 
 	if (ret.ReturnCode)
 	{
-		WLog_WARN(TAG, "SCardGetAttrib: %s (0x%08"PRIX32") cbAttrLen: %"PRIu32"",
+		WLog_DBG(TAG, "SCardGetAttrib: %s (0x%08"PRIX32") cbAttrLen: %"PRIu32"",
 		          SCardGetAttributeString(call->dwAttrId), call->dwAttrId, call->cbAttrLen);
 		Stream_Zero(irp->output, 256);
 		free(ret.pbAttr);
@@ -2108,7 +2120,8 @@ LONG smartcard_irp_device_control_call(SMARTCARD_DEVICE* smartcard, SMARTCARD_OP
 	}
 
 	if ((result != SCARD_S_SUCCESS) && (result != SCARD_E_TIMEOUT) &&
-	    (result != SCARD_E_NO_READERS_AVAILABLE) && (result != SCARD_E_NO_SERVICE))
+	    (result != SCARD_E_NO_READERS_AVAILABLE) && (result != SCARD_E_NO_SERVICE) &&
+		(result != SCARD_E_UNSUPPORTED_FEATURE))
 	{
 		WLog_WARN(TAG, "IRP failure: %s (0x%08"PRIX32"), status: %s (0x%08"PRIX32")",
 		          smartcard_get_ioctl_string(ioControlCode, TRUE), ioControlCode,
